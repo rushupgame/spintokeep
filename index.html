@@ -3,18 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Découvrez Spin To Keep, la solution n°1 pour commerçants : collectez massivement des avis Google, générez des leads et fidélisez grâce à une roue de la fortune via QR Code.">
-    <meta name="keywords" content="Roue de la fortune en ligne, collecter avis Google, QR code commerce, fidélisation client, outil CRM RGPD, augmenter ses avis, jeu concours boutique, SEO local, marketing point de vente, récolter avis positifs">
+    <meta name="description" content="Plateforme B2B d'animation commerciale : collectez des avis Google, likes et contacts qualifiés via des jeux interactifs (Roue de la fortune, Bandit Manchot, Cartes à gratter).">
+    <meta name="keywords" content="Roue de la fortune commerce, Bandit manchot digital, jeu concours point de vente, collecter avis Google, QR code avis clients, CRM local, gamification marketing, machine a sous digitale commerce">
     <meta name="author" content="Spin To Keep">
     <meta name="robots" content="index, follow">
     
+    <!-- Favicon Emoji 🎰 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+
     <!-- Open Graph for Social Media -->
-    <meta property="og:title" content="Spin To Keep | Collecte d'Avis Google & Fidélisation Client">
-    <meta property="og:description" content="Transformez votre point de vente en machine à récolter des avis positifs et des emails avec notre outil interactif 100% personnalisable.">
+    <meta property="og:title" content="Spin To Keep | Gamification Commerce & Collecte d'Avis Google">
+    <meta property="og:description" content="Transformez votre point de vente grâce à des jeux interactifs (Roue, Bandit Manchot) et boostez vos avis Google et votre base CRM.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.spintokeep.com">
     
-    <title>Spin To Keep | Collecte d'Avis Google, CRM & Fidélisation par QR Code</title>
+    <!-- Données structurées SEO (Schema.org JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Spin To Keep",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "9.90",
+        "priceCurrency": "EUR"
+      },
+      "description": "Plateforme SaaS d'animation commerciale et de collecte d'avis Google par gamification (Roue de la fortune, Bandit Manchot)."
+    }
+    </script>
+    
+    <title>Spin To Keep | Jeux Concours Commerce, Avis Google & CRM par QR Code</title>
     
     <!-- Librairies pour le Configurateur -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -351,11 +371,28 @@
         .screen-mockup h4, .screen-mockup p, .screen-mockup h5, .screen-mockup span, .client-card h2, .client-card h3, .client-card p, .client-card span { color: var(--text-color); position: relative; z-index: 2; }
         .delete-bg { position: absolute; top: 5px; right: 5px; background: #ff4d4d; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 20px; padding: 0; }
 
+        /* CALCULATOR STYLES */
+        .calculator-card { background: #fff; border-radius: 24px; padding: 3rem; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); position: relative; max-width: 900px; margin: 0 auto; }
+        .slider-container { margin: 2rem 0; padding: 1.5rem; background: var(--bg-secondary); border-radius: 16px; }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .slider-value { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
+        input[type="range"].styled-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 8px; background: #ddd; border-radius: 4px; outline: none; }
+        input[type="range"].styled-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-color); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 3px solid #fff; }
+        .results-grid-calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .result-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem 1rem; text-align: center; transition: transform 0.2s; }
+        .result-box:hover { transform: translateY(-5px); }
+        .result-box.dark { background: #1d1d1f; border-color: #1d1d1f; }
+        .result-number { font-size: 2.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .result-number.accent { color: var(--accent-color); }
+        .result-label { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.5px; }
+
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .footer-content { grid-template-columns: 1fr; }
             .seo-block { padding: 2rem 1.5rem; }
             .modal-content { padding: 2rem 1.5rem; margin: 10% auto; }
+            .calculator-card { padding: 2rem 1rem; }
+            .slider-header { flex-direction: column; align-items: flex-start; gap: 10px; }
         }
     </style>
 </head>
@@ -389,10 +426,10 @@
     <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 4rem;">
         <h1>Décuplez vos <span class="highlight">Avis Google</span> et fidélisez en point de vente.</h1>
         <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
-            Transformez votre comptoir en véritable machine à collecter des avis, des likes et des emails grâce à un jeu de roulette 100% personnalisable à votre image.
+            Transformez votre comptoir en véritable machine à collecter des avis, des likes et des emails grâce à des jeux concours 100% personnalisables à votre image (Roue de la fortune, Bandit Manchot, Cartes à gratter).
         </p>
         <div class="text-center">
-            <a href="#tarifs" class="btn hover-effect">Créer ma roue personnalisée</a>
+            <a href="#tarifs" class="btn hover-effect">Créer mon jeu personnalisé</a>
             <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">Testez gratuitement • Configuration en 1 minute</p>
         </div>
     </section>
@@ -409,14 +446,14 @@
     <section id="concept">
         <h2>Un concept simple et ludique pour votre commerce</h2>
         <p class="text-center" style="margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-            Finis les flyers ignorés ! En gamifiant l'expérience client à la caisse, vous supprimez la friction et incitez naturally à l'action.
+            Finis les flyers ignorés ! En gamifiant l'expérience client à la caisse (Roues interactives, Bandit Manchot), vous supprimez la friction et incitez naturellement à l'action.
         </p>
         
         <div class="grid-4">
             <div class="card hover-effect">
                 <span class="card-icon">🎨</span>
-                <h3>1. Créez votre roue en 1 min</h3>
-                <p>Personnalisez les cadeaux, les couleurs et les règles de votre jeu concours en quelques clics, directement en ligne.</p>
+                <h3>1. Créez votre jeu en 1 min</h3>
+                <p>Personnalisez vos cadeaux, couleurs, logos et règles de jeu en quelques clics, directement en ligne.</p>
             </div>
             <div class="card hover-effect">
                 <span class="card-icon">📲</span>
@@ -424,9 +461,9 @@
                 <p>Exposez-le avec votre client à la caisse ou à l'accueil de votre commerce de proximité via une PLV ou une tablette.</p>
             </div>
             <div class="card hover-effect">
-                <span class="card-icon">🎡</span>
+                <span class="card-icon">🎰</span>
                 <h3>3. Vos clients jouent</h3>
-                <p>Ils s'amusent et gagnent des cadeaux immédiats. En échange, vous récupérez leurs contacts qualifiés (nom, tel, email).</p>
+                <p>Ils s'amusent (roue, machine à sous) et gagnent des cadeaux immédiats. En échange, vous récupérez leurs contacts (nom, tel, email).</p>
             </div>
             <div class="card hover-effect">
                 <span class="card-icon">⭐👍</span>
@@ -580,7 +617,7 @@
                 </details>
 
                 <details>
-                    <summary id="sum-actions">✅ Actions clients avant la roue</summary>
+                    <summary id="sum-actions">✅ Actions clients avant le jeu</summary>
                     <label id="lbl-google-url">URL de destination (Google, Insta...) :</label>
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </details>
@@ -659,19 +696,19 @@
     <!-- ENJEUX SEO LOCAL (Text Blocks optimisés SEO) -->
     <div id="enjeux-seo" class="bg-gray">
         <div class="container">
-            <h2>Pourquoi la collecte d'avis est vitale pour votre SEO Local ?</h2>
+            <h2>Pourquoi la collecte d'avis par jeux interactifs est vitale pour votre SEO Local ?</h2>
             
             <article class="seo-block">
-                <h3>Dominez les résultats de recherche Google grâce aux avis clients</h3>
+                <h3>Dominez les résultats de recherche Google grâce à la gamification</h3>
                 <p>Aujourd'hui, <strong>plus de 90% des consommateurs</strong> consultent les avis en ligne avant de se rendre dans un établissement physique. Votre fiche Google My Business (Google Profil d'Entreprise) est votre première vitrine. Obtenir un flux constant de <strong>nouveaux avis Google positifs 5 étoiles ⭐⭐⭐⭐⭐</strong> est le signal le plus puissant pour l'algorithme de référencement local.</p>
-                <p>Avec notre solution de <em>roulette personnalisée via QR Code</em>, vous ne subissez plus les avis négatifs aléatoires : vous provoquez pro-activement les avis de vos clients satisfaits directement sur le lieu de vente, à l'instant où leur satisfaction est la plus haute.</p>
+                <p>Avec nos mécanismes ludiques via QR Code (<em>Roue de la fortune, Bandit Manchot, Machines à sous digitales</em>), vous ne subissez plus les avis négatifs aléatoires : vous provoquez pro-activement les avis de vos clients satisfaits directement sur le lieu de vente, à l'instant où leur satisfaction est la plus haute.</p>
             </article>
 
             <article class="seo-block">
                 <h3>Créez une base de données client (CRM) qualifiée et RGPD</h3>
-                <p>La pérennité de votre commerce ne dépend pas seulement de l'acquisition de nouveaux clients, mais de la <strong>fidélisation</strong>. En scannant le QR code pour participer à votre jeu concours en boutique, le client accepte de vous partager ses coordonnées (Opt-in).</p>
+                <p>La pérennité de votre commerce ne dépend pas seulement de l'acquisition de nouveaux clients, mais de la <strong>fidélisation</strong>. En scannant le QR code pour participer à votre animation interactive en boutique, le client accepte de vous partager ses coordonnées (Opt-in).</p>
                 <ul>
-                    <li><strong>Zéro papier :</strong> Remplacez les vieux carnets de tombola et les formulaires illisibles par une solution digitale fiable.</li>
+                    <li><strong>Zéro papier :</strong> Remplacez les vieux carnets de tombola et les formulaires illisibles par une solution digitale captivante.</li>
                     <li><strong>Marketing direct :</strong> Exportez instantanément votre base au format Excel (CSV) 🖥️.</li>
                     <li><strong>Fidélisation active :</strong> Utilisez ces données pour envoyer des newsletters ciblées, des promotions par SMS pour les anniversaires ou des invitations à vos ventes privées.</li>
                 </ul>
@@ -680,17 +717,58 @@
         </div>
     </div>
 
+    <!-- NOUVEAU BLOC ROI CALCULATEUR -->
+    <section id="calculateur-roi" style="padding-top: 4rem; padding-bottom: 4rem;">
+        <div class="calculator-card hover-effect animate-up">
+            <h3 style="text-align: center; font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--text-primary);">Combien Spin To Keep vous rapporte vraiment ?</h3>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                L'intérêt d'offrir un cadeau (un café, un -10%), c'est que le client <strong>revient pour le consommer</strong>.
+            </p>
+
+            <div class="slider-container">
+                <div class="slider-header">
+                    <label for="customers-slider" style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary);">Combien de clients par jour passent chez vous ?</label>
+                    <div class="slider-value"><span id="slider-val">100</span> / jour</div>
+                </div>
+                <input type="range" id="customers-slider" class="styled-slider" min="10" max="500" value="100" step="10">
+            </div>
+
+            <div class="results-grid-calc">
+                <div class="result-box">
+                    <div class="result-number accent" id="res-avis">+ 45</div>
+                    <div class="result-label">AVIS GOOGLE CERTIFIÉS<br><span style="font-size:0.75rem; font-weight:normal; text-transform: lowercase;">/ mois</span></div>
+                </div>
+                <div class="result-box">
+                    <div class="result-number accent" id="res-crm">+ 150</div>
+                    <div class="result-label">CONTACTS CRM COLLECTÉS<br><span style="font-size:0.75rem; font-weight:normal; text-transform: lowercase;">/ mois</span></div>
+                </div>
+                <div class="result-box dark">
+                    <div class="result-number" id="res-return" style="color: #ffffff;">+ 80</div>
+                    <div class="result-label" style="color: #d2d2d7;">CLIENTS FIDÉLISÉS DE RETOUR<br><span style="font-size:0.75rem; font-weight:normal; text-transform: lowercase;">ce mois-ci</span></div>
+                </div>
+            </div>
+
+            <p style="text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 2rem; font-style: italic;">
+                *On estime que près de 55% des gagnants d'une animation promotionnelle reviennent utiliser leur lot dans les 30 jours (Sources de l'industrie retail : LSA, A3 Distrib, NielsenIQ).
+            </p>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#tarifs" class="btn hover-effect" style="font-size: 1.2rem; padding: 16px 40px;">Créer mon jeu personnalisé ➡️</a>
+            </div>
+        </div>
+    </section>
+
     <!-- FONCTIONNALITÉS & OUTILS -->
     <section id="fonctionnalites">
         <h2>Les fonctionnalités de notre plateforme d'animation</h2>
         <p class="text-center" style="max-width: 900px; margin: 0 auto 3rem;">
-            Notre plateforme transforme la récolte d'avis en une expérience ludique grâce à une roue de la fortune entièrement paramétrable aux couleurs de votre enseigne. Gérez vos lots et automatisez votre marketing de point de vente.
+            Notre plateforme transforme la récolte d'avis en une expérience divertissante grâce à des jeux entièrement paramétrables aux couleurs de votre enseigne. Gérez vos lots et automatisez votre marketing de point de vente.
         </p>
         
         <div class="grid-3">
             <div class="card hover-effect">
                 <h3>🎨 Personnalisation visuelle</h3>
-                <p>Intégrez votre propre logo et vos codes couleurs pour une roue parfaitement alignée sur l'identité de votre marque (branding).</p>
+                <p>Intégrez votre propre logo et vos codes couleurs pour des jeux parfaitement alignés sur l'identité de votre marque (branding).</p>
             </div>
             <div class="card hover-effect">
                 <h3>🎁 Éditeur de lots intuitif</h3>
@@ -817,7 +895,6 @@
                     <li>✔️ <strong>Personnalisation totale</strong> (design et URL de destination)</li>
                     <li>✔️ <strong>Choix illimité</strong> des lots et probabilités</li>
                     <li>✔️ <strong>CRM complet</strong> et export de base clients</li>
-                    <li>✔️ <strong>Volume de création</strong> de campagnes illimité</li>
                     <li>✔️ <strong>Configuration instantanée</strong> en 1 minute</li>
                 </ul>
 
@@ -856,15 +933,15 @@
             
             <details>
                 <summary>Comment fonctionne exactement Spin To Keep pour mon commerce ?</summary>
-                <p>C’est très simple. Notre plateforme vous permet de transformer la récolte fastidieuse d'avis clients en un jeu interactif très ludique. Vous concevez une roue de la fortune digitale en quelques clics, paramétrez vos lots à gagner (remises, goodies), et vous exposez votre QR code imprimé en boutique. Pour tenter leur chance, vos clients scannent le code avec l'appareil photo de leur smartphone. Après avoir joué, ils sont automatiquement redirigés vers vos pages d’avis (Google Profil d'Entreprise, Instagram, etc.).</p>
+                <p>C’est très simple. Notre plateforme vous permet de transformer la récolte fastidieuse d'avis clients en un jeu interactif très ludique. Vous concevez votre jeu digital (Roue, Bandit Manchot) en quelques clics, paramétrez vos lots à gagner (remises, goodies), et vous exposez votre QR code imprimé en boutique. Pour tenter leur chance, vos clients scannent le code avec leur smartphone. Après avoir joué, ils sont automatiquement redirigés vers vos pages d’avis (Google Profil d'Entreprise, Instagram, etc.).</p>
             </details>
             <details>
                 <summary>Est-ce que cet outil m'aide vraiment à obtenir plus d'avis Google positifs ?</summary>
                 <p>Oui, de façon très massive. Le principal frein d'un client satisfait pour laisser un avis est le manque de motivation ou tout simplement l'oubli une fois rentré chez lui. En transformant cette action en un jeu avec une récompense immédiate et tangible (un café offert, -10% de remise, un accessoire gratuit), vous multipliez par 5 en moyenne votre taux de conversion pour la collecte d'avis.</p>
             </details>
             <details>
-                <summary>Puis-je personnaliser le design de ma roue promotionnelle ?</summary>
-                <p>Tout à fait. Pour que l'expérience digitale soit parfaitement cohérente avec votre image de marque physique, notre éditeur vous permet d'importer facilement votre logo et de modifier précisément les couleurs des segments de la roue et des boutons pour qu'ils correspondent à 100% à votre charte graphique.</p>
+                <summary>Puis-je personnaliser le design de mes jeux promotionnels ?</summary>
+                <p>Tout à fait. Pour que l'expérience digitale soit parfaitement cohérente avec votre image de marque physique, notre éditeur vous permet d'importer facilement votre logo et de modifier précisément les couleurs des jeux et des boutons pour qu'ils correspondent à 100% à votre charte graphique.</p>
             </details>
             <details>
                 <summary>Combien de temps prend la configuration du jeu concours ?</summary>
@@ -872,15 +949,15 @@
             </details>
             <details>
                 <summary>Sur quelles plateformes puis-je rediriger mes clients gagnants ?</summary>
-                <p>Vous avez une totale liberté. Vous pouvez bien sûr configurer la roue pour rediriger vers votre fiche Google My Business (pour le référencement local SEO), mais aussi vers vos comptes Instagram, TikTok, la page Facebook de votre boutique, ou même votre page TripAdvisor si vous êtes un restaurant.</p>
+                <p>Vous avez une totale liberté. Vous pouvez bien sûr configurer le jeu pour rediriger vers votre fiche Google My Business (pour le référencement local SEO), mais aussi vers vos comptes Instagram, TikTok, la page Facebook de votre boutique, ou même votre page TripAdvisor si vous êtes un restaurant.</p>
             </details>
             <details>
                 <summary>Quel est le tarif réel du service ? Y a-t-il des frais cachés ?</summary>
-                <p>Nous proposons un accès complet à notre plateforme SaaS pour un tarif unique et transparent de 9,90€ TTC par mois. Contrairement à d'autres solutions sur le marché, il n'y a aucun abonnement caché ni aucun frais de mise en service. Une fois le paiement validé, vous avez immédiatement accès à tous les outils pour lancer vos campagnes en illimité.</p>
+                <p>Nous proposons un accès complet à notre plateforme SaaS pour un tarif unique et transparent de 9,90€ TTC par mois. Contrairement à d'autres solutions sur le marché, il n'y a aucun abonnement caché ni aucun frais de mise en service. Une fois le paiement validé, vous avez immédiatement accès à tous les outils pour lancer vos campagnes.</p>
             </details>
             <details>
                 <summary>Comment les clients récupèrent-ils concrètement leurs cadeaux ?</summary>
-                <p>Lorsqu'un client gagne suite à la rotation de la roue, son résultat (et son code ID unique) s'affiche sur son téléphone. Il lui suffit de présenter son écran en caisse. Vous pouvez valider le gain très rapidement en vérifiant l'écran, ce qui permet d'éviter toute fraude.</p>
+                <p>Lorsqu'un client gagne suite au jeu, son résultat (et son code ID unique) s'affiche sur son téléphone. Il lui suffit de présenter son écran en caisse. Vous pouvez valider le gain très rapidement en vérifiant l'écran, ce qui permet d'éviter toute fraude.</p>
             </details>
             <details>
                 <summary>Ai-je besoin de compétences techniques ou informatiques particulières ?</summary>
@@ -934,7 +1011,7 @@
         
         <h3>1. Objet</h3>
         <p>Les présentes Conditions Générales d'Utilisation (ci-après "CGU") régissent l'utilisation de la plateforme Spin To Keep (ci-après "la Plateforme" ou "le Service"), éditée par Spin To Keep (ci-après "nous", "notre").</p>
-        <p>La Plateforme permet aux commerçants (ci-après "Utilisateurs" ou "vous") de créer et gérer des campagnes de roues cadeaux interactives pour engager leurs clients et générer des avis en ligne.</p>
+        <p>La Plateforme permet aux commerçants (ci-après "Utilisateurs" ou "vous") de créer et gérer des campagnes de jeux concours interactifs (roues, bandit manchot) pour engager leurs clients et générer des avis en ligne.</p>
         
         <h3>2. Acceptation des CGU</h3>
         <p>L'utilisation de la Plateforme implique l'acceptation pleine et entière des présentes CGU. L'accès au service est conditionné par le paiement préalable du prix de vente.</p>
@@ -948,7 +1025,7 @@
         <h3>3. Description du Service</h3>
         <p><strong>3.1 Fonctionnalités principales :</strong></p>
         <ul>
-            <li>Création et gestion de campagnes de roues cadeaux personnalisées.</li>
+            <li>Création et gestion de campagnes de jeux concours interactifs personnalisés.</li>
             <li>Configuration des cadeaux, probabilités et règles du jeu.</li>
             <li>Collecte d'avis sur diverses plateformes (Google, Instagram, TikTok, etc.).</li>
             <li>Génération de QR codes et liens de partage.</li>
@@ -971,10 +1048,10 @@
         </ul>
         
         <h3>6. Propriété Intellectuelle</h3>
-        <p>La structure générale de la plateforme Spin To Keep, ainsi que les textes, graphismes, images et sons la composant, sont la propriété de l'éditeur. Toute représentation et/ou reproduction et/ou exploitation partielle ou totale des contenus sans autorisation préalable est strictly interdite.</p>
+        <p>La structure générale de la plateforme Spin To Keep, ainsi que les textes, graphismes, images et sons la composant, sont la propriété de l'éditeur. Toute représentation et/ou reproduction et/ou exploitation partielle ou totale des contenus sans autorisation préalable est strictement interdite.</p>
         
         <h3>7. Protection des Données (RGPD)</h3>
-        <p>La collecte et le traitement de vos données sont régis par notre Politique de Confidentialité. En tant que commerçant, vous êtes responsable de la gestion des données de vos propres clients collectées via la roue cadeau et vous vous engagez à respecter la réglementation RGPD en vigueur.</p>
+        <p>La collecte et le traitement de vos données sont régis par notre Politique de Confidentialité. En tant que commerçant, vous êtes responsable de la gestion des données de vos propres clients collectées via le jeu concours et vous vous engagez à respecter la réglementation RGPD en vigueur.</p>
         
         <h3>8. Responsabilité</h3>
         <p>Nous ne saurions être tenus responsables :</p>
@@ -1004,13 +1081,13 @@
         <p>Nous collectons deux types de données :</p>
         <ul>
             <li><strong>Données des Utilisateurs (Commerçants) :</strong> Nom, email, informations de facturation et données de connexion lors de la création de votre compte sur notre plateforme.</li>
-            <li><strong>Données des Participants (Vos clients) :</strong> Lorsqu'un client joue à votre roue cadeau, les données collectées (souvent email, prénom, ou numéro de téléphone) le sont pour votre compte. Vous êtes le responsable de traitement de ces données, et nous agissons en tant que sous-traitant.</li>
+            <li><strong>Données des Participants (Vos clients) :</strong> Lorsqu'un client joue à votre jeu concours, les données collectées (souvent email, prénom, ou numéro de téléphone) le sont pour votre compte. Vous êtes le responsable de traitement de ces données, et nous agissons en tant que sous-traitant.</li>
         </ul>
 
         <h3>2. Utilisation des données</h3>
         <p>Les données collectées servent exclusivement à :</p>
         <ul>
-            <li>Fournir et maintenir le Service de roue interactive.</li>
+            <li>Fournir et maintenir le Service de jeux interactifs.</li>
             <li>Gérer les transactions et la facturation (via nos prestataires de paiement sécurisés).</li>
             <li>Assurer le support technique et améliorer l'expérience utilisateur.</li>
             <li>Permettre aux commerçants de gérer leurs fichiers clients et l'attribution des gains.</li>
@@ -1079,7 +1156,37 @@ window.onclick = function(event) {
     }
 }
 
+// ==========================================
+// SCRIPT ROI CALCULATOR
+// ==========================================
+const slider = document.getElementById('customers-slider');
+const valDisplay = document.getElementById('slider-val');
+const resAvis = document.getElementById('res-avis');
+const resCrm = document.getElementById('res-crm');
+const resReturn = document.getElementById('res-return');
+
+if(slider) {
+    slider.addEventListener('input', function() {
+        const clients = parseInt(this.value);
+        valDisplay.textContent = clients;
+
+        // Calculs dérivés (Proportionnels à 100 clients/jour)
+        const avis = Math.round(clients * 0.45);
+        const crm = Math.round(clients * 1.5);
+        const retours = Math.round(clients * 0.8);
+
+        // Affichage
+        resAvis.textContent = '+ ' + avis;
+        resCrm.textContent = '+ ' + crm;
+        resReturn.textContent = '+ ' + retours;
+    });
+    // Init values
+    slider.dispatchEvent(new Event('input'));
+}
+
+// ==========================================
 // SCRIPT DU CONFIGURATEUR DE ROULETTE
+// ==========================================
 const SB_URL = "https://drscbjrshjhupvrrzqec.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyc2NianJzaGpodXB2cnJ6cWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDM2NDUsImV4cCI6MjA4NTExOTY0NX0.t15POxBSoA0bmQ0WXEBN0sClGRtvxc1JKYGeaY65Y7g";
 
