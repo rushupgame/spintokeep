@@ -16,6 +16,12 @@
     
     <title>Spin To Keep | Collecte d'Avis Google, CRM & Fidélisation par QR Code</title>
     
+    <!-- Librairies pour le Configurateur -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         /* Variables Apple-like Design */
         :root {
@@ -29,6 +35,9 @@
             --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
             --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+
+            /* Variables Configurateur */
+            --bg: #f8f9fa; --black: #000000; --white: #ffffff; --yellow-border: #FFD700; --bulb-color: #FFD700; --bulb-size: 8px; --border-width: 13px; --text-color: #333333;
         }
 
         /* Base & Smooth Scroll */
@@ -64,12 +73,58 @@
         nav {
             display: flex; justify-content: space-between; align-items: center;
             width: 100%; max-width: 1200px;
+            position: relative;
         }
         .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
         .logo span { color: var(--accent-color); }
         .nav-links { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; }
         .nav-links a { text-decoration: none; color: var(--text-primary); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover { color: var(--accent-color); }
+
+        /* Hamburger Menu Icon */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 26px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+        .hamburger-btn span {
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Mobile Navigation */
+        @media (max-width: 768px) {
+            .hamburger-btn { display: flex; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: -2rem;
+                right: -2rem;
+                background-color: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--border-color);
+                padding: 1.5rem 2rem;
+                gap: 1.2rem;
+                box-shadow: var(--shadow-md);
+            }
+            .nav-links.active { display: flex; }
+            .hamburger-btn.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .hamburger-btn.active span:nth-child(2) { opacity: 0; }
+            .hamburger-btn.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        }
 
         /* Typography */
         h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; }
@@ -139,19 +194,168 @@
         .pricing-features li { padding: 1rem 0; border-bottom: 1px solid var(--border-color); font-size: 1.05rem; }
         .pricing-features li:last-child { border-bottom: none; }
 
+        /* PayPal Button Styling */
+        #paypal-button-container-P-16K40079FK484592LNF4PL2Q {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin: 20px 0;
+        }
+        #paypal-button-container-P-16K40079FK484592LNF4PL2Q > div {
+            width: 100%;
+            max-width: 500px;
+        }
+
         /* Footer & Legal */
         footer { background-color: #151516; color: #a1a1a6; padding: 5rem 2rem 3rem; font-size: 0.95rem; }
         .footer-content { max-width: 1200px; margin: 0 auto; display: grid; gap: 3rem; grid-template-columns: 1fr 1fr; }
         .footer-content h3 { color: #f5f5f7; margin-bottom: 1.5rem; font-size: 1.3rem; }
-        .footer-links a { color: #a1a1a6; text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.2s; }
-        .footer-links a:hover { color: #fff; }
+        .footer-links a, .modal-trigger { color: #a1a1a6; text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.2s; background: none; border: none; padding: 0; font: inherit; cursor: pointer; text-align: left; }
+        .footer-links a:hover, .modal-trigger:hover { color: #fff; text-decoration: underline; }
         .legal-text { max-width: 1200px; margin: 4rem auto 0; padding-top: 2rem; border-top: 1px solid #333; font-size: 0.85rem; text-align: center; line-height: 1.6; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: var(--bg-primary);
+            margin: 5% auto;
+            padding: 3rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+        }
+        .modal-content h2 { text-align: left; font-size: 2rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; }
+        .modal-content h3 { font-size: 1.2rem; margin-top: 1.5rem; color: var(--text-primary); }
+        .modal-content p, .modal-content li { font-size: 1rem; color: var(--text-primary); line-height: 1.6; }
+        .modal-content ul { padding-left: 1.5rem; }
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: var(--text-primary); }
+
+        /* CSS DU CONFIGURATEUR DE ROULETTE */
+        #loader-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff;
+            display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+        }
+        .loader {
+            width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #000000; border-radius: 50%;
+            animation: spin-loader 1s linear infinite;
+        }
+        @keyframes spin-loader { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .main-wrapper { display: none; flex-direction: column; gap: 20px; max-width: 1400px; margin: auto; padding: 10px; text-align: left; }
+        @media (min-width: 1100px) { 
+            .main-wrapper { flex-direction: row; align-items: flex-start; } 
+            .panel-config { order: 1; flex: 1.2; min-width: 550px; } 
+            .panel-preview { order: 2; flex: 2; } 
+        }
+        .panel { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        
+        .brand-colors { display: flex; gap: 20px; background: #f1f3f5; padding: 15px; border-radius: 12px; margin-bottom: 20px; align-items: center; justify-content: center; }
+        .color-input-group { text-align: center; }
+        .color-input-group input[type="color"] { 
+            width: 50px; height: 50px; border: 3px solid white; border-radius: 20%; cursor: pointer; background: none; padding: 0; box-shadow: 0 0 4px rgba(0,0,0,0.2); appearance: none; -webkit-appearance: none;
+        }
+        .color-input-group input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: none; }
+        .color-input-group div { font-size: 10px; margin-top: 5px; font-weight: bold; color: #666; }
+        
+        .lot-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-end; }
+        .input-wrapper { display: flex; flex-direction: column; gap: 4px; }
+        .mobile-label { display: none; font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; }
+
+        .panel input, .panel textarea, .panel select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
+        .ln { flex: 2; height: 40px; min-width: 0; width: 100%; } 
+        .lp { width: 70px; text-align: center; font-weight: bold; } 
+        .ls { width: 70px; text-align: center; } 
+        .lc { width: 45px; height: 40px; padding: 0; border: none; background: none; cursor: pointer; flex-shrink: 0; }
+
+        .labels-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 0.70em; font-weight: bold; color: #888; padding-right: 33px; text-align: center; }
+        .labels-row div { display: flex; align-items: center; justify-content: center; line-height: 1.1; }
+        .ln-label { flex: 2; } .lp-label { width: 70px; } .ls-label { width: 70px; } .lc-label { width: 45px; }
+
+        @media (max-width: 600px) {
+            .labels-row { display: none; }
+            .lot-row { flex-wrap: wrap; background: #fcfcfc; padding: 15px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 20px; gap: 12px; }
+            .input-wrapper { width: 100%; }
+            .input-wrapper.small { width: calc(50% - 6px); }
+            .input-wrapper.color { width: calc(33.33% - 8px); }
+            .mobile-label { display: block; }
+            .ln, .lp, .ls, .lc { width: 100% !important; }
+            .lc { border: 1px solid #ddd !important; border-radius: 8px; height: 35px; }
+        }
+
+        .full-width { width: 100%; box-sizing: border-box; margin-bottom: 12px; display: block; }
+        .panel label { font-weight: bold; font-size: 0.85em; color: #666; display: block; margin-bottom: 5px; text-align: left; }
+        .btn-black { background: var(--black) !important; color: white !important; border: none; padding: 15px 25px; border-radius: 50px; font-size: 16px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-add-container { text-align: right; margin: 10px 0 10px 0; }
+        .btn-add { background: var(--black); color: white; border: none; padding: 8px 15px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+        
+        #prob-info { background: #fffde7; padding: 12px; border-radius: 10px; border: 1px solid #ffe082; font-size: 13px; margin-bottom: 20px; color: #856404; line-height: 1.4; }
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .screen-mockup { border: 12px solid #222; border-radius: 35px; padding: 15px; background: #FAF9F6; min-height: 520px; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; max-width: 280px; margin: auto; background-size: cover; background-position: center; z-index: 1; }
+        .screen-mockup::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-color); z-index: -1; }
+        .screen-mockup::before { content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 18px; background: #222; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 11; }
+        .screen-label { font-size: 0.70em; font-weight: bold; color: #fff !important; background: #333; padding: 3px 10px; border-radius: 10px; margin-bottom: 15px; display: inline-block; position: relative; z-index: 12; }
+        
+        .wheel-container, .wheel-box { position: relative; margin: 20px auto; border: var(--border-width) solid var(--yellow-border); border-radius: 50%; box-shadow: 0 0 15px var(--yellow-border); animation: lights 1.5s infinite alternate; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+        .wheel-container { width: 220px; height: 220px; }
+        .wheel-box { width: 300px; height: 300px; }
+        .bulb { position: absolute; width: var(--bulb-size); height: var(--bulb-size); background: white; border-radius: 50%; z-index: 15; box-shadow: 0 0 5px white; animation: bulb-flash 0.6s infinite alternate; }
+
+        @keyframes bulb-flash { from { background: #fff; box-shadow: 0 0 2px #fff; } to { background: var(--bulb-color); box-shadow: 0 0 10px var(--bulb-color); } }
+        @keyframes lights { from { box-shadow: 0 0 10px var(--yellow-border), inset 0 0 5px var(--yellow-border); } to { box-shadow: 0 0 25px var(--yellow-border), inset 0 0 15px var(--yellow-border); border-color: #fff700; } }
+        #canvas-preview, #rc { transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); border-radius: 50%; display: block; }
+        
+        .pointer, .client-pointer { position: absolute; top: -23px; left: 50%; transform: translateX(-50%); width: 45px; height: 32px; background: #ff0000; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); border-radius: 20px 20px 0px 0px; z-index: 20; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        @keyframes pick-vibrate { 0% { transform: translateX(-50%) rotate(0deg); } 25% { transform: translateX(-50%) rotate(-10deg); } 50% { transform: translateX(-50%) rotate(0deg); } 75% { transform: translateX(-48%) rotate(10deg); } 100% { transform: translateX(-50%) rotate(0deg); } }
+        .vibrating { animation: pick-vibrate 0.2s infinite linear; transform-origin: top center;}
+        
+        .logo-center-preview { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; background: white; border: 2px solid #fff; object-fit: contain; z-index: 5; pointer-events: none; }
+        #qr-display { display:none; margin-top: 20px; text-align: center; background: #fff; padding: 25px; border: 2px dashed #000; border-radius: 15px; }
+        #qrcode-area { padding: 20px; background: white; display: inline-block; text-align: center; }
+        #qrcode { display: flex; justify-content: center; margin: 10px 0; padding: 10px; border: 2px solid #000; display: inline-block; }
+        .qr-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .btn-download { padding: 10px 20px; border-radius: 50px; cursor: pointer; font-size: 13px; font-weight: bold; border: 1px solid #000; background: white; }
+        .gain-box { margin-top:20px; border: 2px solid #000; padding: 15px; border-radius: 15px; background: #fff; }
+        .upload-wrapper { margin-bottom: 15px; padding: 15px; border: 2px dashed #ccc; border-radius: 12px; text-align: center; background: #fafafa; position: relative; }
+        #upload-status, #bg-upload-status { font-size: 12px; margin-top: 8px; font-weight: bold; }
+        .mock-form input { width: 100%; margin-bottom: 8px; padding: 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 5px; }
+        
+        .screen-mockup div[style*="background:white"], .screen-mockup .gain-box, .client-card { background: transparent !important; border: none !important; box-shadow: none !important; }
+        .screen-mockup h4, .screen-mockup p, .screen-mockup h5, .screen-mockup span, .client-card h2, .client-card h3, .client-card p, .client-card span { color: var(--text-color); position: relative; z-index: 2; }
+        .delete-bg { position: absolute; top: 5px; right: 5px; background: #ff4d4d; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 20px; padding: 0; }
 
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
-            .nav-links { display: none; } /* On mobile, a hamburger menu would typically go here */
             .footer-content { grid-template-columns: 1fr; }
             .seo-block { padding: 2rem 1.5rem; }
+            .modal-content { padding: 2rem 1.5rem; margin: 10% auto; }
         }
     </style>
 </head>
@@ -160,13 +364,22 @@
 <header>
     <nav>
         <a href="#accueil" class="logo">SpinToKeep<span>.</span></a>
-        <ul class="nav-links">
-            <li><a href="#concept">Comment ça marche</a></li>
-            <li><a href="#enjeux-seo">Pourquoi les Avis ?</a></li>
-            <li><a href="#fonctionnalites">Outil & CRM</a></li>
-            <li><a href="#secteurs">Secteurs</a></li>
-            <li><a href="#tarifs">Tarifs</a></li>
-            <li><a href="#faq">FAQ</a></li>
+        
+        <!-- Hamburger Button Mobile -->
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu principal">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="#concept" onclick="closeMenu()">Comment ça marche</a></li>
+            <li><a href="#configurateur" onclick="closeMenu()">Configurateur</a></li>
+            <li><a href="#enjeux-seo" onclick="closeMenu()">Pourquoi les Avis ?</a></li>
+            <li><a href="#fonctionnalites" onclick="closeMenu()">Outil & CRM</a></li>
+            <li><a href="#secteurs" onclick="closeMenu()">Secteurs</a></li>
+            <li><a href="#tarifs" onclick="closeMenu()">Tarifs</a></li>
+            <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
         </ul>
     </nav>
 </header>
@@ -196,7 +409,7 @@
     <section id="concept">
         <h2>Un concept simple et ludique pour votre commerce</h2>
         <p class="text-center" style="margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-            Finis les flyers ignorés ! En gamifiant l'expérience client à la caisse, vous supprimez la friction et incitez naturellement à l'action.
+            Finis les flyers ignorés ! En gamifiant l'expérience client à la caisse, vous supprimez la friction et incitez naturally à l'action.
         </p>
         
         <div class="grid-4">
@@ -219,6 +432,226 @@
                 <span class="card-icon">⭐👍</span>
                 <h3>4. Récoltez avis et likes</h3>
                 <p>Le participant est redirigé intelligemment pour laisser un avis Google, ou s'abonner à vos réseaux sociaux.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION CONFIGURATEUR DE ROULETTE INTERACTIF -->
+    <section id="configurateur" style="padding-top:2rem; padding-bottom: 2rem;">
+        <div id="loader-wrapper">
+            <div class="loader"></div>
+        </div>
+
+        <div class="main-wrapper" id="main-content">
+            <div class="panel panel-config">
+                <h2 id="conf-title">⚙️ Configuration de votre jeu 100% personnalisé :</h2>
+
+                <div style="margin-bottom: 20px; padding: 15px; background: #f1f3f5; border-radius: 12px;">
+                    <label id="lbl-lang">🌐 Choisir la langue du jeu :</label>
+                    <select id="game_lang" class="full-width" onchange="changeLanguage(this.value)">
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+                        <option value="ar">🇸🇦 العربية (Arabe)</option>
+                        <option value="pt">🇵🇹 Português</option>
+                        <option value="ru">🇷🇺 Русский (Russe)</option>
+                        <option value="zh">🇨🇳 中文 (Chinois)</option>
+                        <option value="ja">🇯🇵 日本語 (Japonais)</option>
+                        <option value="bn">🇧🇩 বাঙালি (Bengali)</option>
+                        <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Pendjabi)</option>
+                    </select>
+                </div>
+
+                <details open>
+                    <summary id="sum-logo">🖼️ Logo & branding</summary>
+                    <label id="lbl-logo-file">Personnaliser le jeu avec votre logo :</label>
+                    <div class="upload-wrapper">
+                        <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')">
+                        <div id="upload-status">Formats acceptés : PNG, JPG, WEBP</div>
+                    </div>
+                    <label id="lbl-logo-url">ou indiquer l’URL du logo si il est stocké en ligne :</label>
+                    <input type="text" id="logo_url" class="full-width" oninput="update()" value="https://drscbjrshjhupvrrzqec.supabase.co/storage/v1/object/public/logos/1770049092342-yourlogo.png">
+                </details>
+
+                <details>
+                    <summary id="sum-screen">🎨 Écrans & couleurs</summary>
+                    <label id="lbl-screen-cust">Personaliser les écrans de jeu (fond image et/ou couleur et couleur texte) :</label>
+                    <div class="upload-wrapper">
+                        <button class="delete-bg" onclick="document.getElementById('bg_url').value=''; update();" title="Supprimer l'image">×</button>
+                        <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')">
+                        <div id="bg-upload-status">Uploader votre image de fond : taille idéale 1080 x 1920 pixels (Format 9:16).</div>
+                    </div>
+                    <input type="text" id="bg_url" class="full-width" oninput="update()" value="https://drscbjrshjhupvrrzqec.supabase.co/storage/v1/object/public/logos/1770076221296-bg.jpg" placeholder="URL de l'image de fond">
+                    <div class="brand-colors">
+                        <div class="color-input-group">
+                            <input type="color" id="bg_color" value="#ffffff" oninput="update()">
+                            <div id="lbl-col-bg">COULEUR FOND</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="range" id="bg_opacity" min="0" max="1" step="0.1" value="0.4" oninput="update()" style="width: 60px; vertical-align: middle;">
+                            <div id="lbl-col-op">OPACITÉ FOND</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="color" id="text_color" value="#333333" oninput="update()">
+                            <div id="lbl-col-txt">COULEUR TEXTE</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="color" id="button_color" value="#000000" oninput="update()">
+                            <div id="lbl-col-btn">COULEUR BOUTONS</div>
+                        </div>
+                    </div>
+                </details>
+
+                <details>
+                    <summary id="sum-wheel">🎡 Design de la roue</summary>
+                    <label id="lbl-wheel-design">Design de la roue bordure et lumière :</label>
+                    <div class="brand-colors" style="flex-wrap: wrap;">
+                        <div class="color-input-group">
+                            <input type="color" id="wheel_border_color" value="#ff004c" oninput="update()">
+                            <div id="lbl-col-bord">COULEUR BORDURE</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="color" id="wheel_bulb_color" value="#FFD700" oninput="update()">
+                            <div id="lbl-col-bulb">COULEUR LUMIÈRES</div>
+                        </div>
+                        <div class="color-input-group">
+                            <input type="number" id="wheel_bulb_size" value="16" min="2" max="20" oninput="update()" style="width: 50px; padding: 5px;">
+                            <div id="lbl-size-bulb">TAILLE LUMIÈRES (px)</div>
+                        </div>
+                    </div>
+                    <label id="lbl-brand-quick">Configuration rapide des couleurs :</label>
+                    <div class="brand-colors">
+                        <div class="color-input-group">
+                            <input type="color" id="color1" value="#cdc7fc" oninput="updateAllLotsColors(this.value, 'bg')">
+                            <div id="lbl-col-def1">COULEUR DÉFAUT 1</div>
+                        </div>
+                        <div style="font-size: 20px;">🔄</div>
+                        <div class="color-input-group">
+                            <input type="color" id="color2" value="#fa879a" oninput="updateAllLotsColors(this.value, 'bg')">
+                            <div id="lbl-col-def2">COULEUR DÉFAUT 2</div>
+                        </div>
+                    </div>
+                </details>
+
+                <details>
+                    <summary id="sum-lots">🎁 Gestion lots & probabilités</summary>
+                    <label id="lbl-lots-cust">Personalisez le nom des lots et les probabilités : </label>
+                    <div class="labels-row">
+                        <div class="ln-label" id="lbl-row-name">NOM DU LOT</div>
+                        <div class="lp-label" id="lbl-row-prob">PROBABILITÉ %</div>
+                        <div class="ls-label" id="lbl-row-size">TAILLE TEXTE</div>
+                        <div class="lc-label" id="lbl-row-bg">FOND</div>
+                        <div class="lc-label" id="lbl-row-txt">TEXTE</div>
+                    </div>
+                    <div id="lots-inputs"></div>
+                    <div class="btn-add-container">
+                        <button class="btn-add" id="btn-add-lot" onclick="addLotRow('', 0, 12, '#000000', '#ffffff')"><span>+</span> rajouter un lot</button>
+                    </div>
+                    <div id="prob-info"></div>
+                </details>
+
+                <details id="details_texts">
+                    <summary id="sum-texts">📝 Textes & conditions</summary>
+                    <label id="lbl-txt-cust">Textes à personnaliser :</label>
+                    <input type="text" id="t1" class="full-width" value="Cadeaux à gagner ! ✨" oninput="update()">
+                    <input type="text" id="t2" class="full-width" value="Laissez un avis pour débloquer la roue. Voir conditions* dans votre point de vente." oninput="update()">
+                    <input type="text" id="t3" class="full-width" value="LAISSEZ UN AVIS" oninput="update()">
+                    <input type="text" id="t_wheel" class="full-width" value="Tournez la roue et tentez de gagner* de nombreux cadeaux !" oninput="update()">
+                    
+                    <label id="lbl-qr-scanner">Texte affiche QR (Scannez-moi) :</label>
+                    <input type="text" id="t_qr_scan" class="full-width" value="Scannez-moi" oninput="update()">
+
+                    <label id="lbl-form-fields">Champs & boutons (Formulaire) :</label>
+                    <input type="text" id="t_last_step" class="full-width" value="Dernière étape !" oninput="update()" placeholder="Titre formulaire">
+                    <input type="text" id="t_name" class="full-width" value="Nom complet" oninput="update()" placeholder="Placeholder Nom">
+                    <input type="text" id="t_email" class="full-width" value="Email" oninput="update()" placeholder="Placeholder Email">
+                    <input type="text" id="t_phone" class="full-width" value="Téléphone" oninput="update()" placeholder="Placeholder Téléphone">
+                    <input type="text" id="t_btn_validate" class="full-width" value="VALIDER ET JOUER" oninput="update()" placeholder="Texte bouton valider">
+                    
+                    <label id="lbl-end-msg">Boutons & messages de fin :</label>
+                    <input type="text" id="t_btn_spin" class="full-width" value="LANCEZ LA ROUE" oninput="update()" placeholder="Texte bouton lancer">
+                    <input type="text" id="t_thanks" class="full-width" value="Merci pour votre participation ! 🎉" oninput="update()" placeholder="Message merci">
+                    <input type="text" id="t_res_label" class="full-width" value="Résultat :" oninput="update()" placeholder="Texte avant résultat">
+
+                    <label id="lbl-cond-part">Conditions de participation :</label>
+                    <textarea id="t_cond" class="full-width" rows="6" oninput="update()">Si vous avez gagné, présenter cet écran à l’accueil. Le jeu est ouvert à toute personne physique majeure, sans obligation d’achat. La participation est strictement limitée à un seul lancer par personne. Les gains obtenus doivent être réclamés ou consommés immédiatement et ne peuvent être reportés à une date ultérieure en fonction des conditions. Les lots gagnés ne sont pas cumulables avec d'autres offres promotionnelles, réductions en cours dans l'établissement. Les lots sont proposés dans la limite des stocks disponibles. Les gains ne sont ni échangeables, ni remboursables en espèces. Vos données sont traitées pour la gestion du jeu.</textarea>
+                </details>
+
+                <details>
+                    <summary id="sum-actions">✅ Actions clients avant la roue</summary>
+                    <label id="lbl-google-url">URL de destination (Google, Insta...) :</label>
+                    <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
+                </details>
+
+                <button id="btn-gen" class="btn-black" style="width:100%; margin-top:20px;" onclick="saveAndGenerate()">Générer le QR Code</button>
+
+                <div id="qr-display">
+                    <div id="qrcode-area">
+                        <img id="qr-logo-top" src="" style="max-width: 150px; max-height: 80px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;" loading="lazy">
+                        <h3 id="qr-title" style="margin: 0; font-size: 22px; color: #000; font-weight: bold;">Cadeau à gagner ! ✨</h3>
+                        <p id="qr-scan-text" style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold; color: #333;">Scannez-moi</p>
+                        <div id="qrcode"></div>
+                        <p id="qr-id-display" style="font-family: monospace; font-weight: bold; margin-top: 5px; color: #555;"></p>
+                    </div>
+                    <div class="qr-actions">
+                        <button class="btn-download" id="btn-dl-png" onclick="downloadQR('png')">Télécharger PNG</button>
+                        <button class="btn-download" id="btn-dl-pdf" onclick="downloadQR('pdf')">Télécharger PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-preview">
+                <h2 id="prev-title">👁️ Aperçu du parcours client</h2>
+                <div class="preview-grid">
+                    <div class="screen-mockup" id="pre-s1">
+                        <span class="screen-label" id="stp1-lbl">Étape 1 : Avis</span>
+                        <div style="margin-top:40px;">
+                            <img id="pre-logo-pop" src="" style="max-width: 100px; margin-bottom: 15px;" loading="lazy">
+                            <div style="padding:15px;">
+                                <h4 id="pre-t1" style="margin:0 0 10px 0; font-size: 14px;"></h4>
+                                <p id="pre-t2" style="font-size:10px;"></p>
+                                <div class="btn-black" id="pre-t3" style="font-size:10px; padding:8px 15px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="screen-mockup" id="pre-s2">
+                        <span class="screen-label" id="stp2-lbl">Étape 2 : Formulaire</span>
+                        <div style="margin-top:30px; text-align: left; padding: 0 10px;">
+                            <h5 id="pre-t-last" style="margin: 0 0 10px 0; text-align: center;"></h5>
+                            <div class="mock-form">
+                                <input type="text" id="pre-ph-name" placeholder="" disabled="">
+                                <input type="text" id="pre-ph-email" placeholder="" disabled="">
+                                <input type="text" id="pre-ph-phone" placeholder="" disabled="">
+                                <div style="font-size: 9px; display: flex; gap: 5px; align-items: flex-start; margin-top: 10px;">
+                                    <input type="checkbox" checked="" style="width: auto;">
+                                    <span id="pre-rgpd-text"></span>
+                                </div>
+                                <div class="btn-black" id="pre-btn-val" style="font-size:10px; padding:10px; width: 100%; margin-top: 15px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="screen-mockup" id="pre-s3">
+                        <span class="screen-label" id="stp3-lbl">Étape 3 : Jeu</span>
+                        <h4 id="pre-twheel" style="margin: 10px 0; font-size: 14px;"></h4>
+                        <div class="wheel-container" id="preview-bulbs-container">
+                            <div class="pointer" id="pre-pointer"></div>
+                            <img id="pre-logo-wheel" src="" class="logo-center-preview" loading="lazy">
+                            <canvas id="canvas-preview" width="200" height="200"></canvas>
+                        </div>
+                        <div class="btn-black" id="pre-btn-spin" onclick="spinPreview()" style="font-size:10px; padding:10px 20px; width:150px;"></div>
+                    </div>
+                    <div class="screen-mockup" id="pre-s4">
+                        <span class="screen-label" id="stp4-lbl">Étape 4 : Résultat</span>
+                        <div class="gain-box" style="margin-top:30px;">
+                            <img id="pre-logo-gain" src="" style="max-width: 50px; margin-bottom: 10px;" loading="lazy">
+                            <h4 id="pre-t-thanks" style="margin:0; font-size: 13px;"></h4>
+                            <p style="font-size:12px; font-weight:bold; margin:10px 0;"><span id="pre-t-res"></span> <span id="preview-win-txt">[Nom du gain]</span></p>
+                            <p id="pre-cond" style="font-size:8px; border-top:1px solid rgba(0,0,0,0.1); padding-top:10px; margin-top:10px; text-align:justify; line-height:1.2;"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -365,7 +798,7 @@
         </div>
     </section>
 
-    <!-- PRICING SECTION (Plan Unique) -->
+    <!-- PRICING SECTION (Plan Unique avec Bouton PayPal officiel) -->
     <div id="tarifs" class="bg-gray">
         <div class="container">
             <h2>Des outils complets. Un tarif transparent.</h2>
@@ -377,7 +810,7 @@
                 <h3 style="font-size: 1.8rem; margin-bottom: 0;">Plan Premium Access</h3>
                 <div class="pricing-price">9,90 € <span>TTC / mois</span></div>
                 <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Sans engagement de durée</p>
-                <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 2rem;">Paiement 100% sécurisé via la technologie PayPal pour garantir la protection totale de vos informations bancaires. <em>(Aucun compte PayPal nécessaire pour régler par carte bancaire classique).</em></p>
+                <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">Paiement 100% sécurisé via PayPal. <em>(Aucun compte PayPal nécessaire pour régler par carte bancaire).</em></p>
                 
                 <ul class="pricing-features">
                     <li>✔️ <strong>Annulation facile</strong> en 1 clic</li>
@@ -387,8 +820,30 @@
                     <li>✔️ <strong>Volume de création</strong> de campagnes illimité</li>
                     <li>✔️ <strong>Configuration instantanée</strong> en 1 minute</li>
                 </ul>
-                <a href="#" class="btn" style="width: 100%; box-sizing: border-box; margin-top: 1rem;">Commencer la configuration</a>
-                <p style="font-size: 0.8rem; margin-top: 1.5rem;">La personnalisation de l'url de destination (vers l'action d'avis, de like, ou follow) est débloquée avec ce plan payant.</p>
+
+                <!-- PayPal Button Container Integration -->
+                <div id="paypal-button-container-P-16K40079FK484592LNF4PL2Q"></div>
+                <script src="https://www.paypal.com/sdk/js?client-id=Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+                <script>
+                  paypal.Buttons({
+                      style: {
+                          shape: 'rect',
+                          color: 'gold',
+                          layout: 'vertical',
+                          label: 'subscribe'
+                      },
+                      createSubscription: function(data, actions) {
+                        return actions.subscription.create({
+                          plan_id: 'P-16K40079FK484592LNF4PL2Q'
+                        });
+                      },
+                      onApprove: function(data, actions) {
+                        alert("ID de l'abonnement : " + data.subscriptionID);
+                      }
+                  }).render('#paypal-button-container-P-16K40079FK484592LNF4PL2Q');
+                </script>
+
+                <p style="font-size: 0.8rem; margin-top: 1.5rem;">La personnalisation de l'url de destination (vers l'action d'avis, de like, ou follow) est débloquée immédiatement avec cet abonnement.</p>
             </div>
         </div>
     </div>
@@ -429,7 +884,7 @@
             </details>
             <details>
                 <summary>Ai-je besoin de compétences techniques ou informatiques particulières ?</summary>
-                <p>Absolument aucune. Si vous savez utiliser un smartphone basique pour surfer sur internet, vous saurez utiliser Games Reviews / Spin To Keep. Nous générons de manière automatisée le QR code final que vous n'avez plus qu'à imprimer ou à afficher sur une tablette en caisse.</p>
+                <p>Absolument aucune. Si vous savez utiliser un smartphone basique pour surfer sur internet, vous saurez utiliser Spin To Keep. Nous générons de manière automatisée le QR code final que vous n'avez plus qu'à imprimer ou à afficher sur une tablette en caisse.</p>
             </details>
         </div>
     </section>
@@ -450,26 +905,860 @@
                 Pour toute demande commerciale ou technique, contactez-nous par e-mail :<br><br>
                 📩 <a href="mailto:contact@spintokeep.com" style="display: inline; color: #fff; font-weight: 600; font-size: 1.1rem; text-decoration: underline;">contact@spintokeep.com</a>
             </p>
-            <a href="#legal">Mentions Légales</a>
-            <a href="#legal">Conditions Générales de Vente (CGV)</a>
-            <a href="#legal">Politique de confidentialité (Gestion RGPD)</a>
+            <button class="modal-trigger" onclick="openModal('modal-cgu')">Conditions Générales d'Utilisation (CGU)</button>
+            <button class="modal-trigger" onclick="openModal('modal-confidentialite')">Politique de Confidentialité (RGPD)</button>
         </div>
     </div>
     
     <div id="legal" class="legal-text">
         <p><strong style="color: #fff; font-size: 1rem;">Mentions Légales & Hébergement</strong></p>
-        <p>GAMES REVIEWS / Spin To Keep<br>
+        <p>Spin To Keep<br>
         S.A.S au Capital de Ariary 2 100 000 Ar<br>
         NIF 3004082242 &nbsp;|&nbsp; RCS 2020B00582 &nbsp;|&nbsp; STAT N° 70202 11 2020 0 10628</p>
         <p>Siège social : LOT IVF 45 Behoririka, Antsiranana 201, Madagascar.<br>
         Territoires d'intervention : France, Belgique, Suisse, Madagascar.<br>
         Hébergement des bases de données : Les serveurs du site internet sont hébergés à Madagascar.</p>
         <p style="margin-top: 1.5rem; font-style: italic; color: #777;">
-            Conformément à la réglementation RGPD, toutes les données collectées (nom, téléphone, adresse électronique) le sont via un processus de consentement explicite (Opt-In). Vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles.
+            Conformément à la réglementation RGPD, toutes les données collectées (nom, téléphone, adresse électronique) le sont via un processus de consentement explicite (Opt-In). Vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles en nous écrivant à contact@spintokeep.com.
         </p>
         <p style="margin-top: 3rem; font-size: 0.75rem; color: #555;">&copy; 2026 Spin To Keep. Tous droits réservés.</p>
     </div>
 </footer>
+
+<!-- MODAL CGU -->
+<div id="modal-cgu" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('modal-cgu')">&times;</span>
+        <h2>Conditions Générales d'Utilisation</h2>
+        <p><strong>Dernière mise à jour : 2026</strong></p>
+        
+        <h3>1. Objet</h3>
+        <p>Les présentes Conditions Générales d'Utilisation (ci-après "CGU") régissent l'utilisation de la plateforme Spin To Keep (ci-après "la Plateforme" ou "le Service"), éditée par Spin To Keep (ci-après "nous", "notre").</p>
+        <p>La Plateforme permet aux commerçants (ci-après "Utilisateurs" ou "vous") de créer et gérer des campagnes de roues cadeaux interactives pour engager leurs clients et générer des avis en ligne.</p>
+        
+        <h3>2. Acceptation des CGU</h3>
+        <p>L'utilisation de la Plateforme implique l'acceptation pleine et entière des présentes CGU. L'accès au service est conditionné par le paiement préalable du prix de vente.</p>
+        <p>En vous inscrivant et en procédant à l'achat, vous déclarez :</p>
+        <ul>
+            <li>Avoir la capacité juridique pour contracter.</li>
+            <li>Agir dans le cadre de votre activité professionnelle.</li>
+            <li>Fournir des informations exactes et complètes.</li>
+        </ul>
+        
+        <h3>3. Description du Service</h3>
+        <p><strong>3.1 Fonctionnalités principales :</strong></p>
+        <ul>
+            <li>Création et gestion de campagnes de roues cadeaux personnalisées.</li>
+            <li>Configuration des cadeaux, probabilités et règles du jeu.</li>
+            <li>Collecte d'avis sur diverses plateformes (Google, Instagram, TikTok, etc.).</li>
+            <li>Génération de QR codes et liens de partage.</li>
+            <li>CRM intégré et statistiques détaillées.</li>
+        </ul>
+        <p><strong>3.2 Absence de période d'essai :</strong> Le Service ne propose pas de période d'essai gratuite. L'accès à l'intégralité des fonctionnalités de la Plateforme est activé après la validation du paiement de 9,90€.</p>
+        <p><strong>3.3 Disponibilité :</strong> Nous nous efforçons d'assurer une disponibilité de 99,5% du Service. Des interruptions peuvent survenir pour maintenance technique ou mises à jour nécessaires au bon fonctionnement de l'outil.</p>
+        
+        <h3>4. Tarifs et Paiement</h3>
+        <p><strong>4.1 Prix de vente :</strong> Le prix d'accès au service est fixé à 9,90€ (Hors Taxes ou TTC selon le régime fiscal applicable affiché lors du paiement).</p>
+        <p><strong>4.2 Modalités de paiement :</strong> Le paiement est effectué de manière sécurisée via les prestataires de paiement intégrés. L'accès au service est débloqué dès la confirmation de la transaction. Les factures sont disponibles et téléchargeables directement depuis votre espace client.</p>
+        <p><strong>4.3 Absence de remboursement :</strong> Compte tenu de la nature numérique du service et de l'accès immédiat aux fonctionnalités dès le paiement, aucun remboursement ne sera effectué après l'achat, conformément aux dispositions légales relatives aux contenus numériques.</p>
+        
+        <h3>5. Inscription et Obligations</h3>
+        <p>L'Utilisateur s'engage à :</p>
+        <ul>
+            <li>Maintenir la confidentialité de ses identifiants de connexion.</li>
+            <li>Ne pas utiliser le service à des fins frauduleuses (création de faux avis, etc.).</li>
+            <li>Respecter les conditions d'utilisation des plateformes tierces (Google, etc.) lors de la sollicitation d'avis.</li>
+        </ul>
+        
+        <h3>6. Propriété Intellectuelle</h3>
+        <p>La structure générale de la plateforme Spin To Keep, ainsi que les textes, graphismes, images et sons la composant, sont la propriété de l'éditeur. Toute représentation et/ou reproduction et/ou exploitation partielle ou totale des contenus sans autorisation préalable est strictly interdite.</p>
+        
+        <h3>7. Protection des Données (RGPD)</h3>
+        <p>La collecte et le traitement de vos données sont régis par notre Politique de Confidentialité. En tant que commerçant, vous êtes responsable de la gestion des données de vos propres clients collectées via la roue cadeau et vous vous engagez à respecter la réglementation RGPD en vigueur.</p>
+        
+        <h3>8. Responsabilité</h3>
+        <p>Nous ne saurions être tenus responsables :</p>
+        <ul>
+            <li>En cas d'interruption du réseau internet ou de bugs techniques indépendants de notre contrôle.</li>
+            <li>De l'utilisation illicite du service par l'Utilisateur.</li>
+            <li>Du contenu des campagnes créées par l'Utilisateur.</li>
+        </ul>
+        
+        <h3>9. Droit Applicable</h3>
+        <p>Les présentes CGU sont régies par le droit malgache. En cas de litige, les tribunaux malgaches seront seuls compétents.</p>
+        
+        <h3>10. Contact</h3>
+        <p>Pour toute question, vous pouvez nous contacter directement par e-mail à : <strong>contact@spintokeep.com</strong>.</p>
+    </div>
+</div>
+
+<!-- MODAL CONFIDENTIALITÉ -->
+<div id="modal-confidentialite" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('modal-confidentialite')">&times;</span>
+        <h2>Politique de Confidentialité</h2>
+        <p><strong>Dernière mise à jour : 2026</strong></p>
+        <p>La société Spin To Keep accorde une importance capitale à la protection de vos données personnelles et de celles de vos clients finaux.</p>
+
+        <h3>1. Collecte des données</h3>
+        <p>Nous collectons deux types de données :</p>
+        <ul>
+            <li><strong>Données des Utilisateurs (Commerçants) :</strong> Nom, email, informations de facturation et données de connexion lors de la création de votre compte sur notre plateforme.</li>
+            <li><strong>Données des Participants (Vos clients) :</strong> Lorsqu'un client joue à votre roue cadeau, les données collectées (souvent email, prénom, ou numéro de téléphone) le sont pour votre compte. Vous êtes le responsable de traitement de ces données, et nous agissons en tant que sous-traitant.</li>
+        </ul>
+
+        <h3>2. Utilisation des données</h3>
+        <p>Les données collectées servent exclusivement à :</p>
+        <ul>
+            <li>Fournir et maintenir le Service de roue interactive.</li>
+            <li>Gérer les transactions et la facturation (via nos prestataires de paiement sécurisés).</li>
+            <li>Assurer le support technique et améliorer l'expérience utilisateur.</li>
+            <li>Permettre aux commerçants de gérer leurs fichiers clients et l'attribution des gains.</li>
+        </ul>
+
+        <h3>3. Conservation des données</h3>
+        <p><strong>Données de compte :</strong> Conservées tant que votre compte est actif et jusqu'à 3 ans après notre dernier contact.</p>
+        <p><strong>Données des participants :</strong> Nous conservons les données des joueurs pour votre compte. En cas de résiliation, vous disposez de 30 jours pour exporter ces données avant leur suppression définitive de nos serveurs (sous réserve d'un délai légal de 3 mois pour purge complète).</p>
+
+        <h3>4. Partage des données à des tiers</h3>
+        <p>Nous ne vendons jamais vos données personnelles. Elles sont partagées uniquement avec nos prestataires de confiance nécessaires au fonctionnement du service (hébergement sécurisé et plateformes de traitement de paiement sécurisé pour votre achat de 9,90€).</p>
+
+        <h3>5. Cookies</h3>
+        <p>Nous utilisons des cookies essentiels pour :</p>
+        <ul>
+            <li>Maintenir votre session ouverte.</li>
+            <li>Mémoriser vos préférences de configuration.</li>
+            <li>Prévenir la fraude (vérification qu'un utilisateur ne joue pas plusieurs fois si vous avez activé cette option).</li>
+        </ul>
+
+        <h3>6. Vos Droits (RGPD)</h3>
+        <p>Conformément à la réglementation européenne, vous (et vos clients) disposez des droits suivants :</p>
+        <ul>
+            <li>Droit d'accès et de rectification.</li>
+            <li>Droit à l'effacement (« droit à l'oubli »).</li>
+            <li>Droit à la portabilité de vos données.</li>
+            <li>Droit d'opposition ou de limitation du traitement.</li>
+        </ul>
+        <p>Pour exercer ces droits, contactez-nous directement à : <strong>contact@spintokeep.com</strong>.</p>
+
+        <h3>7. Sécurité</h3>
+        <p>Nous mettons en œuvre des mesures techniques (chiffrement SSL, protocoles de sécurité avancés) pour protéger vos données contre tout accès non autorisé ou perte.</p>
+    </div>
+</div>
+
+<script>
+// Toggle Hamburger Menu Mobile
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const navMenu = document.getElementById('nav-menu');
+
+hamburgerBtn.addEventListener('click', () => {
+    hamburgerBtn.classList.toggle('active');
+    navMenu.classList.toggle('active');
+});
+
+function closeMenu() {
+    hamburgerBtn.classList.remove('active');
+    navMenu.classList.remove('active');
+}
+
+// Modals Handling
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = "block";
+    document.body.style.overflow = "hidden";
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+}
+
+// SCRIPT DU CONFIGURATEUR DE ROULETTE
+const SB_URL = "https://drscbjrshjhupvrrzqec.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyc2NianJzaGpodXB2cnJ6cWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDM2NDUsImV4cCI6MjA4NTExOTY0NX0.t15POxBSoA0bmQ0WXEBN0sClGRtvxc1JKYGeaY65Y7g";
+
+const uiTranslations = {
+    fr: {
+        confTitle: "⚙️ Configuration de votre jeu 100% personnalisé :",
+        lblLang: "🌐 Choisir la langue du jeu :",
+        sumLogo: "🖼️ Logo & branding",
+        lblLogoFile: "Personnaliser le jeu avec votre logo :",
+        lblLogoUrl: "ou indiquer l’URL du logo si il est stocké en ligne :",
+        sumScreen: "🎨 Écrans & couleurs",
+        lblScreenCust: "Personaliser les écrans de jeu (fond image et/ou couleur et couleur texte) :",
+        lblColBg: "COULEUR FOND",
+        lblColOp: "OPACITÉ FOND",
+        lblColTxt: "COULEUR TEXTE",
+        lblColBtn: "COULEUR BOUTONS",
+        sumWheel: "🎡 Design de la roue",
+        lblWheelDesign: "Design de la roue bordure et lumière :",
+        lblColBord: "COULEUR BORDURE",
+        lblColBulb: "COULEUR LUMIÈRES",
+        lblSizeBulb: "TAILLE LUMIÈRES (px)",
+        lblBrandQuick: "Configuration rapide des couleurs :",
+        lblColDef1: "COULEUR DÉFAUT 1",
+        lblColDef2: "COULEUR DÉFAUT 2",
+        sumLots: "🎁 Gestion lots & probabilités",
+        lblLotsCust: "Personalisez le nom des lots et les probabilités :",
+        lblRowName: "NOM DU LOT",
+        lblRowProb: "PROBABILITÉ %",
+        lblRowSize: "TAILLE TEXTE",
+        lblRowBg: "FOND",
+        lblRowTxt: "TEXTE",
+        btnAddLot: "+ rajouter un lot",
+        sumTexts: "📝 Textes & conditions",
+        lblTxtCust: "Textes à personnaliser :",
+        lblQrScanner: "Texte affiche QR (Scannez-moi) :",
+        lblFormFields: "Champs & boutons (Formulaire) :",
+        lblEndMsg: "Boutons & messages de fin :",
+        lblCondPart: "Conditions de participation :",
+        sumActions: "✅ Actions clients avant la roue",
+        lblGoogleUrl: "URL de destination (Google, Insta...) :",
+        btnGen: "Générer le QR Code",
+        btnDlPng: "Télécharger PNG",
+        btnDlPdf: "Télécharger PDF",
+        prevTitle: "👁️ Aperçu du parcours client",
+        stp1Lbl: "Étape 1 : Avis",
+        stp2Lbl: "Étape 2 : Formulaire",
+        stp3Lbl: "Étape 3 : Jeu",
+        stp4Lbl: "Étape 4 : Résultat",
+        qrScanDefault: "Scannez-moi"
+    },
+    en: {
+        confTitle: "⚙️ Configure your 100% personalized game:",
+        lblLang: "🌐 Choose game language:",
+        sumLogo: "🖼️ Logo & branding",
+        lblLogoFile: "Customize the game with your logo:",
+        lblLogoUrl: "or provide the logo URL if stored online:",
+        sumScreen: "🎨 Screens & Colors",
+        lblScreenCust: "Customize game screens (background and text):",
+        lblColBg: "BG COLOR",
+        lblColOp: "BG OPACITY",
+        lblColTxt: "TEXT COLOR",
+        lblColBtn: "BUTTON COLOR",
+        sumWheel: "🎡 Wheel Design",
+        lblWheelDesign: "Wheel border and lights design:",
+        lblColBord: "BORDER COLOR",
+        lblColBulb: "LIGHTS COLOR",
+        lblSizeBulb: "LIGHTS SIZE (px)",
+        lblBrandQuick: "Quick color configuration:",
+        lblColDef1: "DEFAULT COLOR 1",
+        lblColDef2: "DEFAULT COLOR 2",
+        sumLots: "🎁 Prizes & Probabilities",
+        lblLotsCust: "Customize prize names and probabilities:",
+        lblRowName: "PRIZE NAME",
+        lblRowProb: "PROBABILITY %",
+        lblRowSize: "TEXT SIZE",
+        lblRowBg: "BG",
+        lblRowTxt: "TEXT",
+        btnAddLot: "+ add a prize",
+        sumTexts: "📝 Texts & Conditions",
+        lblTxtCust: "Customizable texts:",
+        lblQrScanner: "QR Poster Text (Scan me):",
+        lblFormFields: "Fields & Buttons (Form):",
+        lblEndMsg: "End buttons & messages:",
+        lblCondPart: "Terms of participation:",
+        sumActions: "✅ Actions before spinning",
+        lblGoogleUrl: "Destination URL (Google, Insta...):",
+        btnGen: "Generate QR Code",
+        btnDlPng: "Download PNG",
+        btnDlPdf: "Download PDF",
+        prevTitle: "👁️ Customer Journey Preview",
+        stp1Lbl: "Step 1: Review",
+        stp2Lbl: "Step 2: Form",
+        stp3Lbl: "Step 3: Game",
+        stp4Lbl: "Step 4: Result",
+        qrScanDefault: "Scan me"
+    }
+};
+
+const translations = {
+    fr: { t1: "Cadeaux à gagner ! ✨", t2: "Laissez un avis pour débloquer la roue. Voir conditions* dans votre point de vente.", t3: "LAISSEZ UN AVIS", tw: "Tournez la roue et tentez de gagner* de nombreux cadeaux !", last: "Dernière étape !", name: "Nom complet", email: "Email", phone: "Téléphone", val: "VALIDER ET JOUER", spin: "LANCEZ LA ROUE", thx: "Merci pour votre participation ! 🎉", res: "Résultat :", cond: "Si vous avez gagné, présenter cet écran à l’accueil. Le jeu est ouvert à toute personne physique majeure, sans obligation d’achat. La participation est strictement limitée à un seul lancer par personne. Les gains obtenus doivent être réclamés ou consommés immédiatement et ne peuvent être reportés à une date ultérieure en fonction des conditions. Les lots gagnés ne sont pas cumulables avec d'autres offres promotionnelles, réductions en cours dans l'établissement. Les lots sont proposés dans la limite des stocks disponibles. Les gains ne sont ni échangeables, ni remboursables en espèces. Vos données sont traitées pour la gestion du jeu.", rgpd: "J'accepte que mes données soient collectées pour être recontacté si je gagne. J'accepte le règlement du jeu et l'utilisation de mes données pour ma participation. J'accepte également de recevoir des offres promotionnelles de l'établissement par email et téléphone.", qr: "Scannez-moi" },
+    en: { t1: "Gifts to win! ✨", t2: "Leave a review to unlock the wheel. See conditions* at your point of sale.", t3: "LEAVE A REVIEW", tw: "Spin the wheel and try to win* many gifts!", last: "Last step!", name: "Full Name", email: "Email", phone: "Phone", val: "VALIDATE AND PLAY", spin: "SPIN THE WHEEL", thx: "Thank you for participating! 🎉", res: "Result:", cond: "If you have won, present this screen at the reception. The game is open to any adult individual, without obligation to purchase. Participation is strictly limited to one spin per person. Winnings must be claimed or consumed immediately and cannot be postponed. Prizes cannot be combined with other ongoing promotions. Prizes are available while supplies last. Winnings are neither exchangeable nor refundable in cash. Your data is processed for game management.", rgpd: "I agree that my data will be collected to be contacted if I win. I accept the game rules and the use of my data for my participation. I also agree to receive promotional offers from the establishment by email and phone.", qr: "Scan me" }
+};
+
+function changeLanguage(lang) {
+    const t = translations[lang];
+    if(!t) return;
+    
+    document.getElementById('t1').value = t.t1;
+    document.getElementById('t2').value = t.t2;
+    document.getElementById('t3').value = t.t3;
+    document.getElementById('t_wheel').value = t.tw;
+    document.getElementById('t_last_step').value = t.last;
+    document.getElementById('t_name').value = t.name;
+    document.getElementById('t_email').value = t.email;
+    document.getElementById('t_phone').value = t.phone;
+    document.getElementById('t_btn_validate').value = t.val;
+    document.getElementById('t_btn_spin').value = t.spin;
+    document.getElementById('t_thanks').value = t.thx;
+    document.getElementById('t_res_label').value = t.res;
+    document.getElementById('t_cond').value = t.cond;
+    document.getElementById('t_qr_scan').value = t.qr;
+    
+    const ui = uiTranslations[lang] || uiTranslations.en;
+    if(ui) {
+        document.getElementById('conf-title').innerText = ui.confTitle;
+        document.getElementById('lbl-lang').innerText = ui.lblLang;
+        document.getElementById('sum-logo').innerText = ui.sumLogo;
+        document.getElementById('lbl-logo-file').innerText = ui.lblLogoFile;
+        document.getElementById('lbl-logo-url').innerText = ui.lblLogoUrl;
+        document.getElementById('sum-screen').innerText = ui.sumScreen;
+        document.getElementById('lbl-screen-cust').innerText = ui.lblScreenCust;
+        document.getElementById('lbl-col-bg').innerText = ui.lblColBg;
+        document.getElementById('lbl-col-op').innerText = ui.lblColOp;
+        document.getElementById('lbl-col-txt').innerText = ui.lblColTxt;
+        document.getElementById('lbl-col-btn').innerText = ui.lblColBtn;
+        document.getElementById('sum-wheel').innerText = ui.sumWheel;
+        document.getElementById('lbl-wheel-design').innerText = ui.lblWheelDesign;
+        document.getElementById('lbl-col-bord').innerText = ui.lblColBord;
+        document.getElementById('lbl-col-bulb').innerText = ui.lblColBulb;
+        document.getElementById('lbl-size-bulb').innerText = ui.lblSizeBulb;
+        document.getElementById('lbl-brand-quick').innerText = ui.lblBrandQuick;
+        document.getElementById('lbl-col-def1').innerText = ui.lblColDef1;
+        document.getElementById('lbl-col-def2').innerText = ui.lblColDef2;
+        document.getElementById('sum-lots').innerText = ui.sumLots;
+        document.getElementById('lbl-lots-cust').innerText = ui.lblLotsCust;
+        document.getElementById('lbl-row-name').innerText = ui.lblRowName;
+        document.getElementById('lbl-row-prob').innerText = ui.lblRowProb;
+        document.getElementById('lbl-row-size').innerText = ui.lblRowSize;
+        document.getElementById('lbl-row-bg').innerText = ui.lblRowBg;
+        document.getElementById('lbl-row-txt').innerText = ui.lblRowTxt;
+        document.getElementById('btn-add-lot').innerHTML = `<span>+</span> ${ui.btnAddLot}`;
+        document.getElementById('sum-texts').innerText = ui.sumTexts;
+        document.getElementById('lbl-txt-cust').innerText = ui.lblTxtCust;
+        document.getElementById('lbl-qr-scanner').innerText = ui.lblQrScanner;
+        document.getElementById('lbl-form-fields').innerText = ui.lblFormFields;
+        document.getElementById('lbl-end-msg').innerText = ui.lblEndMsg;
+        document.getElementById('lbl-cond-part').innerText = ui.lblCondPart;
+        document.getElementById('sum-actions').innerText = ui.sumActions;
+        document.getElementById('lbl-google-url').innerText = ui.lblGoogleUrl;
+        document.getElementById('btn-gen').innerText = ui.btnGen;
+        document.getElementById('btn-dl-png').innerText = ui.btnDlPng;
+        document.getElementById('btn-dl-pdf').innerText = ui.btnDlPdf;
+        document.getElementById('prev-title').innerText = ui.prevTitle;
+        document.getElementById('stp1-lbl').innerText = ui.stp1Lbl;
+        document.getElementById('stp2-lbl').innerText = ui.stp2Lbl;
+        document.getElementById('stp3-lbl').innerText = ui.stp3Lbl;
+        document.getElementById('stp4-lbl').innerText = ui.stp4Lbl;
+    }
+
+    update();
+}
+
+function generateUID() {
+    return Math.random().toString(36).substring(2, 9).toUpperCase();
+}
+
+function createBulbs(containerId, count) {
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    const bulbs = container.querySelectorAll('.bulb');
+    bulbs.forEach(b => b.remove());
+    
+    for (let i = 0; i < count; i++) {
+        const bulb = document.createElement('div');
+        bulb.className = 'bulb';
+        const angle = (i / count) * (Math.PI * 2);
+        const x = 50 + 52 * Math.cos(angle);
+        const y = 50 + 52 * Math.sin(angle);
+        bulb.style.left = `${x}%`;
+        bulb.style.top = `${y}%`;
+        bulb.style.transform = 'translate(-50%, -50%)';
+        bulb.style.animationDelay = `${(i % 2) * 0.3}s`;
+        container.appendChild(bulb);
+    }
+}
+
+async function uploadLogoDirect(input, targetId, statusId) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const status = document.getElementById(statusId);
+    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+    status.innerText = "⏳ Téléchargement...";
+    status.style.color = "blue";
+    try {
+        const response = await fetch(`${SB_URL}/storage/v1/object/logos/${fileName}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': file.type },
+            body: file
+        });
+        if (response.ok) {
+            const publicUrl = `${SB_URL}/storage/v1/object/public/logos/${fileName}`;
+            document.getElementById(targetId).value = publicUrl;
+            status.innerText = "✅ Succès !";
+            status.style.color = "green";
+            update();
+        } else { status.innerText = "❌ Erreur"; status.style.color = "red"; }
+    } catch (e) { status.innerText = "❌ Erreur réseau"; status.style.color = "red"; }
+}
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+async function saveAndGenerate() {
+    const btn = document.getElementById('btn-gen');
+    btn.innerText = "⏳ Enregistrement...";
+    btn.disabled = true;
+    
+    const configId = generateUID();
+    const inputs = Array.from(document.querySelectorAll('.lot-row'));
+    const configData = {
+        lang: document.getElementById('game_lang').value,
+        n: inputs.map(i => i.querySelector('.ln').value),
+        p: inputs.map(i => parseFloat(i.querySelector('.lp').value) || 0),
+        s: inputs.map(i => parseInt(i.querySelector('.ls').value) || 12),
+        bg: inputs.map(i => i.querySelector('.lbg').value),
+        tx: inputs.map(i => i.querySelector('.ltx').value),
+        u: document.getElementById('google_url').value, 
+        l: document.getElementById('logo_url').value,
+        t1: document.getElementById('t1').value, 
+        t2: document.getElementById('t2').value,
+        t3: document.getElementById('t3').value, 
+        tw: document.getElementById('t_wheel').value,
+        tc: document.getElementById('t_cond').value,
+        t_qr_scan: document.getElementById('t_qr_scan').value,
+        t_last: document.getElementById('t_last_step').value,
+        t_name: document.getElementById('t_name').value,
+        t_email: document.getElementById('t_email').value,
+        t_phone: document.getElementById('t_phone').value,
+        t_btn_v: document.getElementById('t_btn_validate').value,
+        t_btn_s: document.getElementById('t_btn_spin').value,
+        t_thx: document.getElementById('t_thanks').value,
+        t_res: document.getElementById('t_res_label').value,
+        b1: document.getElementById('color1').value,
+        b2: document.getElementById('color2').value,
+        wb_c: document.getElementById('wheel_border_color').value,
+        wb_s: "13",
+        wl_c: document.getElementById('wheel_bulb_color').value,
+        wl_s: document.getElementById('wheel_bulb_size').value,
+        cust_bg: document.getElementById('bg_url').value,
+        cust_bg_c: document.getElementById('bg_color').value,
+        cust_bg_o: document.getElementById('bg_opacity').value,
+        cust_tx_c: document.getElementById('text_color').value,
+        cust_btn_c: document.getElementById('button_color').value
+    };
+
+    try {
+        const response = await fetch(`${SB_URL}/rest/v1/roulette_configs`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: configId, data: configData })
+        });
+        if (!response.ok) throw new Error();
+        const url = window.location.origin + window.location.pathname + "?id=" + configId;
+        document.getElementById('qr-display').style.display = 'block';
+        document.getElementById('qr-id-display').innerText = "ID : " + configId;
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark: "#000000" });
+        const lang = document.getElementById('game_lang').value;
+        btn.innerText = (lang === 'fr' ? "QR Code prêt !" : "QR Code ready!");
+        btn.disabled = false;
+    } catch (e) {
+        alert("Erreur d'enregistrement.");
+        btn.disabled = false;
+    }
+}
+
+const defaultLots = [
+    { n: "🥹  DOMMAGE", p: 95, s: 16, bg: "#fa879a", tx: "#ffffff" },
+    { n: "-20% REMISE", p: 1, s: 16, bg: "#cdc7fc", tx: "#ffffff" },
+    { n: "PERDU    🥹", p: 1, s: 16, bg: "#fa879a", tx: "#ffffff" },
+    { n: "-10% REMISE", p: 1, s: 16, bg: "#cdc7fc", tx: "#ffffff" },
+    { n: "RATÉ🥹", p: 1, s: 16, bg: "#fa879a", tx: "#ffffff" },
+    { n: "-5%  REMISE", p: 1, s: 16, bg: "#cdc7fc", tx: "#ffffff" }
+];
+
+function addLotRow(n, p, s, bg, tx) {
+    const container = document.getElementById('lots-inputs');
+    const div = document.createElement('div');
+    div.className = 'lot-row-wrapper';
+    div.innerHTML = `<div class="lot-row">
+        <div class="input-wrapper">
+            <span class="mobile-label">LOT (2 lignes auto)</span>
+            <input type="text" class="ln" value="${n}" oninput="update()">
+        </div>
+        <div class="input-wrapper small">
+            <span class="mobile-label">PROB. %</span>
+            <input type="number" class="lp" value="${p}" step="0.1" oninput="handleProbChange(this)">
+        </div>
+        <div class="input-wrapper small">
+            <span class="mobile-label">TAILLE</span>
+            <input type="number" class="ls" value="${s}" oninput="update()">
+        </div>
+        <div class="input-wrapper color">
+            <span class="mobile-label">FOND</span>
+            <input type="color" class="lc lbg" value="${bg}" oninput="update()">
+        </div>
+        <div class="input-wrapper color">
+            <span class="mobile-label">TEXTE</span>
+            <input type="color" class="lc ltx" value="${tx}" oninput="update()">
+        </div>
+        <button onclick="this.closest('.lot-row-wrapper').remove(); update();" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold; font-size:18px; width:25px; align-self: center;">×</button>
+    </div>`;
+    container.appendChild(div);
+}
+
+function handleProbChange(input) {
+    const rows = Array.from(document.querySelectorAll('.lot-row'));
+    if (rows.length <= 1) {
+        input.value = 100;
+        update();
+        return;
+    }
+    let newValue = parseFloat(input.value) || 0;
+    if (newValue > 100) newValue = 100;
+    if (newValue < 0) newValue = 0;
+    input.value = newValue;
+
+    const otherRows = rows.filter(r => r.querySelector('.lp') !== input);
+    const currentOtherTotal = otherRows.reduce((sum, r) => sum + (parseFloat(r.querySelector('.lp').value) || 0), 0);
+    const targetOtherTotal = 100 - newValue;
+
+    if (currentOtherTotal > 0) {
+        otherRows.forEach(r => {
+            const pInput = r.querySelector('.lp');
+            const currentP = parseFloat(pInput.value) || 0;
+            const share = currentP / currentOtherTotal;
+            pInput.value = (share * targetOtherTotal).toFixed(1);
+        });
+    } else {
+        const equalShare = (targetOtherTotal / otherRows.length).toFixed(1);
+        otherRows.forEach(r => r.querySelector('.lp').value = equalShare);
+    }
+    update();
+}
+
+function updateAllLotsColors(val, type) {
+    const inputs = Array.from(document.querySelectorAll('.lot-row'));
+    inputs.forEach((row, idx) => {
+        if(type === 'bg') {
+            const c1 = document.getElementById('color1').value;
+            const c2 = document.getElementById('color2').value;
+            row.querySelector('.lbg').value = (idx % 2 === 0) ? c1 : c2;
+        }
+    });
+    update();
+}
+
+function update() {
+    const logoUrl = document.getElementById('logo_url').value;
+    const bgUrl = document.getElementById('bg_url').value;
+    const bgColor = document.getElementById('bg_color').value;
+    const bgOpacity = document.getElementById('bg_opacity').value;
+    const textColor = document.getElementById('text_color').value;
+    const buttonColor = document.getElementById('button_color').value;
+    const lang = document.getElementById('game_lang').value;
+
+    document.getElementById('pre-logo-pop').src = logoUrl;
+    document.getElementById('pre-logo-wheel').src = logoUrl;
+    document.getElementById('pre-logo-gain').src = logoUrl;
+    document.getElementById('qr-logo-top').src = logoUrl;
+    
+    document.getElementById('pre-t1').innerText = document.getElementById('t1').value;
+    document.getElementById('qr-title').innerText = document.getElementById('t1').value;
+    document.getElementById('qr-scan-text').innerText = document.getElementById('t_qr_scan').value;
+    document.getElementById('pre-t2').innerText = document.getElementById('t2').value;
+    document.getElementById('pre-t3').innerText = document.getElementById('t3').value;
+    document.getElementById('pre-twheel').innerText = document.getElementById('t_wheel').value;
+    document.getElementById('pre-cond').innerText = document.getElementById('t_cond').value;
+    
+    document.getElementById('pre-t-last').innerText = document.getElementById('t_last_step').value;
+    document.getElementById('pre-ph-name').placeholder = document.getElementById('t_name').value;
+    document.getElementById('pre-ph-email').placeholder = document.getElementById('t_email').value;
+    document.getElementById('pre-ph-phone').placeholder = document.getElementById('t_phone').value;
+    document.getElementById('pre-btn-val').innerText = document.getElementById('t_btn_validate').value;
+    document.getElementById('pre-btn-spin').innerText = document.getElementById('t_btn_spin').value;
+    document.getElementById('pre-t-thanks').innerText = document.getElementById('t_thanks').value;
+    document.getElementById('pre-t-res').innerText = document.getElementById('t_res_label').value;
+    
+    if(translations[lang]) document.getElementById('pre-rgpd-text').innerText = translations[lang].rgpd;
+
+    const root = document.documentElement;
+    root.style.setProperty('--yellow-border', document.getElementById('wheel_border_color').value);
+    root.style.setProperty('--bulb-color', document.getElementById('wheel_bulb_color').value);
+    root.style.setProperty('--bulb-size', document.getElementById('wheel_bulb_size').value + 'px');
+    root.style.setProperty('--text-color', textColor);
+    root.style.setProperty('--black', buttonColor);
+
+    const rgb = hexToRgb(bgColor);
+    const rgbaColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${bgOpacity})`;
+    root.style.setProperty('--overlay-color', rgbaColor);
+
+    for(let i=1; i<=4; i++) {
+        const mock = document.getElementById('pre-s'+i);
+        mock.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : 'none';
+    }
+
+    const inputs = Array.from(document.querySelectorAll('.lot-row'));
+    const ns = inputs.map(i => i.querySelector('.ln').value);
+    const ps = inputs.map(i => parseFloat(i.querySelector('.lp').value) || 0);
+    const ss = inputs.map(i => parseInt(i.querySelector('.ls').value) || 12);
+    const bgs = inputs.map(i => i.querySelector('.lbg').value);
+    const txs = inputs.map(i => i.querySelector('.ltx').value);
+
+    const total = ps.reduce((a, b) => a + b, 0);
+    let infoStr = lang === 'fr' ? `Sur 100 participants, environ : ` : `Approx per 100 participants : `;
+    const details = ns.map((n, i) => {
+        const name = n.trim() || "Lot";
+        return `<strong>${Math.round(ps[i])}</strong> -> "${name}"`;
+    });
+    document.getElementById('prob-info').innerHTML = infoStr + details.join(', ') + ".";
+
+    draw(ns, ps, ss, bgs, txs);
+    createBulbs('preview-bulbs-container', 12);
+}
+
+function draw(ns, ps, ss, bgs, txs) {
+    const canvas = document.getElementById('canvas-preview'), ctx = canvas.getContext('2d');
+    const filtered = ns.map((n, i) => n.trim() !== "" ? i : -1).filter(idx => idx !== -1);
+    ctx.clearRect(0,0,200,200);
+    if(filtered.length === 0) return;
+    const centerX = 100, centerY = 100, radius = 100;
+    const arc = (2 * Math.PI) / filtered.length; 
+    filtered.forEach((idx, i) => {
+        ctx.beginPath(); ctx.fillStyle = bgs[idx];
+        ctx.moveTo(centerX, centerY); ctx.arc(centerX, centerY, radius, i * arc, (i + 1) * arc); ctx.fill();
+        ctx.save(); ctx.translate(centerX, centerY); ctx.rotate(i * arc + arc / 2);
+        ctx.fillStyle = txs[idx]; ctx.font = `bold ${ss[idx]*0.7}px Arial`; ctx.textAlign = "left";
+        const text = ns[idx];
+        if (text.length > 10 && text.includes(' ')) {
+            const mid = Math.floor(text.length / 2);
+            const spaceIdx = text.indexOf(' ', mid) !== -1 ? text.indexOf(' ', mid) : text.lastIndexOf(' ', mid);
+            if (spaceIdx !== -1) {
+                ctx.fillText(text.substring(0, spaceIdx), 40, -4);
+                ctx.fillText(text.substring(spaceIdx + 1), 40, 8);
+            } else { ctx.fillText(text, 40, 4); }
+        } else { ctx.fillText(text, 40, 4); }
+        ctx.restore();
+    });
+    ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(centerX, centerY, 25, 0, Math.PI * 2); ctx.fill();
+}
+
+function spinPreview() {
+    const btn = document.getElementById('pre-btn-spin');
+    const canvas = document.getElementById('canvas-preview');
+    const pointer = document.getElementById('pre-pointer');
+    canvas.style.transform = `rotate(${3600 + Math.random()*360}deg)`;
+    pointer.classList.add('vibrating');
+    btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5';
+    setTimeout(() => {
+        pointer.classList.remove('vibrating');
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        canvas.style.transition = 'none'; canvas.style.transform = 'rotate(0deg)';
+        setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; }, 50);
+    }, 5200);
+}
+
+async function downloadQR(format) {
+    const area = document.getElementById('qrcode-area');
+    const canvas = await html2canvas(area, { scale: 3, useCORS: true, backgroundColor: "#ffffff" });
+    if (format === 'png') {
+        const link = document.createElement('a'); link.download = 'roulette.png';
+        link.href = canvas.toDataURL('image/png'); link.click();
+    } else {
+        const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 100, 100 * (canvas.height / canvas.width));
+        pdf.save('roulette.pdf');
+    }
+}
+
+function renderClient(config, configId) {
+    const bSize = 13;
+    const bColor = config.wb_c || '#FFD700';
+    const lSize = config.wl_s || 10;
+    const lColor = config.wl_c || '#FFD700';
+    const bgImg = config.cust_bg || '';
+    const bgCol = config.cust_bg_c || '#FAF9F6';
+    const bgOp = config.cust_bg_o || 0.5;
+    const txCol = config.cust_tx_c || '#333333';
+    const btnCol = config.cust_btn_c || '#000000';
+    const rgb = hexToRgb(bgCol);
+    const rgbaColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${bgOp})`;
+    const lang = config.lang || 'fr';
+    const t = translations[lang] || translations.fr;
+
+    document.body.innerHTML = `
+    <style>
+        body { margin: 0; padding: 0; box-sizing: border-box; min-height: 100vh; background-color: ${bgCol}; background-image: ${bgImg ? `url('${bgImg}')` : 'none'}; background-size: cover; background-position: center; background-attachment: fixed; color: ${txCol}; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-family: 'Segoe UI', sans-serif; position: relative; overflow-x: hidden; direction: ${lang === 'ar' ? 'rtl' : 'ltr'}; }
+        body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: ${rgbaColor}; z-index: 0; pointer-events: none; }
+        .client-card { position: relative; z-index: 1; background: transparent; padding: 40px 20px; width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+        .btn-black-c { background: ${btnCol}; color: #fff; border: none; padding: 18px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px; font-size: 16px; margin: 15px auto 0 auto; position: relative; z-index: 2; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; }
+        .btn-black-c:active { transform: scale(0.98); }
+        input[type="text"], input[type="email"], input[type="tel"] { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; box-sizing: border-box; position: relative; z-index: 2; font-size: 16px; }
+        .wheel-box-client { position: relative; width: 300px; height: 300px; margin: 30px auto; border: ${bSize}px solid ${bColor}; border-radius: 50%; box-shadow: 0 0 15px ${bColor}; animation: lights-client 1.5s infinite alternate; display: flex; align-items: center; justify-content: center; box-sizing: border-box; z-index: 2; }
+        @media (max-width: 380px) { .wheel-box-client { width: 260px; height: 260px; border-width: 10px; } #rc { width: 100% !important; height: 100% !important; } }
+        @keyframes lights-client { from { box-shadow: 0 0 10px ${bColor}; } to { box-shadow: 0 0 25px ${bColor}; border-color: #fff700; } }
+        .bulb-client { position: absolute; width: ${lSize}px; height: ${lSize}px; background: white; border-radius: 50%; z-index: 15; box-shadow: 0 0 5px white; animation: bulb-flash-client 0.6s infinite alternate; }
+        @keyframes bulb-flash-client { from { background: #fff; box-shadow: 0 0 2px #fff; } to { background: ${lColor}; box-shadow: 0 0 10px ${lColor}; } }
+        #rc { border-radius: 50%; transition: transform 5s cubic-bezier(0.1,0,0.1,1); display: block; width: 100%; height: 100%; }
+        .client-pointer { position: absolute; top: -23px; left: 50%; transform: translateX(-50%); width: 48px; height: 37px; background: #ff0000; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); border-radius: 20px 20px 0px 0px; z-index: 20; display: flex; align-items: flex-start; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        @keyframes pick-vibrate { 0% { transform: translateX(-50%) rotate(0deg); } 25% { transform: translateX(-52%) rotate(-5deg); } 50% { transform: translateX(-50%) rotate(0deg); } 75% { transform: translateX(-48%) rotate(5deg); } 100% { transform: translateX(-50%) rotate(0deg); } }
+        .vibrating { animation: pick-vibrate 0.2s infinite linear; }
+        h2 { font-size: 24px; margin-bottom: 15px; border-bottom: none !important; }
+        p { font-size: 16px; line-height: 1.4; margin-bottom: 25px; }
+        h2, h3, p, span { color: ${txCol} !important; position: relative; z-index: 2; }
+        .res-box { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-top: 20px; border: 1px solid rgba(0,0,0,0.05); width: 100%; }
+    </style>
+    <div id="step-avis" class="client-card">
+        <img src="${config.l}" style="max-width:150px; max-height:120px; margin-bottom:30px; object-fit: contain;">
+        <h2>${config.t1}</h2>
+        <p>${config.t2}</p>
+        <a href="${config.u}" target="_blank" class="btn-black-c" style="text-decoration:none; line-height: 1.2;" onclick="setTimeout(()=>showStep('step-form'), 1500)">${config.t3}</a>
+    </div>
+    <div id="step-form" class="client-card" style="display:none;">
+        <img src="${config.l}" style="max-width:100px; margin-bottom:25px; object-fit: contain;">
+        <h3>${config.t_last || t.last}</h3>
+        <p>${lang === 'fr' ? 'Complétez vos infos pour lancer la roue.' : 'Complete your info to spin the wheel.'}</p>
+        <input type="text" id="c_nom" placeholder="${config.t_name || t.name}" required>
+        <input type="email" id="c_email" placeholder="${config.t_email || t.email}" required>
+        <input type="tel" id="c_tel" placeholder="${config.t_phone || t.phone}" required>
+        <label style="font-size: 12px; display: flex; gap: 10px; text-align: left; align-items: flex-start; margin-top: 15px; position: relative; z-index: 2; cursor: pointer;">
+            <input type="checkbox" id="c_rgpd" required style="margin-top:3px; width: 18px; height: 18px;"> 
+            <span>${t.rgpd}</span>
+        </label>
+        <button class="btn-black-c" onclick="validateForm()">${config.t_btn_v || t.val}</button>
+    </div>
+    <div id="step-wheel" class="client-card" style="display:none;">
+        <h2 style="font-size: 1.3em; margin-bottom: 10px;">${config.tw}</h2> 
+        <div class="wheel-box-client" id="client-bulbs-container">
+            <div class="client-pointer" id="c-pointer"></div>
+            <img src="${config.l}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:60px; height:60px; border-radius:50%; background:white; z-index:5; border:2px solid #fff; object-fit:contain;">
+            <canvas id="rc" width="300" height="300"></canvas>
+        </div>
+        <button id="spin-btn" class="btn-black-c" onclick="spinClient()">${config.t_btn_s || t.spin}</button>
+        <div id="res-box" class="res-box" style="display:none;">
+             <h3 style="margin: 0;">${config.t_thx || t.thx}</h3>
+             <p style="font-size:26px; font-weight:bold; margin: 10px 0;">${config.t_res || t.res} <span id="win-txt"></span></p>
+             <p style="font-size:11px; text-align:justify; border-top: 1px solid rgba(0,0,0,0.1); padding-top:15px; margin-bottom: 0;">${config.tc}</p>
+        </div>
+    </div>`;
+
+    window.showStep = (id) => {
+        document.getElementById('step-avis').style.display = 'none';
+        document.getElementById('step-form').style.display = 'none';
+        document.getElementById('step-wheel').style.display = 'none';
+        document.getElementById(id).style.display = 'flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if(id === 'step-wheel') {
+            drawClientWheel(config);
+            const container = document.getElementById('client-bulbs-container');
+            for (let i = 0; i < 16; i++) {
+                const bulb = document.createElement('div');
+                bulb.className = 'bulb-client';
+                const angle = (i / 16) * (Math.PI * 2);
+                bulb.style.left = `${50 + 52 * Math.cos(angle)}%`;
+                bulb.style.top = `${50 + 52 * Math.sin(angle)}%`;
+                bulb.style.transform = 'translate(-50%, -50%)';
+                bulb.style.animationDelay = `${(i % 2) * 0.3}s`;
+                container.appendChild(bulb);
+            }
+        }
+    };
+
+    window.validateForm = () => {
+        if(!document.getElementById('c_nom').value || !document.getElementById('c_email').value || !document.getElementById('c_rgpd').checked) return alert("Validation error.");
+        showStep('step-wheel');
+    };
+
+    window.sendToDatabase = async (winLabel) => {
+        const participantData = {
+            config_id: configId,
+            nom: document.getElementById('c_nom').value,
+            email: document.getElementById('c_email').value,
+            telephone: document.getElementById('c_tel').value,
+            lot_gagne: winLabel,
+            OPTIN: document.getElementById('c_rgpd').checked ? "oui" : "non"
+        };
+        try {
+            await fetch(`${SB_URL}/rest/v1/roulette_participants`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                body: JSON.stringify(participantData)
+            });
+        } catch (e) { console.error("Error saving participant", e); }
+    };
+
+    window.spinClient = () => {
+        const btn = document.getElementById('spin-btn');
+        const pointer = document.getElementById('c-pointer');
+        btn.style.display = 'none';
+        pointer.classList.add('vibrating');
+        const r = Math.random() * 100; let s = 0, t = 0;
+        for(let i=0; i<config.p.length; i++){ s += config.p[i]; if(r <= s){ t = i; break; } }
+        const deg = 3600 + (360 - (t * (360/config.n.length)) - (180/config.n.length)) + 270;
+        document.getElementById('rc').style.transform = `rotate(${deg}deg)`;
+        setTimeout(() => {
+            pointer.classList.remove('vibrating');
+            const winLabel = config.n[t];
+            document.getElementById('win-txt').innerText = winLabel;
+            document.getElementById('res-box').style.display = 'block';
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            sendToDatabase(winLabel);
+        }, 5200);
+    };
+}
+
+function drawClientWheel(config) {
+    const canvas = document.getElementById('rc'), ctx = canvas.getContext('2d'), arc = (2 * Math.PI) / config.n.length;
+    const cx = 150, cy = 150, r = 150; 
+    config.n.forEach((n, i) => {
+        ctx.beginPath(); ctx.fillStyle = config.bg[i];
+        ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, i * arc, (i + 1) * arc); ctx.fill();
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * arc + arc / 2);
+        ctx.fillStyle = config.tx[i]; ctx.font = `bold ${config.s[i]}px Arial`; ctx.textAlign = "left";
+        const text = n;
+        if (text.length > 10 && text.includes(' ')) {
+            const mid = Math.floor(text.length / 2);
+            const spaceIdx = text.indexOf(' ', mid) !== -1 ? text.indexOf(' ', mid) : text.lastIndexOf(' ', mid);
+            if (spaceIdx !== -1) {
+                ctx.fillText(text.substring(0, spaceIdx), 60, -6);
+                ctx.fillText(text.substring(spaceIdx + 1), 60, 12);
+            } else { ctx.fillText(text, 60, 6); }
+        } else { ctx.fillText(text, 60, 6); }
+        ctx.restore();
+    });
+    ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(cx, cy, 35, 0, Math.PI * 2); ctx.fill();
+}
+
+window.onload = async () => {
+    setTimeout(() => {
+        const loader = document.getElementById('loader-wrapper');
+        const content = document.getElementById('main-content');
+        if (loader) loader.style.opacity = '0';
+        setTimeout(() => {
+            if (loader) loader.style.display = 'none';
+            if (content) content.style.display = 'flex';
+        }, 500);
+    }, 1500);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const configId = urlParams.get('id');
+    if (configId) {
+        const response = await fetch(`${SB_URL}/rest/v1/roulette_configs?id=eq.${configId}&select=data`, {
+            headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY }
+        });
+        const result = await response.json();
+        if (result[0]) renderClient(result[0].data, configId);
+    } else {
+        defaultLots.forEach(lot => addLotRow(lot.n, lot.p, lot.s, lot.bg, lot.tx));
+        update();
+    }
+};
+</script>
 
 </body>
 </html>
