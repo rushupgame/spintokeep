@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Découvrez Spin To Keep, la solution n°1 pour commerçants : collectez massivement des avis Google, générez des leads et fidélisez grâce à une roue de la fortune via QR Code.">
+    <meta name="keywords" content="Roue de la fortune en ligne, collecter avis Google, QR code commerce, fidélisation client, outil CRM RGPD, augmenter ses avis, jeu concours boutique, SEO local, marketing point de vente, récolter avis positifs">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph for Social Media -->
+    <meta property="og:title" content="Spin To Keep | Collecte d'Avis Google & Fidélisation Client">
+    <meta property="og:description" content="Transformez votre point de vente en machine à récolter des avis positifs et des emails avec notre outil interactif 100% personnalisable.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.spintokeep.com">
+    
+    <title>Spin To Keep | Collecte d'Avis Google, CRM & Fidélisation par QR Code</title>
+    
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        /* Base & Smooth Scroll */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            margin: 0; padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animations & Effects */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+
+        /* HEADER NAVIGATION */
+        header {
+            position: sticky; top: 0; z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 0 2rem; height: 70px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; max-width: 1200px;
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; }
+        .nav-links a { text-decoration: none; color: var(--text-primary); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--accent-color); }
+
+        /* Typography */
+        h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; }
+        h1 { font-size: 3.5rem; font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; text-align: center; }
+        h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; text-align: center; color: var(--text-primary); }
+        h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.5rem; }
+        p { color: var(--text-secondary); font-size: 1.1rem; }
+        .text-center { text-align: center; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); }
+
+        /* Buttons */
+        .btn {
+            display: inline-block; background-color: var(--accent-color); color: #fff;
+            padding: 14px 32px; border-radius: 980px; font-size: 1.1rem; font-weight: 600;
+            text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer;
+        }
+        .btn:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+
+        /* Layout & Sections */
+        section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+        .bg-gray { background-color: var(--bg-secondary); width: 100%; padding: 6rem 2rem; box-sizing: border-box; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Grids */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-primary); padding: 2.5rem 2rem; border-radius: 20px;
+            border: 1px solid var(--border-color); text-align: left;
+        }
+        .card-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
+
+        /* SEO Text Blocks */
+        .seo-block {
+            max-width: 900px; margin: 0 auto 3rem; text-align: left;
+            background: #fff; padding: 3rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+        }
+        .seo-block h3 { font-size: 1.8rem; margin-bottom: 1rem; color: var(--text-primary); }
+        .seo-block p { font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8; }
+        .seo-block ul { margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem; line-height: 1.8; }
+        .seo-block li { margin-bottom: 0.5rem; }
+
+        /* FAQ Accordion */
+        details {
+            background: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 1rem; padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        details[open] { box-shadow: var(--shadow-sm); border-color: var(--accent-color); }
+        summary { font-weight: 600; font-size: 1.1rem; cursor: pointer; list-style: none; outline: none; color: var(--text-primary); }
+        summary::-webkit-details-marker { display: none; }
+        details p { margin-top: 1rem; margin-bottom: 0; font-size: 1rem; }
+
+        /* Pricing (Single Plan) */
+        .pricing-card {
+            background: var(--bg-primary); padding: 4rem 3rem; border-radius: 24px;
+            box-shadow: var(--shadow-md); border: 2px solid var(--accent-color);
+            max-width: 500px; margin: 0 auto; text-align: center;
+        }
+        .pricing-price { font-size: 4.5rem; font-weight: 700; color: var(--text-primary); margin: 1rem 0; }
+        .pricing-price span { font-size: 1.2rem; color: var(--text-secondary); font-weight: 400; }
+        .pricing-features { list-style: none; padding: 0; margin: 2rem 0; text-align: left; }
+        .pricing-features li { padding: 1rem 0; border-bottom: 1px solid var(--border-color); font-size: 1.05rem; }
+        .pricing-features li:last-child { border-bottom: none; }
+
+        /* Footer & Legal */
+        footer { background-color: #151516; color: #a1a1a6; padding: 5rem 2rem 3rem; font-size: 0.95rem; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: grid; gap: 3rem; grid-template-columns: 1fr 1fr; }
+        .footer-content h3 { color: #f5f5f7; margin-bottom: 1.5rem; font-size: 1.3rem; }
+        .footer-links a { color: #a1a1a6; text-decoration: none; display: block; margin-bottom: 0.8rem; transition: color 0.2s; }
+        .footer-links a:hover { color: #fff; }
+        .legal-text { max-width: 1200px; margin: 4rem auto 0; padding-top: 2rem; border-top: 1px solid #333; font-size: 0.85rem; text-align: center; line-height: 1.6; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .nav-links { display: none; } /* On mobile, a hamburger menu would typically go here */
+            .footer-content { grid-template-columns: 1fr; }
+            .seo-block { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="#accueil" class="logo">SpinToKeep<span>.</span></a>
+        <ul class="nav-links">
+            <li><a href="#concept">Comment ça marche</a></li>
+            <li><a href="#enjeux-seo">Pourquoi les Avis ?</a></li>
+            <li><a href="#fonctionnalites">Outil & CRM</a></li>
+            <li><a href="#secteurs">Secteurs</a></li>
+            <li><a href="#tarifs">Tarifs</a></li>
+            <li><a href="#faq">FAQ</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <!-- HERO SECTION -->
+    <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 4rem;">
+        <h1>Décuplez vos <span class="highlight">Avis Google</span> et fidélisez en point de vente.</h1>
+        <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
+            Transformez votre comptoir en véritable machine à collecter des avis, des likes et des emails grâce à un jeu de roulette 100% personnalisable à votre image.
+        </p>
+        <div class="text-center">
+            <a href="#tarifs" class="btn hover-effect">Créer ma roue personnalisée</a>
+            <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">Testez gratuitement • Configuration en 1 minute</p>
+        </div>
+    </section>
+
+    <!-- STATS BANNER -->
+    <div class="container animate-up hover-effect" style="margin-bottom: 4rem;">
+        <div style="background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">🚀 + 200 avis ⭐ et abonnés "j'aime" 👍 en 1 mois*</h2>
+            <p style="margin:0; font-size: 1.2rem; color: var(--text-primary);">En moyenne, propulsez votre visibilité locale sur la plateforme de votre choix.</p>
+        </div>
+    </div>
+
+    <!-- CONCEPT SECTION -->
+    <section id="concept">
+        <h2>Un concept simple et ludique pour votre commerce</h2>
+        <p class="text-center" style="margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+            Finis les flyers ignorés ! En gamifiant l'expérience client à la caisse, vous supprimez la friction et incitez naturellement à l'action.
+        </p>
+        
+        <div class="grid-4">
+            <div class="card hover-effect">
+                <span class="card-icon">🎨</span>
+                <h3>1. Créez votre roue en 1 min</h3>
+                <p>Personnalisez les cadeaux, les couleurs et les règles de votre jeu concours en quelques clics, directement en ligne.</p>
+            </div>
+            <div class="card hover-effect">
+                <span class="card-icon">📲</span>
+                <h3>2. Partagez le QR code</h3>
+                <p>Exposez-le avec votre client à la caisse ou à l'accueil de votre commerce de proximité via une PLV ou une tablette.</p>
+            </div>
+            <div class="card hover-effect">
+                <span class="card-icon">🎡</span>
+                <h3>3. Vos clients jouent</h3>
+                <p>Ils s'amusent et gagnent des cadeaux immédiats. En échange, vous récupérez leurs contacts qualifiés (nom, tel, email).</p>
+            </div>
+            <div class="card hover-effect">
+                <span class="card-icon">⭐👍</span>
+                <h3>4. Récoltez avis et likes</h3>
+                <p>Le participant est redirigé intelligemment pour laisser un avis Google, ou s'abonner à vos réseaux sociaux.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ENJEUX SEO LOCAL (Text Blocks optimisés SEO) -->
+    <div id="enjeux-seo" class="bg-gray">
+        <div class="container">
+            <h2>Pourquoi la collecte d'avis est vitale pour votre SEO Local ?</h2>
+            
+            <article class="seo-block">
+                <h3>Dominez les résultats de recherche Google grâce aux avis clients</h3>
+                <p>Aujourd'hui, <strong>plus de 90% des consommateurs</strong> consultent les avis en ligne avant de se rendre dans un établissement physique. Votre fiche Google My Business (Google Profil d'Entreprise) est votre première vitrine. Obtenir un flux constant de <strong>nouveaux avis Google positifs 5 étoiles ⭐⭐⭐⭐⭐</strong> est le signal le plus puissant pour l'algorithme de référencement local.</p>
+                <p>Avec notre solution de <em>roulette personnalisée via QR Code</em>, vous ne subissez plus les avis négatifs aléatoires : vous provoquez pro-activement les avis de vos clients satisfaits directement sur le lieu de vente, à l'instant où leur satisfaction est la plus haute.</p>
+            </article>
+
+            <article class="seo-block">
+                <h3>Créez une base de données client (CRM) qualifiée et RGPD</h3>
+                <p>La pérennité de votre commerce ne dépend pas seulement de l'acquisition de nouveaux clients, mais de la <strong>fidélisation</strong>. En scannant le QR code pour participer à votre jeu concours en boutique, le client accepte de vous partager ses coordonnées (Opt-in).</p>
+                <ul>
+                    <li><strong>Zéro papier :</strong> Remplacez les vieux carnets de tombola et les formulaires illisibles par une solution digitale fiable.</li>
+                    <li><strong>Marketing direct :</strong> Exportez instantanément votre base au format Excel (CSV) 🖥️.</li>
+                    <li><strong>Fidélisation active :</strong> Utilisez ces données pour envoyer des newsletters ciblées, des promotions par SMS pour les anniversaires ou des invitations à vos ventes privées.</li>
+                </ul>
+                <p>L'outil capture légalement le nom, l'email et le numéro de téléphone, garantissant une protection absolue et conforme à la législation européenne sur les données personnelles.</p>
+            </article>
+        </div>
+    </div>
+
+    <!-- FONCTIONNALITÉS & OUTILS -->
+    <section id="fonctionnalites">
+        <h2>Les fonctionnalités de notre plateforme d'animation</h2>
+        <p class="text-center" style="max-width: 900px; margin: 0 auto 3rem;">
+            Notre plateforme transforme la récolte d'avis en une expérience ludique grâce à une roue de la fortune entièrement paramétrable aux couleurs de votre enseigne. Gérez vos lots et automatisez votre marketing de point de vente.
+        </p>
+        
+        <div class="grid-3">
+            <div class="card hover-effect">
+                <h3>🎨 Personnalisation visuelle</h3>
+                <p>Intégrez votre propre logo et vos codes couleurs pour une roue parfaitement alignée sur l'identité de votre marque (branding).</p>
+            </div>
+            <div class="card hover-effect">
+                <h3>🎁 Éditeur de lots intuitif</h3>
+                <p>Gérez facilement vos récompenses et ajustez les probabilités de gain selon vos stocks réels et votre budget d'animation.</p>
+            </div>
+            <div class="card hover-effect">
+                <h3>🛠️ Algorithme de probabilité</h3>
+                <p>Maîtrisez la distribution de vos lots grâce à un système de tirage au sort numérique intelligent, transparent et fiable.</p>
+            </div>
+            <div class="card hover-effect">
+                <h3>✒️ Texte 100% modifiable</h3>
+                <p>Adaptez chaque message de votre campagne pour communiquer efficacement et refléter le ton de votre entreprise.</p>
+            </div>
+            <div class="card hover-effect">
+                <h3>🖨️ Exports Print-Ready</h3>
+                <p>Générez des supports de communication en très haute définition, prêts à être imprimés pour décorer votre comptoir de boutique.</p>
+            </div>
+            <div class="card hover-effect">
+                <h3>🪪 Conformité RGPD intégrée</h3>
+                <p>Garantissez la protection des données de vos clients grâce à un cadre juridique déjà configuré, sécurisé et légal.</p>
+            </div>
+        </div>
+        
+        <div class="card text-center hover-effect" style="margin-top: 3rem; background: linear-gradient(to right, #ffffff, #fbfbfd);">
+            <h3>📊 Un tableau de bord de suivi inclus (Dashboard)</h3>
+            <p style="max-width: 800px; margin: 1rem auto;">Testez par vous-même la robustesse du système : chaque scan de QR code génère un ID unique de 7 caractères (ex: <strong>ID test XXXXXX</strong>). Cela vous permet de retrouver facilement vos participants, de vérifier leurs gains en caisse, et de télécharger l'intégralité de la base de contacts en Excel en un clic.</p>
+        </div>
+    </section>
+
+    <!-- SECTEURS D'ACTIVITÉ -->
+    <div id="secteurs" class="bg-gray">
+        <div class="container">
+            <h2>Des avantages concrets pour chaque type de commerce</h2>
+            <p class="text-center" style="margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Que vous soyez dans l'alimentaire, les services ou le prêt-à-porter, la gamification accélère votre croissance locale de manière mesurable.
+            </p>
+            
+            <div class="grid-4">
+                <div class="card hover-effect">
+                    <div class="card-icon">🍴</div>
+                    <h3>Restauration</h3>
+                    <p>Transforme l'attente de l'addition en un moment ludique et viral (ex: café offert / digestif offert / sauce maison).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">✂️</div>
+                    <h3>Coiffure / Beauté</h3>
+                    <p>Incite vos clientes à partager leur nouveau look sur Instagram (ex: échantillon / massage crânien / shampoing gratuit).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">🥖</div>
+                    <h3>Boulangerie</h3>
+                    <p>Dynamise le passage quotidien avec une animation interactive en caisse (ex: chouquette offerte / croissant gratuit).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">👕</div>
+                    <h3>Habillement Mode</h3>
+                    <p>Fidélise les acheteurs occasionnels en collectant leurs emails pour les soldes (ex: totebag / retouche offerte).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">🚗</div>
+                    <h3>Garage & Auto</h3>
+                    <p>Rassure les nouveaux clients grâce à un flux d'avis positifs récents (ex: liquide lave-glace / désodorisant auto offert).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">☕</div>
+                    <h3>Bars & Cafés</h3>
+                    <p>Encourage la clientèle à taguer votre établissement durant l'happy hour (ex: sirop offert / tapas / cacahuètes bonus).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">🛒</div>
+                    <h3>Alimentaire / GSA</h3>
+                    <p>Différencie votre commerce face à la concurrence locale (ex: fruit offert / sac cabas réutilisable / épice gratuite).</p>
+                </div>
+                <div class="card hover-effect">
+                    <div class="card-icon">🌸</div>
+                    <h3>Fleuriste</h3>
+                    <p>Valorise vos créations florales par des photos d'avis clients authentiques (ex: brin offert / ruban cadeau gratuit).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TÉMOIGNAGES -->
+    <section id="avis">
+        <h2>Ils ont boosté leur visibilité locale</h2>
+        <div class="grid-3">
+            <div class="card hover-effect">
+                <div style="color: #ffb400; margin-bottom: 1rem; font-size:1.4rem;">⭐⭐⭐⭐⭐</div>
+                <p><em>"Un partenaire de confiance au service de la croissance. Outil professionnel, extrêmement efficace et simple d'utilisation pour mes équipes de vente."</em></p>
+                <p style="font-weight: 700; margin-bottom: 0; color: var(--text-primary);">Christian K.</p>
+                <p style="font-size: 0.95rem; margin-top:0;">Bijoutier Indépendant</p>
+            </div>
+            <div class="card hover-effect">
+                <div style="color: #ffb400; margin-bottom: 1rem; font-size:1.4rem;">⭐⭐⭐⭐⭐</div>
+                <p><em>"Un service client au top et des résultats exceptionnels : nous avons récolté <strong>+ 200 avis sur notre fiche Google en 1 mois</strong> seulement !"</em></p>
+                <p style="font-weight: 700; margin-bottom: 0; color: var(--text-primary);">Iris D.</p>
+                <p style="font-size: 0.95rem; margin-top:0;">Fleuriste en franchise</p>
+            </div>
+            <div class="card hover-effect">
+                <div style="color: #ffb400; margin-bottom: 1rem; font-size:1.4rem;">⭐⭐⭐⭐⭐</div>
+                <p><em>"Cette société a littéralement transformé notre visibilité sur internet. Leurs solutions d'animation commerciale sont très innovantes et fiables."</em></p>
+                <p style="font-weight: 700; margin-bottom: 0; color: var(--text-primary);">Amélie A.</p>
+                <p style="font-size: 0.95rem; margin-top:0;">Gérante Restaurant Pizza</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING SECTION (Plan Unique) -->
+    <div id="tarifs" class="bg-gray">
+        <div class="container">
+            <h2>Des outils complets. Un tarif transparent.</h2>
+            <p class="text-center" style="margin-bottom: 3rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Idéal pour les entreprises en croissance (TPE / PME). Optimisez votre animation commerciale sans vous ruiner.
+            </p>
+            
+            <div class="pricing-card hover-effect">
+                <h3 style="font-size: 1.8rem; margin-bottom: 0;">Plan Premium Access</h3>
+                <div class="pricing-price">9,90 € <span>TTC / mois</span></div>
+                <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Sans engagement de durée</p>
+                <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 2rem;">Paiement 100% sécurisé via la technologie PayPal pour garantir la protection totale de vos informations bancaires. <em>(Aucun compte PayPal nécessaire pour régler par carte bancaire classique).</em></p>
+                
+                <ul class="pricing-features">
+                    <li>✔️ <strong>Annulation facile</strong> en 1 clic</li>
+                    <li>✔️ <strong>Personnalisation totale</strong> (design et URL de destination)</li>
+                    <li>✔️ <strong>Choix illimité</strong> des lots et probabilités</li>
+                    <li>✔️ <strong>CRM complet</strong> et export de base clients</li>
+                    <li>✔️ <strong>Volume de création</strong> de campagnes illimité</li>
+                    <li>✔️ <strong>Configuration instantanée</strong> en 1 minute</li>
+                </ul>
+                <a href="#" class="btn" style="width: 100%; box-sizing: border-box; margin-top: 1rem;">Commencer la configuration</a>
+                <p style="font-size: 0.8rem; margin-top: 1.5rem;">La personnalisation de l'url de destination (vers l'action d'avis, de like, ou follow) est débloquée avec ce plan payant.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ SECTION -->
+    <section id="faq">
+        <div class="container" style="max-width: 850px;">
+            <h2>Foire aux questions (FAQ)</h2>
+            <p class="text-center" style="margin-bottom: 3rem;">Tout ce que vous devez savoir sur la collecte d'avis par gamification.</p>
+            
+            <details>
+                <summary>Comment fonctionne exactement Spin To Keep pour mon commerce ?</summary>
+                <p>C’est très simple. Notre plateforme vous permet de transformer la récolte fastidieuse d'avis clients en un jeu interactif très ludique. Vous concevez une roue de la fortune digitale en quelques clics, paramétrez vos lots à gagner (remises, goodies), et vous exposez votre QR code imprimé en boutique. Pour tenter leur chance, vos clients scannent le code avec l'appareil photo de leur smartphone. Après avoir joué, ils sont automatiquement redirigés vers vos pages d’avis (Google Profil d'Entreprise, Instagram, etc.).</p>
+            </details>
+            <details>
+                <summary>Est-ce que cet outil m'aide vraiment à obtenir plus d'avis Google positifs ?</summary>
+                <p>Oui, de façon très massive. Le principal frein d'un client satisfait pour laisser un avis est le manque de motivation ou tout simplement l'oubli une fois rentré chez lui. En transformant cette action en un jeu avec une récompense immédiate et tangible (un café offert, -10% de remise, un accessoire gratuit), vous multipliez par 5 en moyenne votre taux de conversion pour la collecte d'avis.</p>
+            </details>
+            <details>
+                <summary>Puis-je personnaliser le design de ma roue promotionnelle ?</summary>
+                <p>Tout à fait. Pour que l'expérience digitale soit parfaitement cohérente avec votre image de marque physique, notre éditeur vous permet d'importer facilement votre logo et de modifier précisément les couleurs des segments de la roue et des boutons pour qu'ils correspondent à 100% à votre charte graphique.</p>
+            </details>
+            <details>
+                <summary>Combien de temps prend la configuration du jeu concours ?</summary>
+                <p>Moins de 5 minutes. L'interface logicielle est pensée spécifiquement pour les commerçants pressés : vous téléchargez votre logo, choisissez vos teintes, listez vos cadeaux, et votre campagne marketing est instantanément prête à l'emploi. Le QR Code est généré automatiquement.</p>
+            </details>
+            <details>
+                <summary>Sur quelles plateformes puis-je rediriger mes clients gagnants ?</summary>
+                <p>Vous avez une totale liberté. Vous pouvez bien sûr configurer la roue pour rediriger vers votre fiche Google My Business (pour le référencement local SEO), mais aussi vers vos comptes Instagram, TikTok, la page Facebook de votre boutique, ou même votre page TripAdvisor si vous êtes un restaurant.</p>
+            </details>
+            <details>
+                <summary>Quel est le tarif réel du service ? Y a-t-il des frais cachés ?</summary>
+                <p>Nous proposons un accès complet à notre plateforme SaaS pour un tarif unique et transparent de 9,90€ TTC par mois. Contrairement à d'autres solutions sur le marché, il n'y a aucun abonnement caché ni aucun frais de mise en service. Une fois le paiement validé, vous avez immédiatement accès à tous les outils pour lancer vos campagnes en illimité.</p>
+            </details>
+            <details>
+                <summary>Comment les clients récupèrent-ils concrètement leurs cadeaux ?</summary>
+                <p>Lorsqu'un client gagne suite à la rotation de la roue, son résultat (et son code ID unique) s'affiche sur son téléphone. Il lui suffit de présenter son écran en caisse. Vous pouvez valider le gain très rapidement en vérifiant l'écran, ce qui permet d'éviter toute fraude.</p>
+            </details>
+            <details>
+                <summary>Ai-je besoin de compétences techniques ou informatiques particulières ?</summary>
+                <p>Absolument aucune. Si vous savez utiliser un smartphone basique pour surfer sur internet, vous saurez utiliser Games Reviews / Spin To Keep. Nous générons de manière automatisée le QR code final que vous n'avez plus qu'à imprimer ou à afficher sur une tablette en caisse.</p>
+            </details>
+        </div>
+    </section>
+</main>
+
+<!-- FOOTER -->
+<footer id="contact">
+    <div class="footer-content">
+        <div>
+            <h3>À propos de notre mission</h3>
+            <p style="color: #a1a1a6; line-height: 1.7; padding-right: 2rem;">
+                Notre mission est claire : transformer chaque interaction physique de vos clients en une action digitale stratégique (Growth Hacking Local). La survie et la croissance d'un commerce de proximité moderne dépendent de sa capacité à exister et briller au-delà de ses murs physiques. Une audience engagée sur les réseaux sociaux et une "pluie" d'avis Google positifs très récents sont les nouveaux piliers incontournables de la réussite commerciale.
+            </p>
+        </div>
+        <div class="footer-links" style="padding-left: 2rem; border-left: 1px solid #333;">
+            <h3>Assistance & Informations</h3>
+            <p style="margin-bottom: 2rem; color: #a1a1a6; font-size: 1.05rem;">
+                Pour toute demande commerciale ou technique, contactez-nous par e-mail :<br><br>
+                📩 <a href="mailto:contact@spintokeep.com" style="display: inline; color: #fff; font-weight: 600; font-size: 1.1rem; text-decoration: underline;">contact@spintokeep.com</a>
+            </p>
+            <a href="#legal">Mentions Légales</a>
+            <a href="#legal">Conditions Générales de Vente (CGV)</a>
+            <a href="#legal">Politique de confidentialité (Gestion RGPD)</a>
+        </div>
+    </div>
+    
+    <div id="legal" class="legal-text">
+        <p><strong style="color: #fff; font-size: 1rem;">Mentions Légales & Hébergement</strong></p>
+        <p>GAMES REVIEWS / Spin To Keep<br>
+        S.A.S au Capital de Ariary 2 100 000 Ar<br>
+        NIF 3004082242 &nbsp;|&nbsp; RCS 2020B00582 &nbsp;|&nbsp; STAT N° 70202 11 2020 0 10628</p>
+        <p>Siège social : LOT IVF 45 Behoririka, Antsiranana 201, Madagascar.<br>
+        Territoires d'intervention : France, Belgique, Suisse, Madagascar.<br>
+        Hébergement des bases de données : Les serveurs du site internet sont hébergés à Madagascar.</p>
+        <p style="margin-top: 1.5rem; font-style: italic; color: #777;">
+            Conformément à la réglementation RGPD, toutes les données collectées (nom, téléphone, adresse électronique) le sont via un processus de consentement explicite (Opt-In). Vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles.
+        </p>
+        <p style="margin-top: 3rem; font-size: 0.75rem; color: #555;">&copy; 2026 Spin To Keep. Tous droits réservés.</p>
+    </div>
+</footer>
+
+</body>
+</html>
