@@ -49,6 +49,9 @@
   CONFIGURATION REQUISE CÔTÉ SUPABASE (à exécuter une fois dans l'éditeur SQL)
   ============================================================================
 
+  -- 0. Extension nécessaire à la génération d'identifiants (gen_random_uuid)
+  create extension if not exists pgcrypto;
+
   -- 1. Table des profils (1 ligne par utilisateur, liée à auth.users)
   create table if not exists profiles (
     id uuid primary key references auth.users(id) on delete cascade,
@@ -66,7 +69,14 @@
   create policy "Création de profil à l'inscription"
     on profiles for insert with check (auth.uid() = id);
 
-  -- 2. Lier chaque roulette à son créateur
+  -- 2. Table des roulettes créées (une ligne par jeu généré)
+  create table if not exists roulette_configs (
+    id text primary key,
+    data jsonb not null,
+    owner_id uuid references auth.users(id),
+    is_premium_url boolean default false,
+    created_at timestamptz default now()
+  );
   alter table roulette_configs add column if not exists owner_id uuid references auth.users(id);
   alter table roulette_configs add column if not exists is_premium_url boolean default false;
   alter table roulette_configs enable row level security;
@@ -77,12 +87,27 @@
   create policy "Un utilisateur modifie ses propres roulettes"
     on roulette_configs for update using (auth.uid() = owner_id);
 
-  -- 3. Participants : ajout du statut gagné/perdu et de la remise du lot
+  -- 3. Table des participants (une ligne par partie jouée par un client final)
+  create table if not exists roulette_participants (
+    id uuid primary key default gen_random_uuid(),
+    config_id text references roulette_configs(id) on delete cascade,
+    nom text,
+    email text,
+    telephone text,
+    lot_gagne text,
+    "OPTIN" text,
+    is_win boolean default true,
+    lot_recupere boolean default false,
+    created_at timestamptz default now()
+  );
   alter table roulette_participants add column if not exists is_win boolean default true;
   alter table roulette_participants add column if not exists lot_recupere boolean default false;
   alter table roulette_participants enable row level security;
-  create policy "Lecture publique des participants (comptage)" on roulette_participants for select using (true);
   create policy "Écriture publique des participants (jeu client)" on roulette_participants for insert with check (true);
+  create policy "Le propriétaire lit les participants de ses roulettes"
+    on roulette_participants for select using (
+      auth.uid() = (select owner_id from roulette_configs where roulette_configs.id = roulette_participants.config_id)
+    );
   create policy "Le propriétaire met à jour les participants de ses roulettes"
     on roulette_participants for update using (
       auth.uid() = (select owner_id from roulette_configs where roulette_configs.id = roulette_participants.config_id)
@@ -607,6 +632,10 @@
     .premium-price .amount span { font-size: .45em; font-weight: 700; }
     .premium-benefits { list-style: none; padding: 0; margin: 0 0 18px 0; font-size: 13.5px; }
     .premium-benefits li { padding: 8px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: flex-start; }
+    .promo-code-box { margin-top: 14px; text-align: center; }
+    .promo-toggle { background: none; border: none; color: var(--muted); font-size: 12px; text-decoration: underline; cursor: pointer; padding: 4px; }
+    .promo-toggle:hover { color: var(--ink); }
+    #promo-code-fields input { text-align: center; font-weight: 700; letter-spacing: 1px; }
     .premium-benefits li:last-child { border-bottom: none; }
     #paypal-button-container { min-height: 45px; }
 
@@ -1175,6 +1204,17 @@
             Connectez-vous ou créez un compte avant de payer, pour rattacher Premium à votre compte.
         </div>
         <div id="paypal-button-container"></div>
+
+        <div class="promo-code-box">
+            <button type="button" class="promo-toggle" onclick="togglePromoBox()">J'ai un code promo</button>
+            <div id="promo-code-fields" style="display:none;">
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <input type="text" id="promo-code-input" placeholder="Code promo" style="text-transform:uppercase;" onkeydown="if(event.key==='Enter'){event.preventDefault();redeemPromoCode();}">
+                    <button type="button" class="btn-ghost" onclick="redeemPromoCode()">Valider</button>
+                </div>
+                <p id="promo-code-error" style="display:none; color:var(--danger); font-size:12px; margin:8px 0 0 0;"></p>
+            </div>
+        </div>
     </div>
 </div>
     </section>
@@ -1846,6 +1886,9 @@ if(slider) {
         document.getElementById('premium-modal').classList.add('show');
         document.getElementById('paypal-login-required').style.display = currentUser ? 'none' : 'block';
         document.getElementById('paypal-button-container').style.display = currentUser ? 'block' : 'none';
+        document.getElementById('promo-code-fields').style.display = 'none';
+        document.getElementById('promo-code-input').value = '';
+        document.getElementById('promo-code-error').style.display = 'none';
         if (currentUser) loadPaypalSdk();
     }
     function closePremiumModal() {
@@ -1891,6 +1934,57 @@ if(slider) {
             if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
         } catch (e) {
             toast("Le paiement a réussi mais l'activation a échoué. Contactez le support avec l'ID d'abonnement : " + subscriptionId, "error");
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // CODE PROMO (accès premium illimité sans passer par PayPal)
+    // ---------------------------------------------------------------
+    const VALID_PROMO_CODES = ['MADA'];
+
+    function togglePromoBox() {
+        const box = document.getElementById('promo-code-fields');
+        const isHidden = box.style.display === 'none';
+        box.style.display = isHidden ? 'block' : 'none';
+        if (isHidden) document.getElementById('promo-code-input').focus();
+    }
+
+    async function redeemPromoCode() {
+        if (!currentUser) {
+            openAuthModal('login');
+            toast("Connectez-vous d'abord pour appliquer un code promo.");
+            return;
+        }
+        const input = document.getElementById('promo-code-input');
+        const errBox = document.getElementById('promo-code-error');
+        const code = input.value.trim().toUpperCase();
+        errBox.style.display = 'none';
+
+        if (!code) {
+            errBox.innerText = "Entrez un code promo.";
+            errBox.style.display = 'block';
+            return;
+        }
+        if (!VALID_PROMO_CODES.includes(code)) {
+            errBox.innerText = "Code promo invalide.";
+            errBox.style.display = 'block';
+            return;
+        }
+
+        try {
+            const { error } = await sb.from('profiles').update({
+                is_premium: true, premium_since: new Date().toISOString(), paypal_subscription_id: 'PROMO-' + code
+            }).eq('id', currentUser.id);
+            if (error) throw error;
+            currentProfile = { ...currentProfile, is_premium: true };
+            renderAuthUI();
+            renderUrlGate();
+            closePremiumModal();
+            toast("🎉 Code promo appliqué : accès Premium illimité débloqué !", "success");
+            if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
+        } catch (e) {
+            errBox.innerText = "Erreur lors de l'application du code. Réessayez.";
+            errBox.style.display = 'block';
         }
     }
 
