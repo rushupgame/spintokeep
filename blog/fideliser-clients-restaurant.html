@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Comment Fidéliser les Clients de votre Restaurant (et exploser vos Avis) | Spin To Keep</title>
+    <meta name="description" content="Découvrez la méthode infaillible pour fidéliser les clients de votre restaurant, récolter des dizaines d'avis Google par semaine et remplir votre salle.">
+    <meta name="keywords" content="fidéliser clients restaurant, attirer clients restaurant, marketing restaurant, avis google restaurant, qr code restaurant, carte de fidélité restaurant, Spin To Keep">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.7; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* HEADER */
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .btn-nav { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s ease; }
+        .btn-nav:hover { background: var(--accent-hover); }
+
+        /* TYPOGRAPHY */
+        h1 { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; text-align: center; letter-spacing: -0.03em; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-top: 3.5rem; margin-bottom: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 10px; }
+        h3 { font-size: 1.6rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 1.5rem; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* LAYOUT */
+        .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; text-align: center; }
+        .bg-gray { background-color: var(--bg-secondary); padding: 4rem 0; width: 100%; }
+        .content-section { max-width: 850px; margin: 0 auto; padding: 0 2rem; }
+        article { background: #fff; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        /* LISTS & FAQ */
+        .benefits-list { list-style: none; padding: 0; margin-bottom: 2rem; }
+        .benefits-list li { font-size: 1.15rem; padding: 16px 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: flex-start; gap: 12px; }
+        .benefits-list li:last-child { border-bottom: none; }
+        .benefits-list li::before { content: '🍽️'; font-size: 1.2rem; margin-top: 2px; }
+        
+        .faq-box { background: var(--bg-secondary); padding: 2.5rem; border-radius: 16px; margin-top: 2rem; border: 1px solid var(--border-color); }
+        .faq-item { margin-bottom: 2rem; }
+        .faq-item:last-child { margin-bottom: 0; }
+        .faq-item h4 { font-size: 1.3rem; margin: 0 0 0.8rem 0; color: var(--text-primary); }
+        .faq-item p { font-size: 1.1rem; margin: 0; }
+
+        /* INFO BOX */
+        .info-box { background: rgba(0, 113, 227, 0.05); border-left: 4px solid var(--accent-color); padding: 1.5rem 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; }
+        .info-box p { margin: 0; color: var(--text-primary); }
+
+        /* BUTTONS */
+        .btn-large { display: inline-block; background-color: var(--accent-color); color: #fff; padding: 18px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3); }
+        .btn-large:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+        .btn-outline { display: inline-block; background-color: transparent; color: var(--accent-color); padding: 16px 36px; border-radius: 50px; font-size: 1.1rem; font-weight: 600; text-decoration: none; border: 2px solid var(--accent-color); transition: all 0.2s ease; margin-top: 1rem; }
+        .btn-outline:hover { background-color: rgba(0, 113, 227, 0.05); }
+
+        /* FOOTER */
+        footer { background-color: #151516; color: #a1a1a6; padding: 3rem 2rem; text-align: center; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            article { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/index.html" class="logo">SpinToKeep<span>.</span></a>
+        <a href="/index.html#configurateur" class="btn-nav">Tester l'outil</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero animate-up">
+        <h1>Comment <span class="highlight">Fidéliser les Clients</span> de votre Restaurant (et booster vos Avis)</h1>
+        <p>
+            Attirer de nouveaux clients coûte cher. Les faire revenir est le secret des restaurants les plus rentables. Découvrez comment digitaliser l'expérience de fin de repas pour créer un effet "waouh", récolter des avis Google en masse et remplir votre salle les jours creux.
+        </p>
+        <a href="/index.html#configurateur" class="btn-large hover-effect">Créer une roue pour mon restaurant</a>
+    </section>
+
+    <div class="bg-gray">
+        <section class="content-section animate-up">
+            <article>
+                <h2>Le vrai défi d'un restaurateur aujourd'hui</h2>
+                <p>
+                    Gérer un restaurant demande une énergie folle : management de l'équipe, gestion des stocks, inflation, accueil client... Pourtant, la rentabilité de votre établissement ne repose pas uniquement sur la qualité de votre cuisine. Elle repose sur votre <strong>capacité à faire revenir un client</strong>.
+                </p>
+                <p>
+                    En marketing, on dit que l'acquisition d'un nouveau client coûte 5 à 7 fois plus cher que la fidélisation d'un client existant. Mais comment fidéliser une clientèle de plus en plus volatile ?
+                </p>
+
+                <h3>Le problème de la carte de fidélité classique</h3>
+                <p>
+                    La petite carte cartonnée "10 repas achetés = 1 repas offert" ne fonctionne plus. Les clients la perdent, l'oublient dans un autre portefeuille, ou n'y trouvent pas une motivation suffisante à court terme. De plus, elle ne vous permet pas de garder le contact avec eux une fois qu'ils ont franchi la porte de votre établissement.
+                </p>
+
+                <h2>L'addition : le moment stratégique par excellence</h2>
+                <p>
+                    Dans l'expérience client d'un restaurant, le moment de payer l'addition est souvent le "point de friction" majeur. L'ambiance redescend, l'attente peut être longue. C'est précisément à cet instant que vous devez agir.
+                </p>
+                <div class="info-box">
+                    <p>Imaginez que le serveur pose l'addition avec un petit QR Code indiquant : <strong>"Scannez pour gagner votre café, un digestif ou votre prochain dessert !"</strong>. Vous venez de transformer un moment ennuyeux en une expérience mémorable.</p>
+                </div>
+
+                <h2>La Gamification : L'arme secrète des restaurateurs rentables</h2>
+                <p>
+                    Grâce à la solution <a href="/index.html" style="color: var(--accent-color); font-weight: 600;">Spin To Keep</a>, vous pouvez créer en deux minutes une <strong>Roue de la Fortune Digitale</strong> ou un <strong>Bandit Manchot</strong>. Le client scanne le QR code avec son téléphone et joue instantanément. Cette simple mécanique résout trois problèmes majeurs de votre restaurant.
+                </p>
+                
+                <h3>1. L'explosion de votre référencement (Local Pack Google)</h3>
+                <p>
+                    Comment apparaître en premier quand un touriste tape "Bon restaurant autour de moi" ? Grâce au volume et à la fraîcheur de vos avis Google. Avec notre outil, pour valider son gain (ou juste avant de lancer la roue), le client est intelligemment invité à <strong>laisser un avis 5 étoiles sur votre page Google</strong>. L'effort est récompensé immédiatement, et votre e-réputation grimpe en flèche sans que vos serveurs aient besoin de "mendier" un commentaire.
+                </p>
+
+                <h3>2. Se constituer un fichier client (Le Graal du restaurateur)</h3>
+                <p>
+                    Pour tourner la roue, le client entre son nom et son email. Automatiquement, vous vous constituez une base de données (CRM) conforme au RGPD. À quoi ça sert ?
+                </p>
+                <p>
+                    Votre salle est souvent vide le mardi soir ? Exportez votre base de données et envoyez un email : <em>"Ce soir, pour nos clients fidèles, une bouteille de vin offerte pour toute table de 4 personnes"</em>. Vous venez de reprendre le contrôle de votre remplissage.
+                </p>
+
+                <h3>3. La fidélisation par la récompense différée</h3>
+                <p>
+                    Le configurateur Spin To Keep vous permet de paramétrer exactement les lots et leurs probabilités. Vous pouvez offrir :
+                </p>
+                <ul class="benefits-list">
+                    <li><strong>Pour un gain immédiat :</strong> Le café offert, le digestif de la maison, ou la sauce en supplément.</li>
+                    <li><strong>Pour faire revenir le client :</strong> "-15% sur votre prochaine addition", "Un dessert offert lors de votre prochaine visite". Ce type de lot (très apprécié) garantit le retour du client dans les semaines qui suivent.</li>
+                </ul>
+
+                <h2>Comment mettre en place ce jeu dans votre restaurant ?</h2>
+                <p>L'installation prend moins de 5 minutes et ne nécessite aucun matériel supplémentaire, ni aucune application à télécharger pour vos clients :</p>
+                <ol style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;">
+                    <li>Allez sur le <strong>configurateur gratuit Spin To Keep</strong>.</li>
+                    <li>Choisissez le thème de votre établissement (couleurs, logo).</li>
+                    <li>Sélectionnez vos lots (cafés, desserts, pourcentages de remise) et ajustez le pourcentage de chance de tomber dessus.</li>
+                    <li>Imprimez le QR code généré sur vos portes-additions, des chevalets de table, ou votre menu.</li>
+                </ol>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Créer une roue pour mon restaurant</a>
+                </div>
+
+                <h2>Foire Aux Questions (FAQ) pour les Restaurateurs</h2>
+                
+                <div class="faq-box">
+                    <div class="faq-item">
+                        <h4>Est-ce que cela va ralentir le service de mes serveurs ?</h4>
+                        <p>Absolument pas. Le client joue en toute autonomie sur son propre smartphone à sa table. Le serveur a juste à jeter un coup d'œil à l'écran du client au moment de l'encaissement pour appliquer la réduction ou offrir le lot.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Je n'ai pas un gros budget pour offrir des cadeaux...</h4>
+                        <p>L'outil est fait pour ça. Vous pouvez régler les probabilités pour que 80% des clients gagnent un "Café offert" ou "Un grand merci" et seulement 1% gagne "Le repas offert". De plus, le coût de revient d'un café est infime comparé à la valeur d'un avis Google 5 étoiles et d'une adresse email qualifiée.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Mes clients peuvent-ils jouer plusieurs fois de suite ?</h4>
+                        <p>Le système Spin To Keep intègre une protection par cookies et par identification qui limite la participation à un seul lancer par client. Les conditions légales du jeu sont également affichées directement sous la roue.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 2rem;">Remplissez votre salle et dominez Tripadvisor & Google</h3>
+                    <p style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Digitalisez la fin du repas. Offrez une expérience mémorable à vos clients et regardez vos réservations augmenter grâce à la puissance des avis locaux.</p>
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Démarrer gratuitement ➡️</a><br>
+                    <a href="/index.html" class="btn-outline">En savoir plus sur la plateforme</a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; Spin To Keep. Solution de fidélisation et de Growth Hacking pour les professionnels de la restauration.</p>
+    <p style="font-size: 0.85rem; margin-top: 0.8rem;"><a href="/index.html" style="color: #a1a1a6; text-decoration: underline;">Retour à l'accueil du site</a></p>
+</footer>
+
+</body>
+</html>
