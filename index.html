@@ -231,14 +231,22 @@
   revoke all on function redeem_promo_code(text) from public;
   grant execute on function redeem_promo_code(text) to authenticated;
 
-  -- ⚠️ SÉCURITÉ : le déblocage Premium ci-dessous met à jour `is_premium` depuis le
-  -- navigateur après validation PayPal (abonnement 9,90 €/mois). C'est suffisant pour
-  -- un MVP mais un utilisateur technique pourrait falsifier l'appel, et rien ne
-  -- désactive automatiquement `is_premium` en cas d'annulation ou d'échec de paiement
-  -- récurrent. Pour la mise en production, déplacez la validation de l'abonnement
-  -- PayPal (création + webhooks BILLING.SUBSCRIPTION.CANCELLED / PAYMENT.SALE.DENIED)
-  -- dans une Supabase Edge Function qui met à jour `is_premium` côté serveur.
-  -- (Le code promo, lui, est déjà sécurisé côté serveur via la fonction ci-dessus.)
+  -- ✅ SÉCURITÉ PayPal : l'activation Premium passe désormais par deux Supabase
+  -- Edge Functions (à déployer séparément, hors de ce fichier HTML) :
+  --   1. verify-paypal-subscription : appelée par le site juste après le paiement,
+  --      revérifie l'abonnement auprès de PayPal avant d'activer `is_premium`.
+  --   2. paypal-webhook : reçoit les webhooks PayPal (annulation, suspension,
+  --      paiement refusé/remboursé...) et désactive `is_premium` automatiquement.
+  -- Déploiement (CLI Supabase, à faire une seule fois) :
+  --   supabase functions deploy verify-paypal-subscription
+  --   supabase functions deploy paypal-webhook --no-verify-jwt
+  --   supabase secrets set PAYPAL_CLIENT_ID=... PAYPAL_CLIENT_SECRET=... \
+  --     PAYPAL_ENV=live PAYPAL_PLAN_ID=P-16K40079FK484592LNF4PL2Q PAYPAL_WEBHOOK_ID=...
+  -- Puis, dans le dashboard PayPal (Developer > Apps > votre app > Webhooks),
+  -- créer un webhook pointant vers l'URL publique de paypal-webhook et cocher au
+  -- minimum : BILLING.SUBSCRIPTION.CANCELLED, BILLING.SUBSCRIPTION.SUSPENDED,
+  -- BILLING.SUBSCRIPTION.EXPIRED, PAYMENT.SALE.DENIED, PAYMENT.SALE.REFUNDED.
+  -- (Le code promo, lui, était déjà sécurisé côté serveur via la fonction ci-dessus.)
   ============================================================================
 -->
 
@@ -566,20 +574,19 @@
     .ls { width: 72px; text-align: center; }
     .lc { width: 42px; height: 42px; padding: 0; border: none; background: none; cursor: pointer; flex-shrink: 0; }
 
-    .labels-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: .68em; font-weight: 700; color: var(--muted); padding-right: 33px; text-align: center; }
-    .labels-row div { display: flex; align-items: center; justify-content: center; line-height: 1.1; }
-    .ln-label { flex: 2; } .lp-label { width: 72px; } .ls-label { width: 72px; } .lc-label { width: 42px; }
-
-    @media (max-width: 600px) {
-        .labels-row { display: none; }
-        .lot-row { flex-wrap: wrap; background: #fbfbfc; padding: 14px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 14px; gap: 10px; }
-        .input-wrapper { width: 100%; }
-        .input-wrapper.small { width: calc(50% - 5px); }
-        .input-wrapper.color { width: calc(33.33% - 7px); }
-        .input-wrapper.win { width: calc(33.33% - 7px); }
-        .mobile-label { display: block; }
-        .ln, .lp, .ls, .lc { width: 100% !important; }
-        .lc { border: 1px solid var(--line) !important; border-radius: 8px; height: 38px; }
+    /* Même mise en page "carte" pour les lots, sur PC comme sur mobile */
+    .labels-row { display: none; }
+    .lot-row { flex-wrap: wrap; background: #fbfbfc; padding: 14px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 14px; gap: 10px; }
+    .input-wrapper { width: 100%; }
+    .input-wrapper.small { width: calc(50% - 5px); }
+    .input-wrapper.color { width: calc(33.33% - 7px); }
+    .input-wrapper.win { width: calc(33.33% - 7px); }
+    .mobile-label { display: block; }
+    .ln, .lp, .ls, .lc { width: 100% !important; }
+    .lc { border: 1px solid var(--line) !important; border-radius: 8px; height: 38px; }
+    @media (min-width: 601px) {
+        #lots-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; align-items: start; }
+        #lots-inputs .lot-row-wrapper { margin-bottom: 0; }
     }
 
     .full-width { width: 100%; margin-bottom: 12px; display: block; }
@@ -1063,13 +1070,7 @@
             <summary><span class="num">6</span><span class="label" id="sum-lots">Lots & probabilités</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-lots-cust">Le total des probabilités doit toujours faire 100 %.</p>
-                <div style="display:flex; align-items:flex-end; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
-                    <div class="input-wrapper" style="max-width:160px;">
-                        <label class="field-label" id="lbl-lot-count" style="margin-bottom:4px;">Nombre de lots au total</label>
-                        <input type="number" id="lot_count" min="2" max="12" value="6" oninput="setLotCount(this.value)">
-                    </div>
-                    <p style="font-size:11.5px; color:var(--muted); margin:0 0 9px 0;">Les probabilités sont réparties automatiquement, ajustez-les ensuite lot par lot si besoin.</p>
-                </div>
+                <input type="hidden" id="lot_count" min="2" max="12" value="4">
                 <div class="prob-bar-label"><span id="prob-bar-txt">Total : 100%</span></div>
                 <div class="prob-bar-track"><div class="prob-bar-fill" id="prob-bar-fill" style="width:100%;background:var(--success);"></div></div>
                 <div class="labels-row">
@@ -1080,6 +1081,9 @@
                     <div class="lc-label" id="lbl-row-txt">TEXTE</div>
                 </div>
                 <div id="lots-inputs"></div>
+                <div class="btn-add-container">
+                    <button type="button" class="btn-add" id="btn-add-lot" onclick="addNewLotManual()">+ <span id="btn-add-lot-lbl">rajouter un lot</span></button>
+                </div>
                 <div id="prob-info"></div>
             </div>
         </details>
@@ -1143,7 +1147,7 @@
             </div>
             <div id="poster-area" style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
                 <p id="poster-status" style="font-size:12.5px; color:var(--muted); margin:0 0 10px 0;">🖼️ Préparation de vos 3 affiches A4 / A5 / A6...</p>
-                <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Télécharger mes affiches (PDF, A4+A5+A6)</button>
+                <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Aperçu de mes affiches (PDF, A4+A5+A6)</button>
             </div>
         </div>
     </div>
@@ -1347,6 +1351,17 @@
         <div id="link-back-to-login" style="text-align:center; margin-top:14px;">
             <a href="#" onclick="switchAuthTab('login'); return false;" style="font-size:12.5px; color:var(--muted); text-decoration:underline; cursor:pointer;">← Retour à la connexion</a>
         </div>
+    </div>
+</div>
+
+<!-- ============ POSTER PREVIEW MODAL ============ -->
+<div class="modal-overlay" id="poster-preview-modal">
+    <div class="modal-box wide">
+        <button class="modal-close" onclick="closePosterPreview()">×</button>
+        <h3 class="modal-title">Aperçu de vos affiches</h3>
+        <p class="modal-sub">Vérifiez le rendu avant de télécharger le PDF (A4, A5, A6).</p>
+        <div id="poster-preview-images" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:14px; margin-bottom:18px;"></div>
+        <button class="btn-black" style="width:100%;" onclick="downloadPostersPdf()">📄 Télécharger le PDF</button>
     </div>
 </div>
 
@@ -2033,7 +2048,9 @@ if(slider) {
                 if (data.user) {
                     await sb.from('profiles').insert({ id: data.user.id, email, birthdate }).select();
                 }
-                toast("Compte créé ! Vérifiez votre email si une confirmation est requise.", "success");
+                // La confirmation d'email est désactivée côté Supabase : signUp() renvoie
+                // directement une session active, l'utilisateur est donc déjà connecté.
+                toast("Compte créé ! Vous êtes connecté.", "success");
             } else {
                 const { data, error } = await sb.auth.signInWithPassword({ email, password });
                 if (error) throw error;
@@ -2093,16 +2110,30 @@ if(slider) {
         }
         const initial = (currentProfile && currentProfile.email ? currentProfile.email[0] : 'U').toUpperCase();
         const premiumChip = currentProfile && currentProfile.is_premium ? `<span class="chip-premium">⭐ Premium</span>` : '';
+        // Le bouton "compte" (avatar) ramène au configurateur : il ne doit surtout pas
+        // déconnecter au clic, sinon l'utilisateur croit être "souvent déconnecté" alors
+        // qu'il clique simplement sur ce qu'il pense être son compte. La déconnexion est
+        // une action volontaire séparée, sur son propre bouton.
         if (actions) actions.innerHTML = `
             ${premiumChip}
             <button class="btn-ghost" onclick="openDashboard()">Dashboard</button>
-            <button class="avatar-btn" title="${currentProfile ? currentProfile.email : ''}" onclick="handleLogout()">${initial}</button>
+            <button class="btn-ghost" title="${currentProfile ? currentProfile.email : ''}" onclick="goToMyAccount()">
+                <span class="avatar-btn" style="display:inline-flex; width:22px; height:22px; font-size:11px; margin-right:6px; vertical-align:middle;">${initial}</span>Mon compte
+            </button>
+            <button class="btn-ghost" onclick="handleLogout()" title="Se déconnecter">Déconnexion</button>
         `;
         if (navAuth) navAuth.innerHTML = `
             ${premiumChip}
             <button class="btn-nav-login" onclick="closeMenu(); openDashboard();">Dashboard</button>
-            <button class="avatar-btn" title="${currentProfile ? currentProfile.email : ''}" onclick="handleLogout()">${initial}</button>
+            <button class="btn-nav-login" onclick="closeMenu(); goToMyAccount();">Mon compte</button>
+            <button class="btn-nav-login" onclick="closeMenu(); handleLogout();" style="background:none; color:var(--muted); border:1px solid var(--line);">Déconnexion</button>
         `;
+    }
+
+    function goToMyAccount() {
+        closeDashboard();
+        const section = document.getElementById('configurateur');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // ---------------------------------------------------------------
@@ -2176,13 +2207,25 @@ if(slider) {
 
     async function activatePremium(subscriptionId) {
         try {
-            const { error } = await sb.from('profiles').update({
-                is_premium: true, premium_since: new Date().toISOString(), paypal_subscription_id: subscriptionId
-            }).eq('id', currentUser.id);
-            if (error) throw error;
-            currentProfile = { ...currentProfile, is_premium: true };
-            renderAuthUI();
-            renderUrlGate();
+            // La validation ne se fait plus depuis le navigateur : on transmet juste
+            // l'ID de l'abonnement à l'Edge Function, qui revérifie tout auprès de
+            // PayPal avant d'activer Premium côté serveur (service role).
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) throw new Error("Session expirée, reconnectez-vous.");
+
+            const res = await fetch(`${SB_URL}/functions/v1/verify-paypal-subscription`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`,
+                    'apikey': SB_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ subscriptionID: subscriptionId })
+            });
+            const result = await res.json();
+            if (!res.ok || !result.success) throw new Error(result.message || "Activation refusée.");
+
+            await refreshSession();
             closePremiumModal();
             toast("🎉 Abonnement Premium activé ! L'URL personnalisée est débloquée.", "success");
             if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
@@ -2647,7 +2690,7 @@ if(slider) {
             document.getElementById('lbl-row-size').innerText = ui.lblRowSize;
             document.getElementById('lbl-row-bg').innerText = ui.lblRowBg;
             document.getElementById('lbl-row-txt').innerText = ui.lblRowTxt;
-            document.getElementById('lbl-lot-count').innerText = ui.lblLotCount || document.getElementById('lbl-lot-count').innerText;
+            document.getElementById('btn-add-lot-lbl').innerText = ui.btnAddLot || document.getElementById('btn-add-lot-lbl').innerText;
             document.getElementById('sum-texts').innerText = ui.sumTexts;
             document.getElementById('lbl-txt-cust').innerText = ui.lblTxtCust;
             document.getElementById('lbl-qr-scanner').innerText = ui.lblQrScanner;
@@ -3602,12 +3645,12 @@ if(slider) {
         el.style.textAlign = 'center';
 
         el.innerHTML = `
-            <div style="display:flex; flex-direction:column; align-items:center; margin-top:${Math.round(pad * 0.4)}px;">
+            <div id="poster-top-block" style="display:flex; flex-direction:column; align-items:center; margin-top:${Math.round(pad * 0.4)}px; max-height:${Math.round(h * 0.42)}px; overflow:hidden; width:100%; box-sizing:border-box;">
                 ${logoUrl
                 ? `<img src="${logoUrl}" crossorigin="anonymous" style="max-width:${logoW}px; max-height:${logoW}px; object-fit:contain; margin-bottom:${gap}px;">`
                 : `<div style="font-size:${emojiSize}px; margin-bottom:${gap}px; line-height:1;">${emoji}</div>`}
-                <h1 style="font-size:${titleSize}px; font-weight:800; margin:0 0 ${gap}px 0; line-height:1.15; max-width:90%;">${escapeHtml(title)}</h1>
-                <p style="font-size:${subSize}px; font-weight:600; margin:0; opacity:.95; max-width:82%; line-height:1.4;">${escapeHtml(subtitle)}</p>
+                <h1 id="poster-title" style="font-size:${titleSize}px; font-weight:800; margin:0 0 ${gap}px 0; line-height:1.15; max-width:90%;">${escapeHtml(title)}</h1>
+                <p id="poster-subtitle" style="font-size:${subSize}px; font-weight:600; margin:0; opacity:.95; max-width:82%; line-height:1.4;">${escapeHtml(subtitle)}</p>
             </div>
             <div style="background:#fff; border-radius:${radius}px; padding:${qrCardPad}px; box-shadow:0 ${Math.round(w * 0.02)}px ${Math.round(w * 0.06)}px rgba(0,0,0,.25); display:flex; flex-direction:column; align-items:center;">
                 <img src="${qrDataUrl}" style="width:${qrSize}px; height:${qrSize}px; display:block;">
@@ -3617,6 +3660,31 @@ if(slider) {
         `;
         return el;
     }
+
+    // Réduit progressivement la taille du titre (puis du sous-titre) jusqu'à ce que le
+    // bloc du haut tienne dans son budget de hauteur, pour ne jamais repousser le QR
+    // code hors de l'affiche quand le texte est long.
+    function fitPosterTopBlock(el) {
+        const block = el.querySelector('#poster-top-block');
+        const titleEl = el.querySelector('#poster-title');
+        const subEl = el.querySelector('#poster-subtitle');
+        if (!block || !titleEl) return;
+        const maxHeight = parseFloat(block.style.maxHeight) || block.clientHeight;
+        let titleSize = parseFloat(getComputedStyle(titleEl).fontSize);
+        let subSize = subEl ? parseFloat(getComputedStyle(subEl).fontSize) : 0;
+        let guard = 0;
+        while (block.scrollHeight > maxHeight && titleSize > 10 && guard < 40) {
+            titleSize -= 1;
+            titleEl.style.fontSize = titleSize + 'px';
+            if (subEl && subSize > 8) {
+                subSize -= 0.4;
+                subEl.style.fontSize = subSize + 'px';
+            }
+            guard++;
+        }
+    }
+
+    let posterFormatsCache = [];
 
     async function generatePosters() {
         if (!lastGeneratedConfigId || !lastGeneratedUrl || !lastGeneratedConfigData) return;
@@ -3641,29 +3709,60 @@ if(slider) {
                 { name: 'A6', wmm: 105, hmm: 148, wpx: 550 }
             ];
 
-            const { jsPDF } = window.jspdf;
-            let pdf = null;
+            posterFormatsCache = [];
 
             for (const f of formats) {
                 const el = buildPosterElement(f, bg, textColor, logoUrl, emoji, title, subtitle, qrDataUrl);
                 document.body.appendChild(el);
                 await new Promise(r => setTimeout(r, 60));
+                fitPosterTopBlock(el);
                 const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
                 document.body.removeChild(el);
                 const imgData = canvas.toDataURL('image/jpeg', 0.92);
-                if (!pdf) pdf = new jsPDF({ unit: 'mm', format: [f.wmm, f.hmm] });
-                else pdf.addPage([f.wmm, f.hmm], 'p');
-                pdf.addImage(imgData, 'JPEG', 0, 0, f.wmm, f.hmm);
+                posterFormatsCache.push({ ...f, imgData });
             }
 
-            pdf.save(`affiches-${lastGeneratedConfigId}.pdf`);
-            if (statusEl) statusEl.innerText = '✅ Vos 3 affiches (A4, A5, A6) sont prêtes et téléchargées.';
+            if (statusEl) statusEl.innerText = '✅ Aperçu prêt. Vérifiez vos affiches avant de les télécharger.';
             if (btnEl) btnEl.style.display = 'block';
+            openPosterPreview();
         } catch (e) {
             if (statusEl) statusEl.innerText = "⚠️ Erreur lors de la génération des affiches (souvent liée à un logo externe bloquant l'export). Cliquez pour réessayer.";
             if (btnEl) btnEl.style.display = 'block';
         }
     }
+
+    function openPosterPreview() {
+        if (!posterFormatsCache.length) return;
+        const wrap = document.getElementById('poster-preview-images');
+        wrap.innerHTML = posterFormatsCache.map(f => `
+            <div style="text-align:center;">
+                <img src="${f.imgData}" style="max-width:100%; border-radius:10px; border:1px solid var(--line); box-shadow:0 4px 14px rgba(0,0,0,.1);">
+                <p style="font-size:11.5px; color:var(--muted); margin:6px 0 0 0; font-weight:700;">Format ${f.name}</p>
+            </div>
+        `).join('');
+        document.getElementById('poster-preview-modal').classList.add('show');
+    }
+
+    function closePosterPreview() {
+        document.getElementById('poster-preview-modal').classList.remove('show');
+    }
+
+    function downloadPostersPdf() {
+        if (!posterFormatsCache.length || !lastGeneratedConfigId) return;
+        const { jsPDF } = window.jspdf;
+        let pdf = null;
+        posterFormatsCache.forEach(f => {
+            if (!pdf) pdf = new jsPDF({ unit: 'mm', format: [f.wmm, f.hmm] });
+            else pdf.addPage([f.wmm, f.hmm], 'p');
+            pdf.addImage(f.imgData, 'JPEG', 0, 0, f.wmm, f.hmm);
+        });
+        pdf.save(`affiches-${lastGeneratedConfigId}.pdf`);
+        closePosterPreview();
+        const statusEl = document.getElementById('poster-status');
+        if (statusEl) statusEl.innerText = '✅ Vos 3 affiches (A4, A5, A6) sont prêtes et téléchargées.';
+    }
+
+
 
     function updateEditBanner() {
         const el = document.getElementById('edit-mode-banner');
@@ -3745,12 +3844,10 @@ if(slider) {
     }
 
     const defaultLots = [
-        { n: "🥹  DOMMAGE", p: 95, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "-20% REMISE", p: 1, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
-        { n: "PERDU    🥹", p: 1, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "-10% REMISE", p: 1, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
-        { n: "RATÉ🥹", p: 1, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "-5%  REMISE", p: 1, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
+        { n: "PERDU    🥹", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
+        { n: "-20% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
+        { n: "RATÉ🥹", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
+        { n: "-10% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
     ];
 
     function addLotRow(n, p, s, bg, tx, w) {
@@ -3794,6 +3891,18 @@ if(slider) {
         const rows = document.querySelectorAll('.lot-row-wrapper');
         if (rows.length <= 2) { toast("Il faut au moins 2 lots.", "error"); return; }
         btn.closest('.lot-row-wrapper').remove();
+        redistributeProbabilities();
+        document.getElementById('lot_count').value = document.querySelectorAll('.lot-row-wrapper').length;
+        update();
+    }
+
+    function addNewLotManual() {
+        const rows = document.querySelectorAll('.lot-row-wrapper');
+        if (rows.length >= 12) { toast("12 lots maximum.", "error"); return; }
+        const c1 = document.getElementById('color1').value;
+        const c2 = document.getElementById('color2').value;
+        const bg = rows.length % 2 === 0 ? c1 : c2;
+        addLotRow('Nouveau lot', 0, 12, bg, getContrastColor(bg), true);
         redistributeProbabilities();
         document.getElementById('lot_count').value = document.querySelectorAll('.lot-row-wrapper').length;
         update();
