@@ -1904,12 +1904,12 @@ if(slider) {
     // vérification serveur échoue avec "Abonnement PayPal introuvable" (elle
     // interroge l'API live alors que l'abonnement a été créé en sandbox, ou l'inverse).
     // ============================================================================
-    const PAYPAL_TEST_MODE = false; // → true pendant vos tests, repassez à false en prod
+    const PAYPAL_TEST_MODE = true; // → true pendant vos tests, repassez à false en prod
 
     const PAYPAL_LIVE_CLIENT_ID = "Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak";
     const PAYPAL_LIVE_PLAN_ID = "P-16K40079FK484592LNF4PL2Q";
-    const PAYPAL_SANDBOX_CLIENT_ID = "COLLEZ_ICI_VOTRE_CLIENT_ID_SANDBOX";
-    const PAYPAL_SANDBOX_PLAN_ID = "COLLEZ_ICI_VOTRE_PLAN_ID_SANDBOX";
+    const PAYPAL_SANDBOX_CLIENT_ID = "ASc59-JlaBgcQHuPlBGH72iJVuyONvZDwmuEuc-SMrRgP_LR98txizXKuuJnoXda1PdkGR0jD1gQXf1Q";
+    const PAYPAL_SANDBOX_PLAN_ID = "P-6TM45236VA047520RNKHLOTI";
 
     const PAYPAL_CLIENT_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_CLIENT_ID : PAYPAL_LIVE_CLIENT_ID;
     const PREMIUM_PLAN_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_PLAN_ID : PAYPAL_LIVE_PLAN_ID;
