@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Logiciel de Jeux Concours pour Commerce : Le Guide Comparatif | Spin To Keep</title>
+    <meta name="description" content="Découvrez le meilleur logiciel de jeux concours pour magasin et commerce. Créez des roues de la fortune et tirages au sort digitaux pour booster votre visibilité.">
+    <meta name="keywords" content="logiciel jeux concours commerce gratuit, creer jeu concours magasin, application roue de la fortune, animation commerciale digitale, Spin To Keep, jeu concours qr code">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.7; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* HEADER */
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .btn-nav { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s ease; }
+        .btn-nav:hover { background: var(--accent-hover); }
+
+        /* TYPOGRAPHY */
+        h1 { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; text-align: center; letter-spacing: -0.03em; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-top: 3.5rem; margin-bottom: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 10px; }
+        h3 { font-size: 1.6rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 1.5rem; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* LAYOUT */
+        .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; text-align: center; }
+        .bg-gray { background-color: var(--bg-secondary); padding: 4rem 0; width: 100%; }
+        .content-section { max-width: 850px; margin: 0 auto; padding: 0 2rem; }
+        article { background: #fff; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        /* LISTS & FAQ */
+        .benefits-list { list-style: none; padding: 0; margin-bottom: 2rem; }
+        .benefits-list li { font-size: 1.15rem; padding: 16px 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: flex-start; gap: 12px; }
+        .benefits-list li:last-child { border-bottom: none; }
+        .benefits-list li::before { content: '🎯'; font-size: 1.2rem; margin-top: 2px; }
+        
+        .faq-box { background: var(--bg-secondary); padding: 2.5rem; border-radius: 16px; margin-top: 2rem; border: 1px solid var(--border-color); }
+        .faq-item { margin-bottom: 2rem; }
+        .faq-item:last-child { margin-bottom: 0; }
+        .faq-item h4 { font-size: 1.3rem; margin: 0 0 0.8rem 0; color: var(--text-primary); }
+        .faq-item p { font-size: 1.1rem; margin: 0; }
+
+        /* TABLE COMPARATIF */
+        .comp-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 1.05rem; }
+        .comp-table th, .comp-table td { padding: 14px 16px; border: 1px solid var(--border-color); text-align: left; }
+        .comp-table th { background: var(--bg-secondary); font-weight: 700; color: var(--text-primary); }
+
+        /* INFO BOX */
+        .info-box { background: rgba(0, 113, 227, 0.05); border-left: 4px solid var(--accent-color); padding: 1.5rem 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; }
+        .info-box p { margin: 0; color: var(--text-primary); }
+
+        /* BUTTONS */
+        .btn-large { display: inline-block; background-color: var(--accent-color); color: #fff; padding: 18px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3); }
+        .btn-large:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+        .btn-outline { display: inline-block; background-color: transparent; color: var(--accent-color); padding: 16px 36px; border-radius: 50px; font-size: 1.1rem; font-weight: 600; text-decoration: none; border: 2px solid var(--accent-color); transition: all 0.2s ease; margin-top: 1rem; }
+        .btn-outline:hover { background-color: rgba(0, 113, 227, 0.05); }
+
+        /* FOOTER */
+        footer { background-color: #151516; color: #a1a1a6; padding: 3rem 2rem; text-align: center; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            article { padding: 2rem 1.5rem; }
+            .comp-table { font-size: 0.9rem; }
+            .comp-table th, .comp-table td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/index.html" class="logo">SpinToKeep<span>.</span></a>
+        <a href="/index.html#configurateur" class="btn-nav">Tester le logiciel</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero animate-up">
+        <h1>Quel est le Meilleur <span class="highlight">Logiciel de Jeux Concours</span> pour Commerce ?</h1>
+        <p>
+            Vous souhaitez dynamiser votre magasin, capturer des contacts clients et augmenter vos avis Google ? Découvrez comment choisir le bon logiciel de jeu concours et pourquoi la gamification par QR code surpasse les méthodes traditionnelles.
+        </p>
+        <a href="/index.html#configurateur" class="btn-large hover-effect">Tester le Configurateur Gratuit</a>
+    </section>
+
+    <div class="bg-gray">
+        <section class="content-section animate-up">
+            <article>
+                <h2>Pourquoi lancer un jeu concours dans son point de vente ?</h2>
+                <p>
+                    Pour un commerce physique (boutique, restaurant, salon de coiffure), l'animation commerciale est le levier idéal pour casser la routine, attirer l'attention des passants et booster l'engagement client.
+                </p>
+                <p>
+                    Mais au-delà de l'aspect festif, l'utilisation d'un **logiciel de jeu concours en magasin** répond à trois objectifs stratégiques majeurs :
+                </p>
+                <ul class="benefits-list">
+                    <li><strong>La collecte de données (CRM) :</strong> Obtenir légalement le nom, l'email et le numéro de téléphone de vos clients en caisse.</li>
+                    <li><strong>La croissance de la e-réputation :</strong> Inciter les participants à laisser un avis positif sur Google My Business ou Tripadvisor.</li>
+                    <li><strong>L'augmentation des ventes :</strong> Offrir des bons de réduction ou des remises immédiates pour déclencher l'achat et faire revenir le client.</li>
+                </ul>
+
+                <h2>Comparatif : Les différents types de jeux concours en magasin</h2>
+                <p>
+                    Tous les formats de jeux ne se valent pas. Voici un comparatif des solutions disponibles sur le marché pour les commerçants :
+                </p>
+
+                <table class="comp-table">
+                    <thead>
+                        <tr>
+                            <th>Format</th>
+                            <th>Avantages</th>
+                            <th>Inconvénients</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Urne & Bulletin Papier</strong></td>
+                            <td>Très peu coûteux à l'achat.</td>
+                            <td>Écritures illisibles, saisie manuelle chronophage, zéro collecte d'avis Google.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Application sur Borne / Tablette</strong></td>
+                            <td>Visuellement très attractif.</td>
+                            <td>Matériel coûteux, files d'attente à la caisse, désinfection constante requise.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Web App QR Code (SpinToKeep)</strong></td>
+                            <td>100% sur le téléphone du client, instantané, collecte CRM + Avis Google automatisés.</td>
+                            <td>Nécessite une connexion internet côté client.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Pourquoi choisir une plateforme de jeu concours par QR Code ?</h2>
+                <p>
+                    La majorité des logiciels de jeux concours traditionnels se concentrent uniquement sur la capture d'emails. La solution <a href="/index.html" style="color: var(--accent-color); font-weight: 600;">Spin To Keep</a> va plus loin en transformant chaque jeu en un véritable moteur de croissance locale.
+                </p>
+
+                <div class="info-box">
+                    <p><strong>L'expérience sans friction :</strong> Le client scanne le QR code posé sur votre comptoir avec son propre smartphone. Il accède à votre **Roue de la fortune**, votre **Bandit manchot** ou vos **Coffres mystères** sans avoir à télécharger la moindre application.</p>
+                </div>
+
+                <h3>Les fonctionnalités clés à exiger d'un logiciel de jeu concours</h3>
+                <p>
+                    Lorsque vous choisissez un outil pour votre point de vente, veillez à vérifier les points suivants :
+                </p>
+                <ul class="benefits-list">
+                    <li><strong>Éditeur de probabilités de gain :</strong> Vous devez pouvoir paramétrer exactement le pourcentage de chance de gagner pour chaque lot afin de maîtriser votre budget d'animation.</li>
+                    <li><strong>Redirection vers vos avis Google :</strong> Le logiciel doit intégrer une étape incitant le gagnant à déposer une évaluation 5 étoiles.</li>
+                    <li><strong>Personnalisation visuelle :</strong> Possibilité d'intégrer votre logo, vos couleurs et votre charte graphique.</li>
+                    <li><strong>Export des données (CSV / Excel) :</strong> Vous devez rester propriétaire de votre fichier client pour le réutiliser dans votre CRM.</li>
+                    <li><strong>Conformité RGPD :</strong> Recueil explicite du consentement de l'utilisateur (Opt-In).</li>
+                </ul>
+
+                <h2>Comment créer votre premier jeu concours en 2 minutes ?</h2>
+                <p>
+                    Avec Spin To Keep, l'installation est d'une simplicité enfantine et ne nécessite aucune compétence informatique :
+                </p>
+                <ol style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;">
+                    <li>Accédez à notre **configurateur en ligne**.</li>
+                    <li>Sélectionnez le format de jeu (Roue de la fortune, Bandit manchot, Ticket à gratter, Plinko...).</li>
+                    <li>Ajoutez vos lots et vos couleurs de marque.</li>
+                    <li>Collez votre lien d'avis Google.</li>
+                    <li>Cliquez sur **Générer** : vous obtenez votre QR Code et vos affiches A4/A5/A6 prêtes à imprimer pour votre comptoir !</li>
+                </ol>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Lancer le Configurateur Gratuit</a>
+                </div>
+
+                <h2>Foire Aux Questions (FAQ) sur les logiciels de jeux concours</h2>
+                
+                <div class="faq-box">
+                    <div class="faq-item">
+                        <h4>Puis-je tester le logiciel gratuitement ?</h4>
+                        <p>Oui. Le configurateur Spin To Keep est accessible librement en ligne. Vous pouvez personnaliser votre jeu, tester les animations et prévisualiser le parcours client sans débourser un centime.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Comment éviter qu'un même client ne joue plusieurs fois d'affilée ?</h4>
+                        <p>Le logiciel Spin To Keep intègre un système de limitation par session et adresse IP qui empêche un même utilisateur de relancer le jeu immédiatement sur son téléphone.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Est-il possible d'utiliser le jeu sur une tablette en boutique ?</h4>
+                        <p>Absolument. Vous pouvez afficher le QR Code sur un chevalet ou ouvrir directement l'URL de votre jeu sur une tablette installée au niveau de la caisse ou de la zone d'accueil.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 2rem;">Boostez l'animation de votre commerce dès aujourd'hui</h3>
+                    <p style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Proposez une expérience ludique à vos clients, collectez des données qualifiées et propulsez votre fiche Google My Business.</p>
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Créer mon jeu concours ➡️</a><br>
+                    <a href="/index.html" class="btn-outline">En savoir plus sur Spin To Keep</a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; Spin To Keep. La solution SaaS d'animation commerciale et jeux concours pour points de vente.</p>
+    <p style="font-size: 0.85rem; margin-top: 0.8rem;"><a href="/index.html" style="color: #a1a1a6; text-decoration: underline;">Retour à l'accueil du site</a></p>
+</footer>
+
+</body>
+</html>
