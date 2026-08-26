@@ -49,8 +49,10 @@
   CONFIGURATION REQUISE CÔTÉ SUPABASE (à exécuter une fois dans l'éditeur SQL)
   ============================================================================
 
-  -- 0. Extension nécessaire à la génération d'identifiants (gen_random_uuid)
-  create extension if not exists pgcrypto;
+  -- 0. Extension nécessaire à la génération d'identifiants (gen_random_uuid) et au
+  -- hachage du mot de passe (crypt/gen_salt). Sur Supabase, pgcrypto s'installe dans
+  -- le schéma `extensions`, pas `public` : on le précise explicitement.
+  create extension if not exists pgcrypto with schema extensions;
 
   -- 1. Table des profils (1 ligne par utilisateur, liée à auth.users)
   create table if not exists profiles (
@@ -79,13 +81,13 @@
   -- aussi une donnée assez devinable/publique (réseaux sociaux) : c'est donc un
   -- niveau de sécurité correct pour un petit outil interne, mais plus faible qu'un
   -- vrai lien de réinitialisation envoyé par email.
-  create extension if not exists pgcrypto;
+  create extension if not exists pgcrypto with schema extensions;
 
   create or replace function reset_password_with_birthdate(p_email text, p_birthdate date, p_new_password text)
   returns json
   language plpgsql
   security definer
-  set search_path = public, auth
+  set search_path = public, auth, extensions
   as $$
   declare
     v_user_id uuid;
@@ -321,7 +323,7 @@
         .nav-auth { display: flex; align-items: center; gap: 10px; }
         .btn-nav-login { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background .2s ease; white-space: nowrap; }
         .btn-nav-login:hover { background: var(--accent-hover); }
-        @media (max-width: 768px) {
+        @media (max-width: 1300px) {
             .nav-auth-item { margin-left: 0; margin-top: 0.5rem; }
             .btn-nav-login { width: 100%; padding: 12px 18px; }
         }
@@ -347,8 +349,11 @@
             transition: all 0.3s ease;
         }
 
-        /* Responsive Mobile Navigation */
-        @media (max-width: 768px) {
+        /* Responsive Mobile Navigation
+           Seuil relevé à 1300px : avec les boutons Premium/Dashboard/Mon compte/
+           Déconnexion en plus de Se connecter, les 7 onglets + les actions de compte
+           ne tiennent plus sur une seule ligne bien avant 768px. */
+        @media (max-width: 1300px) {
             .hamburger-btn { display: flex; }
             .nav-links {
                 display: none;
@@ -529,8 +534,8 @@
     .main-wrapper { display: none; flex-direction: column; gap: 18px; max-width: 100%; margin: 0; padding: 16px; padding-bottom: 100px; }
     @media (min-width: 1100px) {
         .main-wrapper { flex-direction: row; align-items: flex-start; padding: 20px 28px 40px 28px; gap: 26px; }
-        .panel-config { order: 1; flex: 1.2; min-width: 550px; position: sticky; top: 74px; }
-        .panel-preview { order: 2; flex: 2; }
+        .panel-config { order: 1; flex: 1.2; min-width: 550px; }
+        .panel-preview { order: 2; flex: 2; position: sticky; top: 74px; align-self: flex-start; max-height: calc(100vh - 90px); overflow-y: auto; }
     }
 
     .panel { background: white; padding: 20px; border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.05); }
@@ -649,6 +654,11 @@
 
     /* --- Ticket à gratter --- */
     .scratch-card { position: relative; width: 100%; max-width: 240px; margin: 18px auto 8px; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 26px rgba(0,0,0,.16); border: 1px solid rgba(0,0,0,.06); background: #fff; }
+    /* Le fond de la carte est toujours blanc (quel que soit le thème choisi), donc son
+       texte doit rester sombre en dur : sinon un thème avec texte blanc rend le résultat
+       du grattage illisible (texte blanc sur carte blanche). */
+    .scratch-result .txt { color: #1d1d1f !important; }
+    .scratch-result .ic { color: #1d1d1f; }
     .scratch-result { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 10px; }
     .scratch-result .ic { font-size: 24px; }
     .scratch-result .txt { font-weight: 800; font-size: 13.5px; width: 100%; overflow: hidden; overflow-wrap: break-word; word-break: normal; hyphens: auto; line-height: 1.15; }
@@ -656,8 +666,11 @@
     .scratch-hint { text-align: center; font-size: 11.5px; color: var(--muted); font-weight: 600; margin-top: 6px; }
 
     /* --- Coffres mystères --- */
-    .mystery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 240px; margin: 18px auto 6px; }
-    .mystery-box { position: relative; aspect-ratio: 1/1; border-radius: 14px; cursor: pointer; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,.14); background: linear-gradient(145deg, var(--slot-c1,#cdc7fc), var(--slot-c2,#fa879a)); display: flex; align-items: center; justify-content: center; transition: transform .12s ease; }
+    /* Coffres mystère en flex (et non grid) : avec flex-wrap, justify-content centre
+       chaque ligne indépendamment, donc les coffres restent groupés par paire au
+       centre même quand leur nombre est impair (le dernier centré tout seul). */
+    .mystery-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 240px; margin: 18px auto 6px; }
+    .mystery-box { position: relative; width: calc(50% - 5px); aspect-ratio: 1/1; border-radius: 14px; cursor: pointer; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,.14); background: linear-gradient(145deg, var(--slot-c1,#cdc7fc), var(--slot-c2,#fa879a)); display: flex; align-items: center; justify-content: center; transition: transform .12s ease; }
     .mystery-box:active { transform: scale(.93); }
     .mystery-box.disabled { pointer-events: none; opacity: .35; filter: grayscale(.5); }
     .mystery-box .mb-icon { font-size: 26px; transition: transform .25s ease, opacity .25s ease; }
@@ -722,6 +735,9 @@
     .lock-overlay .lock-text { font-size: 12.5px; color: #7a5c00; line-height: 1.4; }
     .lock-overlay .lock-text strong { color: #5c4400; }
     .btn-premium { background: linear-gradient(135deg,#f6c453,#e8a63a); color: #4a3400; border: none; padding: 10px 16px; border-radius: 50px; font-weight: 800; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+    /* Même gabarit (padding/police) que .btn-ghost pour que le bouton Premium du header
+       ait la même longueur que "Dashboard" à côté de lui. */
+    .btn-premium-nav { background: linear-gradient(135deg,#f6c453,#e8a63a); color: #4a3400; border: none; padding: 9px 14px; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 
     /* --- Sticky mobile CTA --- */
     .sticky-cta { display: none; }
@@ -811,7 +827,7 @@
     table.dash-participants-table td { padding: 8px; border-bottom: 1px solid #f2f2f4; vertical-align: middle; }
     .badge-win { background: var(--success-bg); color: var(--success); font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
     .badge-loss { background: #f1f1f3; color: var(--muted); font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-    .badge-claimed { background: var(--success-bg); color: var(--success); font-weight: 700; font-size: 11px; padding: 4px 9px; border-radius: 20px; border: none; cursor: default; white-space: nowrap; }
+    .badge-claimed { background: var(--success-bg); color: var(--success); font-weight: 700; font-size: 11px; padding: 4px 9px; border-radius: 20px; border: none; cursor: pointer; white-space: nowrap; }
     .badge-unclaimed { background: var(--danger-bg); color: var(--danger); font-weight: 700; font-size: 11px; padding: 4px 9px; border-radius: 20px; border: none; cursor: pointer; white-space: nowrap; }
 
         /* CALCULATOR STYLES */
@@ -1016,8 +1032,8 @@
                     <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')">
                     <div id="upload-status">Formats acceptés : PNG, JPG, WEBP</div>
                 </div>
-                <label class="field-label" id="lbl-logo-url">ou URL du logo si déjà hébergé en ligne</label>
-                <input type="text" id="logo_url" class="full-width" oninput="update()" value="https://drscbjrshjhupvrrzqec.supabase.co/storage/v1/object/public/logos/1770049092342-yourlogo.png">
+                <label class="field-label" id="lbl-logo-url" style="display:none;">ou URL du logo si déjà hébergé en ligne</label>
+                <input type="text" id="logo_url" class="full-width" oninput="update()" value="" style="display:none;">
             </div>
         </details>
 
@@ -1069,7 +1085,7 @@
         <details class="step">
             <summary><span class="num">6</span><span class="label" id="sum-lots">Lots & probabilités</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-lots-cust">Le total des probabilités doit toujours faire 100 %.</p>
+                <p class="step-help" id="lbl-lots-cust">Le total des probabilités doit toujours faire 100 %. Astuce : commencez le nom du lot par un emoji (🎁, 💸, 🥹...), il reste visible quel que soit le thème choisi.</p>
                 <input type="hidden" id="lot_count" min="2" max="12" value="4">
                 <div class="prob-bar-label"><span id="prob-bar-txt">Total : 100%</span></div>
                 <div class="prob-bar-track"><div class="prob-bar-fill" id="prob-bar-fill" style="width:100%;background:var(--success);"></div></div>
@@ -1602,27 +1618,12 @@
                     <li>✔️ <strong>Configuration instantanée</strong> en 1 minute</li>
                 </ul>
 
-                <!-- PayPal Button Container Integration -->
-                <div id="paypal-button-container-P-16K40079FK484592LNF4PL2Q"></div>
-                <script src="https://www.paypal.com/sdk/js?client-id=Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
-                <script>
-                  paypal.Buttons({
-                      style: {
-                          shape: 'rect',
-                          color: 'gold',
-                          layout: 'vertical',
-                          label: 'subscribe'
-                      },
-                      createSubscription: function(data, actions) {
-                        return actions.subscription.create({
-                          plan_id: 'P-16K40079FK484592LNF4PL2Q'
-                        });
-                      },
-                      onApprove: function(data, actions) {
-                        alert("ID de l'abonnement : " + data.subscriptionID);
-                      }
-                  }).render('#paypal-button-container-P-16K40079FK484592LNF4PL2Q');
-                </script>
+                <!-- Ce bouton passe par le vrai parcours de l'app (openPremiumFlow) au lieu
+                     d'un bouton PayPal statique indépendant : ça garantit qu'un compte existe
+                     avant paiement, et que l'abonnement est bien vérifié + activé via
+                     l'Edge Function verify-paypal-subscription (pas juste une alert()). -->
+                <button class="btn-black" style="width:100%; padding:16px; font-size:15px; border-radius:50px;" onclick="openPremiumFlow()">⭐ Passer Premium</button>
+                <p style="font-size: 12.5px; color: var(--muted); margin-top: 10px;">Un compte gratuit vous sera demandé avant le paiement (30 secondes, ça permet de retrouver vos roulettes et vos clients).</p>
 
                 <p style="font-size: 0.8rem; margin-top: 1.5rem;">La personnalisation de l'url de destination (vers l'action d'avis, de like, ou follow) est débloquée immédiatement avec cet abonnement.</p>
             </div>
@@ -1890,10 +1891,28 @@ if(slider) {
 
     const SB_URL = "https://drscbjrshjhupvrrzqec.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyc2NianJzaGpodXB2cnJ6cWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDM2NDUsImV4cCI6MjA4NTExOTY0NX0.t15POxBSoA0bmQ0WXEBN0sClGRtvxc1JKYGeaY65Y7g";
-    // ⚠️ Identifiants PayPal réels du plan d'abonnement 9,90 €/mois (les mêmes que ceux
-    // utilisés par la carte tarifaire de la page d'accueil, section #tarifs).
-    const PAYPAL_CLIENT_ID = "Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak";
-    const PREMIUM_PLAN_ID = "P-16K40079FK484592LNF4PL2Q";
+
+    // ============================================================================
+    // PAYPAL : bascule LIVE / SANDBOX
+    // Pour tester en sandbox : mettez PAYPAL_TEST_MODE à true et renseignez vos
+    // identifiants sandbox ci-dessous (créés sur developer.paypal.com, onglet
+    // "Sandbox" > Apps & Credentials > votre app > Client ID, puis un plan
+    // d'abonnement sandbox créé avec ce même compte).
+    // ⚠️ Le SDK JS PayPal ci-dessous doit utiliser le même environnement (même
+    // Client ID) que les secrets PAYPAL_ENV / PAYPAL_CLIENT_SECRET / PAYPAL_PLAN_ID
+    // configurés sur l'Edge Function verify-paypal-subscription, sinon la
+    // vérification serveur échoue avec "Abonnement PayPal introuvable" (elle
+    // interroge l'API live alors que l'abonnement a été créé en sandbox, ou l'inverse).
+    // ============================================================================
+    const PAYPAL_TEST_MODE = false; // → true pendant vos tests, repassez à false en prod
+
+    const PAYPAL_LIVE_CLIENT_ID = "Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak";
+    const PAYPAL_LIVE_PLAN_ID = "P-16K40079FK484592LNF4PL2Q";
+    const PAYPAL_SANDBOX_CLIENT_ID = "COLLEZ_ICI_VOTRE_CLIENT_ID_SANDBOX";
+    const PAYPAL_SANDBOX_PLAN_ID = "COLLEZ_ICI_VOTRE_PLAN_ID_SANDBOX";
+
+    const PAYPAL_CLIENT_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_CLIENT_ID : PAYPAL_LIVE_CLIENT_ID;
+    const PREMIUM_PLAN_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_PLAN_ID : PAYPAL_LIVE_PLAN_ID;
 
     const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
@@ -2110,12 +2129,14 @@ if(slider) {
         }
         const initial = (currentProfile && currentProfile.email ? currentProfile.email[0] : 'U').toUpperCase();
         const premiumChip = currentProfile && currentProfile.is_premium ? `<span class="chip-premium">⭐ Premium</span>` : '';
+        const premiumBtn = currentProfile && currentProfile.is_premium ? '' : `<button class="btn-premium-nav" onclick="openPremiumFlow()">⭐ Premium</button>`;
         // Le bouton "compte" (avatar) ramène au configurateur : il ne doit surtout pas
         // déconnecter au clic, sinon l'utilisateur croit être "souvent déconnecté" alors
         // qu'il clique simplement sur ce qu'il pense être son compte. La déconnexion est
         // une action volontaire séparée, sur son propre bouton.
         if (actions) actions.innerHTML = `
             ${premiumChip}
+            ${premiumBtn}
             <button class="btn-ghost" onclick="openDashboard()">Dashboard</button>
             <button class="btn-ghost" title="${currentProfile ? currentProfile.email : ''}" onclick="goToMyAccount()">
                 <span class="avatar-btn" style="display:inline-flex; width:22px; height:22px; font-size:11px; margin-right:6px; vertical-align:middle;">${initial}</span>Mon compte
@@ -2124,6 +2145,7 @@ if(slider) {
         `;
         if (navAuth) navAuth.innerHTML = `
             ${premiumChip}
+            ${premiumBtn ? `<button class="btn-nav-login" onclick="closeMenu(); openPremiumFlow();">⭐ Premium</button>` : ''}
             <button class="btn-nav-login" onclick="closeMenu(); openDashboard();">Dashboard</button>
             <button class="btn-nav-login" onclick="closeMenu(); goToMyAccount();">Mon compte</button>
             <button class="btn-nav-login" onclick="closeMenu(); handleLogout();" style="background:none; color:var(--muted); border:1px solid var(--line);">Déconnexion</button>
@@ -2308,11 +2330,18 @@ if(slider) {
         document.getElementById('dash-status-premium').innerText = isPremium() ? 'Premium ⭐' : 'Free';
         document.getElementById('dash-upsell').style.display = isPremium() ? 'none' : 'flex';
 
-        const { data: configs, error } = await sb.from('roulette_configs').select('id, data, created_at').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
+        const { data: fetchedConfigs, error } = await sb.from('roulette_configs').select('id, data, created_at').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
+        // On fusionne les roulettes créées dans cette session (voir justCreatedRoulettes)
+        // qui ne seraient pas encore ressorties du SELECT, pour ne jamais avoir besoin de
+        // recharger la page pour les voir apparaître dans l'historique.
+        let configs = fetchedConfigs || [];
+        const knownIds = new Set(configs.map(c => c.id));
+        justCreatedRoulettes.forEach(rc => { if (!knownIds.has(rc.id)) { configs = [rc, ...configs]; knownIds.add(rc.id); } });
+
         const list = document.getElementById('dash-list');
         list.innerHTML = '';
 
-        if (error || !configs || configs.length === 0) {
+        if ((error && configs.length === 0) || configs.length === 0) {
             ['dash-count-configs', 'dash-count-scans', 'dash-count-participants', 'dash-count-wins', 'dash-count-losses'].forEach(id => document.getElementById(id).innerText = '0');
             document.getElementById('dash-count-conversion').innerText = '0%';
             list.innerHTML = `<div class="dash-empty"><div class="big">🎡</div>Aucune roulette pour le moment.<br>Créez-en une depuis le configurateur.</div>`;
@@ -2415,7 +2444,7 @@ if(slider) {
             const winBadge = p.is_win ? `<span class="badge-win">✅ Gagné</span>` : `<span class="badge-loss">Perdu</span>`;
             const claimBtn = !p.is_win ? `<span style="color:var(--muted); font-size:11px;">—</span>`
                 : p.lot_recupere
-                    ? `<button class="badge-claimed" disabled>✅ Remis</button>`
+                    ? `<button class="badge-claimed" onclick="toggleLotRecupere('${p.id}', false, this)" title="Cliquez pour annuler (marqué par erreur ?)">✅ Remis</button>`
                     : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${p.id}', true, this)">⏳ À remettre</button>`;
             return `<tr>
                 <td>${date}</td>
@@ -2510,17 +2539,19 @@ if(slider) {
         const { error } = await sb.from('roulette_participants').update({ lot_recupere: newVal }).eq('id', participantId);
         if (error) {
             toast("Erreur lors de la mise à jour.", "error");
-            if (btnEl) { btnEl.disabled = false; btnEl.innerText = '⏳ À remettre'; }
+            if (btnEl) { btnEl.disabled = false; btnEl.innerText = newVal ? '⏳ À remettre' : '✅ Remis'; }
             return;
         }
         if (btnEl) {
-            btnEl.outerHTML = `<button class="badge-claimed" disabled>✅ Remis</button>`;
+            btnEl.outerHTML = newVal
+                ? `<button class="badge-claimed" onclick="toggleLotRecupere('${participantId}', false, this)" title="Cliquez pour annuler (marqué par erreur ?)">✅ Remis</button>`
+                : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${participantId}', true, this)">⏳ À remettre</button>`;
         }
         Object.values(dashParticipantsCache).forEach(rows => {
             const p = rows.find(r => r.id === participantId);
             if (p) p.lot_recupere = newVal;
         });
-        toast("Lot marqué comme remis ✅", "success");
+        toast(newVal ? "Lot marqué comme remis ✅" : "Marquage annulé, lot repassé à \"à remettre\".", "success");
     }
 
     function renderWinLossChart(wins, losses) {
@@ -2593,7 +2624,7 @@ if(slider) {
             sumWheel: "Design de la roue", lblWheelDesign: "Bordure, lumières et couleurs par défaut des lots.",
             lblColBord: "BORDURE", lblColBulb: "LUMIÈRES", lblSizeBulb: "TAILLE (px)",
             lblBrandQuick: "Couleurs de marque rapides (appliquées aux lots)", lblColDef1: "COULEUR 1", lblColDef2: "COULEUR 2",
-            sumLots: "Lots & probabilités", lblLotsCust: "Le total des probabilités doit toujours faire 100 %.",
+            sumLots: "Lots & probabilités", lblLotsCust: "Le total des probabilités doit toujours faire 100 %. Astuce : commencez le nom du lot par un emoji (🎁, 💸, 🥹...), il reste visible quel que soit le thème choisi.",
             lblRowName: "NOM DU LOT", lblRowProb: "PROBABILITÉ", lblRowSize: "TAILLE", lblRowBg: "FOND", lblRowTxt: "TEXTE",
             btnAddLot: "rajouter un lot",
             sumTexts: "Textes & conditions", lblTxtCust: "Textes affichés au client",
@@ -2614,7 +2645,7 @@ if(slider) {
             sumWheel: "Wheel Design", lblWheelDesign: "Border, lights and default prize colors.",
             lblColBord: "BORDER", lblColBulb: "LIGHTS", lblSizeBulb: "SIZE (px)",
             lblBrandQuick: "Quick brand colors (applied to prizes)", lblColDef1: "COLOR 1", lblColDef2: "COLOR 2",
-            sumLots: "Prizes & Probabilities", lblLotsCust: "Probabilities must always total 100%.",
+            sumLots: "Prizes & Probabilities", lblLotsCust: "Probabilities must always total 100%. Tip: start each prize name with an emoji (🎁, 💸, 🥹...) so it stays visible whatever theme you pick.",
             lblRowName: "PRIZE NAME", lblRowProb: "PROBABILITY", lblRowSize: "SIZE", lblRowBg: "BG", lblRowTxt: "TEXT",
             btnAddLot: "add a prize",
             sumTexts: "Texts & Conditions", lblTxtCust: "Customer-facing texts",
@@ -2825,44 +2856,34 @@ if(slider) {
 
     const SECTOR_PRESETS = {
         fastfood: { label: 'Restauration rapide', emoji: '🍔', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['🥤 Boisson offerte', 6], ['🍟 Frites offertes', 6],
-            ["-20% sur l'addition", 6], ['🍔 Menu offert', 6], ["-10% sur l'addition", 6]
+            ['😢 Dommage, une prochaine fois', 98], ['🍔 Menu offert', 1], ["🍟 -20% sur l'addition", 1]
         ]},
         restaurant: { label: 'Restaurant traditionnel', emoji: '🍽️', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['🍷 Apéritif offert', 6], ['🍰 Dessert offert', 6],
-            ["-15% sur l'addition", 6], ['☕ Café offert', 6], ["-10% sur l'addition", 6]
+            ['😢 Dommage, une prochaine fois', 98], ['🍷 Apéritif offert', 1], ['🍰 Dessert offert', 1]
         ]},
         hotel: { label: 'Hôtellerie', emoji: '🏨', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['🥐 Petit-déjeuner offert', 6], ['⬆️ Surclassement chambre', 6],
-            ['-15% prochain séjour', 6], ['🕐 Late check-out offert', 6], ['-10% prochain séjour', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['🥐 Petit-déjeuner offert', 1], ['⬆️ Surclassement chambre', 1]
         ]},
         coiffure: { label: 'Coiffure & Barbier', emoji: '✂️', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['💇 -15% sur votre coupe', 6], ['🧴 Shampoing offert', 6],
-            ['💨 Brushing offert', 6], ['-10% sur votre coupe', 6], ['🎁 Soin offert', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['💇 -15% sur votre coupe', 1], ['🎁 Soin offert', 1]
         ]},
         beaute: { label: 'Institut de beauté / Spa', emoji: '💆', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['💅 Manucure offerte', 6], ['-20% sur un soin', 6],
-            ['🧖 Accès spa offert', 6], ['-10% sur un soin', 6], ['🎁 Épilation offerte', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['💅 Manucure offerte', 1], ['🧖 Accès spa offert', 1]
         ]},
         garage: { label: 'Garage / Mécanique auto', emoji: '🔧', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['🧽 Lavage offert', 6], ['-15% sur la révision', 6],
-            ['🛞 Contrôle pression offert', 6], ['-10% sur la révision', 6], ['🎁 Vidange -20%', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['🧽 Lavage offert', 1], ['🎁 Vidange -20%', 1]
         ]},
         immobilier: { label: 'Agence immobilière', emoji: '🏠', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['📋 Estimation offerte', 6], ['🎁 Bon cadeau 50€', 6],
-            ['-50% frais de dossier', 6], ['📸 Reportage photo offert', 6], ['🎁 Bon cadeau 20€', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['📋 Estimation offerte', 1], ['🎁 Bon cadeau 50€', 1]
         ]},
         fitness: { label: 'Salle de sport / Fitness', emoji: '🏋️', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ["🎟️ Séance d'essai offerte", 6], ['👕 Goodie offert', 6],
-            ["-20% sur l'abonnement", 6], ['🧃 Boisson protéinée offerte', 6], ["-10% sur l'abonnement", 6]
+            ['😢 Dommage, une prochaine fois', 98], ["🎟️ Séance d'essai offerte", 1], ["💪 -20% sur l'abonnement", 1]
         ]},
         boulangerie: { label: 'Boulangerie-Pâtisserie', emoji: '🥐', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['🥐 Viennoiserie offerte', 6], ['🍰 Part de gâteau offerte', 6],
-            ['-15% sur votre achat', 6], ['☕ Café offert', 6], ['-10% sur votre achat', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['🥐 Viennoiserie offerte', 1], ['🍰 Part de gâteau offerte', 1]
         ]},
         medical: { label: 'Médecin / Dentiste / Clinique', emoji: '🩺', lots: [
-            ['😢 Dommage, une prochaine fois', 70], ['☕ Café offert en salle d\'attente', 6], ['🎁 Bon cadeau partenaire', 6],
-            ['📋 Bilan offert', 6], ['🎁 Trousse de soins offerte', 6], ['🎁 Bon cadeau 10€', 6]
+            ['😢 Dommage, une prochaine fois', 98], ['☕ Café offert en salle d\'attente', 1], ['🎁 Bon cadeau partenaire', 1]
         ]}
     };
 
@@ -3562,6 +3583,7 @@ if(slider) {
                 });
             }
             if (!response.ok) throw new Error();
+            const wasNewConfig = !editingConfigId;
             editingConfigId = configId;
             updateEditBanner();
             const url = window.location.origin + window.location.pathname + "?id=" + configId;
@@ -3577,6 +3599,9 @@ if(slider) {
             lastGeneratedConfigId = configId;
             lastGeneratedUrl = url;
             lastGeneratedConfigData = configData;
+            if (wasNewConfig && currentUser) {
+                justCreatedRoulettes.unshift({ id: configId, data: configData, created_at: new Date().toISOString() });
+            }
             generatePosters();
         } catch (e) {
             toast("Erreur d'enregistrement. Réessayez.", "error");
@@ -3587,6 +3612,10 @@ if(slider) {
 
     let editingConfigId = null;
     let lastGeneratedConfigId = null, lastGeneratedUrl = null, lastGeneratedConfigData = null;
+    // Sécurité anti-latence : quand une roulette vient d'être créée, on la garde ici pour
+    // l'injecter immédiatement dans le dashboard même si le SELECT qui suit l'INSERT ne
+    // la renvoie pas encore (évite d'avoir à recharger la page pour la voir apparaître).
+    let justCreatedRoulettes = [];
 
     function escapeHtml(s) {
         return (s || '').toString().replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
