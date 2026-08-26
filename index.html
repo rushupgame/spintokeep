@@ -43,6 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
 <!--
   ============================================================================
@@ -153,10 +154,12 @@
     "OPTIN" text,
     is_win boolean default true,
     lot_recupere boolean default false,
+    extra_fields jsonb default '{}'::jsonb,
     created_at timestamptz default now()
   );
   alter table roulette_participants add column if not exists is_win boolean default true;
   alter table roulette_participants add column if not exists lot_recupere boolean default false;
+  alter table roulette_participants add column if not exists extra_fields jsonb default '{}'::jsonb;
   alter table roulette_participants enable row level security;
   create policy "Écriture publique des participants (jeu client)" on roulette_participants for insert with check (true);
   create policy "Le propriétaire lit les participants de ses roulettes"
@@ -325,13 +328,13 @@
         .nav-links { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; }
         .nav-links a { text-decoration: none; color: var(--text-primary); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover { color: var(--accent-color); }
-        .nav-auth-item { display: flex; align-items: center; margin-left: 0.5rem; }
-        .nav-auth { display: flex; align-items: center; gap: 10px; }
+        .nav-auth { display: flex; align-items: center; gap: 10px; margin-left: 1rem; flex-shrink: 0; }
         .btn-nav-login { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background .2s ease; white-space: nowrap; }
         .btn-nav-login:hover { background: var(--accent-hover); }
-        @media (max-width: 1300px) {
-            .nav-auth-item { margin-left: 0; margin-top: 0.5rem; }
-            .btn-nav-login { width: 100%; padding: 12px 18px; }
+        @media (max-width: 640px) {
+            .nav-auth { gap: 6px; }
+            .btn-nav-login { padding: 8px 12px; font-size: 0.8rem; }
+            .chip-premium { padding: 6px 9px; font-size: 11px; }
         }
 
         /* Hamburger Menu Icon */
@@ -355,10 +358,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Responsive Mobile Navigation
-           Seuil relevé à 1300px : avec les boutons Premium/Dashboard/Mon compte/
-           Déconnexion en plus de Se connecter, les 7 onglets + les actions de compte
-           ne tiennent plus sur une seule ligne bien avant 768px. */
+        /* Responsive Mobile Navigation (utilisateur non connecté) */
         @media (max-width: 1300px) {
             .hamburger-btn { display: flex; }
             .nav-links {
@@ -381,6 +381,37 @@
             .hamburger-btn.active span:nth-child(2) { opacity: 0; }
             .hamburger-btn.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
         }
+
+        /* Une fois l'utilisateur connecté : les 7 liens de navigation passent
+           systématiquement dans le menu ☰ (quelle que soit la largeur d'écran)
+           pour laisser la place aux actions de compte (⭐ Premium, Dashboard...). */
+        nav.logged-in .hamburger-btn { display: flex; }
+        nav.logged-in .nav-links {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 60px;
+            left: -2rem;
+            right: -2rem;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            gap: 1.2rem;
+            box-shadow: var(--shadow-md);
+        }
+        nav.logged-in .nav-links.active { display: flex; }
+        nav.logged-in .hamburger-btn.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        nav.logged-in .hamburger-btn.active span:nth-child(2) { opacity: 0; }
+        nav.logged-in .hamburger-btn.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+        /* Bandeau défilant des enseignes (sous le hero) */
+        .brand-marquee { width: 100%; overflow: hidden; padding: 1.1rem 0; margin: -1.5rem 0 3rem 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+        .brand-marquee-track { display: flex; width: max-content; animation: brand-marquee-scroll 45s linear infinite; }
+        .brand-marquee-group { display: flex; white-space: nowrap; padding-right: 2.5rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #48484a; }
+        @keyframes brand-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @media (prefers-reduced-motion: reduce) { .brand-marquee-track { animation: none; } }
 
         /* Typography */
         h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; }
@@ -533,7 +564,7 @@
     .topbar-actions { display: flex; align-items: center; gap: 8px; }
     .btn-ghost { background: none; border: 1px solid var(--line); color: var(--ink); padding: 9px 14px; border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-ghost:hover { background: #f4f4f5; }
-    .chip-premium { display: inline-flex; align-items: center; gap: 5px; background: var(--premium-bg); color: var(--premium); border: 1px solid #f0d68a; padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; }
+    .chip-premium { display: inline-flex; align-items: center; gap: 5px; background: var(--premium-bg); color: var(--premium); border: 1px solid #f0d68a; padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; white-space: nowrap; }
     .avatar-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--black); color: #fff; border: none; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     /* --- Layout --- */
@@ -629,7 +660,7 @@
     .wheel-ring canvas { display: block; border-radius: 50%; transition: transform 5s cubic-bezier(.1,0,.1,1); }
     .wheel-dot { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--bulb-color); z-index: 15; animation: dot-pulse 2.4s ease-in-out infinite; }
     @keyframes dot-pulse { 0%, 100% { opacity: .3; } 50% { opacity: .9; } }
-    .wheel-pointer-clean { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 22px; height: 27px; z-index: 25; background: var(--pointer-color, #ff3b30); clip-path: polygon(50% 100%, 14% 55%, 14% 6%, 86% 6%, 86% 55%); border-radius: 6px 6px 2px 2px; filter: drop-shadow(0 3px 5px rgba(0,0,0,.3)); }
+    .wheel-pointer-clean { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 22px; height: 27px; z-index: 25; background: var(--pointer-color, #ff3b30); clip-path: polygon(50% 100%, 14% 55%, 14% 6%, 86% 6%, 86% 55%); border-radius: 6px 6px 2px 2px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.55)) drop-shadow(0 0 4px rgba(0,0,0,.35)); }
     .wheel-hub { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.18), 0 0 0 3px #fff, 0 0 0 4.5px rgba(0,0,0,.07); display: flex; align-items: center; justify-content: center; z-index: 6; overflow: hidden; }
     .wheel-hub img { width: 100%; height: 100%; object-fit: contain; }
     @keyframes pick-vibrate { 0% { transform: translateX(-50%) rotate(0deg); } 25% { transform: translateX(-50%) rotate(-8deg); } 50% { transform: translateX(-50%) rotate(0deg); } 75% { transform: translateX(-48%) rotate(8deg); } 100% { transform: translateX(-50%) rotate(0deg); } }
@@ -824,6 +855,25 @@
     .dash-item-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .dash-item-url { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
     .dash-item-url input { font-size: 12.5px; padding: 8px 10px; }
+
+    /* Aperçu statique (démo) du Dashboard, affiché dans la section "Pourquoi les avis" */
+    .dash-preview-mock { background: #fff; border-radius: 18px; padding: 22px; margin-top: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.06); max-width: 720px; margin-left: auto; margin-right: auto; text-align: left; }
+    .dash-preview-mock-header { display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 1.1em; margin-bottom: 16px; color: var(--text-primary); }
+    .dash-preview-mock-tag { font-size: 11px; font-weight: 700; color: var(--muted, #86868b); background: #f1f1f3; padding: 4px 10px; border-radius: 20px; }
+    .dash-preview-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px,1fr)); gap: 10px; margin-bottom: 18px; }
+    .dash-preview-card { background: #f9f9fb; border-radius: 12px; padding: 12px; text-align: center; }
+    .dash-preview-card .num { font-size: 1.3em; font-weight: 800; color: var(--text-primary); }
+    .dash-preview-card .lbl { font-size: 11px; color: #86868b; font-weight: 600; margin-top: 2px; }
+    .dash-preview-card.win .num { color: #2fb350; }
+    .dash-preview-card.loss .num { color: #d24545; }
+    .dash-preview-bar { display: flex; width: 100%; height: 14px; border-radius: 20px; overflow: hidden; background: #f1f1f3; }
+    .dash-preview-bar-win { background: #2fb350; }
+    .dash-preview-bar-loss { background: #d24545; }
+    .dash-preview-bar-legend { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: #86868b; margin: 6px 0 18px; }
+    .dash-preview-mock-title { font-size: 13px; font-weight: 800; margin-bottom: 10px; color: var(--text-primary); }
+    .dash-preview-lots { display: flex; flex-direction: column; gap: 8px; }
+    .dash-preview-lot { display: flex; justify-content: space-between; font-size: 13px; background: #f9f9fb; border-radius: 10px; padding: 9px 12px; color: var(--text-primary); font-weight: 600; }
+    .dash-preview-lot span:last-child { color: #86868b; font-weight: 700; }
     .dash-empty { text-align: center; padding: 50px 20px; color: var(--muted); }
     .dash-empty .big { font-size: 2.4em; margin-bottom: 10px; }
     .dash-participants-table-wrap { margin-top: 14px; overflow-x: auto; border-top: 1px solid var(--line); padding-top: 12px; display: none; }
@@ -882,8 +932,8 @@
             <li><a href="#secteurs" onclick="closeMenu()">Secteurs</a></li>
             <li><a href="#tarifs" onclick="closeMenu()">Tarifs</a></li>
             <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
-            <li class="nav-auth-item"><div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button></div></li>
         </ul>
+        <div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button></div>
     </nav>
 </header>
 
@@ -895,10 +945,18 @@
             Transformez votre comptoir en véritable machine à collecter des avis, des likes et des emails grâce à des jeux concours 100% personnalisables à votre image (Roue de la fortune, Bandit Manchot, Cartes à gratter).
         </p>
         <div class="text-center">
-            <a href="#tarifs" class="btn hover-effect">Créer mon jeu personnalisé</a>
+            <a href="#configurateur" class="btn hover-effect">Créer mon jeu personnalisé</a>
             <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">Testez gratuitement • Configuration en 1 minute</p>
         </div>
     </section>
+
+    <!-- BANDEAU DÉFILANT DES ENSEIGNES -->
+    <div class="brand-marquee" aria-hidden="true">
+        <div class="brand-marquee-track">
+            <div class="brand-marquee-group">Starbucks • Columbus Café • Norauto • Midas • McDonald's • Burger King • Franck Provost • Jean Louis David • Marie Blachère • Ange • Zara • Mango • Carrefour Proximité • Spar • Monceau Fleurs • Le Jardin des Fleurs • Pandora • Histoire d'Or • Basic-Fit • Fitness Park • O2 • Shiva • Yves Rocher • Body Minute • Saint Algue • Fabio Salsa •</div>
+            <div class="brand-marquee-group">Starbucks • Columbus Café • Norauto • Midas • McDonald's • Burger King • Franck Provost • Jean Louis David • Marie Blachère • Ange • Zara • Mango • Carrefour Proximité • Spar • Monceau Fleurs • Le Jardin des Fleurs • Pandora • Histoire d'Or • Basic-Fit • Fitness Park • O2 • Shiva • Yves Rocher • Body Minute • Saint Algue • Fabio Salsa •</div>
+        </div>
+    </div>
 
     <!-- STATS BANNER -->
     <div class="container animate-up hover-effect" style="margin-bottom: 4rem;">
@@ -965,23 +1023,7 @@
             <button class="btn-ghost" onclick="startNewConfig()" style="white-space:nowrap;">+ Nouvelle roulette</button>
         </div>
 
-        <div style="margin-bottom: 16px; padding: 14px; background: #f8f8f9; border-radius: 12px;">
-            <label class="field-label" id="lbl-lang">🌐 Langue du jeu (client final)</label>
-            <select id="game_lang" class="full-width" style="margin-bottom:0;" onchange="changeLanguage(this.value)">
-                <option value="fr">🇫🇷 Français</option>
-                <option value="en">🇬🇧 English</option>
-                <option value="es">🇪🇸 Español</option>
-                <option value="de">🇩🇪 Deutsch</option>
-                <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
-                <option value="ar">🇸🇦 العربية (Arabe)</option>
-                <option value="pt">🇵🇹 Português</option>
-                <option value="ru">🇷🇺 Русский (Russe)</option>
-                <option value="zh">🇨🇳 中文 (Chinois)</option>
-                <option value="ja">🇯🇵 日本語 (Japonais)</option>
-                <option value="bn">🇧🇩 বাঙালি (Bengali)</option>
-                <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Pendjabi)</option>
-            </select>
-        </div>
+        <input type="hidden" id="game_lang" value="fr">
 
         <details class="step" id="step-sector">
             <summary><span class="num">1</span><span class="label" id="sum-sector">Votre secteur d'activité</span><span class="chev">▾</span></summary>
@@ -999,6 +1041,7 @@
                     <option value="fitness">🏋️ Salle de sport / Fitness</option>
                     <option value="boulangerie">🥐 Boulangerie-Pâtisserie</option>
                     <option value="medical">🩺 Médecin / Dentiste / Clinique</option>
+                    <option value="grandedistrib">🛒 Grande distribution</option>
                 </select>
             </div>
         </details>
@@ -1127,6 +1170,12 @@
                 <input type="text" id="t_name" class="full-width" value="Nom complet" oninput="update()" placeholder="Placeholder Nom">
                 <input type="text" id="t_email" class="full-width" value="Email" oninput="update()" placeholder="Placeholder Email">
                 <input type="text" id="t_phone" class="full-width" value="Téléphone" oninput="update()" placeholder="Placeholder Téléphone">
+
+                <label class="field-label">Champs supplémentaires du formulaire</label>
+                <p class="step-help" style="margin-top:-6px;">Ajoutez vos propres champs (ex : date de naissance, code postal...). Ils apparaîtront aussi comme colonnes dans le Dashboard.</p>
+                <div id="extra-fields-inputs"></div>
+                <button type="button" class="btn-ghost" style="margin-bottom:14px;" onclick="addExtraFieldRow()">+ Ajouter un champ</button>
+
                 <input type="text" id="t_btn_validate" class="full-width" value="VALIDER ET JOUER" oninput="update()" placeholder="Texte bouton valider">
 
                 <label class="field-label" id="lbl-end-msg">Boutons & messages de fin</label>
@@ -1150,6 +1199,21 @@
                     <div class="lock-text">🔒 <strong>URL personnalisée</strong> réservée à Premium. Passez Premium pour rediriger vers votre propre lien.</div>
                     <button class="btn-premium" onclick="openPremiumFlow()">Débloquer</button>
                 </div>
+
+                <div style="background:#eef6ff; border:1px solid #cfe4fb; border-radius:12px; padding:12px 14px; margin-top:14px; font-size:12px; color:#0a4a8a; line-height:1.5;">
+                    💡 <strong>Comment récupérer le lien de votre fiche Google My Business ?</strong><br>
+                    Ouvrez Google Maps, recherchez votre établissement, cliquez sur « Demander des avis » (ou « Partager ») : un lien court est généré. Copiez-collez ce lien ci-dessus pour que vos clients atterrissent directement sur le formulaire d'avis.
+                </div>
+
+                <label style="display:flex; align-items:center; gap:8px; margin-top:16px; font-size:13px; cursor:pointer;">
+                    <input type="checkbox" id="opt_skip_avis" onchange="update()">
+                    Autoriser le client à continuer sans laisser d'avis
+                </label>
+
+                <label style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; cursor:pointer; ${'' }" title="Réservé aux comptes Premium">
+                    <input type="checkbox" id="opt_avis_end" onchange="handleAvisEndToggle(this)">
+                    ⭐ Demander l'avis à la fin du jeu plutôt qu'au début (Premium)
+                </label>
             </div>
         </details>
 
@@ -1170,6 +1234,10 @@
             <div id="poster-area" style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
                 <p id="poster-status" style="font-size:12.5px; color:var(--muted); margin:0 0 10px 0;">🖼️ Préparation de vos 3 affiches A4 / A5 / A6...</p>
                 <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Aperçu de mes affiches (PDF, A4+A5+A6)</button>
+            </div>
+            <div style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
+                <button class="btn-download" style="width:100%;" onclick="downloadReglementJeu()">⚖️ Télécharger le règlement du jeu (PDF)</button>
+                <p style="font-size:11.5px; color:var(--muted); margin:8px 0 0 0;">Document légal prêt à compléter : il vous suffit d'indiquer votre raison sociale, SIREN, adresse du siège, etc.</p>
             </div>
         </div>
     </div>
@@ -1211,7 +1279,7 @@
 
                 <div id="pre-block-wheel">
                     <div class="wheel-shell">
-                        <div class="wheel-ring" id="pre-wheel-ring" style="width:200px;height:200px;border-width:7px;">
+                        <div class="wheel-ring" id="pre-wheel-ring" style="width:200px;height:200px;border-width:9px;">
                             <div class="wheel-pointer-clean"></div>
                             <canvas id="canvas-preview" width="200" height="200"></canvas>
                             <div class="wheel-hub" id="pre-wheel-hub" style="width:40px;height:40px;">
@@ -1383,7 +1451,10 @@
         <h3 class="modal-title">Aperçu de vos affiches</h3>
         <p class="modal-sub">Vérifiez le rendu avant de télécharger le PDF (A4, A5, A6).</p>
         <div id="poster-preview-images" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:14px; margin-bottom:18px;"></div>
-        <button class="btn-black" style="width:100%;" onclick="downloadPostersPdf()">📄 Télécharger le PDF</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-black" style="flex:1; min-width:180px;" onclick="downloadPostersPdf()">📄 Télécharger le PDF</button>
+            <button class="btn-black" style="flex:1; min-width:180px; background:#d24726;" onclick="downloadPostersPptx()">📊 Télécharger en PowerPoint</button>
+        </div>
     </div>
 </div>
 
@@ -1440,6 +1511,37 @@
                 </ul>
                 <p>L'outil capture légalement le nom, l'email et le numéro de téléphone, garantissant une protection absolue et conforme à la législation européenne sur les données personnelles.</p>
             </article>
+
+            <article class="seo-block">
+                <h3>📊 Un tableau de bord de suivi inclus (Dashboard)</h3>
+                <p>Retrouvez facilement vos participants, vérifiez leurs gains en caisse, et téléchargez l'intégralité de votre base de contacts en Excel en un clic. Aperçu de votre futur espace :</p>
+
+                <div class="dash-preview-mock hover-effect">
+                    <div class="dash-preview-mock-header">
+                        <span>Mon Dashboard</span>
+                        <span class="dash-preview-mock-tag">Aperçu</span>
+                    </div>
+                    <div class="dash-preview-cards">
+                        <div class="dash-preview-card"><div class="num">12</div><div class="lbl">Roulettes créées</div></div>
+                        <div class="dash-preview-card"><div class="num">657</div><div class="lbl">Scans QR code</div></div>
+                        <div class="dash-preview-card"><div class="num">94%</div><div class="lbl">Taux de participation</div></div>
+                        <div class="dash-preview-card win"><div class="num">2%</div><div class="lbl">Gains distribués</div></div>
+                        <div class="dash-preview-card loss"><div class="num">98%</div><div class="lbl">Rejoués / Perdus</div></div>
+                    </div>
+                    <div class="dash-preview-bar">
+                        <div class="dash-preview-bar-win" style="width:2%;"></div>
+                        <div class="dash-preview-bar-loss" style="width:98%;"></div>
+                    </div>
+                    <div class="dash-preview-bar-legend"><span>🎁 2% Gagné</span><span>🔁 98% Perdu</span></div>
+                    <div class="dash-preview-mock-title">🏆 Top des lots distribués</div>
+                    <div class="dash-preview-lots">
+                        <div class="dash-preview-lot"><span>☕ Café offert</span><span>41%</span></div>
+                        <div class="dash-preview-lot"><span>🥐 -10% sur l'addition</span><span>27%</span></div>
+                        <div class="dash-preview-lot"><span>🎟️ Rejouez demain</span><span>19%</span></div>
+                        <div class="dash-preview-lot"><span>🍪 Petit cadeau surprise</span><span>13%</span></div>
+                    </div>
+                </div>
+            </article>
         </div>
     </div>
 
@@ -1479,7 +1581,7 @@
             </p>
 
             <div style="text-align: center; margin-top: 2rem;">
-                <a href="#tarifs" class="btn hover-effect" style="font-size: 1.2rem; padding: 16px 40px;">Créer mon jeu personnalisé ➡️</a>
+                <a href="#configurateur" class="btn hover-effect" style="font-size: 1.2rem; padding: 16px 40px;">Créer mon jeu personnalisé ➡️</a>
             </div>
         </div>
     </section>
@@ -1518,10 +1620,7 @@
             </div>
         </div>
         
-        <div class="card text-center hover-effect" style="margin-top: 3rem; background: linear-gradient(to right, #ffffff, #fbfbfd);">
-            <h3>📊 Un tableau de bord de suivi inclus (Dashboard)</h3>
-            <p style="max-width: 800px; margin: 1rem auto;">Testez par vous-même la robustesse du système : chaque scan de QR code génère un ID unique de 7 caractères (ex: <strong>ID test XXXXXX</strong>). Cela vous permet de retrouver facilement vos participants, de vérifier leurs gains en caisse, et de télécharger l'intégralité de la base de contacts en Excel en un clic.</p>
-        </div>
+
     </section>
 
     <!-- SECTEURS D'ACTIVITÉ -->
@@ -1668,7 +1767,7 @@
             </details>
             <details>
                 <summary>Comment les clients récupèrent-ils concrètement leurs cadeaux ?</summary>
-                <p>Lorsqu'un client gagne suite au jeu, son résultat (et son code ID unique) s'affiche sur son téléphone. Il lui suffit de présenter son écran en caisse. Vous pouvez valider le gain très rapidement en vérifiant l'écran, ce qui permet d'éviter toute fraude.</p>
+                <p>Lorsqu'un client gagne suite au jeu, son résultat s'affiche sur son téléphone. Il lui suffit de présenter son écran en caisse. Vous pouvez valider le gain très rapidement en vérifiant dans le Dashboard, ce qui permet d'éviter toute fraude.</p>
             </details>
             <details>
                 <summary>Ai-je besoin de compétences techniques ou informatiques particulières ?</summary>
@@ -2127,12 +2226,15 @@ if(slider) {
     function renderAuthUI() {
         const actions = document.getElementById('topbar-actions');
         const navAuth = document.getElementById('nav-auth');
+        const navEl = document.querySelector('header nav');
         if (!currentUser) {
             const html = `<button class="btn-ghost" onclick="openAuthModal('login')">Se connecter</button>`;
             if (actions) actions.innerHTML = html;
             if (navAuth) navAuth.innerHTML = `<button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button>`;
+            if (navEl) navEl.classList.remove('logged-in');
             return;
         }
+        if (navEl) navEl.classList.add('logged-in');
         const initial = (currentProfile && currentProfile.email ? currentProfile.email[0] : 'U').toUpperCase();
         const premiumChip = currentProfile && currentProfile.is_premium ? `<span class="chip-premium">⭐ Premium</span>` : '';
         const premiumBtn = currentProfile && currentProfile.is_premium ? '' : `<button class="btn-premium-nav" onclick="openPremiumFlow()">⭐ Premium</button>`;
@@ -2337,6 +2439,7 @@ if(slider) {
     let dashTopLotsChart = null;
     let dashParticipantsCache = {};
     let dashConfigNamesCache = {};
+    let dashConfigExtraFieldsCache = {};
 
     async function loadDashboard() {
         document.getElementById('dash-status-premium').innerText = isPremium() ? 'Premium ⭐' : 'Free';
@@ -2376,12 +2479,12 @@ if(slider) {
 
         // Tous les participants de toutes les roulettes du compte
         const { data: allParticipants } = await sb.from('roulette_participants')
-            .select('id, config_id, nom, email, telephone, lot_gagne, is_win, lot_recupere, created_at')
+            .select('id, config_id, nom, email, telephone, lot_gagne, is_win, lot_recupere, "OPTIN", extra_fields, created_at')
             .in('config_id', configIds)
             .order('created_at', { ascending: false });
         const participants = allParticipants || [];
         dashParticipantsCache = {};
-        configs.forEach(cfg => { dashParticipantsCache[cfg.id] = participants.filter(p => p.config_id === cfg.id); dashConfigNamesCache[cfg.id] = (cfg.data && (cfg.data.roulette_name || cfg.data.t1)) || cfg.id; });
+        configs.forEach(cfg => { dashParticipantsCache[cfg.id] = participants.filter(p => p.config_id === cfg.id); dashConfigNamesCache[cfg.id] = (cfg.data && (cfg.data.roulette_name || cfg.data.t1)) || cfg.id; dashConfigExtraFieldsCache[cfg.id] = (cfg.data && cfg.data.ef) || []; });
 
         const totalPlays = participants.length;
         const totalWins = participants.filter(p => p.is_win).length;
@@ -2443,14 +2546,16 @@ if(slider) {
                     <button class="btn-ghost" ${isPremium() ? `onclick="saveDashboardUrl('${cfg.id}')"` : 'disabled'}>Enregistrer</button>
                 </div>
                 <div class="dash-participants-table-wrap" id="dash-table-${cfg.id}">
-                    ${renderParticipantsTable(cfgParticipants)}
+                    ${renderParticipantsTable(cfgParticipants, (cfg.data && cfg.data.ef) || [])}
                 </div>`;
             list.appendChild(row);
         });
     }
 
-    function renderParticipantsTable(rows) {
+    function renderParticipantsTable(rows, extraFieldLabels) {
+        extraFieldLabels = extraFieldLabels || [];
         if (!rows || rows.length === 0) return `<p style="color:var(--muted); font-size:12.5px; margin:0;">Aucun participant pour le moment.</p>`;
+        const extraHeaders = extraFieldLabels.map(l => `<th>${String(l).replace(/</g, '&lt;')}</th>`).join('');
         const trs = rows.map(p => {
             const date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
             const winBadge = p.is_win ? `<span class="badge-win">✅ Gagné</span>` : `<span class="badge-loss">Perdu</span>`;
@@ -2458,20 +2563,56 @@ if(slider) {
                 : p.lot_recupere
                     ? `<button class="badge-claimed" onclick="toggleLotRecupere('${p.id}', false, this)" title="Cliquez pour annuler (marqué par erreur ?)">✅ Remis</button>`
                     : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${p.id}', true, this)">⏳ À remettre</button>`;
-            return `<tr>
+            const optinBadge = p.OPTIN === 'oui'
+                ? `<span class="badge-win">✅ Oui</span>`
+                : `<span class="badge-loss">Non</span>`;
+            const extraCells = extraFieldLabels.map(l => `<td>${((p.extra_fields && p.extra_fields[l]) || '—').toString().replace(/</g, '&lt;')}</td>`).join('');
+            return `<tr id="prow-${p.id}">
                 <td>${date}</td>
-                <td>${(p.nom || '—').replace(/</g, '&lt;')}</td>
-                <td>${(p.email || '—').replace(/</g, '&lt;')}</td>
-                <td>${(p.telephone || '—').replace(/</g, '&lt;')}</td>
+                <td class="editable-cell" data-field="nom" data-id="${p.id}">${(p.nom || '—').replace(/</g, '&lt;')}</td>
+                <td class="editable-cell" data-field="email" data-id="${p.id}">${(p.email || '—').replace(/</g, '&lt;')}</td>
+                <td class="editable-cell" data-field="telephone" data-id="${p.id}">${(p.telephone || '—').replace(/</g, '&lt;')}</td>
                 <td>${(p.lot_gagne || '—').replace(/</g, '&lt;')}</td>
                 <td>${winBadge}</td>
                 <td>${claimBtn}</td>
+                <td>${optinBadge}</td>
+                ${extraCells}
+                <td><button class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="editParticipantRow('${p.id}')">✏️ Éditer</button></td>
             </tr>`;
         }).join('');
         return `<table class="dash-participants-table">
-            <thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Lot</th><th>Résultat</th><th>Lot remis ?</th></tr></thead>
+            <thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Lot</th><th>Résultat</th><th>Lot remis ?</th><th>Consentement</th>${extraHeaders}<th></th></tr></thead>
             <tbody>${trs}</tbody>
         </table>`;
+    }
+
+    // ---------------------------------------------------------------
+    // ÉDITION DES INFOS CLIENT DEPUIS LE DASHBOARD
+    // ---------------------------------------------------------------
+    function editParticipantRow(participantId) {
+        const row = document.getElementById('prow-' + participantId);
+        if (!row) return;
+        const cells = row.querySelectorAll('.editable-cell');
+        if (row.dataset.editing === '1') {
+            // Sauvegarder
+            const updates = {};
+            cells.forEach(cell => {
+                const input = cell.querySelector('input');
+                if (input) updates[cell.dataset.field] = input.value;
+            });
+            sb.from('roulette_participants').update(updates).eq('id', participantId).then(() => {
+                toast('Informations client mises à jour.', 'success');
+                loadDashboard();
+            });
+            return;
+        }
+        cells.forEach(cell => {
+            const currentVal = cell.innerText.trim() === '—' ? '' : cell.innerText.trim();
+            cell.innerHTML = `<input type="text" value="${currentVal.replace(/"/g, '&quot;')}" style="padding:4px 6px; font-size:12px; margin:0; width:100%;">`;
+        });
+        row.dataset.editing = '1';
+        const btn = row.querySelector('button[onclick^="editParticipantRow"]');
+        if (btn) btn.innerText = '💾 Enregistrer';
     }
 
     function toggleParticipantsTable(configId) {
@@ -2485,8 +2626,9 @@ if(slider) {
         return s;
     }
 
-    function buildCsvFromParticipants(rows) {
-        const header = ['Date', 'Nom', 'Email', 'Téléphone', 'Lot', 'Résultat', 'Lot remis'];
+    function buildCsvFromParticipants(rows, extraFieldLabels) {
+        extraFieldLabels = extraFieldLabels || [];
+        const header = ['Date', 'Nom', 'Email', 'Téléphone', 'Lot', 'Résultat', 'Lot remis', 'Consentement', ...extraFieldLabels];
         const lines = [header.map(csvEscape).join(';')];
         rows.forEach(p => {
             const date = p.created_at ? new Date(p.created_at).toLocaleString('fr-FR') : '';
@@ -2497,7 +2639,9 @@ if(slider) {
                 p.telephone || '',
                 p.lot_gagne || '',
                 p.is_win ? 'Gagné' : 'Perdu',
-                !p.is_win ? '—' : (p.lot_recupere ? 'Remis' : 'À remettre')
+                !p.is_win ? '—' : (p.lot_recupere ? 'Remis' : 'À remettre'),
+                p.OPTIN === 'oui' ? 'Oui' : 'Non',
+                ...extraFieldLabels.map(l => (p.extra_fields && p.extra_fields[l]) || '')
             ].map(csvEscape).join(';'));
         });
         return lines.join('\r\n');
@@ -2518,7 +2662,7 @@ if(slider) {
         const rows = dashParticipantsCache[configId] || [];
         if (rows.length === 0) { toast("Aucun participant à exporter pour cette roulette.", "error"); return; }
         const safeName = (dashConfigNamesCache[configId] || configId).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
-        downloadCsv(buildCsvFromParticipants(rows), `clients-${safeName}.csv`);
+        downloadCsv(buildCsvFromParticipants(rows, dashConfigExtraFieldsCache[configId]), `clients-${safeName}.csv`);
         toast("Export CSV téléchargé ✅", "success");
     }
 
@@ -2527,7 +2671,7 @@ if(slider) {
             rows.map(p => ({ ...p, roulette_name: dashConfigNamesCache[configId] || configId }))
         );
         if (all.length === 0) { toast("Aucun participant à exporter pour le moment.", "error"); return; }
-        const header = ['Roulette', 'Date', 'Nom', 'Email', 'Téléphone', 'Lot', 'Résultat', 'Lot remis'];
+        const header = ['Roulette', 'Date', 'Nom', 'Email', 'Téléphone', 'Lot', 'Résultat', 'Lot remis', 'Consentement'];
         const lines = [header.map(csvEscape).join(';')];
         all.forEach(p => {
             const date = p.created_at ? new Date(p.created_at).toLocaleString('fr-FR') : '';
@@ -2539,7 +2683,8 @@ if(slider) {
                 p.telephone || '',
                 p.lot_gagne || '',
                 p.is_win ? 'Gagné' : 'Perdu',
-                !p.is_win ? '—' : (p.lot_recupere ? 'Remis' : 'À remettre')
+                !p.is_win ? '—' : (p.lot_recupere ? 'Remis' : 'À remettre'),
+                p.OPTIN === 'oui' ? 'Oui' : 'Non'
             ].map(csvEscape).join(';'));
         });
         downloadCsv(lines.join('\r\n'), `tous-mes-clients.csv`);
@@ -2672,7 +2817,7 @@ if(slider) {
     };
 
     const translations = {
-        fr: { t1: "Cadeaux à gagner ! ✨", t2: "Laissez un avis pour débloquer la roue. Voir conditions* dans votre point de vente.", t3: "LAISSEZ UN AVIS", tw: "Tournez la roue et tentez de gagner* de nombreux cadeaux !", last: "Dernière étape !", name: "Nom complet", email: "Email", phone: "Téléphone", val: "VALIDER ET JOUER", spin: "LANCEZ LA ROUE", thx: "Merci pour votre participation ! 🎉", res: "Résultat :", cond: "Si vous avez gagné, présenter cet écran à l’accueil. Le jeu est ouvert à toute personne physique majeure, sans obligation d’achat. La participation est strictement limitée à un seul lancer par personne. Les gains obtenus doivent être réclamés ou consommés immédiatement et ne peuvent être reportés à une date ultérieure en fonction des conditions. Les lots gagnés ne sont pas cumulables avec d'autres offres promotionnelles, réductions en cours dans l'établissement. Les lots sont proposés dans la limite des stocks disponibles. Les gains ne sont ni échangeables, ni remboursables en espèces. Vos données sont traitées pour la gestion du jeu.", rgpd: "J'accepte que mes données soient collectées pour être recontacté si je gagne. J'accepte le règlement du jeu et l'utilisation de mes données pour ma participation. J'accepte également de recevoir des offres promotionnelles de l'établissement par email et téléphone.", qr: "Scannez-moi" },
+        fr: { t1: "Cadeaux à gagner ! ✨", t2: "Laissez un avis pour débloquer la roue. Voir conditions* dans votre point de vente.", t3: "LAISSEZ UN AVIS", tw: "Tournez la roue et tentez de gagner* de nombreux cadeaux !", last: "Dernière étape !", name: "Nom complet", email: "Email", phone: "Téléphone", val: "VALIDER ET JOUER", spin: "LANCEZ LA ROUE", thx: "Merci pour votre participation ! 🎉", res: "Résultat :", cond: "Si vous avez gagné, présenter cet écran à l’accueil. Le jeu est ouvert à toute personne physique majeure, sans obligation d’achat. La participation est strictement limitée à un seul lancer par personne. Les gains obtenus doivent être réclamés ou consommés immédiatement et ne peuvent être reportés à une date ultérieure en fonction des conditions. Les lots gagnés ne sont pas cumulables avec d'autres offres promotionnelles, réductions en cours dans l'établissement. Les lots sont proposés dans la limite des stocks disponibles. Les gains ne sont ni échangeables, ni remboursables en espèces. Vos données sont traitées pour la gestion du jeu.", rgpd: "J'accepte de recevoir des offres promotionnelles de l'établissement par e-mail et téléphone.", qr: "Scannez-moi" },
         en: { t1: "Gifts to win! ✨", t2: "Leave a review to unlock the wheel. See conditions* at your point of sale.", t3: "LEAVE A REVIEW", tw: "Spin the wheel and try to win* many gifts!", last: "Last step!", name: "Full Name", email: "Email", phone: "Phone", val: "VALIDATE AND PLAY", spin: "SPIN THE WHEEL", thx: "Thank you for participating! 🎉", res: "Result:", cond: "If you have won, present this screen at the reception. The game is open to any adult individual, without obligation to purchase. Participation is strictly limited to one spin per person. Winnings must be claimed or consumed immediately and cannot be postponed. Prizes cannot be combined with other ongoing promotions. Prizes are available while supplies last. Winnings are neither exchangeable nor refundable in cash. Your data is processed for game management.", rgpd: "I agree that my data will be collected to be contacted if I win. I accept the game rules and the use of my data for my participation. I also agree to receive promotional offers from the establishment by email and phone.", qr: "Scan me" },
         es: { t1: "¡Regalos para ganar! ✨", t2: "Deja una reseña para desbloquear la rueda. Ver condiciones* en tu punto de venta.", t3: "DEJAR UNA RESEÑA", tw: "¡Gira la rueda e intenta ganar* muchos regalos!", last: "¡Último paso!", name: "Nombre completo", email: "Correo electrónico", phone: "Teléfono", val: "VALIDAR Y JUGAR", spin: "GIRAR LA RUEDA", thx: "¡Gracias por participar! 🎉", res: "Resultado:", cond: "Si ha ganado, presente esta pantalla en la recepción. El juego está abierto a cualquier persona física mayor de edad, sin obligación de compra. La participación está estrictamente limitada a un lanzamiento por persona. Las ganancias deben reclamarse o consumirse de inmediato. Los premios no son acumulables con otras promociones. Los premios están disponibles hasta agotar existencias. Las ganancias no son canjeables ni reembolsables en efectivo. Sus datos se procesan para la gestión del juego.", rgpd: "Acepto que mis datos se recopilen para ser contactado si gano. Acepto las reglas del juego y el uso de mis datos para mi participación. También acepto recibir ofertas promocionales del establecimiento por correo electrónico y teléfono.", qr: "Escanéame" },
         de: { t1: "Geschenke zu gewinnen! ✨", t2: "Hinterlassen Sie eine Bewertung, um das Rad freizuschalten. Siehe Bedingungen* in Ihrem Geschäft.", t3: "BEWERTUNG ABGEBEN", tw: "Drehen Sie am Rad und versuchen Sie, viele Geschenke zu gewinnen!", last: "Letzter Schritt!", name: "Vollständiger Name", email: "E-Mail", phone: "Telefon", val: "BESTÄTIGEN & SPIELEN", spin: "RAD DREHEN", thx: "Vielen Dank für Ihre Teilnahme! 🎉", res: "Ergebnis:", cond: "Wenn Sie gewonnen haben, zeigen Sie diesen Bildschirm am Empfang vor. Das Spiel steht jeder volljährigen Person ohne Kaufzwang offen. Die Teilnahme ist streng auf einen Wurf pro Person begrenzt. Gewinne müssen sofort beansprucht oder verbraucht werden. Die Preise nicht kombinierbar. Gewinne sind weder umtauschbar noch in bar erstattungsfähig. Ihre Daten werden für das Spielmanagement verarbeitet.", rgpd: "Ich stimme zu, dass meine Daten gesammelt werden, um im Falle eines Gewinns kontaktiert zu werden.", qr: "Scannen" },
@@ -2868,34 +3013,37 @@ if(slider) {
 
     const SECTOR_PRESETS = {
         fastfood: { label: 'Restauration rapide', emoji: '🍔', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['🍔 Menu offert', 1], ["🍟 -20% sur l'addition", 1]
+            ['😢 Dommage, une prochaine fois', 40], ['🍔 Menu offert', 10], ['🥹 Raté, retentez votre chance', 40], ["🍟 -20% sur l'addition", 10]
         ]},
         restaurant: { label: 'Restaurant traditionnel', emoji: '🍽️', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['🍷 Apéritif offert', 1], ['🍰 Dessert offert', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['🍷 Apéritif offert', 10], ['🥹 Raté, retentez votre chance', 40], ['🍰 Dessert offert', 10]
         ]},
         hotel: { label: 'Hôtellerie', emoji: '🏨', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['🥐 Petit-déjeuner offert', 1], ['⬆️ Surclassement chambre', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['🥐 Petit-déjeuner offert', 10], ['🥹 Raté, retentez votre chance', 40], ['⬆️ Surclassement chambre', 10]
         ]},
         coiffure: { label: 'Coiffure & Barbier', emoji: '✂️', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['💇 -15% sur votre coupe', 1], ['🎁 Soin offert', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['💇 -15% sur votre coupe', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Soin offert', 10]
         ]},
         beaute: { label: 'Institut de beauté / Spa', emoji: '💆', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['💅 Manucure offerte', 1], ['🧖 Accès spa offert', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['💅 Manucure offerte', 10], ['🥹 Raté, retentez votre chance', 40], ['🧖 Accès spa offert', 10]
         ]},
         garage: { label: 'Garage / Mécanique auto', emoji: '🔧', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['🧽 Lavage offert', 1], ['🎁 Vidange -20%', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['🧽 Lavage offert', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Vidange -20%', 10]
         ]},
         immobilier: { label: 'Agence immobilière', emoji: '🏠', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['📋 Estimation offerte', 1], ['🎁 Bon cadeau 50€', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['📋 Estimation offerte', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Bon cadeau 50€', 10]
         ]},
         fitness: { label: 'Salle de sport / Fitness', emoji: '🏋️', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ["🎟️ Séance d'essai offerte", 1], ["💪 -20% sur l'abonnement", 1]
+            ['😢 Dommage, une prochaine fois', 40], ["🎟️ Séance d'essai offerte", 10], ['🥹 Raté, retentez votre chance', 40], ["💪 -20% sur l'abonnement", 10]
         ]},
         boulangerie: { label: 'Boulangerie-Pâtisserie', emoji: '🥐', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['🥐 Viennoiserie offerte', 1], ['🍰 Part de gâteau offerte', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['🥐 Viennoiserie offerte', 10], ['🥹 Raté, retentez votre chance', 40], ['🍰 Part de gâteau offerte', 10]
         ]},
         medical: { label: 'Médecin / Dentiste / Clinique', emoji: '🩺', lots: [
-            ['😢 Dommage, une prochaine fois', 98], ['☕ Café offert en salle d\'attente', 1], ['🎁 Bon cadeau partenaire', 1]
+            ['😢 Dommage, une prochaine fois', 40], ['☕ Café offert en salle d\'attente', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Bon cadeau partenaire', 10]
+        ]},
+        grandedistrib: { label: 'Grande distribution', emoji: '🛒', lots: [
+            ['😢 Dommage, une prochaine fois', 40], ['🛍️ Bon d\'achat 5€', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Produit offert', 10]
         ]}
     };
 
@@ -3487,10 +3635,51 @@ if(slider) {
         initScratchCard('pre-scratch-canvas', 'pre-scratch-result-text', label, colors, null);
     }
 
+    // Le jeu n'est joué par le client que sur mobile : inutile de conserver des
+    // visuels en pleine résolution. On redimensionne/compresse côté navigateur
+    // avant l'envoi, pour un chargement le plus léger et rapide possible.
+    function resizeImageForMobile(file) {
+        return new Promise((resolve) => {
+            const MAX_DIM = 900; // largement suffisant pour un écran de smartphone
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > MAX_DIM || height > MAX_DIM) {
+                        if (width >= height) { height = Math.round(height * (MAX_DIM / width)); width = MAX_DIM; }
+                        else { width = Math.round(width * (MAX_DIM / height)); height = MAX_DIM; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    // On garde le PNG (transparence) uniquement pour les logos ;
+                    // sinon on compresse en JPEG, beaucoup plus léger.
+                    const isPng = file.type === 'image/png';
+                    const mime = isPng ? 'image/png' : 'image/jpeg';
+                    const quality = isPng ? undefined : 0.75;
+                    canvas.toBlob((blob) => {
+                        if (!blob) { resolve(file); return; }
+                        const newName = file.name.replace(/\.[^.]+$/, isPng ? '.png' : '.jpg');
+                        resolve(new File([blob], newName, { type: mime }));
+                    }, mime, quality);
+                };
+                img.onerror = () => resolve(file);
+                img.src = e.target.result;
+            };
+            reader.onerror = () => resolve(file);
+            reader.readAsDataURL(file);
+        });
+    }
+
     async function uploadLogoDirect(input, targetId, statusId) {
         if (!input.files || input.files.length === 0) return;
-        const file = input.files[0];
+        let file = input.files[0];
         const status = document.getElementById(statusId);
+        status.innerText = "⏳ Optimisation de l'image...";
+        status.style.color = "blue";
+        try { file = await resizeImageForMobile(file); } catch (e) { /* on garde l'original si l'optimisation échoue */ }
         const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
         status.innerText = "⏳ Téléchargement...";
         status.style.color = "blue";
@@ -3571,6 +3760,9 @@ if(slider) {
             cust_bg_o: document.getElementById('bg_opacity').value,
             cust_tx_c: document.getElementById('text_color').value,
             cust_btn_c: document.getElementById('button_color').value,
+            ef: getExtraFieldLabels(),
+            skip_avis: document.getElementById('opt_skip_avis') ? document.getElementById('opt_skip_avis').checked : false,
+            avis_end: (isPremium() && document.getElementById('opt_avis_end')) ? document.getElementById('opt_avis_end').checked : false,
             roulette_name: document.getElementById('t1').value || 'Roulette sans nom'
         };
 
@@ -3605,7 +3797,7 @@ if(slider) {
             qrContainer.innerHTML = "";
             new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark: "#000000" });
             document.getElementById('qr-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            btn.innerText = "✅ QR Code prêt !";
+            btn.innerText = "✅ QR code prêt, cliquez ici à nouveau pour toute modification";
             btn.disabled = false;
             toast(editingConfigId ? "Modifications enregistrées avec succès." : "QR Code généré avec succès.", "success");
             lastGeneratedConfigId = configId;
@@ -3803,6 +3995,22 @@ if(slider) {
         if (statusEl) statusEl.innerText = '✅ Vos 3 affiches (A4, A5, A6) sont prêtes et téléchargées.';
     }
 
+    function downloadPostersPptx() {
+        if (!posterFormatsCache.length || !lastGeneratedConfigId) return;
+        const pptx = new PptxGenJS();
+        posterFormatsCache.forEach(f => {
+            // 1 diapositive par format d'affiche, dimensionnée exactement au format papier (mm -> pouces)
+            pptx.defineLayout({ name: `FMT_${f.name}`, width: f.wmm / 25.4, height: f.hmm / 25.4 });
+            pptx.layout = `FMT_${f.name}`;
+            const slide = pptx.addSlide();
+            slide.addImage({ data: f.imgData, x: 0, y: 0, w: f.wmm / 25.4, h: f.hmm / 25.4 });
+        });
+        pptx.writeFile({ fileName: `affiches-${lastGeneratedConfigId}.pptx` });
+        closePosterPreview();
+        const statusEl = document.getElementById('poster-status');
+        if (statusEl) statusEl.innerText = '✅ Vos 3 affiches (A4, A5, A6) sont prêtes et téléchargées.';
+    }
+
 
 
     function updateEditBanner() {
@@ -3815,7 +4023,7 @@ if(slider) {
 
     function startNewConfig() {
         if (!confirm("Créer une nouvelle roulette vierge ? Vos modifications non enregistrées seront perdues.")) return;
-        window.location.href = window.location.pathname;
+        window.location.href = window.location.pathname + '?new=1#configurateur';
     }
 
     async function loadConfigForEditing(configId) {
@@ -3861,6 +4069,11 @@ if(slider) {
             document.getElementById('text_color').value = c.cust_tx_c || '#ffffff';
             document.getElementById('button_color').value = c.cust_btn_c || '#046A38';
 
+            document.getElementById('extra-fields-inputs').innerHTML = '';
+            (c.ef || []).forEach(label => addExtraFieldRow(label));
+            if (document.getElementById('opt_skip_avis')) document.getElementById('opt_skip_avis').checked = !!c.skip_avis;
+            if (document.getElementById('opt_avis_end')) document.getElementById('opt_avis_end').checked = !!c.avis_end && isPremium();
+
             document.getElementById('lots-inputs').innerHTML = '';
             const n = c.n || [], p = c.p || [], s = c.s || [], bg = c.bg || [], tx = c.tx || [], w = c.w || [];
             n.forEach((label, idx) => addLotRow(label, p[idx], s[idx], bg[idx], tx[idx], w[idx]));
@@ -3885,11 +4098,37 @@ if(slider) {
     }
 
     const defaultLots = [
-        { n: "PERDU    🥹", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "-20% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
-        { n: "RATÉ🥹", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "-10% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
+        { n: "🥹 PERDU", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
+        { n: "🎁 -20% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
+        { n: "🥹 RATÉ", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
+        { n: "🎁 -10% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
     ];
+
+    // ---------------------------------------------------------------
+    // CHAMPS SUPPLÉMENTAIRES DU FORMULAIRE (custom fields)
+    // ---------------------------------------------------------------
+    function addExtraFieldRow(label) {
+        const container = document.getElementById('extra-fields-inputs');
+        const row = document.createElement('div');
+        row.className = 'extra-field-row';
+        row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:center;';
+        row.innerHTML = `<input type="text" class="full-width extra-field-label" style="margin-bottom:0;" value="${(label || '').replace(/"/g, '&quot;')}" placeholder="Nom du champ (ex : Date de naissance)" oninput="update()">
+            <button type="button" class="btn-ghost" onclick="this.parentElement.remove(); update();" style="white-space:nowrap;">✕</button>`;
+        container.appendChild(row);
+    }
+
+    function getExtraFieldLabels() {
+        return Array.from(document.querySelectorAll('#extra-fields-inputs .extra-field-label')).map(i => i.value.trim()).filter(Boolean);
+    }
+
+    function handleAvisEndToggle(checkbox) {
+        if (checkbox.checked && !isPremium()) {
+            checkbox.checked = false;
+            openPremiumFlow();
+            return;
+        }
+        update();
+    }
 
     function addLotRow(n, p, s, bg, tx, w) {
         const container = document.getElementById('lots-inputs');
@@ -4118,7 +4357,7 @@ if(slider) {
         const filtered = ns.map((n, i) => n.trim() !== "" ? i : -1).filter(idx => idx !== -1);
         ctx.clearRect(0, 0, size, size);
         if (filtered.length === 0) return;
-        const centerX = size / 2, centerY = size / 2, radius = size / 2;
+        const centerX = size / 2, centerY = size / 2, radius = size / 2 * 0.96;
         const arc = (2 * Math.PI) / filtered.length;
         filtered.forEach((idx, i) => {
             ctx.beginPath(); ctx.fillStyle = bgs[idx];
@@ -4170,6 +4409,92 @@ if(slider) {
             pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, 100, 100 * (canvas.height / canvas.width));
             pdf.save('roulette.pdf');
         }
+    }
+
+    // Génère un règlement de jeu-concours prêt à l'emploi (PDF), avec les
+    // informations de la roulette déjà pré-remplies, et des champs laissés
+    // volontairement vides (pointillés) pour que le commerçant y indique ses
+    // informations légales (raison sociale, SIREN, siège social, etc.).
+    function downloadReglementJeu() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = 210, margin = 18, maxWidth = pageWidth - margin * 2;
+        let y = 20;
+
+        const cfg = lastGeneratedConfigData || {};
+        const gameName = cfg.roulette_name || cfg.t1 || 'Jeu concours';
+        const configId = lastGeneratedConfigId || '……………………';
+        const gameTypeLabels = { wheel: 'une roue de la fortune', slot: 'un bandit manchot', scratch: 'un ticket à gratter', boxes: 'des coffres mystères', plinko: 'un jeu de type Plinko', cups: 'un jeu de bonneteau (gobelets)' };
+        const gameTypeLabel = gameTypeLabels[cfg.game_type] || 'un jeu interactif';
+        const lots = Array.isArray(cfg.n) ? cfg.n.filter((n, i) => cfg.w ? cfg.w[i] : true) : [];
+        const lotsText = lots.length ? lots.join(', ') : '……………………………………………………';
+        const conditionsText = cfg.tc || "Le jeu est ouvert à toute personne physique majeure, sans obligation d'achat. La participation est strictement limitée à un seul lancer par personne. Les lots sont proposés dans la limite des stocks disponibles. Les gains ne sont ni échangeables, ni remboursables en espèces.";
+
+        function addTitle(text) {
+            pdf.setFont('helvetica', 'bold'); pdf.setFontSize(13);
+            pdf.text(text, margin, y); y += 7;
+            pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10.5);
+        }
+        function addParagraph(text) {
+            const lines = pdf.splitTextToSize(text, maxWidth);
+            lines.forEach(line => {
+                if (y > 280) { pdf.addPage(); y = 20; }
+                pdf.text(line, margin, y); y += 5.2;
+            });
+            y += 3;
+        }
+        function checkPageBreak(space) {
+            if (y + space > 285) { pdf.addPage(); y = 20; }
+        }
+
+        pdf.setFont('helvetica', 'bold'); pdf.setFontSize(16);
+        pdf.text('RÈGLEMENT DE JEU-CONCOURS', pageWidth / 2, y, { align: 'center' }); y += 6;
+        pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10.5);
+        pdf.text(`« ${gameName} »`, pageWidth / 2, y, { align: 'center' }); y += 10;
+
+        addTitle('Article 1 — Société organisatrice');
+        addParagraph("La société ……………………………………………………………………………… (raison sociale), au capital social de ……………………… €, immatriculée au Registre du Commerce et des Sociétés (RCS) de ……………………… sous le numéro SIREN ……………………………, dont le siège social est situé ……………………………………………………………………………………………………, ci-après « la Société organisatrice », organise un jeu-concours gratuit sans obligation d'achat, du ……………………… au ……………………… (ou sans limitation de durée, jusqu'à modification du présent règlement).");
+
+        checkPageBreak(20);
+        addTitle('Article 2 — Objet et modalités du jeu');
+        addParagraph(`Le jeu-concours se déroule exclusivement sur smartphone, en point de vente, via un QR code affiché par la Société organisatrice. Après avoir scanné le QR code, le participant renseigne ses coordonnées puis tente sa chance via ${gameTypeLabel}. Identifiant unique du jeu : ${configId}.`);
+
+        checkPageBreak(20);
+        addTitle('Article 3 — Conditions de participation');
+        addParagraph("La participation est ouverte à toute personne physique majeure, résidant en France, à l'exclusion des membres du personnel de la Société organisatrice et de leur famille. La participation est strictement personnelle et limitée à une seule tentative par personne et par période définie par la Société organisatrice (ex : par jour), sauf mention contraire affichée en point de vente.");
+
+        checkPageBreak(20);
+        addTitle('Article 4 — Dotation (lots mis en jeu)');
+        addParagraph(`Les lots pouvant être gagnés dans le cadre de ce jeu sont les suivants : ${lotsText}. Cette dotation pourra être modifiée par la Société organisatrice, notamment en fonction des stocks disponibles, sans que sa valeur globale ne soit substantiellement diminuée.`);
+
+        checkPageBreak(20);
+        addTitle('Article 5 — Désignation des gagnants et remise des lots');
+        addParagraph("Le résultat est déterminé de manière aléatoire et immédiate par l'application, selon les probabilités définies par la Société organisatrice pour chaque lot. En cas de gain, un identifiant unique de participation est généré et affiché à l'écran du participant, qui doit le présenter en caisse pour se voir remettre son lot. Le lot doit être réclamé immédiatement, lors du passage en caisse suivant la participation, et ne pourra être reporté à une date ultérieure.");
+
+        checkPageBreak(20);
+        addTitle('Article 6 — Conditions complémentaires');
+        addParagraph(conditionsText);
+
+        checkPageBreak(30);
+        addTitle('Article 7 — Données personnelles (RGPD)');
+        addParagraph("Les informations collectées (nom, email, numéro de téléphone) sont nécessaires à la gestion du jeu et à l'attribution des lots. Elles sont traitées par ……………………………………………………………… (raison sociale), responsable de traitement, conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi « Informatique et Libertés ». Elles pourront être utilisées, sous réserve du consentement du participant, à des fins de prospection commerciale (offres, newsletters). Conformément à la réglementation, chaque participant dispose d'un droit d'accès, de rectification, d'opposition et de suppression de ses données, exerçable par écrit auprès de : ……………………………………………………………… (adresse ou email de contact).");
+
+        checkPageBreak(20);
+        addTitle('Article 8 — Responsabilité');
+        addParagraph("La Société organisatrice ne saurait être tenue responsable en cas de dysfonctionnement du réseau internet, du matériel de réception ou des lignes de communication, indépendant de sa volonté, qui empêcherait un participant d'accéder au jeu ou d'en connaître le résultat.");
+
+        checkPageBreak(20);
+        addTitle('Article 9 — Consultation du règlement');
+        addParagraph("Le présent règlement est disponible sur simple demande auprès de la Société organisatrice, à l'adresse suivante : ……………………………………………………………………………………………………………………………………");
+
+        checkPageBreak(20);
+        addTitle('Article 10 — Litiges');
+        addParagraph("Le présent règlement est soumis à la loi française. Tout litige né à l'occasion de ce jeu-concours sera soumis aux tribunaux compétents.");
+
+        pdf.setFontSize(8.5); pdf.setTextColor(150);
+        pdf.text('Document généré automatiquement — à relire et compléter avant diffusion. Ne constitue pas un conseil juridique.', margin, 292);
+
+        pdf.save(`reglement-jeu-${lastGeneratedConfigId || 'concours'}.pdf`);
     }
 
     function renderClient(config, configId) {
@@ -4238,7 +4563,7 @@ if(slider) {
         } else {
             gameStepHtml = `
                 <div class="wheel-shell">
-                    <div class="wheel-ring" id="client-wheel-ring" style="width:280px;height:280px;border-width:10px;">
+                    <div class="wheel-ring" id="client-wheel-ring" style="width:280px;height:280px;border-width:13px;">
                         <div class="wheel-pointer-clean" style="width:28px;height:34px;top:-15px;"></div>
                         <canvas id="rc" width="280" height="280"></canvas>
                         <div class="wheel-hub" id="client-wheel-hub" style="width:56px;height:56px;">
@@ -4250,6 +4575,14 @@ if(slider) {
                 <button id="spin-btn" class="btn-black-c" onclick="spinClient()">${config.t_btn_s || t.spin}</button>`;
         }
 
+        const avisEnd = !!config.avis_end;
+        const extraFieldsHtml = (config.ef || []).map((label, i) =>
+            '<input type="text" class="c-extra-field" data-label="' + String(label).replace(/"/g, '&quot;') + '" id="c_extra_' + i + '" placeholder="' + String(label).replace(/"/g, '&quot;') + '">'
+        ).join('');
+        const skipAvisLinkHtml = config.skip_avis
+            ? '<a href="#" id="skip-avis-link" onclick="event.preventDefault(); window.skipAvisChosen = !window.skipAvisChosen; this.style.opacity = window.skipAvisChosen ? \'1\' : \'.55\'; this.style.textDecoration = window.skipAvisChosen ? \'none\' : \'underline\';" style="display:block; margin-top:12px; margin-bottom:6px; font-size:11px; opacity:.55; text-decoration:underline; position:relative; z-index:2; color:inherit;">' + (avisEnd ? 'Continuer sans laisser d\'avis à la fin' : 'Continuer sans laisser d\'avis') + '</a>'
+            : '';
+
         document.body.innerHTML = `
         <style>
             body { margin: 0; padding: 0; box-sizing: border-box; min-height: 100vh; background-color: ${bgCol}; background-image: ${clientBg.image}; background-size: ${clientBg.size}; background-position: center; background-attachment: fixed; color: ${txCol}; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-family: 'Segoe UI', sans-serif; position: relative; overflow-x: hidden; direction: ${lang === 'ar' ? 'rtl' : 'ltr'}; }
@@ -4257,7 +4590,7 @@ if(slider) {
             .client-card { position: relative; z-index: 1; background: transparent; padding: 40px 20px; width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
             .btn-black-c { background: ${btnCol}; color: #fff; border: none; padding: 18px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px; font-size: 16px; margin: 15px auto 0 auto; position: relative; z-index: 2; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; }
             .btn-black-c:active { transform: scale(0.98); }
-            input[type="text"], input[type="email"], input[type="tel"] { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; box-sizing: border-box; position: relative; z-index: 2; font-size: 16px; }
+            input[type="text"], input[type="email"], input[type="tel"] { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; box-sizing: border-box; position: relative; z-index: 2; font-size: 16px; background: #ffffff; color: #1d1d1f; }
             @media (max-width: 380px) {
                 #client-wheel-ring { width: 240px !important; height: 240px !important; } #rc { width: 100% !important; height: 100% !important; }
                 .plinko-frame { max-width: 220px !important; }
@@ -4267,23 +4600,26 @@ if(slider) {
             h2, h3, p, span { color: ${txCol} !important; position: relative; z-index: 2; }
             .res-box { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-top: 20px; border: 1px solid rgba(0,0,0,0.05); width: 100%; }
         </style>
-        <div id="step-avis" class="client-card">
+        <div id="step-avis" class="client-card" style="${avisEnd ? 'display:none;' : ''}">
             ${logoOrEmojiHtml(config.l, config.logo_emoji || '🎁', '96px', '48px', 'max-width:150px; max-height:120px; margin-bottom:30px; object-fit: contain;', '30px')}
             <h2>${config.t1}</h2>
             <p>${config.t2}</p>
             <a href="${config.u}" target="_blank" class="btn-black-c" style="text-decoration:none; line-height: 1.2;" onclick="setTimeout(()=>showStep('step-form'), 1500)">${config.t3}</a>
         </div>
-        <div id="step-form" class="client-card" style="display:none;">
+        <div id="step-form" class="client-card" style="${avisEnd ? '' : 'display:none;'}">
             ${logoOrEmojiHtml(config.l, config.logo_emoji || '🎁', '70px', '34px', 'max-width:100px; margin-bottom:25px; object-fit: contain;', '25px')}
             <h3>${config.t_last || t.last}</h3>
-            <p>${lang === 'fr' ? 'Complétez vos infos pour jouer.' : 'Complete your info to play.'}</p>
+            <p>Complétez vos infos pour jouer.</p>
             <input type="text" id="c_nom" placeholder="${config.t_name || t.name}" required>
             <input type="email" id="c_email" placeholder="${config.t_email || t.email}" required>
             <input type="tel" id="c_tel" placeholder="${config.t_phone || t.phone}" required>
+            ${extraFieldsHtml}
             <label style="font-size: 12px; display: flex; gap: 10px; text-align: left; align-items: flex-start; margin-top: 15px; position: relative; z-index: 2; cursor: pointer;">
                 <input type="checkbox" id="c_rgpd" required style="margin-top:3px; width: 18px; height: 18px;">
                 <span>${t.rgpd}</span>
             </label>
+            <p style="font-size:11px; text-align:left; opacity:.75; margin: 12px 0 0 0; position:relative; z-index:2;">En validant ma participation, j'accepte le règlement du jeu (disponible en point de vente) et l'utilisation de mes données pour m'informer si je gagne.</p>
+            ${skipAvisLinkHtml}
             <button class="btn-black-c" onclick="validateForm()">${config.t_btn_v || t.val}</button>
         </div>
         <div id="step-game" class="client-card" style="display:none;">
@@ -4293,8 +4629,18 @@ if(slider) {
                  <h3 style="margin: 0;">${config.t_thx || t.thx}</h3>
                  <p style="font-size:26px; font-weight:bold; margin: 10px 0;">${config.t_res || t.res} <span id="win-txt"></span></p>
                  <p style="font-size:11px; text-align:justify; border-top: 1px solid rgba(0,0,0,0.1); padding-top:15px; margin-bottom: 0;">${config.tc}</p>
+                 <div id="end-avis-cta" style="display:none; margin-top:18px;">
+                     <a href="${config.u}" target="_blank" class="btn-black-c" style="text-decoration:none; line-height:1.2;">${config.t3}</a>
+                 </div>
             </div>
         </div>`;
+
+        window.revealEndAvis = () => {
+            if (avisEnd && !window.skipAvisChosen) {
+                const cta = document.getElementById('end-avis-cta');
+                if (cta) cta.style.display = 'block';
+            }
+        };
 
         window.showStep = (id) => {
             document.getElementById('step-avis').style.display = 'none';
@@ -4315,14 +4661,14 @@ if(slider) {
                 const idx = pickWeightedIndex(config.p);
                 initScratchCard('client-scratch-canvas', 'client-scratch-result-text', config.n[idx], { c1: config.b1 || '#cdc7fc', c2: config.b2 || '#fa879a' }, () => {
                     document.getElementById('win-txt').innerText = config.n[idx];
-                    document.getElementById('res-box').style.display = 'block';
+                    document.getElementById('res-box').style.display = 'block'; revealEndAvis();
                     sendToDatabase(config.n[idx]);
                 });
             } else if (gameType === 'boxes') {
                 buildMysteryBoxes('client-boxes-grid', config.n.length, (box, container) => {
                     revealMysteryBox(box, container, { n: config.n, p: config.p }, (label) => {
                         document.getElementById('win-txt').innerText = label;
-                        document.getElementById('res-box').style.display = 'block';
+                        document.getElementById('res-box').style.display = 'block'; revealEndAvis();
                         sendToDatabase(label);
                     });
                 });
@@ -4352,6 +4698,8 @@ if(slider) {
                 const lossKeywords = ['dommage', 'perdu', 'raté', 'rate', 'sorry', 'lost', 'try again', 'rejouer'];
                 isWin = !lossKeywords.some(k => lower.includes(k));
             }
+            const extraFieldsData = {};
+            document.querySelectorAll('.c-extra-field').forEach(el => { extraFieldsData[el.dataset.label] = el.value; });
             const participantData = {
                 config_id: configId,
                 nom: document.getElementById('c_nom').value,
@@ -4359,7 +4707,8 @@ if(slider) {
                 telephone: document.getElementById('c_tel').value,
                 lot_gagne: winLabel,
                 is_win: isWin,
-                OPTIN: document.getElementById('c_rgpd').checked ? "oui" : "non"
+                OPTIN: document.getElementById('c_rgpd').checked ? "oui" : "non",
+                extra_fields: extraFieldsData
             };
             try {
                 await fetch(`${SB_URL}/rest/v1/roulette_participants`, {
@@ -4380,7 +4729,7 @@ if(slider) {
                 spinReelsGeneric(reelEls, symbols, finalIndex, () => {
                     const winLabel = config.n[finalIndex];
                     document.getElementById('win-txt').innerText = winLabel;
-                    document.getElementById('res-box').style.display = 'block';
+                    document.getElementById('res-box').style.display = 'block'; revealEndAvis();
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                     sendToDatabase(winLabel);
                 });
@@ -4392,7 +4741,7 @@ if(slider) {
                 dropPlinkoBall('client-plinko-board', 'client-plinko-bins', 'client-plinko-ball', { n: config.n, p: config.p }, (label) => {
                     btn.style.display = 'none';
                     document.getElementById('win-txt').innerText = label;
-                    document.getElementById('res-box').style.display = 'block';
+                    document.getElementById('res-box').style.display = 'block'; revealEndAvis();
                     sendToDatabase(label);
                 });
                 return;
@@ -4406,7 +4755,7 @@ if(slider) {
                     btn.style.display = 'none';
                     attachCupHandlers('client-cups-row', { n: config.n, p: config.p }, (label) => {
                         document.getElementById('win-txt').innerText = label;
-                        document.getElementById('res-box').style.display = 'block';
+                        document.getElementById('res-box').style.display = 'block'; revealEndAvis();
                         sendToDatabase(label);
                     });
                 });
@@ -4423,7 +4772,7 @@ if(slider) {
                 pointer.classList.remove('vibrating');
                 const winLabel = config.n[t2];
                 document.getElementById('win-txt').innerText = winLabel;
-                document.getElementById('res-box').style.display = 'block';
+                document.getElementById('res-box').style.display = 'block'; revealEndAvis();
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 sendToDatabase(winLabel);
             }, 5200);
@@ -4433,7 +4782,7 @@ if(slider) {
     function drawClientWheel(config) {
         const canvas = document.getElementById('rc'), ctx = canvas.getContext('2d'), arc = (2 * Math.PI) / config.n.length;
         const size = canvas.width;
-        const cx = size / 2, cy = size / 2, r = size / 2;
+        const cx = size / 2, cy = size / 2, r = size / 2 * 0.96;
         config.n.forEach((n, i) => {
             ctx.beginPath(); ctx.fillStyle = config.bg[i];
             ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, i * arc, (i + 1) * arc); ctx.fill();
