@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Comment Attirer et Fidéliser des Clients en Salon de Coiffure | Spin To Keep</title>
+    <meta name="description" content="Découvrez les meilleures stratégies marketing pour attirer de nouveaux clients dans votre salon de coiffure, multiplier vos avis Google et remplir votre agenda.">
+    <meta name="keywords" content="attirer clients salon de coiffure, fideliser clientele coiffure, marketing salon de coiffure, avis google coiffeur, animation salon coiffure, Spin To Keep">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.7; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* HEADER */
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .btn-nav { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s ease; }
+        .btn-nav:hover { background: var(--accent-hover); }
+
+        /* TYPOGRAPHY */
+        h1 { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; text-align: center; letter-spacing: -0.03em; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-top: 3.5rem; margin-bottom: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 10px; }
+        h3 { font-size: 1.6rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 1.5rem; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* LAYOUT */
+        .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; text-align: center; }
+        .bg-gray { background-color: var(--bg-secondary); padding: 4rem 0; width: 100%; }
+        .content-section { max-width: 850px; margin: 0 auto; padding: 0 2rem; }
+        article { background: #fff; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        /* LISTS & FAQ */
+        .benefits-list { list-style: none; padding: 0; margin-bottom: 2rem; }
+        .benefits-list li { font-size: 1.15rem; padding: 16px 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: flex-start; gap: 12px; }
+        .benefits-list li:last-child { border-bottom: none; }
+        .benefits-list li::before { content: '✂️'; font-size: 1.2rem; margin-top: 2px; }
+        
+        .faq-box { background: var(--bg-secondary); padding: 2.5rem; border-radius: 16px; margin-top: 2rem; border: 1px solid var(--border-color); }
+        .faq-item { margin-bottom: 2rem; }
+        .faq-item:last-child { margin-bottom: 0; }
+        .faq-item h4 { font-size: 1.3rem; margin: 0 0 0.8rem 0; color: var(--text-primary); }
+        .faq-item p { font-size: 1.1rem; margin: 0; }
+
+        /* INFO BOX */
+        .info-box { background: rgba(0, 113, 227, 0.05); border-left: 4px solid var(--accent-color); padding: 1.5rem 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; }
+        .info-box p { margin: 0; color: var(--text-primary); }
+
+        /* BUTTONS */
+        .btn-large { display: inline-block; background-color: var(--accent-color); color: #fff; padding: 18px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3); }
+        .btn-large:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+        .btn-outline { display: inline-block; background-color: transparent; color: var(--accent-color); padding: 16px 36px; border-radius: 50px; font-size: 1.1rem; font-weight: 600; text-decoration: none; border: 2px solid var(--accent-color); transition: all 0.2s ease; margin-top: 1rem; }
+        .btn-outline:hover { background-color: rgba(0, 113, 227, 0.05); }
+
+        /* FOOTER */
+        footer { background-color: #151516; color: #a1a1a6; padding: 3rem 2rem; text-align: center; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            article { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/index.html" class="logo">SpinToKeep<span>.</span></a>
+        <a href="/index.html#configurateur" class="btn-nav">Tester l'outil</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero animate-up">
+        <h1>Comment <span class="highlight">Attirer et Fidéliser</span> des Clients en Salon de Coiffure</h1>
+        <p>
+            Remplir les fauteuils les jours creux, contrer la concurrence et se constituer un fichier client engagé sont les défis quotidiens des coiffeurs et barbiers. Découvrez les méthodes marketing indispensables pour faire décoller votre activité.
+        </p>
+        <a href="/index.html#configurateur" class="btn-large hover-effect">Créer une animation pour mon salon</a>
+    </section>
+
+    <div class="bg-gray">
+        <section class="content-section animate-up">
+            <article>
+                <h2>Le marché de la coiffure : Un secteur ultra-concurrentiel</h2>
+                <p>
+                    Avec des dizaines de milliers de salons de coiffure, barbiers et instituts en France, la concurrence locale est féroce. Pour qu'un nouveau client choisisse votre établissement plutôt que celui de la rue d'en face, le bouche-à-oreille classique ne suffit plus.
+                </p>
+                <p>
+                    Aujourd'hui, la décision se prend en ligne : <strong>un client cherche "coiffeur autour de moi" sur son smartphone</strong> et compare immédiatement les notes et le nombre d'avis Google My Business.
+                </p>
+
+                <h2>1. Le levier N°1 : Faire briller votre fiche Google Maps</h2>
+                <p>
+                    Dans le secteur de la coiffure et de la beauté, la confiance est primordiale. Les clients confient leur image à vos ciseaux. Une fiche Google avec 200 avis et une note de 4.9/5 est l'aimant ultime à nouveaux clients.
+                </p>
+                
+                <div class="info-box">
+                    <p><strong>Le moment parfait pour demander un avis :</strong> Le client se regarde dans le miroir en fin de coupe, ravi du résultat. C'est exactement à cet instant que sa satisfaction est à son niveau maximal.</p>
+                </div>
+
+                <h2>2. La Gamification en caisse : La Roue de la Fortune Digitale</h2>
+                <p>
+                    Demander oralement un avis à chaque client est chronophage pour votre équipe. Grâce à <a href="/index.html" style="color: var(--accent-color); font-weight: 600;">Spin To Keep</a>, collez un sticker avec un QR Code sur les miroirs ou placez un chevalet sur la caisse : <em>"Scannez et tentez de gagner un soin offert ou -10% sur votre prochain shampoing !"</em>.
+                </p>
+
+                <ul class="benefits-list">
+                    <li><strong>Engagement immédiat :</strong> Le client scanne pendant qu'il règle ou attend la fin de sa prestation.</li>
+                    <li><strong>Redirection Google :</strong> Pour valider son lot, il dépose son avis 5 étoiles en un clic.</li>
+                    <li><strong>Capture de données (CRM) :</strong> Vous récupérez son email et numéro de téléphone, indispensables pour l'étape suivante.</li>
+                </ul>
+
+                <h2>3. Remplir le salon pendant les heures et jours creux</h2>
+                <p>
+                    Le cauchemar de tout gérant de salon est le mardi après-midi sans aucun client. En utilisant la base de contacts récoltée via le jeu concours Spin To Keep, vous reprenez la main sur votre planning.
+                </p>
+                <p>
+                    Envoyez un SMS ou un email ciblé le lundi soir : <em>"-20% sur les prestations couleur demain mardi entre 14h et 16h pour nos clients membres"</em>. Vous transformez des heures perdues en chiffre d'affaires supplémentaire.
+                </p>
+
+                <h2>4. Transformer les petites attentions en ventes additionnelles</h2>
+                <p>
+                    Le configurateur Spin To Keep vous permet de paramétrer finement vos lots à gagner. Profitez-en pour faire découvrir vos produits de soins à fort coefficient de marge :
+                </p>
+                <ul class="benefits-list">
+                    <li>Un échantillon de sérum ou d'huile à barbe offert.</li>
+                    <li>Un massage crânien de 5 minutes offert lors de la prochaine visite.</li>
+                    <li>Une remise sur la gamme de produits coiffants vendue en boutique.</li>
+                </ul>
+
+                <h2>Comment mettre en place Spin To Keep dans votre salon ?</h2>
+                <p>L'installation ne demande aucune connaissance technique et prend moins de deux minutes :</p>
+                <ol style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;">
+                    <li>Accédez au <strong>configurateur gratuit</strong>.</li>
+                    <li>Ajoutez le logo de votre salon et ajustez les couleurs selon votre charte.</li>
+                    <li>Renseignez vos lots (soins, remises, produits) et vos probabilités.</li>
+                    <li>Imprimez le QR code pour votre comptoir ou vos postes de coiffure.</li>
+                </ol>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Créer le jeu de mon salon de coiffure</a>
+                </div>
+
+                <h2>Foire Aux Questions (FAQ) - Marketing Coiffure</h2>
+                
+                <div class="faq-box">
+                    <div class="faq-item">
+                        <h4>Est-ce adapté aux barbiers et instituts de beauté ?</h4>
+                        <p>Absolument. La mécanique du jeu concours par QR code s'adapte parfaitement aux barbershops, instituts de beauté, ongles et spas. L'expérience ludique séduit tous les profils de clientèle.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Faut-il installer un logiciel sur la caisse du salon ?</h4>
+                        <p>Non. Spin To Keep est une application 100% web. Tout se passe sur le smartphone du client lorsqu'il scanne le QR code, ou sur une tablette si vous préférez la mettre à disposition sur le comptoir.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Combien d'avis puis-je espérer recevoir par mois ?</h4>
+                        <p>En moyenne, un salon de coiffure avec un passage régulier récolte entre 40 et 80 nouveaux avis Google par mois grâce à l'incitation ludique de la roue cadeau.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 2rem;">Faites le plein de réservations dès cette semaine</h3>
+                    <p style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Offrez une expérience moderne et ludique à vos clients, boostez vos avis Google et gardez le contact avec votre clientèle.</p>
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Lancer mon animation coiffure ➡️</a><br>
+                    <a href="/index.html" class="btn-outline">En savoir plus sur Spin To Keep</a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; Spin To Keep. La solution de fidélisation et d'acquisition d'avis pour salons de coiffure et instituts de beauté.</p>
+    <p style="font-size: 0.85rem; margin-top: 0.8rem;"><a href="/index.html" style="color: #a1a1a6; text-decoration: underline;">Retour à l'accueil du site</a></p>
+</footer>
+
+</body>
+</html>
