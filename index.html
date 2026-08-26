@@ -122,12 +122,18 @@
   create table if not exists roulette_configs (
     id text primary key,
     data jsonb not null,
-    owner_id uuid references auth.users(id),
+    owner_id uuid references auth.users(id) on delete cascade,
     is_premium_url boolean default false,
     created_at timestamptz default now()
   );
-  alter table roulette_configs add column if not exists owner_id uuid references auth.users(id);
+  alter table roulette_configs add column if not exists owner_id uuid references auth.users(id) on delete cascade;
   alter table roulette_configs add column if not exists is_premium_url boolean default false;
+  -- Corrige la contrainte pour une table déjà existante (créée avant l'ajout du "on delete
+  -- cascade" ci-dessus) : sans ça, Supabase refuse de supprimer un utilisateur tant qu'il
+  -- possède au moins une roulette, avec une erreur de type "violates foreign key constraint".
+  alter table roulette_configs drop constraint if exists roulette_configs_owner_id_fkey;
+  alter table roulette_configs add constraint roulette_configs_owner_id_fkey
+    foreign key (owner_id) references auth.users(id) on delete cascade;
   alter table roulette_configs enable row level security;
   create policy "Lecture publique des configs (nécessaire pour le jeu client)"
     on roulette_configs for select using (true);
@@ -1904,12 +1910,12 @@ if(slider) {
     // vérification serveur échoue avec "Abonnement PayPal introuvable" (elle
     // interroge l'API live alors que l'abonnement a été créé en sandbox, ou l'inverse).
     // ============================================================================
-    const PAYPAL_TEST_MODE = true; // → true pendant vos tests, repassez à false en prod
+    const PAYPAL_TEST_MODE = false; // → true pendant vos tests, repassez à false en prod
 
     const PAYPAL_LIVE_CLIENT_ID = "Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak";
     const PAYPAL_LIVE_PLAN_ID = "P-16K40079FK484592LNF4PL2Q";
-    const PAYPAL_SANDBOX_CLIENT_ID = "ASc59-JlaBgcQHuPlBGH72iJVuyONvZDwmuEuc-SMrRgP_LR98txizXKuuJnoXda1PdkGR0jD1gQXf1Q";
-    const PAYPAL_SANDBOX_PLAN_ID = "P-6TM45236VA047520RNKHLOTI";
+    const PAYPAL_SANDBOX_CLIENT_ID = "COLLEZ_ICI_VOTRE_CLIENT_ID_SANDBOX";
+    const PAYPAL_SANDBOX_PLAN_ID = "COLLEZ_ICI_VOTRE_PLAN_ID_SANDBOX";
 
     const PAYPAL_CLIENT_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_CLIENT_ID : PAYPAL_LIVE_CLIENT_ID;
     const PREMIUM_PLAN_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_PLAN_ID : PAYPAL_LIVE_PLAN_ID;
@@ -2244,15 +2250,21 @@ if(slider) {
                 },
                 body: JSON.stringify({ subscriptionID: subscriptionId })
             });
-            const result = await res.json();
-            if (!res.ok || !result.success) throw new Error(result.message || "Activation refusée.");
+
+            let result;
+            const rawText = await res.text();
+            try { result = JSON.parse(rawText); }
+            catch { throw new Error(`Réponse inattendue (HTTP ${res.status}) : la fonction verify-paypal-subscription est-elle bien déployée sur Supabase ? Détail : ${rawText.slice(0, 200)}`); }
+
+            if (!res.ok || !result.success) throw new Error(result.message || `Activation refusée (HTTP ${res.status}).`);
 
             await refreshSession();
             closePremiumModal();
             toast("🎉 Abonnement Premium activé ! L'URL personnalisée est débloquée.", "success");
             if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
         } catch (e) {
-            toast("Le paiement a réussi mais l'activation a échoué. Contactez le support avec l'ID d'abonnement : " + subscriptionId, "error");
+            console.error('Activation Premium échouée :', e);
+            toast("Le paiement a réussi mais l'activation a échoué : " + e.message + " (ID d'abonnement : " + subscriptionId + ")", "error");
         }
     }
 
