@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Comment Être Premier sur Google Maps : Le Guide SEO Local Ultime | Spin To Keep</title>
+    <meta name="description" content="Découvrez les secrets de l'algorithme Google Maps pour faire remonter votre commerce dans le Top 3 (Pack Local) et attirer un flux continu de clients locaux.">
+    <meta name="keywords" content="comment etre premier sur google maps, remonter sur google my business, referencement local commerce, pack local google, booster fiche google maps, avis google seo local, Spin To Keep">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+
+    <!-- Données structurées SEO (Schema.org Article & FAQ) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Comment Être Premier sur Google Maps : Le Guide SEO Local Ultime",
+      "description": "Les méthodes concrètes pour positionner votre commerce physique dans le Top 3 Google Maps grâce à la vélocité des avis et à l'optimisation locale.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Spin To Keep",
+        "url": "https://www.spintokeep.com"
+      }
+    }
+    </script>
+
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.7; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* HEADER */
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .btn-nav { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s ease; }
+        .btn-nav:hover { background: var(--accent-hover); }
+
+        /* TYPOGRAPHY */
+        h1 { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; text-align: center; letter-spacing: -0.03em; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-top: 3.5rem; margin-bottom: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 10px; }
+        h3 { font-size: 1.6rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 1.5rem; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* LAYOUT */
+        .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; text-align: center; }
+        .bg-gray { background-color: var(--bg-secondary); padding: 4rem 0; width: 100%; }
+        .content-section { max-width: 850px; margin: 0 auto; padding: 0 2rem; }
+        article { background: #fff; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        /* LISTS & FAQ */
+        .benefits-list { list-style: none; padding: 0; margin-bottom: 2rem; }
+        .benefits-list li { font-size: 1.15rem; padding: 16px 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: flex-start; gap: 12px; }
+        .benefits-list li:last-child { border-bottom: none; }
+        .benefits-list li::before { content: '📍'; font-size: 1.2rem; margin-top: 2px; }
+        
+        .faq-box { background: var(--bg-secondary); padding: 2.5rem; border-radius: 16px; margin-top: 2rem; border: 1px solid var(--border-color); }
+        .faq-item { margin-bottom: 2rem; }
+        .faq-item:last-child { margin-bottom: 0; }
+        .faq-item h4 { font-size: 1.3rem; margin: 0 0 0.8rem 0; color: var(--text-primary); }
+        .faq-item p { font-size: 1.1rem; margin: 0; }
+
+        /* INFO BOX */
+        .info-box { background: rgba(0, 113, 227, 0.05); border-left: 4px solid var(--accent-color); padding: 1.5rem 2rem; margin: 2rem 0; border-radius: 0 12px 12px 0; }
+        .info-box p { margin: 0; color: var(--text-primary); }
+
+        /* BUTTONS */
+        .btn-large { display: inline-block; background-color: var(--accent-color); color: #fff; padding: 18px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3); }
+        .btn-large:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+        .btn-outline { display: inline-block; background-color: transparent; color: var(--accent-color); padding: 16px 36px; border-radius: 50px; font-size: 1.1rem; font-weight: 600; text-decoration: none; border: 2px solid var(--accent-color); transition: all 0.2s ease; margin-top: 1rem; }
+        .btn-outline:hover { background-color: rgba(0, 113, 227, 0.05); }
+
+        /* FOOTER */
+        footer { background-color: #151516; color: #a1a1a6; padding: 3rem 2rem; text-align: center; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            article { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/index.html" class="logo">SpinToKeep<span>.</span></a>
+        <a href="/index.html#configurateur" class="btn-nav">Booster mon SEO Local</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero animate-up">
+        <h1>Comment <span class="highlight">Être Premier sur Google Maps</span> (et y rester)</h1>
+        <p>
+            Plus de 80 % des recherches sur smartphone concernant des commerces de proximité se concluent par une visite en magasin. Découvrez le fonctionnement exact de l'algorithme de référencement local et le levier numéro un pour propulser votre fiche dans le Top 3.
+        </p>
+        <a href="/index.html#configurateur" class="btn-large hover-effect">Dominer le Classement Google Maps</a>
+    </section>
+
+    <div class="bg-gray">
+        <section class="content-section animate-up">
+            <article>
+                <h2>Pourquoi le "Pack Local 3" de Google est le nouvel emplacement N°1</h2>
+                <p>
+                    Lorsqu'un utilisateur recherche « restaurant italien », « coiffeur » ou « boulangerie » suivi du nom de sa ville, Google affiche en priorité la carte Google Maps accompagnée de <strong>trois établissements seulement</strong>. C'est ce qu'on appelle le « Pack Local 3 » (ou Local Pack).
+                </p>
+                <p>
+                    Ces trois positions captent à elles seules <strong>plus de 70 % des clics globaux</strong> de la page de recherche. Être positionné quatrième ou dixième revient quasiment à être invisible pour les clients qui recherchent un commerce dans votre zone de chalandise.
+                </p>
+
+                <h2>Les 3 Piliers de l'algorithme Google Maps</h2>
+                <p>
+                    Pour déterminer quel établissement mérite d'occuper la première place sur la carte, Google s'appuie sur une formule mathématique basée sur trois critères majeurs :
+                </p>
+
+                <ul class="benefits-list">
+                    <li><strong>1. La Proximité :</strong> La distance physique entre l'internaute (ou la zone recherchée) et votre point de vente. C'est le seul paramètre sur lequel vous n'avez aucun moyen d'action direct (sauf à déménager votre boutique).</li>
+                    <li><strong>2. La Pertinence :</strong> L'adéquation entre la recherche tapée par l'internaute et les informations renseignées sur votre fiche Google Profil d'Entreprise (catégorie principale, sous-catégories, mots-clés du site web).</li>
+                    <li><strong>3. La Prominence (Notoriété) :</strong> La popularité et l'autorité de votre commerce sur le web. C'est ici que se joue l'intégralité de votre stratégie SEO local.</li>
+                </ul>
+
+                <h2>La Prominence : Le levier puissant que vous maîtrisez</h2>
+                <p>
+                    Comment Google évalue-t-il la notoriété d'un commerce local ? Par les signaux qu'envoient vos clients. Et parmi ces signaux, <strong>les avis Google représentent plus de 50 % du poids décisionnel de l'algorithme</strong>.
+                </p>
+                
+                <div class="info-box">
+                    <p><strong>L'erreur classique des commerçants :</strong> Penser qu'il suffit d'avoir une note globale de 4.8/5 basée sur 30 avis datant d'il y a deux ans. Google privilégie les fiches vivantes et dynamiques.</p>
+                </div>
+
+                <h3>Les 3 facteurs d'avis exigés par Google pour passer N°1</h3>
+                <p>
+                    Pour dépasser vos concurrents sur Google Maps, vos évaluations doivent respecter trois règles :
+                </p>
+                <ul class="benefits-list">
+                    <li><strong>Le Volume :</strong> Le nombre total d'avis doit être équivalent ou supérieur à la moyenne des concurrents de votre secteur.</li>
+                    <li><strong>La Note Moyenne :</strong> Une moyenne idéalement située entre 4.5 et 4.9/5 (une note parfaite de 5/5 sur des centaines d'avis est parfois suspectée de manipulation).</li>
+                    <li><strong>La Vélocité (Fréquence) :</strong> C'est le critère le plus sous-estimé. Recevoir 10 nouveaux avis chaque semaine est infiniment plus puissant pour l'algorithme que de recevoir 100 avis d'un coup puis plus rien pendant six mois.</li>
+                </ul>
+
+                <h2>Comment automatiser la récolte d'avis en caisse ?</h2>
+                <p>
+                    Répéter oralement « Laissez-nous un avis » à chaque client est épuisant pour vos équipes et produit très peu de résultats. C'est précisément pour résoudre ce blocage que la plateforme <a href="/index.html" style="color: var(--accent-color); font-weight: 600;">Spin To Keep</a> a été conçue.
+                </p>
+                
+                <h3>La Gamification par QR Code (L'accélérateur SEO Local)</h3>
+                <p>
+                    En installant un support physique (chevalet de comptoir, PLV, sticker miroir) invitant vos clients à **scanner pour tourner une roue de la fortune**, vous transformez la récolte d'avis en un jeu ludique et gratifiant :
+                </p>
+                <ul class="benefits-list">
+                    <li>Le client scanne le QR code avec son smartphone à la caisse ou à sa table.</li>
+                    <li>Il fait tourner la roue pour tenter de gagner un petit lot (café, remise, dessert).</li>
+                    <li>Pour valider sa participation ou débloquer son gain, il est automatiquement redirigé en un clic vers votre fiche Google Maps pour y laisser ses 5 étoiles.</li>
+                </ul>
+                <p>
+                    Cette mécanique fait passer votre taux de conversion de 2 % (avec un QR code classique) à <strong>plus de 25 % de participants effectifs</strong>, garantissant à Google la vélocité d'avis constante dont il a besoin pour vous placer au sommet du classement.
+                </p>
+
+                <h2>Check-list rapide pour optimiser votre Fiche Google Maps</h2>
+                <p>
+                    En parallèle de la récolte d'avis régulière via Spin To Keep, veillez à valider les étapes suivantes sur votre espace d'administration Google :
+                </p>
+                <ol style="font-size: 1.15rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;">
+                    <li><strong>Choisissez la bonne catégorie principale :</strong> Soyez ultra-spécifique (ex: « Pizzeria » plutôt que « Restaurant »).</li>
+                    <li><strong>Uniformisez votre NAP (Nom, Adresse, Téléphone) :</strong> Vos coordonnées doivent être rigoureusement identiques sur votre fiche, votre site web et vos annuaires locaux.</li>
+                    <li><strong>Publiez des photos régulièrement :</strong> Les fiches contenant des photos récentes de plats, de produits ou de l'équipe enregistrent 35 % de clics en plus.</li>
+                    <li><strong>Répondez à 100 % des avis :</strong> Prenez le temps de répondre à chaque commentaire en y incluant naturellement des mots-clés liés à votre activité.</li>
+                </ol>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Créer ma roue et booster mon classement</a>
+                </div>
+
+                <h2>Foire Aux Questions (FAQ) - SEO Google Maps</h2>
+                
+                <div class="faq-box">
+                    <div class="faq-item">
+                        <h4>Combien de temps faut-il pour atteindre la première place sur Google Maps ?</h4>
+                        <p>En optimisant correctement votre fiche et en déclenchant un flux régulier de nouveaux avis (via un jeu QR code), les premiers bondissements de position s'observent généralement entre 2 et 6 semaines selon l'intensité concurrentielle de votre ville.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Faut-il ajouter des mots-clés dans le nom de son établissement ?</h4>
+                        <p>Attention : ajouter artificiellement des mots-clés dans le titre de sa fiche (ex: « Boulangerie Dupont - Meilleur Pain Baguette Paris ») est interdit par les consignes de Google et peut entraîner la suspension définitive de votre fiche. Le nom doit correspondre strictement à l'enseigne physique enregistrée.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Avoir un site web est-il obligatoire pour être bien classé sur Google Maps ?</h4>
+                        <p>Ce n'est pas obligatoire mais fortement recommandé. Renseigner un site internet optimisé sur la même zone géographique renforce le signal de pertinence envoyé aux robots de recherche de Google.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 2rem;">Prêt à devancer vos concurrents locaux ?</h3>
+                    <p style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Configurez votre roue cadeau en 2 minutes, téléchargez vos affiches QR code et commencez à engranger des dizaines d'avis Google chaque semaine.</p>
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Passer N°1 sur Google Maps ➡️</a><br>
+                    <a href="/index.html" class="btn-outline">En savoir plus sur Spin To Keep</a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; Spin To Keep. Votre partenaire Growth Hacking et Référencement Local pour commerces de proximité.</p>
+    <p style="font-size: 0.85rem; margin-top: 0.8rem;"><a href="/index.html" style="color: #a1a1a6; text-decoration: underline;">Retour à l'accueil du site</a></p>
+</footer>
+
+</body>
+</html>
