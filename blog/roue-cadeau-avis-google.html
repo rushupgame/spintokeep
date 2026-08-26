@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>La Roue Cadeau pour Booster vos Avis Google | Le Guide Spin To Keep</title>
+    <meta name="description" content="Découvrez comment utiliser une roue de la fortune digitale via QR Code pour décupler vos avis Google, fidéliser votre clientèle et booster votre commerce local.">
+    <meta name="keywords" content="Roue cadeau, avis Google, obtenir plus d'avis clients, QR code commerce, roue de la fortune digitale, jeu concours magasin, e-réputation locale, fidélisation client">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
+
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.7; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* HEADER */
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .btn-nav { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s ease; }
+        .btn-nav:hover { background: var(--accent-hover); }
+
+        /* TYPOGRAPHY */
+        h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; text-align: center; letter-spacing: -0.03em; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-top: 3.5rem; margin-bottom: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; }
+        h3 { font-size: 1.5rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 1.5rem; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* LAYOUT */
+        .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; text-align: center; }
+        .bg-gray { background-color: var(--bg-secondary); padding: 4rem 0; width: 100%; }
+        .content-section { max-width: 800px; margin: 0 auto; padding: 0 2rem; }
+        article { background: #fff; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        /* LISTS & FAQ */
+        .benefits-list { list-style: none; padding: 0; margin-bottom: 2rem; }
+        .benefits-list li { font-size: 1.15rem; padding: 16px 0; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: flex-start; gap: 12px; }
+        .benefits-list li:last-child { border-bottom: none; }
+        .benefits-list li::before { content: '✅'; font-size: 1.3rem; margin-top: 2px; }
+        
+        .faq-box { background: var(--bg-secondary); padding: 2rem; border-radius: 16px; margin-top: 2rem; }
+        .faq-item { margin-bottom: 1.5rem; }
+        .faq-item h4 { font-size: 1.2rem; margin: 0 0 0.5rem 0; color: var(--text-primary); }
+        .faq-item p { font-size: 1.05rem; margin: 0; }
+
+        /* BUTTONS */
+        .btn-large { display: inline-block; background-color: var(--accent-color); color: #fff; padding: 18px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3); }
+        .btn-large:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+
+        /* FOOTER */
+        footer { background-color: #151516; color: #a1a1a6; padding: 3rem 2rem; text-align: center; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            article { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/index.html" class="logo">SpinToKeep<span>.</span></a>
+        <a href="/index.html#configurateur" class="btn-nav">Essayer gratuitement</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero animate-up">
+        <h1>Transformez vos clients en ambassadeurs grâce à la <span class="highlight">Roue Cadeau</span></h1>
+        <p>
+            Récolter des avis Google est devenu le défi numéro un des commerçants. Découvrez comment la gamification par QR Code (la fameuse roue de la fortune digitale) permet de décupler votre e-réputation de manière automatique, sans jamais avoir à "mendier" un commentaire à la caisse.
+        </p>
+        <a href="/index.html#configurateur" class="btn-large hover-effect">Créer ma roue personnalisée</a>
+    </section>
+
+    <div class="bg-gray">
+        <section class="content-section animate-up">
+            <article>
+                <h2>Le défi de la e-réputation locale</h2>
+                <p>
+                    Aujourd'hui, l'immense majorité des consommateurs consultent les avis en ligne avant de franchir la porte d'un restaurant, d'un salon de coiffure ou d'une boutique. Votre fiche établissement Google (anciennement Google My Business) est votre première vitrine numérique. 
+                </p>
+                <p>
+                    Pourtant, un constat amer frappe de nombreux gérants : <strong>un client mécontent laisse presque toujours un avis négatif, tandis qu'un client satisfait rentre chez lui et oublie de vous noter.</strong> Le lui demander oralement au moment de l'encaissement est souvent perçu comme gênant, et les flyers glissés dans le sac finissent généralement à la poubelle. Comment inverser la tendance ?
+                </p>
+
+                <h2>La Gamification : La solution pour obtenir plus d'avis Google</h2>
+                <p>
+                    Pour qu'un client prenne sur son temps personnel pour rédiger un avis, il faut lui fournir une motivation immédiate. C'est ici qu'intervient le concept de la <strong>Roue Cadeau digitale</strong> développée par Spin To Keep. En introduisant la mécanique du jeu (la gamification), vous supprimez la friction et rendez l'action amusante.
+                </p>
+
+                <h3>Comment fonctionne la roue de la fortune par QR Code ?</h3>
+                <p>
+                    Le processus est d'une fluidité redoutable pour le point de vente :
+                </p>
+                <ul class="benefits-list">
+                    <li><strong>L'invitation :</strong> Une petite affiche (PLV) avec un QR Code est posée sur votre comptoir ou vos tables. Elle indique "Scannez pour tenter de gagner un cadeau !".</li>
+                    <li><strong>Le jeu :</strong> Le client scanne avec son smartphone et accède à votre roue personnalisée. Il la fait tourner virtuellement.</li>
+                    <li><strong>L'échange de bons procédés :</strong> Pour découvrir son gain ou le valider, il est invité de manière naturelle à laisser un avis 5 étoiles sur votre page Google.</li>
+                    <li><strong>La récompense :</strong> Il gagne un lot paramétré par vos soins (un café offert, 10% de réduction, un dessert, un goodie).</li>
+                </ul>
+
+                <h2>Les 3 bénéfices majeurs pour votre commerce</h2>
+                
+                <h3>1. L'explosion de votre SEO Local (Local Pack)</h3>
+                <p>
+                    L'algorithme de Google est très clair : pour apparaître dans les 3 premiers résultats de la carte (le "Local Pack"), votre note moyenne est importante, mais <strong>la fraîcheur et le volume de vos avis</strong> le sont encore plus. En générant un flux continu d'avis grâce à la roue cadeau, vous indiquez à Google que votre établissement est actif, populaire et pertinent. Vous doublez naturellement vos concurrents qui n'ont pas reçu d'avis depuis des mois.
+                </p>
+
+                <h3>2. La constitution d'un fichier client (CRM) qualifié</h3>
+                <p>
+                    Pour faire tourner la roue, le client renseigne son prénom et son adresse email. C'est une mine d'or pour votre stratégie marketing. Vous passez d'un trafic anonyme à une véritable base de données. Vous pourrez ensuite exporter ces contacts en un clic pour envoyer des newsletters, des invitations à des ventes privées ou des offres pour la fête des mères.
+                </p>
+
+                <h3>3. La fidélisation et le retour en boutique</h3>
+                <p>
+                    Contrairement aux idées reçues, offrir un cadeau n'est pas une perte sèche, c'est un investissement marketing ultra-rentable. Si un client gagne "un apéritif offert pour son prochain repas" ou "-15% sur sa prochaine coupe", <strong>il reviendra chez vous plutôt que chez votre concurrent</strong>. Le jeu concours devient un outil de rétention massif.
+                </p>
+
+                <h2>Foire Aux Questions (FAQ) sur la Roue Cadeau Google</h2>
+                
+                <div class="faq-box">
+                    <div class="faq-item">
+                        <h4>Faut-il installer une application pour jouer ?</h4>
+                        <p>Absolument pas. L'expérience se fait directement dans le navigateur du smartphone du client après le scan du QR code. Zéro friction, zéro téléchargement.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Puis-je limiter les gros lots (jackpots) ?</h4>
+                        <p>Oui. Le configurateur Spin To Keep vous permet de définir le pourcentage exact de probabilité pour chaque lot. Vous pouvez paramétrer 80% de chances de gagner un petit lot de consolation, et seulement 1% de chance de gagner le grand prix.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Est-ce légal par rapport au RGPD ?</h4>
+                        <p>Parfaitement. Avant de jouer, le client doit cocher une case de consentement explicite (Opt-in) validant l'utilisation de ses données et le règlement du jeu. Tout est automatisé et conforme à la législation européenne.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 2rem;">Passez à la vitesse supérieure</h3>
+                    <p style="margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Mettez en place votre première roue de la fortune digitale dès aujourd'hui. Intégrez votre logo, définissez vos cadeaux et imprimez votre QR code en quelques minutes.</p>
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Créer ma roue gratuitement ➡️</a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; Spin To Keep. Propulsez votre visibilité locale grâce à la gamification et aux jeux concours sur lieu de vente.</p>
+    <p style="font-size: 0.85rem; margin-top: 0.8rem;"><a href="/index.html" style="color: #a1a1a6; text-decoration: underline;">Retour à l'accueil du site</a></p>
+</footer>
+
+</body>
+</html>
