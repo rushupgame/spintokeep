@@ -578,12 +578,12 @@
     .panel { background: white; padding: 20px; border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.05); }
     .panel-heading { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
     h2.title { font-size: 1.15em; margin: 0 0 4px 0; font-weight: 800; letter-spacing: -.2px; }
-    .subtitle { color: var(--muted); font-size: 13px; margin: 0 0 10px 0; }
+    .subtitle { color: var(--muted); font-size: 13px; margin: 0 0 18px 0; }
 
     /* --- Steps (accordion) --- */
-    .step { border: 1px solid var(--line); border-radius: 14px; margin-bottom: 8px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.02); }
+    .step { border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.02); }
     .step[open] { border-color: #d8d8de; }
-    .step summary { cursor: pointer; padding: 11px 16px; list-style: none; display: flex; align-items: center; gap: 12px; background: #fafafc; transition: background .15s ease; }
+    .step summary { cursor: pointer; padding: 14px 16px; list-style: none; display: flex; align-items: center; gap: 12px; background: #fafafc; transition: background .15s ease; }
     .step summary:hover { background: #f1f1f4; }
     .step[open] summary { background: #fff; border-bottom: 1px solid var(--line); }
     .step summary::-webkit-details-marker { display: none; }
@@ -594,8 +594,8 @@
     .step[open] summary .label::after { content: ""; margin: 0; }
     .step summary .chev { font-size: 12px; color: #fff; background: var(--muted); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .25s ease, background .2s ease; }
     .step[open] summary .chev { background: var(--ink); transform: rotate(180deg); }
-    .step-body { padding: 4px 16px 14px 16px; }
-    .step-help { color: var(--muted); font-size: 12.5px; margin: 0 0 10px 0; line-height: 1.5; }
+    .step-body { padding: 4px 16px 18px 16px; }
+    .step-help { color: var(--muted); font-size: 12.5px; margin: 0 0 12px 0; line-height: 1.5; }
     @media (max-width: 480px) { .step summary .label::after { display: none; } }
 
     .brand-colors { display: flex; gap: 18px; background: #f8f8f9; padding: 14px; border-radius: 12px; margin-bottom: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
@@ -751,14 +751,6 @@
     .upload-wrapper { margin-bottom: 15px; padding: 15px; border: 2px dashed #ddd; border-radius: 12px; text-align: center; background: #fafafa; position: relative; }
     #upload-status, #bg-upload-status { font-size: 12px; margin-top: 8px; font-weight: 700; }
     .mock-form input { width: 100%; margin-bottom: 8px; padding: 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 5px; }
-    .opt-check-label { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; font-size: 13px; line-height: 1.4; cursor: pointer; padding: 8px 10px; border-radius: 10px; transition: background .15s; }
-    .opt-check-label:hover { background: #f5f5f7; }
-    .opt-check-label input[type="checkbox"] { flex: 0 0 18px; width: 18px; height: 18px; margin: 1px 0 0 0; accent-color: var(--black, #046A38); }
-    .opt-check-label span { flex: 1 1 auto; min-width: 0; word-break: break-word; }
-    @media (max-width: 480px) {
-        .opt-check-label { font-size: 12.5px; gap: 8px; padding: 8px; }
-        .opt-check-label input[type="checkbox"] { flex-basis: 16px; width: 16px; height: 16px; }
-    }
     .screen-mockup div[style*="background:white"], .screen-mockup .gain-box, .client-card { background: transparent !important; border: none !important; box-shadow: none !important; }
     .screen-mockup h4, .screen-mockup p, .screen-mockup h5, .screen-mockup span, .client-card h2, .client-card h3, .client-card p, .client-card span { color: var(--text-color); position: relative; z-index: 2; }
     .delete-bg { position: absolute; top: 5px; right: 5px; background: #ff4d4d; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 20px; padding: 0; }
@@ -1103,7 +1095,7 @@
                     <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')">
                     <div id="bg-upload-status">Taille idéale : 1080 × 1920 px (format 9:16)</div>
                 </div>
-                <input type="hidden" id="bg_url" value="">
+                <input type="text" id="bg_url" class="full-width" oninput="update()" value="" placeholder="URL de l'image de fond (optionnel)">
 
                 <label class="field-label">Fond dégradé <span style="font-weight:400;color:var(--muted);">(utilisé tant qu'aucune image n'est ajoutée)</span></label>
                 <div class="swatch-grid" id="gradient-swatches" style="margin-bottom:14px;"></div>
@@ -1111,13 +1103,9 @@
                 <label class="field-label">Texture</label>
                 <div class="swatch-grid" id="texture-swatches" style="margin-bottom:16px;"></div>
 
-                <label style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:13px; cursor:pointer;">
-                    <input type="checkbox" id="bg_color_active" onchange="update()">
-                    Utiliser une couleur de fond unie <span style="font-weight:400;color:var(--muted);">(prioritaire sur l'image, le dégradé et la texture)</span>
-                </label>
                 <div class="brand-colors">
                     <div class="color-input-group"><input type="color" id="bg_color" value="#ffffff" oninput="update()"><div id="lbl-col-bg">FOND</div></div>
-                    <div class="color-input-group"><input type="range" id="bg_opacity" min="0" max="1" step="0.1" value="0.4" oninput="update()" style="width:56px;vertical-align:middle;"><div id="lbl-col-op">OPACITÉ DU FOND</div></div>
+                    <div class="color-input-group"><input type="range" id="bg_opacity" min="0" max="1" step="0.1" value="0.4" oninput="update()" style="width:56px;vertical-align:middle;"><div id="lbl-col-op">OPACITÉ</div></div>
                     <div class="color-input-group"><input type="color" id="text_color" value="#ffffff" oninput="update()"><div id="lbl-col-txt">TEXTE</div></div>
                     <div class="color-input-group"><input type="color" id="button_color" value="#046A38" oninput="update()"><div id="lbl-col-btn">BOUTONS</div></div>
                 </div>
@@ -1217,14 +1205,14 @@
                     Ouvrez Google Maps, recherchez votre établissement, cliquez sur « Demander des avis » (ou « Partager ») : un lien court est généré. Copiez-collez ce lien ci-dessus pour que vos clients atterrissent directement sur le formulaire d'avis.
                 </div>
 
-                <label class="opt-check-label">
+                <label style="display:flex; align-items:center; gap:8px; margin-top:16px; font-size:13px; cursor:pointer;">
                     <input type="checkbox" id="opt_skip_avis" onchange="update()">
-                    <span>Autoriser le client à continuer sans laisser d'avis</span>
+                    Autoriser le client à continuer sans laisser d'avis
                 </label>
 
-                <label class="opt-check-label" title="Réservé aux comptes Premium">
+                <label style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; cursor:pointer; ${'' }" title="Réservé aux comptes Premium">
                     <input type="checkbox" id="opt_avis_end" onchange="handleAvisEndToggle(this)">
-                    <span>⭐ Demander l'avis à la fin du jeu plutôt qu'au début (Premium)</span>
+                    ⭐ Demander l'avis à la fin du jeu plutôt qu'au début (Premium)
                 </label>
             </div>
         </details>
@@ -1266,10 +1254,8 @@
                         <h4 id="pre-t1" style="margin:0 0 10px 0; font-size:14px;"></h4>
                         <p id="pre-t2" style="font-size:10px;"></p>
                         <div class="btn-black" id="pre-t3" style="font-size:10px; padding:8px 15px;"></div>
-                        <div id="pre-skip-avis-note" style="font-size:8px; margin-top:8px; text-decoration:underline; opacity:.55; display:none;">Continuer sans laisser d'avis</div>
                     </div>
                 </div>
-                <div id="pre-avis-end-overlay" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,.75); align-items:center; justify-content:center; text-align:center; font-size:9px; font-weight:bold; color:#555; padding:20px; box-sizing:border-box;">Non affiché en premier<br>(avis demandé à la fin)</div>
             </div></div>
             <div class="screen-mockup-wrap"><div class="screen-mockup" id="pre-s2">
                 <span class="screen-label" id="stp2-lbl">Étape 2 : Formulaire</span>
@@ -1279,7 +1265,6 @@
                         <input type="text" id="pre-ph-name" placeholder="" disabled>
                         <input type="text" id="pre-ph-email" placeholder="" disabled>
                         <input type="text" id="pre-ph-phone" placeholder="" disabled>
-                        <div id="pre-extra-fields"></div>
                         <div style="font-size:9px; display:flex; gap:5px; align-items:flex-start; margin-top:10px;">
                             <input type="checkbox" checked style="width:auto;">
                             <span id="pre-rgpd-text"></span>
@@ -1353,7 +1338,6 @@
                     <h4 id="pre-t-thanks" style="margin:0; font-size:13px;"></h4>
                     <p style="font-size:12px; font-weight:bold; margin:10px 0;"><span id="pre-t-res"></span> <span id="preview-win-txt">[Nom du gain]</span></p>
                     <p id="pre-cond" style="font-size:8px; border-top:1px solid rgba(0,0,0,.1); padding-top:10px; margin-top:10px; text-align:justify; line-height:1.2;"></p>
-                    <div class="btn-black" id="pre-end-avis-cta" style="font-size:9px; padding:8px 14px; margin-top:10px; display:none;"></div>
                 </div>
             </div></div>
         </div>
@@ -2035,12 +2019,7 @@ if(slider) {
     const PAYPAL_CLIENT_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_CLIENT_ID : PAYPAL_LIVE_CLIENT_ID;
     const PREMIUM_PLAN_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_PLAN_ID : PAYPAL_LIVE_PLAN_ID;
 
-    const sb = (window.supabase && typeof window.supabase.createClient === 'function')
-        ? window.supabase.createClient(SB_URL, SB_KEY)
-        : { auth: { getSession: async () => ({ data: { session: null } }), signOut: async () => {}, onAuthStateChange: () => {} },
-            from: () => ({ select: () => ({ eq: () => ({ order: async () => ({ data: [], error: new Error('Supabase indisponible') }), maybeSingle: async () => ({ data: null, error: new Error('Supabase indisponible') }) }) }) }),
-            rpc: async () => ({ data: null, error: new Error('Supabase indisponible') }) };
-    if (!window.supabase) console.error("La librairie Supabase (CDN) n'a pas pu être chargée : vérifiez la connexion internet. L'app fonctionne en mode dégradé (pas d'enregistrement).");
+    const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
     let currentUser = null;
     let currentProfile = null; // { id, email, is_premium }
@@ -2248,16 +2227,13 @@ if(slider) {
         const actions = document.getElementById('topbar-actions');
         const navAuth = document.getElementById('nav-auth');
         const navEl = document.querySelector('header nav');
-        const tarifsSection = document.getElementById('tarifs');
         if (!currentUser) {
             const html = `<button class="btn-ghost" onclick="openAuthModal('login')">Se connecter</button>`;
             if (actions) actions.innerHTML = html;
             if (navAuth) navAuth.innerHTML = `<button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button>`;
             if (navEl) navEl.classList.remove('logged-in');
-            if (tarifsSection) tarifsSection.style.display = '';
             return;
         }
-        if (tarifsSection) tarifsSection.style.display = isPremium() ? 'none' : '';
         if (navEl) navEl.classList.add('logged-in');
         const initial = (currentProfile && currentProfile.email ? currentProfile.email[0] : 'U').toUpperCase();
         const premiumChip = currentProfile && currentProfile.is_premium ? `<span class="chip-premium">⭐ Premium</span>` : '';
@@ -2469,20 +2445,7 @@ if(slider) {
         document.getElementById('dash-status-premium').innerText = isPremium() ? 'Premium ⭐' : 'Free';
         document.getElementById('dash-upsell').style.display = isPremium() ? 'none' : 'flex';
 
-        // S'assure que la session est bien à jour avant d'interroger la base (évite les cas où
-        // currentUser.id n'est pas encore synchronisé juste après une connexion/rechargement).
-        if (!currentUser) await refreshSession();
-        if (!currentUser) { closeDashboard(); openAuthModal('login'); return; }
-
-        let { data: fetchedConfigs, error } = await sb.from('roulette_configs').select('id, data, created_at').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
-        if (error) {
-            // Une erreur réseau/session transitoire ne doit pas faire disparaître l'historique :
-            // on retente une fois avant d'abandonner.
-            const retry = await sb.from('roulette_configs').select('id, data, created_at').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
-            fetchedConfigs = retry.data;
-            error = retry.error;
-        }
-        if (error) toast("Erreur lors du chargement de l'historique. Tirez pour réessayer.", "error");
+        const { data: fetchedConfigs, error } = await sb.from('roulette_configs').select('id, data, created_at').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
         // On fusionne les roulettes créées dans cette session (voir justCreatedRoulettes)
         // qui ne seraient pas encore ressorties du SELECT, pour ne jamais avoir besoin de
         // recharger la page pour les voir apparaître dans l'historique.
@@ -2493,16 +2456,7 @@ if(slider) {
         const list = document.getElementById('dash-list');
         list.innerHTML = '';
 
-        if (error && configs.length === 0) {
-            ['dash-count-configs', 'dash-count-scans', 'dash-count-participants', 'dash-count-wins', 'dash-count-losses'].forEach(id => document.getElementById(id).innerText = '0');
-            document.getElementById('dash-count-conversion').innerText = '0%';
-            list.innerHTML = `<div class="dash-empty"><div class="big">⚠️</div>Impossible de charger votre historique.<br><a href="#" onclick="event.preventDefault(); loadDashboard();">Réessayer</a></div>`;
-            renderWinLossChart(0, 0);
-            renderTopLotsChart([]);
-            return;
-        }
-
-        if (configs.length === 0) {
+        if ((error && configs.length === 0) || configs.length === 0) {
             ['dash-count-configs', 'dash-count-scans', 'dash-count-participants', 'dash-count-wins', 'dash-count-losses'].forEach(id => document.getElementById(id).innerText = '0');
             document.getElementById('dash-count-conversion').innerText = '0%';
             list.innerHTML = `<div class="dash-empty"><div class="big">🎡</div>Aucune roulette pour le moment.<br>Créez-en une depuis le configurateur.</div>`;
@@ -2823,7 +2777,7 @@ if(slider) {
             lblLang: "🌐 Langue du jeu (client final)",
             sumLogo: "Logo & branding", lblLogoFile: "Ajoutez le logo qui apparaîtra sur les 4 écrans du jeu.", lblLogoUrl: "ou URL du logo si déjà hébergé en ligne",
             sumScreen: "Écrans & couleurs", lblScreenCust: "Image de fond et couleurs des 4 écrans vus par le client.",
-            lblColBg: "FOND", lblColOp: "OPACITÉ DU FOND", lblColTxt: "TEXTE", lblColBtn: "BOUTONS",
+            lblColBg: "FOND", lblColOp: "OPACITÉ", lblColTxt: "TEXTE", lblColBtn: "BOUTONS",
             sumWheel: "Design de la roue", lblWheelDesign: "Bordure, lumières et couleurs par défaut des lots.",
             lblColBord: "BORDURE", lblColBulb: "LUMIÈRES", lblSizeBulb: "TAILLE (px)",
             lblBrandQuick: "Couleurs de marque rapides (appliquées aux lots)", lblColDef1: "COULEUR 1", lblColDef2: "COULEUR 2",
@@ -2991,17 +2945,6 @@ if(slider) {
     function buildSwatchPickers() {
         const gradWrap = document.getElementById('gradient-swatches');
         if (gradWrap && !gradWrap.children.length) {
-            const noneGradSw = document.createElement('div');
-            noneGradSw.className = 'swatch swatch-none' + (selectedGradient === 'none' ? ' active' : '');
-            noneGradSw.title = 'Aucun fond dégradé';
-            noneGradSw.innerText = '✕';
-            noneGradSw.onclick = () => {
-                selectedGradient = 'none';
-                Array.from(gradWrap.children).forEach(c => c.classList.remove('active'));
-                noneGradSw.classList.add('active');
-                update();
-            };
-            gradWrap.appendChild(noneGradSw);
             Object.keys(GRADIENT_PRESETS).forEach(key => {
                 const sw = document.createElement('div');
                 sw.className = 'swatch' + (key === selectedGradient ? ' active' : '');
@@ -3047,23 +2990,12 @@ if(slider) {
         }
     }
 
-    function computeScreenBackground(bgUrl, gradientKey, textureKey, bgColorActive, bgColor, bgOpacity) {
-        // Le fond uni (« FOND »), quand activé, est prioritaire sur tout le reste (image, dégradé, texture).
-        if (bgColorActive) {
-            const rgb = hexToRgb(bgColor || '#ffffff') || { r: 255, g: 255, b: 255 };
-            const o = (bgOpacity === undefined || bgOpacity === null || bgOpacity === '') ? 1 : bgOpacity;
-            const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${o})`;
-            return { image: `linear-gradient(${rgba}, ${rgba})`, size: 'cover', usingGradient: false, solidColor: true };
-        }
+    function computeScreenBackground(bgUrl, gradientKey, textureKey) {
         if (bgUrl) return { image: `url('${bgUrl}')`, size: 'cover', usingGradient: false };
         gradientKey = gradientKey || selectedGradient;
         textureKey = textureKey || selectedTexture;
-        const tex = TEXTURE_PRESETS[textureKey];
-        if (gradientKey === 'none') {
-            if (tex) return { image: tex.css, size: tex.size, usingGradient: false };
-            return { image: 'none', size: 'auto', usingGradient: false };
-        }
         const grad = GRADIENT_PRESETS[gradientKey] ? GRADIENT_PRESETS[gradientKey].css : 'linear-gradient(135deg,#eee,#ddd)';
+        const tex = TEXTURE_PRESETS[textureKey];
         if (tex) return { image: `${tex.css}, ${grad}`, size: `${tex.size}, cover`, usingGradient: true };
         return { image: grad, size: 'cover', usingGradient: true };
     }
@@ -3228,7 +3160,7 @@ if(slider) {
         scratch: { header: 'Grattez le ticket et tentez de gagner* de nombreux cadeaux !', button: 'GRATTER LE TICKET' },
         boxes: { header: 'Choisissez un coffre et tentez de gagner* de nombreux cadeaux !', button: 'CHOISIR UN COFFRE' },
         plinko: { header: 'Lâchez la bille et tentez de gagner* de nombreux cadeaux !', button: 'LÂCHER LA BILLE' },
-        cups: { header: 'Trouvez le gobelet gagnant et tentez de gagner* de nombreux cadeaux', button: 'MÉLANGER LES GOBELETS' }
+        cups: { header: 'Suivez le bon gobelet et tentez de gagner* de nombreux cadeaux !', button: 'MÉLANGER LES GOBELETS' }
     };
     const KNOWN_DEFAULT_HEADERS = Object.values(GAME_DEFAULT_WORDING).map(w => w.header);
     const KNOWN_DEFAULT_BUTTONS = Object.values(GAME_DEFAULT_WORDING).map(w => w.button);
@@ -3824,7 +3756,6 @@ if(slider) {
             cust_bg: document.getElementById('bg_url').value,
             cust_bg_gradient: selectedGradient,
             cust_bg_texture: selectedTexture,
-            cust_bg_active: document.getElementById('bg_color_active').checked,
             cust_bg_c: document.getElementById('bg_color').value,
             cust_bg_o: document.getElementById('bg_opacity').value,
             cust_tx_c: document.getElementById('text_color').value,
@@ -3998,7 +3929,7 @@ if(slider) {
         try {
             const configData = lastGeneratedConfigData;
             const qrDataUrl = await buildQrDataUrl(lastGeneratedUrl, 500);
-            const bg = computeScreenBackground(configData.cust_bg, configData.cust_bg_gradient, configData.cust_bg_texture, configData.cust_bg_active, configData.cust_bg_c, configData.cust_bg_o);
+            const bg = computeScreenBackground(configData.cust_bg, configData.cust_bg_gradient, configData.cust_bg_texture);
             const textColor = configData.cust_tx_c || getContrastColor(configData.cust_bg_c || '#ffffff');
             const title = configData.tw || configData.t1 || 'Tentez votre chance !';
             const subtitle = configData.t2 || 'Scannez le QR code et jouez pour tenter de gagner un lot';
@@ -4091,6 +4022,7 @@ if(slider) {
     }
 
     function startNewConfig() {
+        if (!confirm("Créer une nouvelle roulette vierge ? Vos modifications non enregistrées seront perdues.")) return;
         window.location.href = window.location.pathname + '?new=1#configurateur';
     }
 
@@ -4132,7 +4064,6 @@ if(slider) {
             document.getElementById('bg_url').value = c.cust_bg || '';
             selectedGradient = c.cust_bg_gradient || 'emerald';
             selectedTexture = c.cust_bg_texture || 'none';
-            document.getElementById('bg_color_active').checked = !!c.cust_bg_active;
             document.getElementById('bg_color').value = c.cust_bg_c || '#ffffff';
             document.getElementById('bg_opacity').value = c.cust_bg_o || 0.5;
             document.getElementById('text_color').value = c.cust_tx_c || '#ffffff';
@@ -4154,8 +4085,7 @@ if(slider) {
             if (texWrap) texWrap.innerHTML = '';
             buildSwatchPickers();
             Array.from(document.getElementById('gradient-swatches').children).forEach(sw => {
-                const label = selectedGradient === 'none' ? 'Aucun fond dégradé' : (GRADIENT_PRESETS[selectedGradient] || {}).label;
-                sw.classList.toggle('active', sw.title === label);
+                sw.classList.toggle('active', sw.title === (GRADIENT_PRESETS[selectedGradient] || {}).label);
             });
 
             update();
@@ -4359,51 +4289,12 @@ if(slider) {
         document.getElementById('pre-ph-name').placeholder = document.getElementById('t_name').value;
         document.getElementById('pre-ph-email').placeholder = document.getElementById('t_email').value;
         document.getElementById('pre-ph-phone').placeholder = document.getElementById('t_phone').value;
-        const preExtraWrap = document.getElementById('pre-extra-fields');
-        if (preExtraWrap) {
-            preExtraWrap.innerHTML = getExtraFieldLabels().map(label =>
-                `<input type="text" placeholder="${escapeHtml(label)}" disabled>`
-            ).join('');
-        }
         document.getElementById('pre-btn-val').innerText = document.getElementById('t_btn_validate').value;
         document.getElementById('pre-btn-spin').innerText = document.getElementById('t_btn_spin').value;
         document.getElementById('pre-t-thanks').innerText = document.getElementById('t_thanks').value;
         document.getElementById('pre-t-res').innerText = document.getElementById('t_res_label').value;
 
         if (translations[lang]) document.getElementById('pre-rgpd-text').innerText = translations[lang].rgpd;
-
-        // Reflet dans l'aperçu des options "continuer sans avis" / "avis à la fin du jeu"
-        const optSkipAvis = document.getElementById('opt_skip_avis');
-        const optAvisEnd = document.getElementById('opt_avis_end');
-        const skipAvisChecked = optSkipAvis ? optSkipAvis.checked : false;
-        const avisEndChecked = optAvisEnd ? (optAvisEnd.checked && isPremium()) : false;
-
-        const preSkipNote = document.getElementById('pre-skip-avis-note');
-        if (preSkipNote) preSkipNote.style.display = (skipAvisChecked && !avisEndChecked) ? 'block' : 'none';
-
-        const avisEndOverlay = document.getElementById('pre-avis-end-overlay');
-        if (avisEndOverlay) avisEndOverlay.style.display = avisEndChecked ? 'flex' : 'none';
-
-        const endAvisCta = document.getElementById('pre-end-avis-cta');
-        if (endAvisCta) {
-            endAvisCta.style.display = avisEndChecked ? 'block' : 'none';
-            endAvisCta.innerText = document.getElementById('t3').value;
-        }
-
-        const stp1 = document.getElementById('stp1-lbl'), stp2 = document.getElementById('stp2-lbl'),
-              stp3 = document.getElementById('stp3-lbl'), stp4 = document.getElementById('stp4-lbl');
-        if (avisEndChecked) {
-            if (stp1) stp1.innerText = 'Non utilisée';
-            if (stp2) stp2.innerText = 'Étape 1 : Formulaire';
-            if (stp3) stp3.innerText = 'Étape 2 : Jeu';
-            if (stp4) stp4.innerText = 'Étape 3 : Résultat + avis';
-        } else if (uiTranslations[lang] || uiTranslations.fr) {
-            const ui = uiTranslations[lang] || uiTranslations.fr;
-            if (stp1) stp1.innerText = ui.stp1Lbl;
-            if (stp2) stp2.innerText = ui.stp2Lbl;
-            if (stp3) stp3.innerText = ui.stp3Lbl;
-            if (stp4) stp4.innerText = ui.stp4Lbl;
-        }
 
         const root = document.documentElement;
         root.style.setProperty('--yellow-border', document.getElementById('wheel_border_color').value);
@@ -4413,10 +4304,11 @@ if(slider) {
         root.style.setProperty('--text-color', textColor);
         root.style.setProperty('--black', buttonColor);
 
-        root.style.setProperty('--overlay-color', 'rgba(0,0,0,0)');
+        const rgb = hexToRgb(bgColor);
+        const usingGradient = !bgUrl;
+        root.style.setProperty('--overlay-color', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${usingGradient ? 0 : bgOpacity})`);
 
-        const bgColorActive = document.getElementById('bg_color_active').checked;
-        const screenBg = computeScreenBackground(bgUrl, null, null, bgColorActive, bgColor, bgOpacity);
+        const screenBg = computeScreenBackground(bgUrl);
         for (let i = 1; i <= 4; i++) {
             const mock = document.getElementById('pre-s' + i);
             mock.style.backgroundImage = screenBg.image;
@@ -4611,9 +4503,10 @@ if(slider) {
         const bgOp = config.cust_bg_o || 0.5;
         const txCol = config.cust_tx_c || '#333333';
         const btnCol = config.cust_btn_c || '#000000';
-        const bgColorActive = !!config.cust_bg_active;
-        const clientBg = computeScreenBackground(bgImg, config.cust_bg_gradient, config.cust_bg_texture, bgColorActive, bgCol, bgOp);
-        const rgbaColor = 'rgba(0,0,0,0)';
+        const usingGradient = !bgImg;
+        const clientBg = computeScreenBackground(bgImg, config.cust_bg_gradient, config.cust_bg_texture);
+        const rgb = hexToRgb(bgCol);
+        const rgbaColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${usingGradient ? 0 : bgOp})`;
         const lang = config.lang || 'fr';
         const t = translations[lang] || translations.fr;
         const gameType = config.game_type || 'wheel';
@@ -4686,15 +4579,8 @@ if(slider) {
         const extraFieldsHtml = (config.ef || []).map((label, i) =>
             '<input type="text" class="c-extra-field" data-label="' + String(label).replace(/"/g, '&quot;') + '" id="c_extra_' + i + '" placeholder="' + String(label).replace(/"/g, '&quot;') + '">'
         ).join('');
-        // Flux standard (avis demandé en premier) : le lien "continuer sans avis" est affiché
-        // sous le bouton d'avis, à l'étape 1, et amène directement à l'étape 2 (formulaire).
-        const skipAvisOnAvisStepHtml = (config.skip_avis && !avisEnd)
-            ? '<a href="#" id="skip-avis-link" onclick="event.preventDefault(); showStep(\'step-form\');" style="display:block; margin-top:12px; font-size:11px; opacity:.55; text-decoration:underline; position:relative; z-index:2; color:inherit;">Continuer sans laisser d\'avis</a>'
-            : '';
-        // Flux Premium (avis demandé à la fin) : le client choisit en amont s'il souhaite qu'on
-        // lui propose de laisser un avis au moment du résultat.
-        const skipAvisOnFormStepHtml = (config.skip_avis && avisEnd)
-            ? '<a href="#" id="skip-avis-link" onclick="event.preventDefault(); window.skipAvisChosen = !window.skipAvisChosen; this.style.opacity = window.skipAvisChosen ? \'1\' : \'.55\'; this.style.textDecoration = window.skipAvisChosen ? \'none\' : \'underline\';" style="display:block; margin-top:12px; margin-bottom:6px; font-size:11px; opacity:.55; text-decoration:underline; position:relative; z-index:2; color:inherit;">Continuer sans laisser d\'avis à la fin</a>'
+        const skipAvisLinkHtml = config.skip_avis
+            ? '<a href="#" id="skip-avis-link" onclick="event.preventDefault(); window.skipAvisChosen = !window.skipAvisChosen; this.style.opacity = window.skipAvisChosen ? \'1\' : \'.55\'; this.style.textDecoration = window.skipAvisChosen ? \'none\' : \'underline\';" style="display:block; margin-top:12px; margin-bottom:6px; font-size:11px; opacity:.55; text-decoration:underline; position:relative; z-index:2; color:inherit;">' + (avisEnd ? 'Continuer sans laisser d\'avis à la fin' : 'Continuer sans laisser d\'avis') + '</a>'
             : '';
 
         document.body.innerHTML = `
@@ -4924,33 +4810,28 @@ if(slider) {
             setTimeout(() => { loader.style.display = 'none'; content.style.display = 'flex'; }, 400);
         }, 900);
 
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const configId = urlParams.get('id');
-            if (configId) {
-                const response = await fetch(`${SB_URL}/rest/v1/roulette_configs?id=eq.${configId}&select=data`, {
-                    headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY }
-                });
-                const result = await response.json();
-                if (result[0]) {
-                    renderClient(result[0].data, configId);
-                    fetch(`${SB_URL}/rest/v1/roulette_scans`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-                        body: JSON.stringify({ config_id: configId })
-                    }).catch(() => {});
-                }
-            } else {
-                document.getElementById('topbar').style.display = 'flex';
-                buildSwatchPickers();
-                defaultLots.forEach(lot => addLotRow(lot.n, lot.p, lot.s, lot.bg, lot.tx, lot.w));
-                update();
-                try { await refreshSession(); } catch (e) { console.error('refreshSession a échoué (réseau/Supabase indisponible) :', e); }
-                try { sb.auth.onAuthStateChange((_event, _session) => { refreshSession(); }); } catch (e) {}
+        const urlParams = new URLSearchParams(window.location.search);
+        const configId = urlParams.get('id');
+        if (configId) {
+            const response = await fetch(`${SB_URL}/rest/v1/roulette_configs?id=eq.${configId}&select=data`, {
+                headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY }
+            });
+            const result = await response.json();
+            if (result[0]) {
+                renderClient(result[0].data, configId);
+                fetch(`${SB_URL}/rest/v1/roulette_scans`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    body: JSON.stringify({ config_id: configId })
+                }).catch(() => {});
             }
-        } catch (e) {
-            console.error('Erreur au chargement de la page :', e);
+        } else {
             document.getElementById('topbar').style.display = 'flex';
+            buildSwatchPickers();
+            defaultLots.forEach(lot => addLotRow(lot.n, lot.p, lot.s, lot.bg, lot.tx, lot.w));
+            update();
+            await refreshSession();
+            sb.auth.onAuthStateChange((_event, _session) => { refreshSession(); });
         }
     };
 
