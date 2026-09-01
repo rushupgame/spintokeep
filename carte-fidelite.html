@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#ffffff">
+    <title>Fidélité Pro | CRM & Cartes de Fidélité Digitales</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!-- PayPal SDK (Remplacer le client-id par le vôtre en production) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak&vault=true&intent=subscription"></script>
+
+    <style>
+        :root {
+            --bg-primary: #ffffff; --bg-secondary: #f8f9fa;
+            --text-primary: #1d1d1f; --text-secondary: #86868b;
+            --accent-color: #0071e3; --accent-hover: #0077ED;
+            --border-color: #d2d2d7; --line: #e5e5ea;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04); --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+            --success: #1a9e5c; --success-bg: #eafaf1;
+            --danger: #d93025; --danger-bg: #fdecea;
+            --premium: #b8860b; --premium-bg: #fff8e6;
+            --radius: 16px;
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.6; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; }
+        .hidden { display: none !important; }
+        
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; cursor:pointer;}
+        .logo span { color: var(--accent-color); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; }
+        .nav-links a { text-decoration: none; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--accent-color); }
+        .nav-auth { display: flex; align-items: center; gap: 10px; margin-left: 1rem; }
+        
+        .btn { display: inline-flex; align-items: center; justify-content: center; background-color: var(--accent-color); color: #fff; padding: 12px 24px; border-radius: 50px; font-size: 1rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+        .btn-black { background-color: var(--text-primary); color: #fff; }
+        .btn-black:hover { background-color: #000; }
+        .btn-ghost { background: none; border: 1px solid var(--border-color); color: var(--text-primary); padding: 9px 16px; border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-ghost:hover { background: var(--bg-secondary); }
+        .btn-premium { background: linear-gradient(135deg,#f6c453,#e8a63a); color: #4a3400; border: none; padding: 8px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(246, 196, 83, 0.4); }
+
+        section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+        .bg-gray { background-color: var(--bg-secondary); width: 100%; padding: 4rem 2rem; }
+        h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; text-align: center; }
+        h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .card { background: var(--bg-primary); padding: 2.5rem 2rem; border-radius: 20px; border: 1px solid var(--border-color); text-align: left; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+        .card-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+        /* CONFIGURATEUR */
+        .config-wrapper { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        @media (min-width: 1024px) { .config-wrapper { flex-direction: row; align-items: flex-start; } .panel-config { flex: 1.2; } .panel-preview { flex: 1; position: sticky; top: 90px; } }
+        .panel { background: white; padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        .step { border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 10px; background: #fff; overflow: hidden; }
+        .step[open] { border-color: #d8d8de; }
+        .step summary { cursor: pointer; padding: 14px 16px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: var(--bg-secondary); font-size: 14.5px; }
+        .step summary::-webkit-details-marker { display: none; }
+        .step summary .num { width: 26px; height: 26px; border-radius: 50%; background: #e5e5ea; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .step[open] summary .num { background: var(--text-primary); color: #fff; }
+        .step-body { padding: 16px; border-top: 1px solid var(--border-color); }
+        
+        label.field-label { font-weight: 700; font-size: 0.85em; color: var(--text-secondary); display: block; margin: 12px 0 6px; text-transform: uppercase; }
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], input[type="tel"], input[type="date"], select { padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; width: 100%; font-family: inherit; }
+        
+        /* UPLOAD WRAPPERS */
+        .upload-area { border: 2px dashed var(--border-color); padding: 15px; border-radius: 10px; text-align: center; position: relative; background: var(--bg-secondary); transition: all 0.2s; }
+        .upload-area:hover { border-color: var(--accent-color); }
+        
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+        .color-item { text-align: center; }
+        .color-item input[type="color"] { width: 100%; height: 45px; border: none; border-radius: 8px; cursor: pointer; padding: 0; }
+        .color-item span { font-size: 11px; font-weight: 700; color: var(--text-secondary); }
+
+        /* SWATCHES DEGRADES */
+        .swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
+        .swatch { aspect-ratio: 1/1; border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: transform .1s ease, border-color .15s ease; background-repeat: repeat; }
+        .swatch:hover { transform: scale(1.06); }
+        .swatch.active { border-color: var(--ink); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ink); }
+        .swatch-none { display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text-secondary); background: #f4f4f5; font-weight: 700; }
+
+        .card-preview { background: var(--c-bg, #fff); color: var(--c-tx, #1d1d1f); padding: 25px; border-radius: 20px; text-align: center; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+        .logo-img { max-width: 90px; max-height: 90px; margin-bottom: 15px; object-fit: contain; border-radius: 12px; z-index: 2; position: relative; }
+        .card-title { font-size: 1.4rem; font-weight: 800; margin: 0 0 20px 0; z-index: 2; position: relative; }
+        .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; z-index: 2; position: relative; }
+        .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; opacity: 0.3; transition: all 0.3s; }
+        .stamp-active { opacity: 1; border-style: solid; border-color: inherit; background: rgba(0,0,0,0.05); transform: scale(1.05); }
+        .reward-box { background: var(--c-btn, #000); color: var(--c-btn-tx, #fff); padding: 15px; border-radius: 14px; width: 100%; margin-top: auto; font-weight: 700; font-size: 0.9rem; z-index: 2; position: relative; margin-bottom: 10px; }
+
+        /* DASHBOARD */
+        .dash-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .dash-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .dash-card .val { font-size: 2rem; font-weight: 800; color: var(--text-primary); }
+        .dash-card .lbl { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+        
+        .dash-table-wrapper { overflow-x: auto; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; min-width: 900px; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+        th { background: var(--bg-secondary); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; font-size: 0.8rem; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge-pending { background: var(--bg-secondary); color: var(--text-secondary); }
+        .badge-success { background: var(--success-bg); color: var(--success); }
+
+        /* MOCKUP DASHBOARD LANDING */
+        .dash-preview-mock { background: #fff; border-radius: 18px; padding: 22px; margin-top: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.06); max-width: 800px; margin-left: auto; margin-right: auto; text-align: left; }
+        .dash-preview-mock-header { display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 1.1em; margin-bottom: 16px; color: var(--text-primary); }
+
+        /* FREEMIUM */
+        .text-blurred { filter: blur(4px); user-select: none; pointer-events: none; opacity: 0.7; font-family: monospace; }
+        .premium-lock-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
+
+        /* MODALS & TOASTS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: #fff; border-radius: 24px; padding: 30px; width: 100%; max-width: 450px; position: relative; box-shadow: var(--shadow-md); max-height: 90vh; overflow-y: auto;}
+        .modal-close { position: absolute; top: 15px; right: 15px; background: var(--bg-secondary); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        
+        .auth-tabs { display: flex; background: var(--bg-secondary); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+        .auth-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text-secondary); }
+        .auth-tab.active { background: #fff; color: var(--text-primary); box-shadow: var(--shadow-sm); }
+        .form-error { background: var(--danger-bg); color: var(--danger); font-size: 13px; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none; }
+
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--text-primary); color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s; box-shadow: var(--shadow-md); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        footer { background-color: #151516; color: #a1a1a6; padding: 4rem 2rem 2rem; font-size: 0.95rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- HEADER (Shared between Landing and Dashboard) -->
+<header id="main-header">
+    <nav>
+        <a class="logo" onclick="showLandingView()">Fidélité<span>Pro</span></a>
+        
+        <ul class="nav-links" id="nav-links-public">
+            <li><a href="#configurateur-section">Créer ma carte</a></li>
+            <li><a href="#concept">Le Concept</a></li>
+            <li><a href="#avantages">Avantages CRM</a></li>
+        </ul>
+
+        <div class="nav-auth" id="nav-auth-area">
+            <!-- Rempli dynamiquement par JS -->
+        </div>
+    </nav>
+</header>
+
+<!-- ==========================================
+     VUE 1 : LANDING PAGE & CONFIGURATEUR
+=========================================== -->
+<div id="landing-view">
+    <main>
+        <section style="padding-top: 5rem; padding-bottom: 3rem;">
+            <h1>Fidélisez vos clients, <br><span style="color: var(--accent-color);">récoltez leurs contacts.</span></h1>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.2rem;">
+                Dites adieu aux cartes en carton. Créez votre programme de fidélité par QR Code. Vos clients scannent, cumulent des points, et vous vous constituez une base de données qualifiée (CRM).
+            </p>
+            <div style="text-align: center;">
+                <a href="#configurateur-section" class="btn" style="padding: 16px 40px; font-size: 1.1rem;">Créer ma carte maintenant</a>
+            </div>
+        </section>
+
+        <!-- CONFIGURATEUR DIRECTEMENT SUR LA PAGE D'ACCUEIL -->
+        <section id="configurateur-section" class="bg-gray">
+            <h2 style="margin-bottom: 0.5rem;">Configurez votre carte de fidélité</h2>
+            <p style="text-align: center; margin-bottom: 3rem;">C'est 100% gratuit à créer. L'aperçu se met à jour en temps réel.</p>
+            
+            <div class="config-wrapper">
+                <div class="panel panel-config">
+                    <h3 style="margin-top:0; margin-bottom: 20px;">Design & Règles</h3>
+
+                    <details class="step" open>
+                        <summary><span class="num">1</span> Identité & Textes</summary>
+                        <div class="step-body">
+                            <label class="field-label">Nom de l'établissement</label>
+                            <input type="text" id="conf_name" value="Ma Super Boutique" oninput="updatePreview()">
+                            
+                            <label class="field-label">Logo de votre enseigne</label>
+                            <div class="upload-area">
+                                <input type="file" id="logo_input" accept="image/*" onchange="handleImageUpload(this, 'conf_logo', 'logo-status')" style="width: 100%; padding: 0; border: none;">
+                                <div id="logo-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Formats acceptés : PNG, JPG. Taille max : 2Mo.</div>
+                            </div>
+                            <input type="hidden" id="conf_logo" value="">
+
+                            <label class="field-label">Titre de la carte</label>
+                            <input type="text" id="conf_title" value="Carte de fidélité" oninput="updatePreview()">
+                        </div>
+                    </details>
+
+                    <details class="step">
+                        <summary><span class="num">2</span> Couleurs & Style</summary>
+                        <div class="step-body">
+                            <div class="color-grid">
+                                <div class="color-item">
+                                    <label class="field-label">Fond unie</label>
+                                    <input type="color" id="conf_bg" value="#ffffff" oninput="updatePreview()">
+                                </div>
+                                <div class="color-item">
+                                    <label class="field-label">Texte</label>
+                                    <input type="color" id="conf_tx" value="#1d1d1f" oninput="updatePreview()">
+                                </div>
+                                <div class="color-item">
+                                    <label class="field-label">Boutons</label>
+                                    <input type="color" id="conf_btn" value="#0071e3" oninput="updatePreview()">
+                                </div>
+                                <div class="color-item">
+                                    <label class="field-label">Texte Btn</label>
+                                    <input type="color" id="conf_btn_tx" value="#ffffff" oninput="updatePreview()">
+                                </div>
+                            </div>
+
+                            <!-- DÉGRADÉS & TEXTURES -->
+                            <label class="field-label" style="margin-top:15px;">Fond Dégradé</label>
+                            <div class="swatch-grid" id="gradient-swatches"></div>
+
+                            <label class="field-label">Texture de fond</label>
+                            <div class="swatch-grid" id="texture-swatches"></div>
+
+                            <label class="field-label" style="margin-top:20px;">Image de fond (Option Premium ⭐)</label>
+                            <p style="font-size:12px; color:var(--text-secondary); margin-top:-5px;">Remplace la couleur de fond et le dégradé. Enlève la mention "Propulsé par Fidélité Pro".</p>
+                            <div class="upload-area" id="bg-upload-area">
+                                <input type="file" id="bg_input" accept="image/*" onchange="handleImageUpload(this, 'conf_bg_img', 'bg-status')" disabled style="width: 100%; padding: 0; border: none;">
+                                <div id="bg-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Taille idéale : 1080 x 1920 px</div>
+                                <button id="btn-unlock-premium-1" class="btn-premium" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);" onclick="openPremiumAction()">Débloquer Premium</button>
+                            </div>
+                            <input type="hidden" id="conf_bg_img" value="">
+                        </div>
+                    </details>
+
+                    <details class="step" open>
+                        <summary><span class="num">3</span> Mécanique du jeu & Acquisition</summary>
+                        <div class="step-body">
+                            <div style="display:flex; gap:10px;">
+                                <div style="flex:1">
+                                    <label class="field-label">Seuil de visites (Objectif)</label>
+                                    <input type="number" id="conf_seuil" value="10" min="2" max="20" oninput="updatePreview()">
+                                </div>
+                                <div style="flex:1">
+                                    <label class="field-label">Ratio Points / Visite</label>
+                                    <input type="number" id="conf_ratio" value="1" step="0.5">
+                                </div>
+                            </div>
+                            
+                            <label class="field-label">Emoji du tampon</label>
+                            <select id="conf_emoji" onchange="updatePreview()">
+                                <option value="⭐">⭐ Étoile</option>
+                                <option value="☕">☕ Café</option>
+                                <option value="🍕">🍕 Pizza</option>
+                                <option value="✂️">✂️ Ciseaux</option>
+                                <option value="🎁">🎁 Cadeau</option>
+                            </select>
+
+                            <label class="field-label">La récompense finale</label>
+                            <input type="text" id="conf_reward" value="Un café offert ! ☕" oninput="updatePreview()">
+
+                            <label class="field-label" style="margin-top:20px;">Boost Avis Google (URL - Option Premium ⭐)</label>
+                            <p style="font-size:12px; color:var(--text-secondary); margin-top:-5px;">Le client sera invité à laisser un avis au moment où il débloque sa récompense.</p>
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="conf_google_url" placeholder="Lien vers votre fiche Google" disabled oninput="updatePreview()">
+                                <button id="btn-unlock-premium-2" class="btn-premium" onclick="openPremiumAction()">Débloquer</button>
+                            </div>
+
+                            <div style="margin-top:20px; border-top: 1px solid var(--line); padding-top:15px;">
+                                <label class="field-label" style="color:var(--danger);">Code PIN Admin (Sécurité)</label>
+                                <p style="font-size:12px; margin-top:-5px; color:var(--text-secondary);">Requis sur le téléphone du client pour valider un tampon.</p>
+                                <input type="password" id="conf_pin" placeholder="Ex: 1234">
+                            </div>
+                        </div>
+                    </details>
+
+                    <button class="btn btn-black" style="width: 100%; margin-top: 15px; padding: 16px; font-size:1.1rem;" onclick="saveConfig()">💾 Sauvegarder & Générer la carte</button>
+
+                    <div id="qr-result-box" class="hidden" style="margin-top:20px; padding:20px; background:var(--bg-secondary); border-radius:12px; text-align:center; border: 2px solid var(--success);">
+                        <h3 style="margin-bottom:10px; color:var(--success);">✅ Carte activée !</h3>
+                        <p style="font-size:13px; color:var(--text-secondary);">Imprimez ce QR Code et placez-le sur votre comptoir.</p>
+                        <div id="admin-qrcode" style="display:inline-block; padding:10px; background:#fff; border-radius:10px; border:1px solid var(--border-color);"></div>
+                        <div style="margin-top:10px;">
+                            <a id="admin-preview-link" href="#" target="_blank" style="font-size:13px; color:var(--accent-color); font-weight:600;">Lien direct de la carte client</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-preview">
+                    <h2 class="title" style="text-align: center; margin-bottom: 20px;">Aperçu Client</h2>
+                    <div class="card-preview" id="live-card">
+                        <img id="live-logo" src="" class="logo-img hidden">
+                        <h3 id="live-name" style="margin:0 0 5px 0; font-size:1.1rem; z-index:2; position:relative;"></h3>
+                        <div id="live-title" class="card-title"></div>
+                        <div class="stamps-grid" id="live-stamps"></div>
+                        
+                        <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 20px; z-index:2; position:relative;">
+                            3 / <span id="live-max">10</span> tampons
+                        </div>
+
+                        <div class="reward-box">
+                            🎁 <span id="live-reward"></span>
+                        </div>
+
+                        <div id="live-watermark" style="font-size:10px; color:#999; margin-top:10px; font-weight: 600; z-index:2; position:relative;">⚡ Propulsé par Fidélité Pro</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="concept">
+            <h2>Comment ça marche en point de vente ?</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <span class="card-icon">🎨</span>
+                    <h3>1. Créez votre carte</h3>
+                    <p>Personnalisez vos couleurs, votre logo, l'emoji de tampon et la récompense finale depuis notre configurateur intuitif ci-dessus.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📱</span>
+                    <h3>2. Le client scanne</h3>
+                    <p>Affichez votre QR Code en caisse. Le client s'inscrit en 10 secondes et obtient sa carte digitale sur son smartphone.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🔒</span>
+                    <h3>3. Tamponnez & Fidélisez</h3>
+                    <p>Pour ajouter un tampon, tapez simplement votre Code PIN secret sur le téléphone du client. Totalement sécurisé et anti-fraude.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD MOCKUP SUR LA LANDING PAGE -->
+        <section id="avantages" class="bg-gray">
+            <h2>Un outil CRM puissant pour votre commerce</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.1rem;">
+                Toutes les données scannées par vos clients remontent automatiquement dans votre tableau de bord.
+            </p>
+            
+            <div class="dash-preview-mock">
+                <div class="dash-preview-mock-header">
+                    <span>Mon Dashboard CRM</span>
+                    <span class="badge badge-success">Aperçu</span>
+                </div>
+                <div class="dash-cards" style="grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom: 15px;">
+                    <div class="dash-card" style="padding:15px;">
+                        <div class="lbl">Clients Inscrits</div>
+                        <div class="val" style="font-size:1.8rem;">482</div>
+                    </div>
+                    <div class="dash-card" style="padding:15px;">
+                        <div class="lbl">Visites Validées</div>
+                        <div class="val" style="font-size:1.8rem;">1,204</div>
+                    </div>
+                    <div class="dash-card" style="padding:15px;">
+                        <div class="lbl">Récompenses</div>
+                        <div class="val" style="font-size:1.8rem; color:var(--success);">85</div>
+                    </div>
+                </div>
+                <div class="dash-table-wrapper" style="border:none; box-shadow:none;">
+                    <table style="min-width:100%; font-size:0.85rem;">
+                        <thead><tr><th>Client</th><th>Contact</th><th>Visites</th><th>Statut</th></tr></thead>
+                        <tbody>
+                            <tr><td style="font-weight:600;">Jean D.</td><td>je***@gmail.com</td><td>9 / 10</td><td><span class="badge badge-pending">En cours</span></td></tr>
+                            <tr><td style="font-weight:600;">Marie L.</td><td>ma***@yahoo.fr</td><td>10 / 10</td><td><span class="badge badge-success">🎁 Dispo</span></td></tr>
+                            <tr><td style="font-weight:600;">Sophie B.</td><td>so***@hotmail.com</td><td>4 / 10</td><td><span class="badge badge-pending">En cours</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 3rem;">
+                <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
+                    <h3>📊 Statistiques détaillées</h3>
+                    <p>Suivez en temps réel le nombre de cartes créées, les visites récurrentes et les récompenses distribuées.</p>
+                </div>
+                <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
+                    <h3>📥 Fichier Client (Export CSV)</h3>
+                    <p>Récupérez les emails et numéros de téléphone de vos clients pour vos futures campagnes marketing.</p>
+                </div>
+                <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
+                    <h3>⭐ Paliers et Avis Google</h3>
+                    <p>Propulsez vos avis Google grâce à nos rappels automatiques dès que le client atteint sa récompense.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="color: #fff; margin-bottom: 1rem;">Fidélité Pro</h3>
+            <p>La solution de gamification et de fidélisation locale.</p>
+            <p style="margin-top: 2rem; font-size: 0.85rem; border-top: 1px solid #333; padding-top: 2rem;">&copy; 2026 Fidélité Pro. Tous droits réservés.</p>
+        </div>
+    </footer>
+</div>
+
+
+<!-- ==========================================
+     VUE 2 : DASHBOARD COMMERÇANT (CRM) Connecté
+=========================================== -->
+<div id="dash-view" class="hidden" style="min-height: 100vh; background: #f8f9fa;">
+    <div class="dash-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">Tableau de bord</h2>
+            <button class="btn-ghost" onclick="showLandingView()">✏️ Modifier ma carte</button>
+        </div>
+
+        <div class="dash-cards">
+            <div class="dash-card">
+                <div class="lbl">Clients Inscrits</div>
+                <div class="val" id="stat-clients">0</div>
+            </div>
+            <div class="dash-card">
+                <div class="lbl">Total Visites Validées</div>
+                <div class="val" id="stat-stamps">0</div>
+            </div>
+            <div class="dash-card">
+                <div class="lbl">Total Points Distribués</div>
+                <div class="val" id="stat-points" style="color: var(--success);">0</div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom: 20px; position: relative;">
+            <div id="chart-premium-overlay" class="premium-lock-overlay">
+                <p style="font-weight:800; font-size: 1.1rem; margin:0 0 10px 0; color:var(--text-primary);">📊 Analyses détaillées (Premium)</p>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top:0; margin-bottom: 15px;">Suivez vos pics d'affluence et l'évolution de vos visites.</p>
+                <button class="btn-premium" onclick="openModal('premium-modal')">Débloquer les Statistiques</button>
+            </div>
+            <h3 style="margin-top:0; margin-bottom:15px;">Évolution des visites (30 derniers jours)</h3>
+            <div style="height: 250px; position: relative; filter: blur(4px); pointer-events: none;" id="chart-blur-wrapper">
+                <canvas id="dash-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">Fichier Client (CRM)</h3>
+                <button id="btn-export-csv" class="btn-premium" onclick="handleExportCSV()">🔒 Exporter CSV (Premium)</button>
+            </div>
+            <div class="dash-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date d'inscription</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Date Naissance</th>
+                            <th>Visites</th>
+                            <th>Points</th>
+                            <th>Statut Récompense</th>
+                        </tr>
+                    </thead>
+                    <tbody id="crm-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==========================================
+     VUE 3 : CLIENT (Mobile - Scan du QR Code)
+=========================================== -->
+<div id="client-view" class="hidden" style="min-height: 100vh; background: #f0f0f5; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    
+    <div id="client-auth-box" class="panel" style="width:100%; max-width:400px; text-align:center;">
+        <h2 style="margin-bottom:10px;">Obtenir ma carte</h2>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Créez votre compte en 10 secondes pour cumuler vos avantages.</p>
+        <input type="text" id="cli-nom" placeholder="Prénom & Nom" style="padding:14px; font-size:16px;" required>
+        <input type="email" id="cli-email" placeholder="Email" style="padding:14px; font-size:16px;" required>
+        <input type="tel" id="cli-tel" placeholder="Téléphone" style="padding:14px; font-size:16px;" required>
+        <label style="text-align: left; display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: var(--text-secondary);">Date de naissance</label>
+        <input type="date" id="cli-dob" style="padding:14px; font-size:16px; margin-bottom: 20px;" required>
+        
+        <button class="btn btn-black" style="width:100%; padding:14px; font-size:16px;" onclick="registerClient()">Activer ma carte</button>
+    </div>
+
+    <div id="client-card-box" class="hidden" style="width:100%; max-width:400px;">
+        <div class="card-preview" id="render-card" style="box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+            <img id="render-logo" src="" class="logo-img hidden">
+            <h3 id="render-shop" style="margin:0 0 5px 0; font-size:1rem; z-index:2; position:relative;"></h3>
+            <div id="render-title" class="card-title"></div>
+            
+            <div class="stamps-grid" id="render-stamps"></div>
+            
+            <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 25px; z-index:2; position:relative;">
+                <span id="render-count">0</span> / <span id="render-max">10</span> visites
+            </div>
+            
+            <p style="font-size:12px; font-weight: bold; margin-top:10px; color:var(--text-secondary); z-index:2; position:relative;">Points totaux : <span id="render-points">0</span></p>
+
+            <div class="reward-box">
+                🎁 <span id="render-reward"></span>
+            </div>
+            
+            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 10px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Soutenez-nous sur Google</a>
+
+            <div id="render-watermark" style="font-size:10px; color:#999; margin-top:15px; font-weight: 600; z-index:2; position:relative;">⚡ Propulsé par Fidélité Pro</div>
+        </div>
+
+        <div style="margin-top:30px; background:#fff; padding:20px; border-radius:20px; text-align:center; box-shadow:var(--shadow-sm);">
+            <h4 style="margin:0 0 10px 0;">QR Code d'identification</h4>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">Présentez ce code au commerçant pour valider votre visite.</p>
+            <div id="client-personal-qr" style="display:inline-block; padding:10px; border:1px solid #eee; border-radius:10px;"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==========================================
+     VUE 4 : COMMERÇANT (Scan de la carte client)
+=========================================== -->
+<div id="scan-view" class="hidden" style="min-height: 100vh; background: #1d1d1f; color:#fff; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #2c2c2e; padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+        <h2 style="color:#fff; margin-bottom:5px;">Validation</h2>
+        <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Espace réservé au commerçant</p>
+        
+        <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:16px; margin-bottom:25px;">
+            <p style="margin:0; font-size:13px; color:#aaa; text-transform:uppercase; font-weight:bold;">Client</p>
+            <p id="merchant-cli-name" style="margin:5px 0 15px 0; font-size:22px; font-weight:bold;">...</p>
+            
+            <p style="margin:0; font-size:13px; color:#aaa; text-transform:uppercase; font-weight:bold;">Visites actuelles</p>
+            <p id="merchant-cli-progress" style="margin:5px 0 0 0; font-size:18px; color:var(--accent-color); font-weight:bold;">X / Y</p>
+        </div>
+
+        <div id="action-stamp">
+            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:8px; text-transform:uppercase;">Code PIN Admin</label>
+            <input type="password" id="merchant-pin" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:20px;">
+            <button class="btn" style="width:100%; padding:16px; font-size:16px; background:var(--success);" onclick="validateAction('stamp')">➕ Ajouter Visite / Points</button>
+        </div>
+
+        <div id="action-reward" class="hidden">
+            <div style="background:var(--premium-bg); color:#5c4400; padding:15px; border-radius:12px; margin-bottom:20px; font-weight:bold;">
+                🎉 Objectif atteint ! Le client a droit à sa récompense.
+            </div>
+            <label style="display:block; text-align:left; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:8px; text-transform:uppercase;">Code PIN Admin</label>
+            <input type="password" id="merchant-pin-reward" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:20px;">
+            <button class="btn" style="width:100%; padding:16px; font-size:16px; background:var(--accent-color);" onclick="validateAction('reward')">🎁 Valider la récompense & Réinitialiser</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODALS -->
+<div class="modal-overlay" id="auth-modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('auth-modal')">×</button>
+        <h2 id="auth-title" style="margin-bottom:5px;">Connexion</h2>
+        <p id="auth-subtitle" style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Gérez vos cartes de fidélité.</p>
+        
+        <div class="auth-tabs" id="auth-tabs">
+            <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Se connecter</div>
+            <div class="auth-tab" id="tab-signup" onclick="switchAuth('signup')">S'inscrire</div>
+        </div>
+        
+        <div id="auth-error" class="form-error"></div>
+        
+        <label class="field-label">Email</label>
+        <input type="email" id="auth-email" placeholder="contact@boutique.com">
+        
+        <div id="field-password">
+            <label class="field-label">Mot de passe</label>
+            <input type="password" id="auth-password" placeholder="6 caractères min.">
+        </div>
+
+        <div id="field-birthdate" style="display:none;">
+            <label class="field-label">Date de naissance</label>
+            <input type="date" id="auth-birthdate">
+            <p style="font-size:11px; color:var(--text-secondary); margin-top:-5px; margin-bottom:10px;">Utilisée pour réinitialiser votre mot de passe de façon sécurisée.</p>
+        </div>
+
+        <div id="link-forgot" style="text-align:right; margin: -5px 0 15px 0;">
+            <a href="#" onclick="switchAuth('reset'); return false;" style="font-size:12px; color:var(--text-secondary); text-decoration:underline;">Mot de passe oublié ?</a>
+        </div>
+
+        <div id="field-new-password" style="display: none;">
+            <label class="field-label">Nouveau mot de passe</label>
+            <input type="password" id="auth-new-password" placeholder="6 caractères min.">
+        </div>
+
+        <button class="btn btn-black" id="auth-btn" style="width:100%; margin-top:10px; padding:14px;" onclick="processAuth()">Se connecter</button>
+
+        <div id="link-back-to-login" style="display: none; text-align:center; margin-top:15px;">
+            <a href="#" onclick="switchAuth('login'); return false;" style="font-size:13px; color:var(--text-secondary); text-decoration:underline;">← Retour à la connexion</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="premium-modal">
+    <div class="modal-box" style="text-align:center;">
+        <button class="modal-close" onclick="closeModal('premium-modal')">×</button>
+        <h2>Passer Premium ⭐</h2>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Débloquez l'export CRM complet (emails/téléphones), les graphiques détaillés, la Marque Blanche (votre fond de carte), et le Boost Google Avis.</p>
+        <div style="background:var(--premium-bg); border:2px solid #f0d68a; border-radius:16px; padding:20px; margin-bottom:20px;">
+            <div style="font-size:2.5rem; font-weight:800; color:#5c4400;">9,90 €<span style="font-size:1rem; font-weight:600;">/mois</span></div>
+            <p style="margin:5px 0 0 0; font-size:13px; font-weight:bold; color:#7a5c00;">Sans engagement</p>
+        </div>
+        
+        <div id="paypal-button-container" style="min-height: 45px; margin-bottom: 20px;"></div>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 15px;">
+            <button class="btn-ghost" onclick="togglePromoBox()" style="font-size: 12px; border:none; text-decoration: underline;">J'ai un code promo</button>
+            <div id="promo-code-fields" style="display:none; margin-top:10px;">
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="promo-code-input" placeholder="Code promo" style="text-transform:uppercase; text-align:center; font-weight:bold; margin:0; flex:1;">
+                    <button class="btn-black" onclick="redeemPromoCode()">Valider</button>
+                </div>
+                <div id="promo-code-error" class="form-error" style="margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // --- 1. CONFIGURATION SUPABASE ET CHARGEMENT ASYNCHRONE ---
+    const SB_URL = "https://drscbjrshjhupvrrzqec.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyc2NianJzaGpodXB2cnJ6cWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDM2NDUsImV4cCI6MjA4NTExOTY0NX0.t15POxBSoA0bmQ0WXEBN0sClGRtvxc1JKYGeaY65Y7g";
+    
+    const LIB_URLS = {
+        qrcode: 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+        confetti: 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js',
+        supabase: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
+        chartjs: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js'
+    };
+    const _loadedScripts = {};
+    function loadScriptOnce(src) {
+        if (_loadedScripts[src]) return _loadedScripts[src];
+        _loadedScripts[src] = new Promise((resolve, reject) => {
+            const s = document.createElement('script'); s.src = src;
+            s.onload = () => resolve(); s.onerror = () => { delete _loadedScripts[src]; reject(); };
+            document.head.appendChild(s);
+        });
+        return _loadedScripts[src];
+    }
+    
+    let sb = null;
+    async function ensureSupabase() {
+        await loadScriptOnce(LIB_URLS.supabase);
+        if (!sb) sb = window.supabase.createClient(SB_URL, SB_KEY);
+        return sb;
+    }
+
+    let currentUser = null;
+    let isPremium = false;
+    let currentConfigId = null;
+    let authMode = 'login';
+    let chartInstance = null;
+    let paypalLoaded = false;
+
+    // --- 2. TRAITEMENT ET UPLOAD D'IMAGES (Issu de index(28).html)[cite: 1] ---
+    function resizeImageForMobile(file) {
+        return new Promise((resolve) => {
+            const MAX_DIM = 900; 
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > MAX_DIM || height > MAX_DIM) {
+                        if (width >= height) { height = Math.round(height * (MAX_DIM / width)); width = MAX_DIM; }
+                        else { width = Math.round(width * (MAX_DIM / height)); height = MAX_DIM; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const isPng = file.type === 'image/png';
+                    const mime = isPng ? 'image/png' : 'image/jpeg';
+                    const quality = isPng ? undefined : 0.8;
+                    canvas.toBlob((blob) => {
+                        if (!blob) { resolve(file); return; }
+                        const newName = file.name.replace(/\.[^.]+$/, isPng ? '.png' : '.jpg');
+                        resolve(new File([blob], newName, { type: mime }));
+                    }, mime, quality);
+                };
+                img.onerror = () => resolve(file);
+                img.src = e.target.result;
+            };
+            reader.onerror = () => resolve(file);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function handleImageUpload(input, targetId, statusId) {
+        if (!input.files || input.files.length === 0) return;
+        
+        if (!currentUser) {
+            showToast("Veuillez créer un compte gratuitement pour héberger vos images.");
+            input.value = '';
+            openAuthModal('signup');
+            return;
+        }
+
+        const status = document.getElementById(statusId);
+        status.innerText = "⏳ Optimisation de l'image...";
+        status.style.color = "var(--accent-color)";
+
+        let file = input.files[0];
+        try { file = await resizeImageForMobile(file); } catch(e) { }
+
+        const fileName = `${currentUser.id}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        status.innerText = "⏳ Envoi au serveur...";
+
+        try {
+            await ensureSupabase();
+            const { data, error } = await sb.storage.from('logos').upload(fileName, file);
+            if (error) throw error;
+            
+            const publicUrl = `${SB_URL}/storage/v1/object/public/logos/${fileName}`;
+            document.getElementById(targetId).value = publicUrl;
+            
+            status.innerText = "✅ Image ajoutée avec succès !";
+            status.style.color = "var(--success)";
+            updatePreview();
+        } catch (e) {
+            console.error("Upload error:", e);
+            status.innerText = "❌ Erreur. Taille max 2Mo.";
+            status.style.color = "var(--danger)";
+        }
+    }
+
+
+    // --- 3. DEGRADES ET TEXTURES (Issu de index(28).html)[cite: 1] ---
+    const GRADIENT_PRESETS = {
+        sunset: { label: 'Coucher de soleil', css: 'linear-gradient(135deg, #FF512F, #F09819)' },
+        ocean: { label: 'Océan', css: 'linear-gradient(135deg, #2193b0, #6dd5ed)' },
+        violet: { label: 'Violet', css: 'linear-gradient(135deg, #654ea3, #eaafc8)' },
+        emerald: { label: 'Émeraude', css: 'linear-gradient(135deg, #11998e, #38ef7d)' },
+        rosegold: { label: 'Rose doré', css: 'linear-gradient(135deg, #ee9ca7, #ffdde1)' },
+        midnight: { label: 'Minuit', css: 'linear-gradient(135deg, #232526, #414345)' },
+        peach: { label: 'Pêche', css: 'linear-gradient(135deg, #ffecd2, #fcb69f)' },
+        royal: { label: 'Royal', css: 'linear-gradient(135deg, #141e30, #243b55)' }
+    };
+    const TEXTURE_PRESETS = {
+        points: { label: 'Points', css: 'radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.6px)', size: '14px 14px' },
+        diagonales: { label: 'Diagonales', css: 'repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 2px, transparent 2px 11px)', size: 'auto' },
+        grille: { label: 'Grille', css: 'repeating-linear-gradient(0deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px), repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px)', size: 'auto' },
+        vagues: { label: 'Vagues', css: 'repeating-radial-gradient(circle at 0 0, transparent 0, transparent 9px, rgba(255,255,255,.14) 9px, rgba(255,255,255,.14) 11px)', size: '22px 22px' }
+    };
+    
+    let selectedGradient = 'none';
+    let selectedTexture = 'none';
+
+    function buildSwatchPickers() {
+        const gradWrap = document.getElementById('gradient-swatches');
+        if (gradWrap && !gradWrap.children.length) {
+            const noneGradSw = document.createElement('div');
+            noneGradSw.className = 'swatch swatch-none' + (selectedGradient === 'none' ? ' active' : '');
+            noneGradSw.innerText = '✕';
+            noneGradSw.onclick = () => {
+                selectedGradient = 'none';
+                Array.from(gradWrap.children).forEach(c => c.classList.remove('active'));
+                noneGradSw.classList.add('active');
+                updatePreview();
+            };
+            gradWrap.appendChild(noneGradSw);
+            
+            Object.keys(GRADIENT_PRESETS).forEach(key => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (key === selectedGradient ? ' active' : '');
+                sw.style.background = GRADIENT_PRESETS[key].css;
+                sw.onclick = () => {
+                    selectedGradient = key;
+                    Array.from(gradWrap.children).forEach(c => c.classList.remove('active'));
+                    sw.classList.add('active');
+                    updatePreview();
+                };
+                gradWrap.appendChild(sw);
+            });
+        }
+
+        const texWrap = document.getElementById('texture-swatches');
+        if (texWrap && !texWrap.children.length) {
+            const noneSw = document.createElement('div');
+            noneSw.className = 'swatch swatch-none active';
+            noneSw.innerText = '✕';
+            noneSw.onclick = () => {
+                selectedTexture = 'none';
+                Array.from(texWrap.children).forEach(c => c.classList.remove('active'));
+                noneSw.classList.add('active');
+                updatePreview();
+            };
+            texWrap.appendChild(noneSw);
+            
+            Object.keys(TEXTURE_PRESETS).forEach(key => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch';
+                sw.style.backgroundColor = '#8a8a92';
+                sw.style.backgroundImage = TEXTURE_PRESETS[key].css;
+                sw.style.backgroundSize = TEXTURE_PRESETS[key].size;
+                sw.onclick = () => {
+                    selectedTexture = key;
+                    Array.from(texWrap.children).forEach(c => c.classList.remove('active'));
+                    sw.classList.add('active');
+                    updatePreview();
+                };
+                texWrap.appendChild(sw);
+            });
+        }
+    }
+
+    function computeScreenBackground(bgUrl, gradientKey, textureKey, bgColor, isPremiumUser) {
+        let images = [];
+        let sizes = [];
+
+        if (bgUrl && isPremiumUser) {
+            images.push(`url('${bgUrl}')`);
+            sizes.push('cover');
+        } else if (gradientKey && gradientKey !== 'none') {
+            const grad = GRADIENT_PRESETS[gradientKey] ? GRADIENT_PRESETS[gradientKey].css : '';
+            const tex = TEXTURE_PRESETS[textureKey];
+            if (tex && tex !== 'none') { images.push(tex.css); sizes.push(tex.size); }
+            if (grad) { images.push(grad); sizes.push('cover'); }
+        }
+
+        if (images.length === 0) return { image: 'none', size: 'auto', color: bgColor };
+        return { image: images.join(', '), size: sizes.join(', '), color: bgColor };
+    }
+
+    // --- 4. UTILITAIRES & ROUTAGE ---
+    function showToast(msg) {
+        const c = document.getElementById('toast-container');
+        const el = document.createElement('div');
+        el.className = 'toast'; el.innerText = msg;
+        c.appendChild(el);
+        setTimeout(() => el.classList.add('show'), 10);
+        setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3000);
+    }
+    function openModal(id) { 
+        document.getElementById(id).classList.add('show'); 
+        if(id === 'premium-modal' && !paypalLoaded) {
+            renderPaypalButton();
+        }
+    }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function hideAllViews() {
+        ['landing-view', 'dash-view', 'client-view', 'scan-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    }
+    function showLandingView() {
+        hideAllViews();
+        document.getElementById('landing-view').classList.remove('hidden');
+        document.getElementById('main-header').classList.remove('hidden');
+    }
+    function showDashboard() {
+        hideAllViews();
+        document.getElementById('dash-view').classList.remove('hidden');
+        document.getElementById('main-header').classList.remove('hidden');
+        loadDashboard();
+    }
+
+    window.onload = async () => {
+        buildSwatchPickers();
+        const params = new URLSearchParams(window.location.search);
+        
+        await ensureSupabase();
+
+        if (params.get('scan')) {
+            hideAllViews();
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('scan-view').classList.remove('hidden');
+            initMerchantScan(params.get('scan'));
+        } else if (params.get('shop')) {
+            hideAllViews();
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('client-view').classList.remove('hidden');
+            initClientCard(params.get('shop'));
+        } else {
+            showLandingView();
+            await checkSession();
+            sb.auth.onAuthStateChange((_event, _session) => { checkSession(); });
+            updatePreview();
+        }
+    };
+
+    // --- 5. AUTHENTIFICATION & SÉCURITÉ EDGE FUNCTION ---
+    function switchAuth(mode) {
+        authMode = mode;
+        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+        document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+        
+        document.getElementById('field-password').style.display = (mode === 'login' || mode === 'signup') ? 'block' : 'none';
+        document.getElementById('field-birthdate').style.display = (mode === 'signup' || mode === 'reset') ? 'block' : 'none';
+        document.getElementById('link-forgot').style.display = (mode === 'login') ? 'block' : 'none';
+        document.getElementById('field-new-password').style.display = (mode === 'reset') ? 'block' : 'none';
+        document.getElementById('link-back-to-login').style.display = (mode === 'reset') ? 'block' : 'none';
+        document.getElementById('auth-tabs').style.display = (mode === 'reset') ? 'none' : 'flex';
+
+        const title = document.getElementById('auth-title');
+        const subtitle = document.getElementById('auth-subtitle');
+        const btn = document.getElementById('auth-btn');
+
+        if (mode === 'login') {
+            title.innerText = 'Connexion'; subtitle.innerText = "Gérez vos cartes de fidélité."; btn.innerText = 'Se connecter';
+        } else if (mode === 'signup') {
+            title.innerText = 'Inscription'; subtitle.innerText = "Créez un compte pour sauvegarder la carte."; btn.innerText = 'Créer mon compte';
+        } else {
+            title.innerText = 'Réinitialisation'; subtitle.innerText = "Entrez votre email, date de naissance et nouveau mot de passe."; btn.innerText = 'Mettre à jour';
+        }
+        document.getElementById('auth-error').style.display = 'none';
+    }
+
+    function openAuthModal(mode) {
+        switchAuth(mode);
+        openModal('auth-modal');
+    }
+
+    async function processAuth() {
+        const email = document.getElementById('auth-email').value;
+        const err = document.getElementById('auth-error');
+        const btn = document.getElementById('auth-btn');
+        err.style.display = 'none';
+
+        // --- Réinitialisation sécurisée par date de naissance (RPC Custom) ---
+        if (authMode === 'reset') {
+            const birthdate = document.getElementById('auth-birthdate').value;
+            const newPassword = document.getElementById('auth-new-password').value;
+
+            if(!email || !birthdate || !newPassword || newPassword.length < 6) {
+                err.innerText = "Email, date de naissance et mot de passe (6 car. min) requis.";
+                err.style.display = 'block'; return;
+            }
+            btn.disabled = true; btn.innerText = "⏳...";
+            
+            try {
+                const { data, error } = await sb.rpc('reset_password_with_birthdate', {
+                    p_email: email, p_birthdate: birthdate, p_new_password: newPassword
+                });
+                
+                if (error) throw error;
+                if (!data || !data.success) throw new Error(data?.message || "Email ou date de naissance incorrect.");
+
+                showToast("Mot de passe mis à jour. Connexion en cours...");
+                await sb.auth.signInWithPassword({ email, password: newPassword });
+                closeModal('auth-modal');
+                checkSession();
+            } catch(e) {
+                err.innerText = e.message;
+                err.style.display = 'block';
+            }
+            btn.disabled = false; btn.innerText = "Mettre à jour";
+            return;
+        }
+
+        const password = document.getElementById('auth-password').value;
+        if(!email || !password || password.length < 6) { err.innerText = "Champs requis (6 car. min)."; err.style.display = 'block'; return; }
+        
+        if(authMode === 'signup') {
+            const birthdate = document.getElementById('auth-birthdate').value;
+            if(!birthdate) { err.innerText = "Date de naissance requise pour sécuriser le compte."; err.style.display = 'block'; return; }
+        }
+
+        btn.disabled = true; btn.innerText = "⏳...";
+
+        try {
+            if (authMode === 'signup') {
+                const { data, error } = await sb.auth.signUp({ email, password });
+                if (error) throw error;
+                // Creation profil avec date de naissance
+                const birthdate = document.getElementById('auth-birthdate').value;
+                await sb.from('profiles').insert({ id: data.user.id, email, birthdate });
+                showToast("Compte créé !");
+            } else {
+                const { error } = await sb.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                showToast("Connexion réussie");
+            }
+            closeModal('auth-modal');
+            await checkSession();
+            
+            // Si on vient de cliquer sur Sauvegarder et qu'on s'est inscrit :
+            if(document.getElementById('landing-view').classList.contains('hidden') === false) {
+                saveConfig(); 
+            }
+        } catch (e) {
+            err.innerText = e.message === "Invalid login credentials" ? "Identifiants incorrects" : e.message;
+            err.style.display = 'block';
+        }
+        btn.disabled = false; btn.innerText = authMode === 'login' ? 'Se connecter' : 'Créer mon compte';
+    }
+
+    async function checkSession() {
+        const { data: { session } } = await sb.auth.getSession();
+        currentUser = session ? session.user : null;
+        const authArea = document.getElementById('nav-auth-area');
+        const publicLinks = document.getElementById('nav-links-public');
+
+        if (currentUser) {
+            publicLinks.classList.add('hidden'); 
+
+            const { data: profile } = await sb.from('profiles').select('is_premium').eq('id', currentUser.id).single();
+            isPremium = profile?.is_premium || false;
+            
+            let premiumBtn = isPremium ? '<span class="btn-premium" style="box-shadow:none; cursor:default; margin-right:10px;">⭐ Compte Premium</span>' : '<button class="btn-premium" style="margin-right:10px;" onclick="openModal(\'premium-modal\')">⭐ Débloquer Premium</button>';
+
+            authArea.innerHTML = `
+                ${premiumBtn}
+                <button class="btn-ghost" onclick="showDashboard()" style="margin-right:10px;">📊 Dashboard</button>
+                <button class="btn-ghost" onclick="handleLogout()">Déconnexion</button>
+            `;
+            
+            if(isPremium) {
+                document.getElementById('bg_input').disabled = false;
+                document.getElementById('conf_google_url').disabled = false;
+                document.getElementById('btn-unlock-premium-1').classList.add('hidden');
+                document.getElementById('btn-unlock-premium-2').classList.add('hidden');
+                
+                const btnExport = document.getElementById('btn-export-csv');
+                btnExport.className = 'btn-ghost';
+                btnExport.innerText = '⬇️ Exporter CSV';
+                document.getElementById('chart-premium-overlay').classList.add('hidden');
+                document.getElementById('chart-blur-wrapper').style.filter = 'none';
+                document.getElementById('chart-blur-wrapper').style.pointerEvents = 'auto';
+            } else {
+                document.getElementById('bg_input').disabled = true;
+                document.getElementById('conf_google_url').disabled = true;
+                document.getElementById('btn-unlock-premium-1').classList.remove('hidden');
+                document.getElementById('btn-unlock-premium-2').classList.remove('hidden');
+                
+                const btnExport = document.getElementById('btn-export-csv');
+                btnExport.className = 'btn-premium';
+                btnExport.innerText = '🔒 Exporter CSV (Premium)';
+                document.getElementById('chart-premium-overlay').classList.remove('hidden');
+                document.getElementById('chart-blur-wrapper').style.filter = 'blur(4px)';
+                document.getElementById('chart-blur-wrapper').style.pointerEvents = 'none';
+            }
+
+            loadConfigData();
+        } else {
+            publicLinks.classList.remove('hidden');
+            authArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')">Espace Commerçant</button>`;
+            
+            document.getElementById('bg_input').disabled = true;
+            document.getElementById('conf_google_url').disabled = true;
+            document.getElementById('btn-unlock-premium-1').classList.remove('hidden');
+            document.getElementById('btn-unlock-premium-2').classList.remove('hidden');
+            
+            currentConfigId = null;
+        }
+    }
+
+    async function handleLogout() {
+        await sb.auth.signOut();
+        checkSession();
+        showLandingView();
+        showToast("Déconnecté");
+    }
+
+    function openPremiumAction() {
+        if(!currentUser) {
+            showToast("Créez d'abord un compte gratuit.");
+            openAuthModal('signup');
+        } else {
+            openModal('premium-modal');
+        }
+    }
+
+    // --- INTÉGRATION PAYPAL & SÉCURITÉ EDGE FUNCTION ---
+    function renderPaypalButton() {
+        const container = document.getElementById('paypal-button-container');
+        if (paypalLoaded || !window.paypal) return;
+        
+        window.paypal.Buttons({
+            style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
+            createSubscription: (data, actions) => actions.subscription.create({
+                plan_id: 'P-16K40079FK484592LNF4PL2Q' 
+            }),
+            onApprove: async (data) => {
+                try {
+                    const { data: { session } } = await sb.auth.getSession();
+                    if (!session) throw new Error("Session expirée");
+
+                    // Appel sécurisé à l'Edge Function Supabase
+                    const res = await fetch(`${SB_URL}/functions/v1/verify-paypal-subscription`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${session.access_token}`,
+                            'apikey': SB_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ subscriptionID: data.subscriptionID })
+                    });
+
+                    let result;
+                    const rawText = await res.text();
+                    try { result = JSON.parse(rawText); } catch { throw new Error("Erreur de l'Edge Function."); }
+
+                    if (!res.ok || !result.success) throw new Error(result.message || "Activation refusée");
+
+                    showToast("🎉 Abonnement Premium activé !");
+                    closeModal('premium-modal');
+                    checkSession();
+                    if(document.getElementById('dash-view').classList.contains('hidden') === false) loadDashboard();
+
+                } catch (e) {
+                    console.error('Erreur PayPal:', e);
+                    showToast("Erreur lors de l'activation : " + e.message);
+                }
+            },
+            onError: () => showToast("Le paiement PayPal a échoué. Réessayez.")
+        }).render('#paypal-button-container');
+        
+        paypalLoaded = true;
+    }
+
+    // --- CODES PROMO ---
+    function togglePromoBox() {
+        const box = document.getElementById('promo-code-fields');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function redeemPromoCode() {
+        const code = document.getElementById('promo-code-input').value.trim().toUpperCase();
+        const errBox = document.getElementById('promo-code-error');
+        errBox.style.display = 'none';
+
+        if (!code) { errBox.innerText = "Entrez un code promo."; errBox.style.display = 'block'; return; }
+
+        try {
+            const { data, error } = await sb.rpc('redeem_promo_code', { p_code: code });
+            if (error) throw error;
+            if (!data || !data.success) throw new Error(data?.message || "Code promo invalide.");
+            
+            showToast("🎉 Code promo appliqué : accès Premium débloqué !");
+            closeModal('premium-modal');
+            checkSession();
+        } catch (e) {
+            errBox.innerText = e.message;
+            errBox.style.display = 'block';
+        }
+    }
+
+
+    // --- 6. CONFIGURATEUR ---
+    function applyStyleToCard(prefix, config, bypassPremium = false) {
+        const card = document.getElementById(prefix + 'card');
+        if(!card) return;
+        
+        card.style.setProperty('--c-btn', config.btn);
+        card.style.setProperty('--c-btn-tx', config.btn_tx);
+        
+        const isUserPremium = bypassPremium || isPremium;
+        
+        // Application du background
+        const bgData = computeScreenBackground(config.bg_img, config.gradient, config.texture, config.bg, isUserPremium);
+        
+        card.style.backgroundImage = bgData.image;
+        card.style.backgroundSize = bgData.size;
+        card.style.backgroundColor = bgData.color;
+
+        if (bgData.image !== 'none') {
+            card.style.color = '#fff';
+            document.getElementById(prefix + 'name').style.color = '#fff';
+        } else {
+            card.style.color = config.tx;
+            document.getElementById(prefix + 'name').style.color = config.tx;
+        }
+
+        document.getElementById(prefix + 'name').innerText = config.name;
+        document.getElementById(prefix + 'title').innerText = config.title;
+        document.getElementById(prefix + 'max').innerText = config.max;
+        
+        if (document.getElementById(prefix + 'reward')) {
+            document.getElementById(prefix + 'reward').innerText = config.reward;
+        }
+
+        const logo = document.getElementById(prefix + 'logo');
+        if (config.logo) { logo.src = config.logo; logo.classList.remove('hidden'); }
+        else { logo.classList.add('hidden'); }
+
+        const watermark = document.getElementById(prefix + 'watermark');
+        if(watermark) {
+            if(isUserPremium) watermark.classList.add('hidden');
+            else watermark.classList.remove('hidden');
+        }
+
+        const grid = document.getElementById(prefix + 'stamps');
+        grid.innerHTML = '';
+        const currentStamps = config.current_stamps || 0;
+        
+        for(let i=0; i<config.max; i++) {
+            const slot = document.createElement('div');
+            slot.className = "stamp-slot" + (i < currentStamps ? " stamp-active" : "");
+            slot.innerHTML = config.emoji || '⭐';
+            slot.style.borderColor = (bgData.image !== 'none') ? '#fff' : config.tx;
+            grid.appendChild(slot);
+        }
+    }
+
+    function updatePreview() {
+        const conf = {
+            name: document.getElementById('conf_name').value || "Boutique",
+            title: document.getElementById('conf_title').value || "Fidélité",
+            logo: document.getElementById('conf_logo').value,
+            bg: document.getElementById('conf_bg').value,
+            tx: document.getElementById('conf_tx').value,
+            btn: document.getElementById('conf_btn').value,
+            btn_tx: document.getElementById('conf_btn_tx').value,
+            bg_img: document.getElementById('conf_bg_img').value, 
+            gradient: selectedGradient,
+            texture: selectedTexture,
+            max: parseInt(document.getElementById('conf_seuil').value) || 10,
+            emoji: document.getElementById('conf_emoji').value,
+            reward: document.getElementById('conf_reward').value,
+            current_stamps: 3 
+        };
+        applyStyleToCard('live-', conf);
+    }
+
+    async function loadConfigData() {
+        const { data: configs } = await sb.from('fidelite_configs').select('*').limit(1); 
+        if (configs && configs.length > 0) {
+            const row = configs[0];
+            const d = row.data || {};
+            currentConfigId = row.id;
+            
+            document.getElementById('conf_name').value = d.name || '';
+            document.getElementById('conf_title').value = d.title || '';
+            document.getElementById('conf_logo').value = d.logo || '';
+            document.getElementById('conf_bg').value = d.bg || '#ffffff';
+            document.getElementById('conf_tx').value = d.tx || '#1d1d1f';
+            document.getElementById('conf_btn').value = d.btn || '#0071e3';
+            document.getElementById('conf_btn_tx').value = d.btn_tx || '#ffffff';
+            document.getElementById('conf_bg_img').value = d.bg_img || '';
+            document.getElementById('conf_google_url').value = d.google_url || '';
+            
+            selectedGradient = d.gradient || 'none';
+            selectedTexture = d.texture || 'none';
+
+            // Sync UI active states for swatches
+            Array.from(document.getElementById('gradient-swatches').children).forEach(sw => {
+                sw.classList.remove('active');
+                if(sw.classList.contains('swatch-none') && selectedGradient === 'none') sw.classList.add('active');
+                else if(sw.style.background.includes(selectedGradient) && selectedGradient !== 'none') sw.classList.add('active');
+            });
+            Array.from(document.getElementById('texture-swatches').children).forEach(sw => {
+                sw.classList.remove('active');
+                if(sw.classList.contains('swatch-none') && selectedTexture === 'none') sw.classList.add('active');
+                else if(sw.style.backgroundImage.includes(selectedTexture) && selectedTexture !== 'none') sw.classList.add('active');
+            });
+            
+            document.getElementById('conf_seuil').value = row.seuil_visites || 10;
+            document.getElementById('conf_ratio').value = row.ratio_points || 1;
+            document.getElementById('conf_pin').value = row.admin_pin || '';
+            
+            document.getElementById('conf_emoji').value = d.emoji || '⭐';
+            document.getElementById('conf_reward').value = d.reward || '';
+            
+            updatePreview();
+            generateAdminQR();
+        }
+    }
+
+    async function saveConfig() {
+        if (!currentUser) {
+            showToast("Veuillez vous inscrire gratuitement pour sauvegarder la carte.");
+            openAuthModal('signup');
+            return;
+        }
+
+        const pin = document.getElementById('conf_pin').value;
+        const seuil = parseInt(document.getElementById('conf_seuil').value) || 10;
+        const ratio = parseFloat(document.getElementById('conf_ratio').value) || 1;
+
+        if(!pin) return showToast("Le Code PIN Admin est obligatoire !");
+
+        const dataJson = {
+            name: document.getElementById('conf_name').value,
+            title: document.getElementById('conf_title').value,
+            logo: document.getElementById('conf_logo').value,
+            bg: document.getElementById('conf_bg').value,
+            tx: document.getElementById('conf_tx').value,
+            btn: document.getElementById('conf_btn').value,
+            btn_tx: document.getElementById('conf_btn_tx').value,
+            bg_img: isPremium ? document.getElementById('conf_bg_img').value : '',
+            gradient: selectedGradient,
+            texture: selectedTexture,
+            emoji: document.getElementById('conf_emoji').value,
+            reward: document.getElementById('conf_reward').value,
+            google_url: isPremium ? document.getElementById('conf_google_url').value : ''
+        };
+
+        const shopId = currentConfigId || "shop_" + Math.random().toString(36).substring(2, 9);
+        
+        const rowToInsert = {
+            id: shopId,
+            data: dataJson,
+            seuil_visites: seuil,
+            ratio_points: ratio,
+            admin_pin: pin
+        };
+
+        const { error } = await sb.from('fidelite_configs').upsert([rowToInsert]);
+
+        if(!error) {
+            currentConfigId = shopId;
+            showToast("Carte sauvegardée !");
+            generateAdminQR();
+        } else {
+            showToast("Erreur: " + error.message);
+        }
+    }
+
+    async function generateAdminQR() {
+        if(!currentConfigId) return;
+        document.getElementById('qr-result-box').classList.remove('hidden');
+        const url = window.location.origin + window.location.pathname + "?shop=" + currentConfigId;
+        document.getElementById('admin-qrcode').innerHTML = "";
+        
+        await loadScriptOnce(LIB_URLS.qrcode);
+        new QRCode(document.getElementById('admin-qrcode'), { text: url, width: 200, height: 200, colorDark: "#000" });
+        document.getElementById('admin-preview-link').href = url;
+    }
+
+    // --- 7. DASHBOARD CRM ---
+    function maskEmail(email) {
+        if(!email) return '-';
+        const [name, domain] = email.split('@');
+        if(!domain) return email;
+        return `${name.charAt(0)}***@${domain}`;
+    }
+    
+    function maskPhone(tel) {
+        if(!tel || tel.length < 4) return '-';
+        return tel.substring(0,2) + ' ** ** ** **';
+    }
+
+    async function loadDashboard() {
+        if(!currentConfigId) return;
+
+        const { data: clients } = await sb.from('fidelite_clients')
+                                          .select('*')
+                                          .eq('config_id', currentConfigId)
+                                          .order('created_at', { ascending: false });
+        if(!clients) return;
+
+        let totalVisites = 0;
+        let totalPoints = 0;
+        const tbody = document.getElementById('crm-tbody');
+        tbody.innerHTML = '';
+
+        const maxVisites = parseInt(document.getElementById('conf_seuil').value) || 10;
+
+        clients.forEach(c => {
+            totalVisites += (c.nb_visites || 0);
+            totalPoints += (c.total_points || 0);
+            
+            const dateCrea = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '-';
+            const isEligible = c.nb_visites >= maxVisites;
+            const nbRewards = c.used_rewards ? c.used_rewards.length : 0;
+            const statusBadge = isEligible 
+                ? '<span class="badge badge-success">🎁 Récompense dispo</span>' 
+                : '<span class="badge badge-pending">En cours</span>';
+
+            const displayEmail = isPremium ? (c.email || '-') : maskEmail(c.email);
+            const displayTel = isPremium ? (c.tel || '-') : maskPhone(c.tel);
+            const blurClass = !isPremium ? "text-blurred" : "";
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dateCrea}</td>
+                <td style="font-weight:600;">${c.nom || '-'}</td>
+                <td><span class="${blurClass}">${displayEmail}</span></td>
+                <td><span class="${blurClass}">${displayTel}</span></td>
+                <td>${c.date_naissance || '-'}</td>
+                <td><strong>${c.nb_visites || 0}</strong> / ${maxVisites}</td>
+                <td>${c.total_points || 0} pts</td>
+                <td>${statusBadge} <br><span style="font-size:10px; color:#888;">(Déjà réclamé: ${nbRewards})</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('stat-clients').innerText = clients.length;
+        document.getElementById('stat-stamps').innerText = totalVisites;
+        document.getElementById('stat-points').innerText = totalPoints;
+
+        renderChart();
+    }
+
+    async function renderChart() {
+        await loadScriptOnce(LIB_URLS.chartjs);
+        const ctx = document.getElementById('dash-chart').getContext('2d');
+        if(chartInstance) chartInstance.destroy();
+
+        // Data de démonstration
+        const labels = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Aujourd\'hui'];
+        const data = [2, 5, 3, 8, 4, 12, 6];
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Visites validées',
+                    data: data,
+                    borderColor: '#0071e3',
+                    backgroundColor: 'rgba(0,113,227,0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function handleExportCSV() {
+        if(!isPremium) {
+            openModal('premium-modal');
+            return;
+        }
+        
+        const rows = document.querySelectorAll('#crm-tbody tr');
+        let csv = "Date Inscription;Nom;Email;Telephone;Date Naissance;Visites;Points;Statut\n";
+        rows.forEach(r => {
+            const cols = r.querySelectorAll('td');
+            const data = Array.from(cols).map(c => c.innerText.replace(/\n/g, ' ')).join(';');
+            csv += data + "\n";
+        });
+        const blob = new Blob(["\ufeff", csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "crm_fidelite.csv";
+        document.body.appendChild(link);
+        link.click(); document.body.removeChild(link);
+    }
+
+    // --- 8. VUE CLIENT ---
+    async function initClientCard(shopId) {
+        const { data: configRow } = await sb.from('fidelite_configs').select('*').eq('id', shopId).single();
+        if(!configRow) return alert("Boutique introuvable");
+        
+        const { data: ownerProfile } = await sb.from('profiles').select('is_premium').eq('id', configRow.owner_id || '').maybeSingle();
+        const shopIsPremium = ownerProfile?.is_premium || false;
+
+        const confObj = {
+            ...configRow.data,
+            bg_img: shopIsPremium ? configRow.data.bg_img : '',
+            max: configRow.seuil_visites || 10
+        };
+
+        const myId = localStorage.getItem('fid_cli_' + shopId);
+        
+        if (myId) {
+            const { data: client } = await sb.from('fidelite_clients').select('*').eq('id', myId).single();
+            if (client) {
+                document.getElementById('client-auth-box').classList.add('hidden');
+                document.getElementById('client-card-box').classList.remove('hidden');
+
+                confObj.current_stamps = client.nb_visites;
+                applyStyleToCard('render-', confObj, shopIsPremium);
+                
+                document.getElementById('render-count').innerText = client.nb_visites;
+                document.getElementById('render-points').innerText = client.total_points || 0;
+
+                const scanUrl = window.location.origin + window.location.pathname + "?scan=" + myId;
+                document.getElementById('client-personal-qr').innerHTML = "";
+                
+                await loadScriptOnce(LIB_URLS.qrcode);
+                new QRCode(document.getElementById('client-personal-qr'), { text: scanUrl, width: 160, height: 160 });
+                
+                if (client.nb_visites >= confObj.max) {
+                    await loadScriptOnce(LIB_URLS.confetti);
+                    confetti({ particleCount: 150, spread: 70 });
+                    
+                    if (shopIsPremium && confObj.google_url) {
+                        const btnGoogle = document.getElementById('client-google-btn');
+                        btnGoogle.href = confObj.google_url;
+                        btnGoogle.classList.remove('hidden');
+                    }
+                }
+            } else {
+                localStorage.removeItem('fid_cli_' + shopId);
+            }
+        }
+    }
+
+    async function registerClient() {
+        const shopId = new URLSearchParams(window.location.search).get('shop');
+        const nom = document.getElementById('cli-nom').value;
+        const email = document.getElementById('cli-email').value;
+        const tel = document.getElementById('cli-tel').value;
+        const dob = document.getElementById('cli-dob').value;
+        
+        if(!nom || !email || !tel || !dob) return showToast("Veuillez remplir tous les champs.");
+
+        const newId = crypto.randomUUID();
+        const { error } = await sb.from('fidelite_clients').insert([{ 
+            id: newId, 
+            config_id: shopId,
+            nom: nom,
+            email: email, 
+            tel: tel, 
+            date_naissance: dob,
+            nb_visites: 0,
+            total_points: 0,
+            used_rewards: []
+        }]);
+
+        if(!error) {
+            localStorage.setItem('fid_cli_' + shopId, newId);
+            location.reload();
+        } else {
+            showToast("Erreur d'activation.");
+        }
+    }
+
+    // --- 9. VUE COMMERÇANT (Scan & Validation) ---
+    let currentScannedClient = null;
+    let merchantConfigData = null;
+    let merchantConfigRow = null;
+
+    async function initMerchantScan(cliId) {
+        const { data: client } = await sb.from('fidelite_clients').select('*').eq('id', cliId).single();
+        if(!client) {
+            document.getElementById('merchant-cli-name').innerText = "Client introuvable";
+            return;
+        }
+        currentScannedClient = client;
+        
+        const { data: confRow } = await sb.from('fidelite_configs').select('*').eq('id', client.config_id).single();
+        merchantConfigRow = confRow;
+        merchantConfigData = confRow.data;
+
+        document.getElementById('merchant-cli-name').innerText = client.nom;
+        document.getElementById('merchant-cli-progress').innerText = `${client.nb_visites} / ${confRow.seuil_visites}`;
+
+        if (client.nb_visites >= confRow.seuil_visites) {
+            document.getElementById('action-stamp').classList.add('hidden');
+            document.getElementById('action-reward').classList.remove('hidden');
+        }
+    }
+
+    async function validateAction(type) {
+        const pinInput = type === 'stamp' ? document.getElementById('merchant-pin').value : document.getElementById('merchant-pin-reward').value;
+        
+        if (pinInput !== merchantConfigRow.admin_pin) return showToast("Code PIN incorrect ❌");
+
+        if (type === 'stamp') {
+            const newVisites = currentScannedClient.nb_visites + 1;
+            const newPoints = currentScannedClient.total_points + (merchantConfigRow.ratio_points || 1);
+            
+            await sb.from('fidelite_clients').update({ 
+                nb_visites: newVisites, 
+                total_points: newPoints 
+            }).eq('id', currentScannedClient.id);
+            
+            showToast("Visite validée ✅");
+            setTimeout(() => { location.href = "?shop=" + currentScannedClient.config_id; }, 1500);
+        } 
+        else if (type === 'reward') {
+            const remainingVisits = currentScannedClient.nb_visites - merchantConfigRow.seuil_visites;
+            const rewardsArray = currentScannedClient.used_rewards || [];
+            rewardsArray.push({ date: new Date().toISOString() });
+            
+            await sb.from('fidelite_clients').update({ 
+                nb_visites: Math.max(0, remainingVisits),
+                used_rewards: rewardsArray
+            }).eq('id', currentScannedClient.id);
+            
+            showToast("Récompense validée ✅");
+            setTimeout(() => { location.href = "?shop=" + currentScannedClient.config_id; }, 1500);
+        }
+    }
+</script>
+
+</body>
+</html>
