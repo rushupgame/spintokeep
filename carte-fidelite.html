@@ -209,7 +209,7 @@
                         <div class="step-body">
                             <div class="color-grid">
                                 <div class="color-item">
-                                    <label class="field-label">Fond unie</label>
+                                    <label class="field-label">Fond uni</label>
                                     <input type="color" id="conf_bg" value="#ffffff" oninput="updatePreview()">
                                 </div>
                                 <div class="color-item">
@@ -265,6 +265,8 @@
                                 <option value="🍕">🍕 Pizza</option>
                                 <option value="✂️">✂️ Ciseaux</option>
                                 <option value="🎁">🎁 Cadeau</option>
+                                <option value="🍺">🍺 Bière</option>
+                                <option value="🚗">🚗 Voiture</option>
                             </select>
 
                             <label class="field-label">La récompense finale</label>
@@ -306,7 +308,7 @@
                         <div class="stamps-grid" id="live-stamps"></div>
                         
                         <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 20px; z-index:2; position:relative;">
-                            3 / <span id="live-max">10</span> tampons
+                            1 / <span id="live-max">10</span> tampons
                         </div>
 
                         <div class="reward-box">
@@ -330,7 +332,7 @@
                 <div class="card">
                     <span class="card-icon">📱</span>
                     <h3>2. Le client scanne</h3>
-                    <p>Affichez votre QR Code en caisse. Le client s'inscrit en 10 secondes et obtient sa carte digitale sur son smartphone.</p>
+                    <p>Affichez votre QR Code en caisse. Le client s'inscrit en 10 secondes et obtient sa carte digitale (1er tampon offert à l'inscription).</p>
                 </div>
                 <div class="card">
                     <span class="card-icon">🔒</span>
@@ -459,6 +461,7 @@
                             <th>Visites</th>
                             <th>Points</th>
                             <th>Statut Récompense</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="crm-tbody"></tbody>
@@ -476,7 +479,7 @@
     
     <div id="client-auth-box" class="panel" style="width:100%; max-width:400px; text-align:center;">
         <h2 style="margin-bottom:10px;">Obtenir ma carte</h2>
-        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Créez votre compte en 10 secondes pour cumuler vos avantages.</p>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Créez votre compte en 10 secondes pour cumuler vos avantages. (1er tampon offert !)</p>
         <input type="text" id="cli-nom" placeholder="Prénom & Nom" style="padding:14px; font-size:16px;" required>
         <input type="email" id="cli-email" placeholder="Email" style="padding:14px; font-size:16px;" required>
         <input type="tel" id="cli-tel" placeholder="Téléphone" style="padding:14px; font-size:16px;" required>
@@ -537,7 +540,10 @@
         <div id="action-stamp">
             <label style="display:block; text-align:left; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:8px; text-transform:uppercase;">Code PIN Admin</label>
             <input type="password" id="merchant-pin" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:20px;">
-            <button class="btn" style="width:100%; padding:16px; font-size:16px; background:var(--success);" onclick="validateAction('stamp')">➕ Ajouter Visite / Points</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" style="flex:1; background:var(--danger); padding:16px;" onclick="validateAction('remove')">➖ Retirer</button>
+                <button class="btn" style="flex:2; background:var(--success); padding:16px;" onclick="validateAction('stamp')">➕ Ajouter Visite</button>
+            </div>
         </div>
 
         <div id="action-reward" class="hidden">
@@ -601,7 +607,7 @@
     <div class="modal-box" style="text-align:center;">
         <button class="modal-close" onclick="closeModal('premium-modal')">×</button>
         <h2>Passer Premium ⭐</h2>
-        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Débloquez l'export CRM complet (emails/téléphones), les graphiques détaillés, la Marque Blanche (votre fond de carte), et le Boost Google Avis.</p>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Débloquez l'export CRM complet (emails/téléphones), les graphiques détaillés, la Marque Blanche (votre fond de carte), le Boost Google Avis et l'édition du fichier client.</p>
         <div style="background:var(--premium-bg); border:2px solid #f0d68a; border-radius:16px; padding:20px; margin-bottom:20px;">
             <div style="font-size:2.5rem; font-weight:800; color:#5c4400;">9,90 €<span style="font-size:1rem; font-weight:600;">/mois</span></div>
             <p style="margin:5px 0 0 0; font-size:13px; font-weight:bold; color:#7a5c00;">Sans engagement</p>
@@ -658,8 +664,10 @@
     let authMode = 'login';
     let chartInstance = null;
     let paypalLoaded = false;
+    // Flag to detect if we need to auto-save after login/signup
+    let pendingSaveAction = false; 
 
-    // --- 2. TRAITEMENT ET UPLOAD D'IMAGES (Issu de index(28).html)[cite: 1] ---
+    // --- 2. TRAITEMENT ET UPLOAD D'IMAGES (Méthode index 28.html)[cite: 1] ---
     function resizeImageForMobile(file) {
         return new Promise((resolve) => {
             const MAX_DIM = 900; 
@@ -695,35 +703,36 @@
 
     async function handleImageUpload(input, targetId, statusId) {
         if (!input.files || input.files.length === 0) return;
-        
-        if (!currentUser) {
-            showToast("Veuillez créer un compte gratuitement pour héberger vos images.");
-            input.value = '';
-            openAuthModal('signup');
-            return;
-        }
-
+        let file = input.files[0];
         const status = document.getElementById(statusId);
         status.innerText = "⏳ Optimisation de l'image...";
         status.style.color = "var(--accent-color)";
 
-        let file = input.files[0];
         try { file = await resizeImageForMobile(file); } catch(e) { }
 
-        const fileName = `${currentUser.id}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        // Si non connecté on génère un prefix guest, bien que les policies supabase doivent l'autoriser
+        const prefix = currentUser ? currentUser.id : 'guest';
+        const fileName = `${prefix}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        
         status.innerText = "⏳ Envoi au serveur...";
 
         try {
-            await ensureSupabase();
-            const { data, error } = await sb.storage.from('logos').upload(fileName, file);
-            if (error) throw error;
-            
-            const publicUrl = `${SB_URL}/storage/v1/object/public/logos/${fileName}`;
-            document.getElementById(targetId).value = publicUrl;
-            
-            status.innerText = "✅ Image ajoutée avec succès !";
-            status.style.color = "var(--success)";
-            updatePreview();
+            // Utilisation exacte du fetch de index (28).html[cite: 1]
+            const response = await fetch(`${SB_URL}/storage/v1/object/logos/${fileName}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': file.type },
+                body: file
+            });
+
+            if (response.ok) {
+                const publicUrl = `${SB_URL}/storage/v1/object/public/logos/${fileName}`;
+                document.getElementById(targetId).value = publicUrl;
+                status.innerText = "✅ Image ajoutée avec succès !";
+                status.style.color = "var(--success)";
+                updatePreview();
+            } else {
+                throw new Error("Erreur serveur");
+            }
         } catch (e) {
             console.error("Upload error:", e);
             status.innerText = "❌ Erreur. Taille max 2Mo.";
@@ -864,7 +873,7 @@
         buildSwatchPickers();
         const params = new URLSearchParams(window.location.search);
         
-        await ensureSupabase();
+        await ensureSupabase(); // Initialize sb
 
         if (params.get('scan')) {
             hideAllViews();
@@ -884,7 +893,7 @@
         }
     };
 
-    // --- 5. AUTHENTIFICATION & SÉCURITÉ EDGE FUNCTION ---
+    // --- 5. AUTHENTIFICATION & SÉCURITÉ DE HAUT NIVEAU (Issu de index(28).html)[cite: 1] ---
     function switchAuth(mode) {
         authMode = mode;
         document.getElementById('tab-login').classList.toggle('active', mode === 'login');
@@ -967,7 +976,6 @@
             if (authMode === 'signup') {
                 const { data, error } = await sb.auth.signUp({ email, password });
                 if (error) throw error;
-                // Creation profil avec date de naissance
                 const birthdate = document.getElementById('auth-birthdate').value;
                 await sb.from('profiles').insert({ id: data.user.id, email, birthdate });
                 showToast("Compte créé !");
@@ -979,9 +987,10 @@
             closeModal('auth-modal');
             await checkSession();
             
-            // Si on vient de cliquer sur Sauvegarder et qu'on s'est inscrit :
-            if(document.getElementById('landing-view').classList.contains('hidden') === false) {
-                saveConfig(); 
+            // Si l'utilisateur avait cliqué sur Sauvegarder avant de s'inscrire, on exécute l'action
+            if(pendingSaveAction) {
+                pendingSaveAction = false;
+                saveConfig();
             }
         } catch (e) {
             err.innerText = e.message === "Invalid login credentials" ? "Identifiants incorrects" : e.message;
@@ -1066,7 +1075,7 @@
         }
     }
 
-    // --- INTÉGRATION PAYPAL & SÉCURITÉ EDGE FUNCTION ---
+    // --- 6. INTÉGRATION PAYPAL & SÉCURITÉ EDGE FUNCTION (Issu de index(28).html)[cite: 1] ---
     function renderPaypalButton() {
         const container = document.getElementById('paypal-button-container');
         if (paypalLoaded || !window.paypal) return;
@@ -1081,7 +1090,6 @@
                     const { data: { session } } = await sb.auth.getSession();
                     if (!session) throw new Error("Session expirée");
 
-                    // Appel sécurisé à l'Edge Function Supabase
                     const res = await fetch(`${SB_URL}/functions/v1/verify-paypal-subscription`, {
                         method: 'POST',
                         headers: {
@@ -1114,7 +1122,6 @@
         paypalLoaded = true;
     }
 
-    // --- CODES PROMO ---
     function togglePromoBox() {
         const box = document.getElementById('promo-code-fields');
         box.style.display = box.style.display === 'none' ? 'block' : 'none';
@@ -1142,7 +1149,7 @@
     }
 
 
-    // --- 6. CONFIGURATEUR ---
+    // --- 7. CONFIGURATEUR ---
     function applyStyleToCard(prefix, config, bypassPremium = false) {
         const card = document.getElementById(prefix + 'card');
         if(!card) return;
@@ -1152,7 +1159,6 @@
         
         const isUserPremium = bypassPremium || isPremium;
         
-        // Application du background
         const bgData = computeScreenBackground(config.bg_img, config.gradient, config.texture, config.bg, isUserPremium);
         
         card.style.backgroundImage = bgData.image;
@@ -1213,7 +1219,7 @@
             max: parseInt(document.getElementById('conf_seuil').value) || 10,
             emoji: document.getElementById('conf_emoji').value,
             reward: document.getElementById('conf_reward').value,
-            current_stamps: 3 
+            current_stamps: 1 // 1 tampon d'aperçu par defaut (et 1er tampon offert)
         };
         applyStyleToCard('live-', conf);
     }
@@ -1238,7 +1244,6 @@
             selectedGradient = d.gradient || 'none';
             selectedTexture = d.texture || 'none';
 
-            // Sync UI active states for swatches
             Array.from(document.getElementById('gradient-swatches').children).forEach(sw => {
                 sw.classList.remove('active');
                 if(sw.classList.contains('swatch-none') && selectedGradient === 'none') sw.classList.add('active');
@@ -1264,7 +1269,7 @@
 
     async function saveConfig() {
         if (!currentUser) {
-            showToast("Veuillez vous inscrire gratuitement pour sauvegarder la carte.");
+            pendingSaveAction = true; // Auto-save after successful registration
             openAuthModal('signup');
             return;
         }
@@ -1323,7 +1328,7 @@
         document.getElementById('admin-preview-link').href = url;
     }
 
-    // --- 7. DASHBOARD CRM ---
+    // --- 8. DASHBOARD CRM (Freemium logic & Edition) ---
     function maskEmail(email) {
         if(!email) return '-';
         const [name, domain] = email.split('@');
@@ -1368,15 +1373,17 @@
             const blurClass = !isPremium ? "text-blurred" : "";
 
             const tr = document.createElement('tr');
+            tr.id = `crm-row-${c.id}`;
             tr.innerHTML = `
                 <td>${dateCrea}</td>
-                <td style="font-weight:600;">${c.nom || '-'}</td>
-                <td><span class="${blurClass}">${displayEmail}</span></td>
-                <td><span class="${blurClass}">${displayTel}</span></td>
-                <td>${c.date_naissance || '-'}</td>
-                <td><strong>${c.nb_visites || 0}</strong> / ${maxVisites}</td>
-                <td>${c.total_points || 0} pts</td>
+                <td class="crm-editable" data-field="nom">${c.nom || '-'}</td>
+                <td class="crm-editable" data-field="email"><span class="${blurClass}">${displayEmail}</span></td>
+                <td class="crm-editable" data-field="tel"><span class="${blurClass}">${displayTel}</span></td>
+                <td class="crm-editable" data-field="date_naissance">${c.date_naissance || '-'}</td>
+                <td class="crm-editable" data-field="nb_visites">${c.nb_visites || 0}</td>
+                <td class="crm-editable" data-field="total_points">${c.total_points || 0}</td>
                 <td>${statusBadge} <br><span style="font-size:10px; color:#888;">(Déjà réclamé: ${nbRewards})</span></td>
+                <td><button class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="editCrmRow('${c.id}')">✏️</button></td>
             `;
             tbody.appendChild(tr);
         });
@@ -1388,12 +1395,61 @@
         renderChart();
     }
 
+    function editCrmRow(id) {
+        if(!isPremium) {
+            showToast("La modification du fichier client est une option Premium.");
+            openModal('premium-modal');
+            return;
+        }
+        const tr = document.getElementById(`crm-row-${id}`);
+        if(tr.dataset.editing === 'true') {
+            saveCrmRow(id);
+            return;
+        }
+        tr.dataset.editing = 'true';
+        tr.querySelectorAll('.crm-editable').forEach(td => {
+            const field = td.dataset.field;
+            const val = td.innerText.trim() === '-' ? '' : td.innerText.trim();
+            const type = (field === 'nb_visites' || field === 'total_points') ? 'number' : (field === 'date_naissance' ? 'date' : 'text');
+            td.innerHTML = `<input type="${type}" value="${val}" style="padding:4px; font-size:12px; width:100%; min-width:80px;">`;
+        });
+        const btn = tr.querySelector('button');
+        btn.innerText = '💾';
+        btn.style.background = 'var(--success)';
+        btn.style.color = '#fff';
+    }
+
+    async function saveCrmRow(id) {
+        const tr = document.getElementById(`crm-row-${id}`);
+        const updates = {};
+        tr.querySelectorAll('.crm-editable').forEach(td => {
+            const field = td.dataset.field;
+            const input = td.querySelector('input');
+            if(input) {
+                let val = input.value;
+                if(field === 'nb_visites' || field === 'total_points') val = parseFloat(val) || 0;
+                updates[field] = val;
+            }
+        });
+        
+        const btn = tr.querySelector('button');
+        btn.innerText = '⏳';
+        
+        const { error } = await sb.from('fidelite_clients').update(updates).eq('id', id);
+        if(error) {
+            showToast("Erreur de sauvegarde");
+            btn.innerText = '💾';
+        } else {
+            showToast("Client mis à jour !");
+            loadDashboard(); // reload table
+        }
+    }
+
     async function renderChart() {
         await loadScriptOnce(LIB_URLS.chartjs);
         const ctx = document.getElementById('dash-chart').getContext('2d');
         if(chartInstance) chartInstance.destroy();
 
-        // Data de démonstration
         const labels = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Aujourd\'hui'];
         const data = [2, 5, 3, 8, 4, 12, 6];
 
@@ -1422,12 +1478,12 @@
             openModal('premium-modal');
             return;
         }
-        
         const rows = document.querySelectorAll('#crm-tbody tr');
         let csv = "Date Inscription;Nom;Email;Telephone;Date Naissance;Visites;Points;Statut\n";
         rows.forEach(r => {
             const cols = r.querySelectorAll('td');
-            const data = Array.from(cols).map(c => c.innerText.replace(/\n/g, ' ')).join(';');
+            // Excluding the action button column
+            const data = Array.from(cols).slice(0, 8).map(c => c.innerText.replace(/\n/g, ' ')).join(';');
             csv += data + "\n";
         });
         const blob = new Blob(["\ufeff", csv], { type: 'text/csv;charset=utf-8;' });
@@ -1438,7 +1494,7 @@
         link.click(); document.body.removeChild(link);
     }
 
-    // --- 8. VUE CLIENT ---
+    // --- 9. VUE CLIENT ---
     async function initClientCard(shopId) {
         const { data: configRow } = await sb.from('fidelite_configs').select('*').eq('id', shopId).single();
         if(!configRow) return alert("Boutique introuvable");
@@ -1505,7 +1561,7 @@
             email: email, 
             tel: tel, 
             date_naissance: dob,
-            nb_visites: 0,
+            nb_visites: 1, // <--- PREMIER TAMPON OFFERT
             total_points: 0,
             used_rewards: []
         }]);
@@ -1518,7 +1574,7 @@
         }
     }
 
-    // --- 9. VUE COMMERÇANT (Scan & Validation) ---
+    // --- 10. VUE COMMERÇANT (Scan & Validation) ---
     let currentScannedClient = null;
     let merchantConfigData = null;
     let merchantConfigRow = null;
@@ -1545,20 +1601,23 @@
     }
 
     async function validateAction(type) {
-        const pinInput = type === 'stamp' ? document.getElementById('merchant-pin').value : document.getElementById('merchant-pin-reward').value;
+        const pinInput = type === 'reward' ? document.getElementById('merchant-pin-reward').value : document.getElementById('merchant-pin').value;
         
         if (pinInput !== merchantConfigRow.admin_pin) return showToast("Code PIN incorrect ❌");
 
-        if (type === 'stamp') {
-            const newVisites = currentScannedClient.nb_visites + 1;
-            const newPoints = currentScannedClient.total_points + (merchantConfigRow.ratio_points || 1);
+        if (type === 'stamp' || type === 'remove') {
+            const increment = type === 'stamp' ? 1 : -1;
+            const newVisites = Math.max(0, currentScannedClient.nb_visites + increment);
+            
+            const pointsInc = type === 'stamp' ? (merchantConfigRow.ratio_points || 1) : -(merchantConfigRow.ratio_points || 1);
+            const newPoints = Math.max(0, currentScannedClient.total_points + pointsInc);
             
             await sb.from('fidelite_clients').update({ 
                 nb_visites: newVisites, 
                 total_points: newPoints 
             }).eq('id', currentScannedClient.id);
             
-            showToast("Visite validée ✅");
+            showToast(type === 'stamp' ? "Visite validée ✅" : "Visite retirée ➖");
             setTimeout(() => { location.href = "?shop=" + currentScannedClient.config_id; }, 1500);
         } 
         else if (type === 'reward') {
