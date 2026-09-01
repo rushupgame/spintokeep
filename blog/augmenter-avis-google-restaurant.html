@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Études de Cas : Comment ils ont décuplé leurs Avis Google | Spin To Keep</title>
+    <meta name="description" content="Découvrez les études de cas de commerçants (restaurants, salons) qui ont utilisé la roue cadeau par QR code pour générer des centaines d'avis Google et fidéliser.">
+    <meta name="keywords" content="etude de cas avis google, augmenter avis restaurant, fidélisation client salon de coiffure, exemple jeu concours qr code, preuve sociale commerce, spin to keep, SEO local">
+    <meta name="author" content="Spin To Keep">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+
+    <style>
+        /* Variables Apple-like Design */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0071e3;
+            --accent-hover: #0077ED;
+            --border-color: #d2d2d7;
+            --alert-bg: #fff5f5;
+            --alert-border: #ffcece;
+            --success-bg: #f2fbf5;
+            --success-border: #34c759;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); line-height: 1.7; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .hover-effect { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* HEADER */
+        header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--accent-color); }
+        .btn-nav { background: var(--accent-color); color: #fff; border: none; padding: 9px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s ease; }
+        .btn-nav:hover { background: var(--accent-hover); }
+
+        /* TYPOGRAPHY */
+        h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; text-align: center; letter-spacing: -0.03em; }
+        h2 { font-size: 2.2rem; font-weight: 700; margin-top: 4rem; margin-bottom: 1.5rem; color: var(--text-primary); letter-spacing: -0.02em; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 10px; }
+        h3 { font-size: 1.5rem; font-weight: 600; margin-top: 3rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 1.5rem; }
+        .highlight { color: var(--accent-color); }
+        strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* LAYOUT */
+        .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; text-align: center; }
+        .bg-gray { background-color: var(--bg-secondary); padding: 4rem 0; width: 100%; }
+        .content-section { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+        article { background: #fff; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        
+        /* ALERTS & BOXES */
+        .success-box { background-color: var(--success-bg); border-left: 4px solid var(--success-border); padding: 1.5rem; border-radius: 0 12px 12px 0; margin: 2rem 0; }
+        .success-box h4 { margin: 0 0 0.5rem 0; color: var(--success-border); font-size: 1.2rem; }
+        .success-box p { margin: 0; color: #1d1d1f; font-size: 1.05rem; }
+
+        /* CASE STUDY CARDS */
+        .case-study { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 2rem; padding-bottom: 3rem; border-bottom: 1px solid var(--border-color); }
+        .case-study:last-of-type { border-bottom: none; padding-bottom: 0; }
+        .case-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
+        .case-icon { font-size: 2.5rem; background: var(--bg-secondary); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--border-color); }
+        .case-title h3 { margin: 0; font-size: 1.6rem; }
+        .case-title span { color: var(--text-secondary); font-size: 1rem; font-weight: 500; }
+        
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .metric { background: #1d1d1f; color: #fff; padding: 1.5rem; border-radius: 12px; text-align: center; }
+        .metric-label { font-size: 0.9rem; color: #a1a1a6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #34c759; }
+
+        /* FAQ */
+        .faq-box { background: var(--bg-secondary); padding: 2rem; border-radius: 16px; margin-top: 2rem; }
+        .faq-item { margin-bottom: 1.5rem; }
+        .faq-item:last-child { margin-bottom: 0; }
+        .faq-item h4 { font-size: 1.2rem; margin: 0 0 0.5rem 0; color: var(--text-primary); }
+        .faq-item p { font-size: 1.05rem; margin: 0; }
+
+        /* BUTTONS */
+        .btn-large { display: inline-block; background-color: var(--accent-color); color: #fff; padding: 18px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; cursor: pointer; margin-top: 1.5rem; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.3); }
+        .btn-large:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+
+        /* FOOTER */
+        footer { background-color: #151516; color: #a1a1a6; padding: 4rem 2rem; text-align: center; font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            article { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/index.html" class="logo">SpinToKeep<span>.</span></a>
+        <a href="/index.html#configurateur" class="btn-nav">Essayer gratuitement</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero animate-up">
+        <h1>De l'anonymat au Top 3 : Les <span class="highlight">Études de Cas</span> Spin To Keep</h1>
+        <p>
+            Plutôt que de grandes théories sur le référencement local, découvrez comment de vrais commerçants indépendants ont utilisé la gamification pour exploser leurs compteurs d'avis Google, fidéliser leur clientèle et dominer leur zone de chalandise.
+        </p>
+        <a href="#solution" class="btn-large hover-effect">Créer ma roue de la fortune ➡️</a>
+    </section>
+
+    <div class="bg-gray">
+        <section class="content-section animate-up">
+            <article>
+                <h2>La force de la Preuve Sociale (Avant/Après)</h2>
+                <p>
+                    La théorie est simple : le QR Code Spin To Keep permet à vos clients de tourner une roue virtuelle, de gagner un cadeau et de laisser un avis 5 étoiles en retour. Mais concrètement, quels sont les résultats sur le terrain ? Voici comment deux établissements aux problématiques opposées ont transformé leur activité.
+                </p>
+
+                <!-- ÉTUDE DE CAS 1 -->
+                <div class="case-study">
+                    <div class="case-header">
+                        <div class="case-icon">🍕</div>
+                        <div class="case-title">
+                            <h3>Le Réveil de la "Pizzeria Fantôme"</h3>
+                            <span>Restauration Rapide • Centre-ville très concurrentiel</span>
+                        </div>
+                    </div>
+                    
+                    <p><strong>Le Problème :</strong> Marco gérait une excellente pizzeria de 40 couverts, mais son établissement était invisible en ligne. En 3 ans d'ouverture, il stagnait à 85 avis Google (moyenne de 4.1/5). Ses seuls nouveaux avis provenaient des rares clients insatisfaits. Il ne captait aucun touriste de passage cherchant sur Google Maps.</p>
+                    
+                    <p><strong>L'Action Spin To Keep :</strong> Installation d'un sticker QR Code sur chaque table. Le serveur annonçait simplement au moment de débarrasser : <em>"En attendant le dessert, flashez le code pour tenter de gagner votre café ou votre Limoncello !"</em></p>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Avis Mensuels (Avant)</div>
+                            <div class="metric-value">~ 2</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Avis Mensuels (Après)</div>
+                            <div class="metric-value">~ 140</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Note Moyenne</div>
+                            <div class="metric-value">4.1 ➔ 4.7</div>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>Le Résultat SEO & Business</h4>
+                        <p>
+                            En seulement 3 mois, l'afflux régulier d'avis positifs a signalé à l'algorithme Google que le restaurant était ultra-populaire. La pizzeria est remontée à la 2ème place du "Local Pack" sur la requête "Pizzeria centre-ville". Résultat indirect : <strong>+22% d'appels entrants pour des réservations le week-end</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ÉTUDE DE CAS 2 -->
+                <div class="case-study" style="margin-top: 4rem;">
+                    <div class="case-header">
+                        <div class="case-icon">✂️</div>
+                        <div class="case-title">
+                            <h3>Le Salon de Coiffure face aux Grandes Chaînes</h3>
+                            <span>Beauté & Bien-être • Quartier résidentiel</span>
+                        </div>
+                    </div>
+                    
+                    <p><strong>Le Problème :</strong> Sarah, gérante d'un salon indépendant, perdait peu à peu ses clientes face aux grandes franchises low-cost du quartier. Elle n'avait aucun moyen de les recontacter après leur coupe. Sa carte de fidélité papier à 10 tampons finissait toujours à la poubelle.</p>
+                    
+                    <p><strong>L'Action Spin To Keep :</strong> Remplacement de la carte papier par la Roue Cadeau sur le comptoir d'encaissement. Les lots paramétrés : 80% de chance de gagner "Un soin offert à la prochaine visite", 19% "-10% sur la coupe aujourd'hui", 1% "Jackpot : Produits de beauté offerts". L'obligation de saisir son email pour tourner la roue a été activée.</p>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Taux d'engagement</div>
+                            <div class="metric-value">75%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Emails Collectés</div>
+                            <div class="metric-value">+1 200</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Retour (Drive-to-store)</div>
+                            <div class="metric-value">+35%</div>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>Le Résultat CRM & Fidélisation</h4>
+                        <p>
+                            Sarah a constitué une base de données de plus de 1200 emails qualifiés en 6 mois (CRM). Elle peut désormais exporter ces contacts en un clic pour envoyer une newsletter mensuelle ("Les tendances de l'été") ou des SMS promotionnels pour combler ses heures creuses du mardi matin. Le cadeau différé ("Soin offert à la prochaine visite") a mécaniquement augmenté son taux de rétention.
+                        </p>
+                    </div>
+                </div>
+
+                <h2 id="solution">Le point commun de ces réussites : L'Automatisation</h2>
+                <p>
+                    Dans les deux cas étudiés, le gérant n'a pas eu à modifier en profondeur le fonctionnement de son commerce, ni à embaucher de Community Manager. Le succès repose sur la suppression de la friction. Le client joue sur son propre téléphone, le logiciel filtre et redirige vers Google, et le tableau de bord collecte les données.
+                </p>
+
+                <h2>Foire Aux Questions : Mise en place pratique</h2>
+                
+                <div class="faq-box">
+                    <div class="faq-item">
+                        <h4>Puis-je personnaliser la roue aux couleurs de mon établissement ?</h4>
+                        <p>Absolument. Vous pouvez (et devez) importer votre logo, choisir vos couleurs de marque, et configurer les noms de vos cadeaux pour que l'expérience soit 100% en accord avec votre image (en marque blanche).</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Mon équipe doit-elle gérer la distribution des lots complexes ?</h4>
+                        <p>Non, gardez les choses simples. Les meilleures stratégies reposent sur des lots à faible coût de revient et faciles à délivrer en caisse (un goodies, un café, une remise de quelques pourcents). L'écran de victoire affiché sur le téléphone du client sert de preuve immédiate pour votre staff.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>Est-ce que je peux essayer avant de m'engager ?</h4>
+                        <p>Oui. L'objectif de Spin To Keep est de prouver son efficacité sur votre chiffre d'affaires. Vous pouvez configurer votre première campagne, générer votre QR code et tester la mécanique d'acquisition d'avis gratuitement.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 5rem; padding-top: 3rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 2rem;">Écrivez la prochaine étude de cas</h3>
+                    <p style="margin-bottom: 2rem; max-width: 700px; margin-left: auto; margin-right: auto;">Soyez le prochain commerce de votre ville à dominer les classements Google Maps. Mettez en place la gamification et transformez vos clients silencieux en de véritables ambassadeurs.</p>
+                    <a href="/index.html#configurateur" class="btn-large hover-effect">Démarrer gratuitement avec Spin To Keep ➡️</a>
+                </div>
+            </article>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <div style="max-width: 800px; margin: 0 auto;">
+        <p style="font-size: 1.1rem; color: #f5f5f7; margin-bottom: 1rem;"><strong>Spin To Keep</strong></p>
+        <p>Le partenaire de croissance des commerçants indépendants. Générez plus d'avis Google, construisez votre base de données et fidélisez votre clientèle grâce à la gamification sur lieu de vente.</p>
+        <p style="font-size: 0.85rem; margin-top: 2rem;">
+            <a href="/index.html" style="color: #a1a1a6; text-decoration: none; border-bottom: 1px solid #a1a1a6; margin: 0 10px;">Retour à l'accueil</a> | 
+            <a href="/mentions-legales.html" style="color: #a1a1a6; text-decoration: none; border-bottom: 1px solid #a1a1a6; margin: 0 10px;">Mentions Légales</a>
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>
