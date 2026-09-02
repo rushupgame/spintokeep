@@ -2,20 +2,421 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Empêche le navigateur (Chrome Android en mode sombre notamment) d'assombrir
+         automatiquement la page — sinon les grands aplats blancs de la carte
+         s'inversent en noir sur les téléphones qui n'ont pas explicité leur thème. -->
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#ffffff">
-    <title>Fidélité Pro | CRM & Cartes de Fidélité Digitales</title>
+    <meta name="description" content="Créez votre carte de fidélité digitale par QR Code : vos clients cumulent des tampons, retrouvent leur carte sur n'importe quel appareil, et vous récoltez un fichier client (CRM) qualifié.">
+    <meta name="keywords" content="carte de fidélité digitale, programme fidélité QR code, CRM commerce local, carte fidélité sans application, fidélisation client boutique">
+    <meta name="author" content="Fidélité Pro">
+    <meta name="robots" content="index, follow">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <!-- PayPal SDK (Remplacer le client-id par le vôtre en production) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak&vault=true&intent=subscription"></script>
+    <!-- « Ajouter à l'écran d'accueil » : la carte client se comporte comme une
+         mini-app une fois épinglée, sans nécessiter de véritable app store. -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ma Carte">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎫</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230071e3%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22>🎫</text></svg>">
+
+    <meta property="og:title" content="Fidélité Pro | Carte de fidélité digitale par QR Code">
+    <meta property="og:description" content="Créez votre carte de fidélité en 2 minutes, sans application à installer. Vos clients scannent, cumulent, reviennent.">
+    <meta property="og:type" content="website">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Fidélité Pro",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "offers": { "@type": "Offer", "price": "9.90", "priceCurrency": "EUR" },
+      "description": "Carte de fidélité digitale par QR Code avec CRM, statistiques et programme Premium."
+    }
+    </script>
+
+    <title>Fidélité Pro | Carte de Fidélité Digitale par QR Code & CRM</title>
+
+    <!-- Connexions anticipées : accélèrent les requêtes à venir sans rien télécharger
+         maintenant (ni pour le visiteur du site, ni pour le client qui scanne un QR
+         code et doit voir sa carte s'afficher instantanément). -->
+    <link rel="preconnect" href="https://drscbjrshjhupvrrzqec.supabase.co" crossorigin>
+    <link rel="dns-prefetch" href="https://drscbjrshjhupvrrzqec.supabase.co">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <!-- Toutes les librairies (QR code, confetti, graphiques, PayPal, Supabase) sont
+         chargées à la demande uniquement (voir loadScriptOnce plus bas) : jamais ici,
+         pour ne jamais ralentir le premier affichage — ni pour le visiteur du site
+         landing, ni pour le client qui scanne un QR code en caisse. -->
+
+<!--
+  ============================================================================
+  CONFIGURATION REQUISE CÔTÉ SUPABASE (à exécuter une fois dans l'éditeur SQL)
+  ============================================================================
+  Même projet Supabase que « Spin To Keep » : la table `profiles` (comptes
+  commerçants), le statut Premium, les codes promo et la vérification PayPal
+  sont partagés entre les deux produits. Un commerçant déjà inscrit sur
+  Spin To Keep peut se connecter ici avec les mêmes identifiants.
+  Si ce fichier est déployé seul, exécuter d'abord le bloc `profiles` +
+  `reset_password_with_birthdate` + `redeem_promo_code` du fichier de
+  Spin To Keep, puis la suite ci-dessous.
+
+  -- 0. Extension nécessaire (uuid, et hachage bcrypt des codes/PIN)
+  create extension if not exists pgcrypto with schema extensions;
+
+  -- 1. Cartes de fidélité créées par un commerçant.
+  create table if not exists fidelite_configs (
+    id text primary key,
+    owner_id uuid references auth.users(id) on delete cascade,
+    data jsonb not null default '{}'::jsonb,
+    seuil_visites int not null default 10,
+    ratio_points numeric not null default 1,
+    mid_seuil int,
+    mid_reward text,
+    birthday_bonus boolean default false,
+    created_at timestamptz default now(),
+    updated_at timestamptz default now()
+  );
+  alter table fidelite_configs add column if not exists mid_seuil int;
+  alter table fidelite_configs add column if not exists mid_reward text;
+  alter table fidelite_configs add column if not exists birthday_bonus boolean default false;
+  alter table fidelite_configs add column if not exists updated_at timestamptz default now();
+  alter table fidelite_configs enable row level security;
+  drop policy if exists "Lecture publique des cartes (nécessaire pour l'affichage client)" on fidelite_configs;
+  create policy "Lecture publique des cartes (nécessaire pour l'affichage client)"
+    on fidelite_configs for select using (true);
+  -- ⚠️ Volontairement AUCUNE policy insert/update publique : la création et la
+  -- modification d'une carte passent uniquement par fidelite_save_config()
+  -- ci-dessous (SECURITY DEFINER), qui vérifie owner_id = auth.uid() côté
+  -- serveur avant d'écrire quoi que ce soit.
+
+  -- 1bis. Codes PIN admin : jamais stockés en clair, jamais dans
+  -- fidelite_configs, jamais exposés par une lecture publique. Cette table
+  -- n'a AUCUNE policy — seules les fonctions SECURITY DEFINER plus bas
+  -- peuvent la lire ou l'écrire (même logique que promo_codes côté
+  -- Spin To Keep).
+  create table if not exists fidelite_admin_pins (
+    config_id text primary key references fidelite_configs(id) on delete cascade,
+    pin_hash text not null,
+    updated_at timestamptz default now()
+  );
+  alter table fidelite_admin_pins enable row level security;
+
+  -- 2. Clients porteurs d'une carte (un email = un client par boutique).
+  -- Comme pour les PIN, aucune policy publique en lecture : les emails et
+  -- téléphones de TOUS les clients ne doivent jamais être accessibles à
+  -- n'importe quel visiteur via la clé anon. Tout passe par les fonctions
+  -- RPC ci-dessous, à l'exception de la lecture/édition CRM du commerçant
+  -- (propriétaire authentifié) autorisée par policy classique.
+  create table if not exists fidelite_clients (
+    id uuid primary key default gen_random_uuid(),
+    config_id text not null references fidelite_configs(id) on delete cascade,
+    nom text,
+    email text not null,
+    tel text,
+    date_naissance date,
+    access_code_hash text not null,
+    nb_visites int not null default 1,
+    total_points numeric not null default 0,
+    used_rewards jsonb not null default '[]'::jsonb,
+    birthday_bonus_year int,
+    last_visit_at timestamptz,
+    created_at timestamptz default now()
+  );
+  alter table fidelite_clients add column if not exists birthday_bonus_year int;
+  alter table fidelite_clients add column if not exists last_visit_at timestamptz;
+  create unique index if not exists fidelite_clients_email_per_shop
+    on fidelite_clients (config_id, lower(email));
+  alter table fidelite_clients enable row level security;
+  drop policy if exists "Le commerçant lit les clients de ses propres cartes" on fidelite_clients;
+  create policy "Le commerçant lit les clients de ses propres cartes"
+    on fidelite_clients for select using (
+      auth.uid() = (select owner_id from fidelite_configs where fidelite_configs.id = fidelite_clients.config_id)
+    );
+  drop policy if exists "Le commerçant modifie les clients de ses propres cartes" on fidelite_clients;
+  create policy "Le commerçant modifie les clients de ses propres cartes"
+    on fidelite_clients for update using (
+      auth.uid() = (select owner_id from fidelite_configs where fidelite_configs.id = fidelite_clients.config_id)
+    );
+  -- (Pas de policy insert publique : la création passe uniquement par
+  -- fidelite_register_client(), en SECURITY DEFINER.)
+
+  -- 3. Journal d'événements (scans, inscriptions, tampons, récompenses,
+  -- anniversaires) : alimente le graphique d'évolution réel du Dashboard.
+  -- Écriture publique (même logique que roulette_scans côté Spin To Keep),
+  -- lecture réservée au propriétaire de la carte concernée.
+  create table if not exists fidelite_events (
+    id bigserial primary key,
+    config_id text not null references fidelite_configs(id) on delete cascade,
+    client_id uuid references fidelite_clients(id) on delete set null,
+    type text not null check (type in ('scan','register','stamp','remove','reward','birthday')),
+    created_at timestamptz default now()
+  );
+  alter table fidelite_events enable row level security;
+  drop policy if exists "Écriture publique des événements" on fidelite_events;
+  create policy "Écriture publique des événements" on fidelite_events for insert with check (true);
+  drop policy if exists "Le commerçant lit les événements de ses propres cartes" on fidelite_events;
+  create policy "Le commerçant lit les événements de ses propres cartes"
+    on fidelite_events for select using (
+      auth.uid() = (select owner_id from fidelite_configs where fidelite_configs.id = fidelite_events.config_id)
+    );
+
+  -- 4. fidelite_save_config : création/mise à jour d'une carte + de son PIN
+  -- en une seule transaction sécurisée (vérifie la propriété avant d'écrire).
+  create or replace function fidelite_save_config(
+    p_id text, p_data jsonb, p_seuil int, p_ratio numeric,
+    p_mid_seuil int, p_mid_reward text, p_birthday_bonus boolean, p_pin text
+  ) returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_owner uuid;
+  begin
+    if auth.uid() is null then
+      return json_build_object('success', false, 'message', 'Vous devez être connecté.');
+    end if;
+
+    select owner_id into v_owner from fidelite_configs where id = p_id;
+    if v_owner is not null and v_owner <> auth.uid() then
+      return json_build_object('success', false, 'message', 'Cette carte appartient à un autre compte.');
+    end if;
+
+    insert into fidelite_configs (id, owner_id, data, seuil_visites, ratio_points, mid_seuil, mid_reward, birthday_bonus, updated_at)
+    values (p_id, auth.uid(), p_data, p_seuil, p_ratio, p_mid_seuil, p_mid_reward, coalesce(p_birthday_bonus,false), now())
+    on conflict (id) do update set
+      data = excluded.data, seuil_visites = excluded.seuil_visites, ratio_points = excluded.ratio_points,
+      mid_seuil = excluded.mid_seuil, mid_reward = excluded.mid_reward,
+      birthday_bonus = excluded.birthday_bonus, updated_at = now();
+
+    if p_pin is not null and length(p_pin) > 0 then
+      insert into fidelite_admin_pins (config_id, pin_hash, updated_at)
+      values (p_id, crypt(p_pin, gen_salt('bf')), now())
+      on conflict (config_id) do update set pin_hash = excluded.pin_hash, updated_at = now();
+    end if;
+
+    return json_build_object('success', true, 'config_id', p_id);
+  end;
+  $$;
+  revoke all on function fidelite_save_config(text, jsonb, int, numeric, int, text, boolean, text) from public;
+  grant execute on function fidelite_save_config(text, jsonb, int, numeric, int, text, boolean, text) to authenticated;
+
+  -- 5. fidelite_register_client : inscription d'un client (1er tampon offert).
+  create or replace function fidelite_register_client(
+    p_config_id text, p_nom text, p_email text, p_tel text, p_birthdate date, p_code text
+  ) returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_id uuid;
+  begin
+    if not exists (select 1 from fidelite_configs where id = p_config_id) then
+      return json_build_object('success', false, 'message', 'Boutique introuvable.');
+    end if;
+    if p_code is null or length(p_code) < 4 then
+      return json_build_object('success', false, 'message', 'Le code doit contenir au moins 4 caractères.');
+    end if;
+    if exists (select 1 from fidelite_clients where config_id = p_config_id and lower(email) = lower(trim(p_email))) then
+      return json_build_object('success', false, 'message', 'Un compte existe déjà avec cet email pour cette boutique. Connectez-vous plutôt.');
+    end if;
+
+    insert into fidelite_clients (config_id, nom, email, tel, date_naissance, access_code_hash, nb_visites)
+    values (p_config_id, p_nom, lower(trim(p_email)), p_tel, p_birthdate, crypt(p_code, gen_salt('bf')), 1)
+    returning id into v_id;
+
+    insert into fidelite_events (config_id, client_id, type) values (p_config_id, v_id, 'register');
+    return json_build_object('success', true, 'client_id', v_id);
+  end;
+  $$;
+  revoke all on function fidelite_register_client(text, text, text, text, date, text) from public;
+  grant execute on function fidelite_register_client(text, text, text, text, date, text) to anon, authenticated;
+
+  -- 6. fidelite_client_login
+  create or replace function fidelite_client_login(p_config_id text, p_email text, p_code text)
+  returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_row fidelite_clients%rowtype;
+  begin
+    select * into v_row from fidelite_clients where config_id = p_config_id and lower(email) = lower(trim(p_email));
+    if not found or v_row.access_code_hash <> crypt(p_code, v_row.access_code_hash) then
+      return json_build_object('success', false, 'message', 'Email ou code incorrect.');
+    end if;
+    return json_build_object('success', true, 'client_id', v_row.id);
+  end;
+  $$;
+  revoke all on function fidelite_client_login(text, text, text) from public;
+  grant execute on function fidelite_client_login(text, text, text) to anon, authenticated;
+
+  -- 7. fidelite_reset_client_code : réinitialisation du code par date de naissance
+  -- (même logique que reset_password_with_birthdate côté commerçant).
+  create or replace function fidelite_reset_client_code(p_config_id text, p_email text, p_birthdate date, p_new_code text)
+  returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_id uuid;
+  begin
+    if p_new_code is null or length(p_new_code) < 4 then
+      return json_build_object('success', false, 'message', 'Le nouveau code doit contenir au moins 4 caractères.');
+    end if;
+    select id into v_id from fidelite_clients
+      where config_id = p_config_id and lower(email) = lower(trim(p_email)) and date_naissance = p_birthdate;
+    if v_id is null then
+      return json_build_object('success', false, 'message', 'Email ou date de naissance incorrect.');
+    end if;
+    update fidelite_clients set access_code_hash = crypt(p_new_code, gen_salt('bf')) where id = v_id;
+    return json_build_object('success', true, 'client_id', v_id);
+  end;
+  $$;
+  revoke all on function fidelite_reset_client_code(text, text, date, text) from public;
+  grant execute on function fidelite_reset_client_code(text, text, date, text) to anon, authenticated;
+
+  -- 8. fidelite_get_card : état de la carte d'UN client (jamais des autres) +
+  -- infos publiques de la boutique, en un seul aller-retour réseau.
+  create or replace function fidelite_get_card(p_client_id uuid)
+  returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_client fidelite_clients%rowtype;
+    v_config fidelite_configs%rowtype;
+    v_is_premium boolean;
+  begin
+    select * into v_client from fidelite_clients where id = p_client_id;
+    if not found then return json_build_object('success', false, 'message', 'Carte introuvable.'); end if;
+    select * into v_config from fidelite_configs where id = v_client.config_id;
+    select coalesce(is_premium, false) into v_is_premium from profiles where id = v_config.owner_id;
+
+    return json_build_object(
+      'success', true, 'nom', v_client.nom, 'nb_visites', v_client.nb_visites,
+      'total_points', v_client.total_points, 'used_rewards', v_client.used_rewards,
+      'date_naissance', v_client.date_naissance, 'birthday_bonus_year', v_client.birthday_bonus_year,
+      'config', json_build_object(
+        'data', v_config.data, 'seuil_visites', v_config.seuil_visites, 'ratio_points', v_config.ratio_points,
+        'mid_seuil', v_config.mid_seuil, 'mid_reward', v_config.mid_reward, 'birthday_bonus', v_config.birthday_bonus,
+        'is_premium', coalesce(v_is_premium, false)
+      )
+    );
+  end;
+  $$;
+  revoke all on function fidelite_get_card(uuid) from public;
+  grant execute on function fidelite_get_card(uuid) to anon, authenticated;
+
+  -- 9. fidelite_claim_birthday_bonus : accorde le bonus anniversaire (1x/an).
+  create or replace function fidelite_claim_birthday_bonus(p_client_id uuid)
+  returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_client fidelite_clients%rowtype;
+    v_config fidelite_configs%rowtype;
+    v_year int := extract(year from now());
+  begin
+    select * into v_client from fidelite_clients where id = p_client_id;
+    if not found then return json_build_object('success', false, 'message', 'Carte introuvable.'); end if;
+    select * into v_config from fidelite_configs where id = v_client.config_id;
+
+    if not coalesce(v_config.birthday_bonus, false) then
+      return json_build_object('success', false, 'message', 'Non disponible.');
+    end if;
+    if v_client.date_naissance is null or extract(month from v_client.date_naissance) <> extract(month from now()) then
+      return json_build_object('success', false, 'message', 'Ce n''est pas votre mois d''anniversaire.');
+    end if;
+    if v_client.birthday_bonus_year = v_year then
+      return json_build_object('success', false, 'message', 'Bonus déjà réclamé cette année.');
+    end if;
+
+    update fidelite_clients set nb_visites = nb_visites + 1, birthday_bonus_year = v_year where id = p_client_id;
+    insert into fidelite_events (config_id, client_id, type) values (v_client.config_id, p_client_id, 'birthday');
+    return json_build_object('success', true);
+  end;
+  $$;
+  revoke all on function fidelite_claim_birthday_bonus(uuid) from public;
+  grant execute on function fidelite_claim_birthday_bonus(uuid) to anon, authenticated;
+
+  -- 10. fidelite_get_scan_info : vue minimale pour l'écran commerçant (juste
+  -- le prénom et la progression — jamais l'email ni le téléphone du client).
+  create or replace function fidelite_get_scan_info(p_client_id uuid)
+  returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_client fidelite_clients%rowtype;
+    v_config fidelite_configs%rowtype;
+  begin
+    select * into v_client from fidelite_clients where id = p_client_id;
+    if not found then return json_build_object('success', false, 'message', 'Client introuvable.'); end if;
+    select * into v_config from fidelite_configs where id = v_client.config_id;
+    insert into fidelite_events (config_id, client_id, type) values (v_config.id, p_client_id, 'scan');
+    return json_build_object(
+      'success', true, 'nom', v_client.nom, 'nb_visites', v_client.nb_visites,
+      'seuil_visites', v_config.seuil_visites, 'mid_seuil', v_config.mid_seuil, 'mid_reward', v_config.mid_reward,
+      'reward', v_config.data->>'reward'
+    );
+  end;
+  $$;
+  revoke all on function fidelite_get_scan_info(uuid) from public;
+  grant execute on function fidelite_get_scan_info(uuid) to anon, authenticated;
+
+  -- 11. fidelite_merchant_action : ajoute/retire un tampon ou valide la
+  -- récompense — le PIN est vérifié côté serveur (bcrypt), jamais comparé
+  -- en clair dans le navigateur ni exposé par une lecture publique.
+  create or replace function fidelite_merchant_action(p_client_id uuid, p_pin text, p_action text)
+  returns json
+  language plpgsql security definer set search_path = public, extensions
+  as $$
+  declare
+    v_client fidelite_clients%rowtype;
+    v_config fidelite_configs%rowtype;
+    v_pin_hash text;
+    v_new_visites int;
+    v_new_points numeric;
+    v_rewards jsonb;
+  begin
+    select * into v_client from fidelite_clients where id = p_client_id;
+    if not found then return json_build_object('success', false, 'message', 'Client introuvable.'); end if;
+    select * into v_config from fidelite_configs where id = v_client.config_id;
+    select pin_hash into v_pin_hash from fidelite_admin_pins where config_id = v_config.id;
+
+    if v_pin_hash is null or v_pin_hash <> crypt(p_pin, v_pin_hash) then
+      return json_build_object('success', false, 'message', 'Code PIN incorrect.');
+    end if;
+
+    if p_action in ('stamp', 'remove') then
+      v_new_visites := greatest(0, v_client.nb_visites + (case when p_action = 'stamp' then 1 else -1 end));
+      v_new_points := greatest(0, v_client.total_points + (case when p_action = 'stamp' then coalesce(v_config.ratio_points,1) else -coalesce(v_config.ratio_points,1) end));
+      update fidelite_clients set nb_visites = v_new_visites, total_points = v_new_points, last_visit_at = now() where id = p_client_id;
+      insert into fidelite_events (config_id, client_id, type) values (v_config.id, p_client_id, p_action);
+      return json_build_object('success', true, 'nb_visites', v_new_visites, 'total_points', v_new_points);
+    elsif p_action = 'reward' then
+      v_rewards := coalesce(v_client.used_rewards, '[]'::jsonb) || jsonb_build_object('date', now());
+      v_new_visites := greatest(0, v_client.nb_visites - v_config.seuil_visites);
+      update fidelite_clients set nb_visites = v_new_visites, used_rewards = v_rewards, last_visit_at = now() where id = p_client_id;
+      insert into fidelite_events (config_id, client_id, type) values (v_config.id, p_client_id, 'reward');
+      return json_build_object('success', true, 'nb_visites', v_new_visites);
+    else
+      return json_build_object('success', false, 'message', 'Action inconnue.');
+    end if;
+  end;
+  $$;
+  revoke all on function fidelite_merchant_action(uuid, text, text) from public;
+  grant execute on function fidelite_merchant_action(uuid, text, text) to anon, authenticated;
+
+  -- 12. Bucket de stockage "logos" : déjà créé côté Spin To Keep (public en
+  -- lecture, écriture via la clé anon) — réutilisé tel quel pour les logos
+  -- et fonds de carte de ce produit.
+  ============================================================================
+-->
 
     <style>
         :root {
+            color-scheme: light;
             --bg-primary: #ffffff; --bg-secondary: #f8f9fa;
             --text-primary: #1d1d1f; --text-secondary: #86868b;
             --accent-color: #0071e3; --accent-hover: #0077ED;
@@ -32,30 +433,55 @@
         body { font-family: var(--font-family); line-height: 1.6; color: var(--text-primary); background-color: var(--bg-primary); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         * { box-sizing: border-box; }
         .hidden { display: none !important; }
-        
+        img { max-width: 100%; }
+        input, select, button, textarea { font-family: inherit; }
+        input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+
         header { position: sticky; top: 0; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.08); padding: 0 2rem; height: 70px; display: flex; align-items: center; justify-content: center; }
-        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; cursor:pointer;}
+        nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; position: relative; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; cursor:pointer; background:none; border:none; padding:0; }
         .logo span { color: var(--accent-color); }
-        .nav-links { display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0; }
+        .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0; }
         .nav-links a { text-decoration: none; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
         .nav-links a:hover { color: var(--accent-color); }
-        .nav-auth { display: flex; align-items: center; gap: 10px; margin-left: 1rem; }
-        
+        .nav-auth { display: flex; align-items: center; gap: 10px; margin-left: 1rem; flex-shrink: 0; }
+
+        .hamburger-btn { display: none; flex-direction: column; justify-content: space-between; width: 24px; height: 17px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
+        .hamburger-btn span { width: 100%; height: 2px; background-color: var(--text-primary); border-radius: 2px; transition: all .25s ease; }
+        .hamburger-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.active span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        @media (max-width: 900px) {
+            .hamburger-btn { display: flex; }
+            .nav-links { display: none; flex-direction: column; align-items: flex-start; position: absolute; top: 58px; left: -2rem; right: -2rem; background: rgba(255,255,255,.98); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 1.3rem 2rem; gap: 1rem; box-shadow: var(--shadow-md); }
+            .nav-links.active { display: flex; }
+            .nav-links .nav-auth-mobile-item { display: flex; flex-direction: column; gap: .6rem; width: 100%; padding-top: .8rem; margin-top: .3rem; border-top: 1px solid var(--border-color); }
+            .nav-links .nav-auth-mobile-item button { width: 100%; }
+            .nav-auth.desktop-only { display: none; }
+        }
+
         .btn { display: inline-flex; align-items: center; justify-content: center; background-color: var(--accent-color); color: #fff; padding: 12px 24px; border-radius: 50px; font-size: 1rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; }
         .btn:hover { background-color: var(--accent-hover); transform: scale(1.02); }
+        .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
         .btn-black { background-color: var(--text-primary); color: #fff; }
         .btn-black:hover { background-color: #000; }
         .btn-ghost { background: none; border: 1px solid var(--border-color); color: var(--text-primary); padding: 9px 16px; border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .btn-ghost:hover { background: var(--bg-secondary); }
+        .btn-danger { background: var(--danger); color: #fff; }
         .btn-premium { background: linear-gradient(135deg,#f6c453,#e8a63a); color: #4a3400; border: none; padding: 8px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(246, 196, 83, 0.4); }
+        .chip-premium { background: linear-gradient(135deg,#f6c453,#e8a63a); color: #4a3400; padding: 6px 12px; border-radius: 50px; font-size: 11.5px; font-weight: 800; }
 
         section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
         .bg-gray { background-color: var(--bg-secondary); width: 100%; padding: 4rem 2rem; }
         h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; text-align: center; }
         h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
-        
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        @media (max-width: 680px) {
+            section, .bg-gray { padding: 3rem 1.2rem; }
+            h1 { font-size: 2.1rem; }
+            h2 { font-size: 1.6rem; }
+        }
+
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; }
         .card { background: var(--bg-primary); padding: 2.5rem 2rem; border-radius: 20px; border: 1px solid var(--border-color); text-align: left; transition: transform 0.3s; }
         .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
         .card-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
@@ -64,28 +490,31 @@
         .config-wrapper { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; }
         @media (min-width: 1024px) { .config-wrapper { flex-direction: row; align-items: flex-start; } .panel-config { flex: 1.2; } .panel-preview { flex: 1; position: sticky; top: 90px; } }
         .panel { background: white; padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
-        
+
         .step { border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 10px; background: #fff; overflow: hidden; }
         .step[open] { border-color: #d8d8de; }
         .step summary { cursor: pointer; padding: 14px 16px; display: flex; align-items: center; gap: 12px; font-weight: 700; background: var(--bg-secondary); font-size: 14.5px; }
         .step summary::-webkit-details-marker { display: none; }
-        .step summary .num { width: 26px; height: 26px; border-radius: 50%; background: #e5e5ea; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .step summary .num { width: 26px; height: 26px; border-radius: 50%; background: #e5e5ea; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink:0; }
         .step[open] summary .num { background: var(--text-primary); color: #fff; }
         .step-body { padding: 16px; border-top: 1px solid var(--border-color); }
-        
+
         label.field-label { font-weight: 700; font-size: 0.85em; color: var(--text-secondary); display: block; margin: 12px 0 6px; text-transform: uppercase; }
-        input[type="text"], input[type="number"], input[type="password"], input[type="email"], input[type="tel"], input[type="date"], select { padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; width: 100%; font-family: inherit; }
-        
-        /* UPLOAD WRAPPERS */
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], input[type="tel"], input[type="date"], select { padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; width: 100%; font-family: inherit; margin-bottom: 4px; }
+        input:disabled, select:disabled { background: var(--bg-secondary); color: var(--text-secondary); cursor: not-allowed; }
+        .field-hint { font-size: 12px; color: var(--text-secondary); margin-top: -2px; margin-bottom: 10px; }
+        .checkbox-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+        .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; margin: 0; flex-shrink: 0; }
+        .checkbox-row label { font-size: 13.5px; font-weight: 600; margin: 0; }
+
         .upload-area { border: 2px dashed var(--border-color); padding: 15px; border-radius: 10px; text-align: center; position: relative; background: var(--bg-secondary); transition: all 0.2s; }
         .upload-area:hover { border-color: var(--accent-color); }
-        
+
         .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
         .color-item { text-align: center; }
         .color-item input[type="color"] { width: 100%; height: 45px; border: none; border-radius: 8px; cursor: pointer; padding: 0; }
         .color-item span { font-size: 11px; font-weight: 700; color: var(--text-secondary); }
 
-        /* SWATCHES DEGRADES */
         .swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
         .swatch { aspect-ratio: 1/1; border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: transform .1s ease, border-color .15s ease; background-repeat: repeat; }
         .swatch:hover { transform: scale(1.06); }
@@ -96,69 +525,80 @@
         .logo-img { max-width: 90px; max-height: 90px; margin-bottom: 15px; object-fit: contain; border-radius: 12px; z-index: 2; position: relative; }
         .card-title { font-size: 1.4rem; font-weight: 800; margin: 0 0 20px 0; z-index: 2; position: relative; }
         .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; z-index: 2; position: relative; }
-        .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; opacity: 0.3; transition: all 0.3s; }
+        .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; opacity: 0.3; transition: all 0.3s; position: relative; }
         .stamp-active { opacity: 1; border-style: solid; border-color: inherit; background: rgba(0,0,0,0.05); transform: scale(1.05); }
+        .stamp-mid::after { content: '🎁'; position:absolute; top:-9px; right:-6px; font-size: .7rem; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
         .reward-box { background: var(--c-btn, #000); color: var(--c-btn-tx, #fff); padding: 15px; border-radius: 14px; width: 100%; margin-top: auto; font-weight: 700; font-size: 0.9rem; z-index: 2; position: relative; margin-bottom: 10px; }
+        .mid-reward-note { font-size: 11.5px; font-weight: 700; opacity: .85; z-index:2; position:relative; margin-top: 4px; }
+        .birthday-banner { background: linear-gradient(135deg,#ff9a9e,#fecfef 60%,#fbc2eb); color:#5c1a3a; padding: 12px 14px; border-radius: 14px; margin-bottom: 14px; font-weight: 800; font-size: .85rem; text-align:center; z-index:2; position:relative; box-shadow: var(--shadow-sm); }
+
+        .skeleton { background: linear-gradient(90deg, #eee 25%, #f6f6f6 37%, #eee 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; border-radius: 10px; }
+        @keyframes skeleton-loading { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
 
         /* DASHBOARD */
         .dash-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .dash-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
         .dash-card .val { font-size: 2rem; font-weight: 800; color: var(--text-primary); }
         .dash-card .lbl { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
-        
-        .dash-table-wrapper { overflow-x: auto; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; }
+
+        .dash-table-wrapper { overflow-x: auto; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; min-width: 900px; }
         th, td { padding: 12px 16px; border-bottom: 1px solid var(--line); }
         th { background: var(--bg-secondary); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; font-size: 0.8rem; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         .badge-pending { background: var(--bg-secondary); color: var(--text-secondary); }
         .badge-success { background: var(--success-bg); color: var(--success); }
+        .badge-mid { background: #fff4e0; color: #8a5a00; }
 
-        /* MOCKUP DASHBOARD LANDING */
         .dash-preview-mock { background: #fff; border-radius: 18px; padding: 22px; margin-top: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.06); max-width: 800px; margin-left: auto; margin-right: auto; text-align: left; }
         .dash-preview-mock-header { display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 1.1em; margin-bottom: 16px; color: var(--text-primary); }
 
-        /* FREEMIUM */
         .text-blurred { filter: blur(4px); user-select: none; pointer-events: none; opacity: 0.7; font-family: monospace; }
-        .premium-lock-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
+        .premium-lock-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); text-align:center; padding: 10px; }
 
-        /* MODALS & TOASTS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); padding: 16px; }
         .modal-overlay.show { display: flex; }
         .modal-box { background: #fff; border-radius: 24px; padding: 30px; width: 100%; max-width: 450px; position: relative; box-shadow: var(--shadow-md); max-height: 90vh; overflow-y: auto;}
         .modal-close { position: absolute; top: 15px; right: 15px; background: var(--bg-secondary); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        
+
         .auth-tabs { display: flex; background: var(--bg-secondary); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text-secondary); }
+        .auth-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 13.5px; font-weight: 700; cursor: pointer; color: var(--text-secondary); }
         .auth-tab.active { background: #fff; color: var(--text-primary); box-shadow: var(--shadow-sm); }
         .form-error { background: var(--danger-bg); color: var(--danger); font-size: 13px; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none; }
+        .form-success { background: var(--success-bg); color: var(--success); font-size: 13px; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none; }
 
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: var(--text-primary); color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s; box-shadow: var(--shadow-md); }
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 92%; max-width: 380px; align-items: center; }
+        .toast { background: var(--text-primary); color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s; box-shadow: var(--shadow-md); font-size: 13.5px; text-align:center; }
         .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
 
         footer { background-color: #151516; color: #a1a1a6; padding: 4rem 2rem 2rem; font-size: 0.95rem; text-align: center; }
+
+        /* VUE CLIENT (scan) */
+        .client-search-row { display:flex; gap:8px; margin-bottom:10px; }
+        .client-search-row input { margin-bottom:0; }
     </style>
 </head>
 <body>
 
 <div id="toast-container"></div>
 
-<!-- HEADER (Shared between Landing and Dashboard) -->
+<!-- HEADER -->
 <header id="main-header">
     <nav>
-        <a class="logo" onclick="showLandingView()">Fidélité<span>Pro</span></a>
-        
-        <ul class="nav-links" id="nav-links-public">
-            <li><a href="#configurateur-section">Créer ma carte</a></li>
-            <li><a href="#concept">Le Concept</a></li>
-            <li><a href="#avantages">Avantages CRM</a></li>
+        <button class="logo" onclick="showLandingView()">Fidélité<span>Pro</span></button>
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#configurateur-section" onclick="closeMenu()">Créer ma carte</a></li>
+            <li><a href="#concept" onclick="closeMenu()">Le Concept</a></li>
+            <li><a href="#avantages" onclick="closeMenu()">Avantages CRM</a></li>
+            <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
 
-        <div class="nav-auth" id="nav-auth-area">
-            <!-- Rempli dynamiquement par JS -->
-        </div>
+        <div class="nav-auth desktop-only" id="nav-auth-area"></div>
     </nav>
 </header>
 
@@ -167,21 +607,21 @@
 =========================================== -->
 <div id="landing-view">
     <main>
-        <section style="padding-top: 5rem; padding-bottom: 3rem;">
+        <section style="padding-top: 4rem; padding-bottom: 2.5rem;">
             <h1>Fidélisez vos clients, <br><span style="color: var(--accent-color);">récoltez leurs contacts.</span></h1>
-            <p style="text-align: center; max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.2rem;">
-                Dites adieu aux cartes en carton. Créez votre programme de fidélité par QR Code. Vos clients scannent, cumulent des points, et vous vous constituez une base de données qualifiée (CRM).
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.15rem;">
+                Dites adieu aux cartes en carton. Créez votre programme de fidélité par QR Code : vos clients scannent, cumulent des tampons, retrouvent leur carte sur n'importe quel appareil — et vous vous constituez une base de données qualifiée (CRM).
             </p>
             <div style="text-align: center;">
-                <a href="#configurateur-section" class="btn" style="padding: 16px 40px; font-size: 1.1rem;">Créer ma carte maintenant</a>
+                <a href="#configurateur-section" class="btn" style="padding: 16px 40px; font-size: 1.1rem;">Créer ma carte gratuitement</a>
             </div>
         </section>
 
-        <!-- CONFIGURATEUR DIRECTEMENT SUR LA PAGE D'ACCUEIL -->
+        <!-- CONFIGURATEUR -->
         <section id="configurateur-section" class="bg-gray">
             <h2 style="margin-bottom: 0.5rem;">Configurez votre carte de fidélité</h2>
             <p style="text-align: center; margin-bottom: 3rem;">C'est 100% gratuit à créer. L'aperçu se met à jour en temps réel.</p>
-            
+
             <div class="config-wrapper">
                 <div class="panel panel-config">
                     <h3 style="margin-top:0; margin-bottom: 20px;">Design & Règles</h3>
@@ -191,11 +631,11 @@
                         <div class="step-body">
                             <label class="field-label">Nom de l'établissement</label>
                             <input type="text" id="conf_name" value="Ma Super Boutique" oninput="updatePreview()">
-                            
+
                             <label class="field-label">Logo de votre enseigne</label>
                             <div class="upload-area">
                                 <input type="file" id="logo_input" accept="image/*" onchange="handleImageUpload(this, 'conf_logo', 'logo-status')" style="width: 100%; padding: 0; border: none;">
-                                <div id="logo-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Formats acceptés : PNG, JPG. Taille max : 2Mo.</div>
+                                <div id="logo-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Formats acceptés : PNG, JPG. Taille max conseillée : 2 Mo.</div>
                             </div>
                             <input type="hidden" id="conf_logo" value="">
 
@@ -226,7 +666,6 @@
                                 </div>
                             </div>
 
-                            <!-- DÉGRADÉS & TEXTURES -->
                             <label class="field-label" style="margin-top:15px;">Fond Dégradé</label>
                             <div class="swatch-grid" id="gradient-swatches"></div>
 
@@ -234,30 +673,30 @@
                             <div class="swatch-grid" id="texture-swatches"></div>
 
                             <label class="field-label" style="margin-top:20px;">Image de fond (Option Premium ⭐)</label>
-                            <p style="font-size:12px; color:var(--text-secondary); margin-top:-5px;">Remplace la couleur de fond et le dégradé. Enlève la mention "Propulsé par Fidélité Pro".</p>
+                            <p class="field-hint">Remplace la couleur de fond et le dégradé. Enlève la mention « Propulsé par Fidélité Pro ».</p>
                             <div class="upload-area" id="bg-upload-area">
                                 <input type="file" id="bg_input" accept="image/*" onchange="handleImageUpload(this, 'conf_bg_img', 'bg-status')" disabled style="width: 100%; padding: 0; border: none;">
                                 <div id="bg-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Taille idéale : 1080 x 1920 px</div>
-                                <button id="btn-unlock-premium-1" class="btn-premium" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);" onclick="openPremiumAction()">Débloquer Premium</button>
+                                <button id="btn-unlock-premium-1" class="btn-premium" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);" onclick="openPremiumAction()" type="button">Débloquer Premium</button>
                             </div>
                             <input type="hidden" id="conf_bg_img" value="">
                         </div>
                     </details>
 
                     <details class="step" open>
-                        <summary><span class="num">3</span> Mécanique du jeu & Acquisition</summary>
+                        <summary><span class="num">3</span> Mécanique du programme</summary>
                         <div class="step-body">
                             <div style="display:flex; gap:10px;">
                                 <div style="flex:1">
                                     <label class="field-label">Seuil de visites (Objectif)</label>
-                                    <input type="number" id="conf_seuil" value="10" min="2" max="20" oninput="updatePreview()">
+                                    <input type="number" id="conf_seuil" value="10" min="2" max="30" oninput="updatePreview()">
                                 </div>
                                 <div style="flex:1">
                                     <label class="field-label">Ratio Points / Visite</label>
                                     <input type="number" id="conf_ratio" value="1" step="0.5">
                                 </div>
                             </div>
-                            
+
                             <label class="field-label">Emoji du tampon</label>
                             <select id="conf_emoji" onchange="updatePreview()">
                                 <option value="⭐">⭐ Étoile</option>
@@ -272,47 +711,65 @@
                             <label class="field-label">La récompense finale</label>
                             <input type="text" id="conf_reward" value="Un café offert ! ☕" oninput="updatePreview()">
 
+                            <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line);">
+                                <label class="field-label" style="margin-top:0;">Palier intermédiaire (Option Premium ⭐)</label>
+                                <p class="field-hint">Un petit bonus à mi-parcours pour garder vos clients motivés (ex : -10% à la 5ᵉ visite).</p>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="number" id="conf_mid_seuil" placeholder="Visite n°" min="1" disabled style="flex:.6" oninput="updatePreview()">
+                                    <input type="text" id="conf_mid_reward" placeholder="Ex : Boisson offerte" disabled style="flex:1.4" oninput="updatePreview()">
+                                </div>
+                                <button id="btn-unlock-premium-3" class="btn-premium" onclick="openPremiumAction()" type="button" style="margin-top:8px;">Débloquer</button>
+                            </div>
+
+                            <div class="checkbox-row" style="margin-top:16px;">
+                                <input type="checkbox" id="conf_birthday_bonus" disabled onchange="updatePreview()">
+                                <label for="conf_birthday_bonus">🎂 Offrir un tampon bonus le mois de l'anniversaire du client (Premium ⭐)</label>
+                            </div>
+
                             <label class="field-label" style="margin-top:20px;">Boost Avis Google (URL - Option Premium ⭐)</label>
-                            <p style="font-size:12px; color:var(--text-secondary); margin-top:-5px;">Le client sera invité à laisser un avis au moment où il débloque sa récompense.</p>
+                            <p class="field-hint">Le client sera invité à laisser un avis au moment où il débloque sa récompense.</p>
                             <div style="display:flex; gap:10px;">
                                 <input type="text" id="conf_google_url" placeholder="Lien vers votre fiche Google" disabled oninput="updatePreview()">
-                                <button id="btn-unlock-premium-2" class="btn-premium" onclick="openPremiumAction()">Débloquer</button>
+                                <button id="btn-unlock-premium-2" class="btn-premium" onclick="openPremiumAction()" type="button">Débloquer</button>
                             </div>
 
                             <div style="margin-top:20px; border-top: 1px solid var(--line); padding-top:15px;">
                                 <label class="field-label" style="color:var(--danger);">Code PIN Admin (Sécurité)</label>
-                                <p style="font-size:12px; margin-top:-5px; color:var(--text-secondary);">Requis sur le téléphone du client pour valider un tampon.</p>
-                                <input type="password" id="conf_pin" placeholder="Ex: 1234">
+                                <p class="field-hint">Demandé sur le téléphone du client pour valider un tampon. Stocké chiffré (jamais en clair).</p>
+                                <input type="password" id="conf_pin" placeholder="4 chiffres minimum, ex : 1234" minlength="4" autocomplete="new-password">
                             </div>
                         </div>
                     </details>
 
-                    <button class="btn btn-black" style="width: 100%; margin-top: 15px; padding: 16px; font-size:1.1rem;" onclick="saveConfig()">💾 Sauvegarder & Générer la carte</button>
+                    <button class="btn btn-black" id="btn-save-config" style="width: 100%; margin-top: 15px; padding: 16px; font-size:1.1rem;" onclick="saveConfig()">💾 Sauvegarder & Générer la carte</button>
 
                     <div id="qr-result-box" class="hidden" style="margin-top:20px; padding:20px; background:var(--bg-secondary); border-radius:12px; text-align:center; border: 2px solid var(--success);">
                         <h3 style="margin-bottom:10px; color:var(--success);">✅ Carte activée !</h3>
                         <p style="font-size:13px; color:var(--text-secondary);">Imprimez ce QR Code et placez-le sur votre comptoir.</p>
                         <div id="admin-qrcode" style="display:inline-block; padding:10px; background:#fff; border-radius:10px; border:1px solid var(--border-color);"></div>
-                        <div style="margin-top:10px;">
-                            <a id="admin-preview-link" href="#" target="_blank" style="font-size:13px; color:var(--accent-color); font-weight:600;">Lien direct de la carte client</a>
+                        <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                            <a id="admin-preview-link" href="#" target="_blank" class="btn-ghost" style="text-decoration:none;">🔗 Voir la carte client</a>
+                            <button class="btn-ghost" onclick="downloadAdminQR()" type="button">⬇️ Télécharger le QR</button>
+                            <button class="btn-ghost" onclick="copyAdminLink()" type="button">📋 Copier le lien</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel panel-preview">
-                    <h2 class="title" style="text-align: center; margin-bottom: 20px;">Aperçu Client</h2>
+                    <h2 class="title" style="text-align: center; margin-bottom: 20px; font-size:1.4rem;">Aperçu Client</h2>
                     <div class="card-preview" id="live-card">
                         <img id="live-logo" src="" class="logo-img hidden">
                         <h3 id="live-name" style="margin:0 0 5px 0; font-size:1.1rem; z-index:2; position:relative;"></h3>
                         <div id="live-title" class="card-title"></div>
                         <div class="stamps-grid" id="live-stamps"></div>
-                        
+
                         <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 20px; z-index:2; position:relative;">
                             1 / <span id="live-max">10</span> tampons
                         </div>
 
                         <div class="reward-box">
                             🎁 <span id="live-reward"></span>
+                            <div class="mid-reward-note hidden" id="live-mid-note"></div>
                         </div>
 
                         <div id="live-watermark" style="font-size:10px; color:#999; margin-top:10px; font-weight: 600; z-index:2; position:relative;">⚡ Propulsé par Fidélité Pro</div>
@@ -332,23 +789,22 @@
                 <div class="card">
                     <span class="card-icon">📱</span>
                     <h3>2. Le client scanne</h3>
-                    <p>Affichez votre QR Code en caisse. Le client s'inscrit en 10 secondes et obtient sa carte digitale (1er tampon offert à l'inscription).</p>
+                    <p>Affichez votre QR Code en caisse. Le client crée un compte sécurisé en 15 secondes (1ᵉʳ tampon offert) et le retrouve sur n'importe quel appareil.</p>
                 </div>
                 <div class="card">
                     <span class="card-icon">🔒</span>
                     <h3>3. Tamponnez & Fidélisez</h3>
-                    <p>Pour ajouter un tampon, tapez simplement votre Code PIN secret sur le téléphone du client. Totalement sécurisé et anti-fraude.</p>
+                    <p>Pour ajouter un tampon, saisissez simplement votre Code PIN secret sur le téléphone du client. Chiffré et vérifié côté serveur, jamais visible.</p>
                 </div>
             </div>
         </section>
 
-        <!-- DASHBOARD MOCKUP SUR LA LANDING PAGE -->
         <section id="avantages" class="bg-gray">
             <h2>Un outil CRM puissant pour votre commerce</h2>
             <p style="text-align: center; max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.1rem;">
                 Toutes les données scannées par vos clients remontent automatiquement dans votre tableau de bord.
             </p>
-            
+
             <div class="dash-preview-mock">
                 <div class="dash-preview-mock-header">
                     <span>Mon Dashboard CRM</span>
@@ -382,37 +838,37 @@
 
             <div class="grid-3" style="margin-top: 3rem;">
                 <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
-                    <h3>📊 Statistiques détaillées</h3>
-                    <p>Suivez en temps réel le nombre de cartes créées, les visites récurrentes et les récompenses distribuées.</p>
+                    <h3>📊 Statistiques en temps réel</h3>
+                    <p>Suivez le nombre de cartes créées, les visites récurrentes et les récompenses distribuées, avec un graphique d'évolution sur 30 jours basé sur vos vraies données.</p>
                 </div>
                 <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
                     <h3>📥 Fichier Client (Export CSV)</h3>
-                    <p>Récupérez les emails et numéros de téléphone de vos clients pour vos futures campagnes marketing.</p>
+                    <p>Récupérez les emails, numéros de téléphone et dates de naissance de vos clients pour vos futures campagnes marketing.</p>
                 </div>
                 <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
-                    <h3>⭐ Paliers et Avis Google</h3>
-                    <p>Propulsez vos avis Google grâce à nos rappels automatiques dès que le client atteint sa récompense.</p>
+                    <h3>🎂 Paliers, anniversaires & Avis Google</h3>
+                    <p>Palier intermédiaire pour garder vos clients motivés, bonus anniversaire automatique, et rappel d'avis Google dès que la récompense est débloquée.</p>
                 </div>
             </div>
         </section>
     </main>
-    
+
     <footer>
         <div style="max-width: 1200px; margin: 0 auto;">
             <h3 style="color: #fff; margin-bottom: 1rem;">Fidélité Pro</h3>
-            <p>La solution de gamification et de fidélisation locale.</p>
-            <p style="margin-top: 2rem; font-size: 0.85rem; border-top: 1px solid #333; padding-top: 2rem;">&copy; 2026 Fidélité Pro. Tous droits réservés.</p>
+            <p>La solution de fidélisation locale par QR Code, sans application à installer.</p>
+            <p style="margin-top: 2rem; font-size: 0.85rem; border-top: 1px solid #333; padding-top: 2rem;">&copy; 2026 Fidélité Pro. Tous droits réservés. Les données collectées ne servent qu'à la gestion de votre programme de fidélité (RGPD).</p>
         </div>
     </footer>
 </div>
 
 
 <!-- ==========================================
-     VUE 2 : DASHBOARD COMMERÇANT (CRM) Connecté
+     VUE 2 : DASHBOARD COMMERÇANT (CRM)
 =========================================== -->
 <div id="dash-view" class="hidden" style="min-height: 100vh; background: #f8f9fa;">
     <div class="dash-container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
             <h2 style="margin:0;">Tableau de bord</h2>
             <button class="btn-ghost" onclick="showLandingView()">✏️ Modifier ma carte</button>
         </div>
@@ -427,6 +883,10 @@
                 <div class="val" id="stat-stamps">0</div>
             </div>
             <div class="dash-card">
+                <div class="lbl">Récompenses Distribuées</div>
+                <div class="val" id="stat-rewards" style="color: var(--premium);">0</div>
+            </div>
+            <div class="dash-card">
                 <div class="lbl">Total Points Distribués</div>
                 <div class="val" id="stat-points" style="color: var(--success);">0</div>
             </div>
@@ -435,19 +895,22 @@
         <div class="panel" style="margin-bottom: 20px; position: relative;">
             <div id="chart-premium-overlay" class="premium-lock-overlay">
                 <p style="font-weight:800; font-size: 1.1rem; margin:0 0 10px 0; color:var(--text-primary);">📊 Analyses détaillées (Premium)</p>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-top:0; margin-bottom: 15px;">Suivez vos pics d'affluence et l'évolution de vos visites.</p>
-                <button class="btn-premium" onclick="openModal('premium-modal')">Débloquer les Statistiques</button>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top:0; margin-bottom: 15px;">Suivez vos pics d'affluence et l'évolution réelle de vos visites.</p>
+                <button class="btn-premium" onclick="openModal('premium-modal')" type="button">Débloquer les Statistiques</button>
             </div>
             <h3 style="margin-top:0; margin-bottom:15px;">Évolution des visites (30 derniers jours)</h3>
-            <div style="height: 250px; position: relative; filter: blur(4px); pointer-events: none;" id="chart-blur-wrapper">
+            <div style="height: 250px; position: relative;" id="chart-blur-wrapper">
                 <canvas id="dash-chart"></canvas>
             </div>
         </div>
 
         <div class="panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
                 <h3 style="margin:0;">Fichier Client (CRM)</h3>
-                <button id="btn-export-csv" class="btn-premium" onclick="handleExportCSV()">🔒 Exporter CSV (Premium)</button>
+                <button id="btn-export-csv" class="btn-premium" onclick="handleExportCSV()" type="button">🔒 Exporter CSV (Premium)</button>
+            </div>
+            <div class="client-search-row">
+                <input type="text" id="crm-search" placeholder="🔎 Rechercher un client (nom, email...)" oninput="filterCrmTable()">
             </div>
             <div class="dash-table-wrapper">
                 <table>
@@ -476,46 +939,110 @@
      VUE 3 : CLIENT (Mobile - Scan du QR Code)
 =========================================== -->
 <div id="client-view" class="hidden" style="min-height: 100vh; background: #f0f0f5; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    
-    <div id="client-auth-box" class="panel" style="width:100%; max-width:400px; text-align:center;">
-        <h2 style="margin-bottom:10px;">Obtenir ma carte</h2>
-        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Créez votre compte en 10 secondes pour cumuler vos avantages. (1er tampon offert !)</p>
-        <input type="text" id="cli-nom" placeholder="Prénom & Nom" style="padding:14px; font-size:16px;" required>
-        <input type="email" id="cli-email" placeholder="Email" style="padding:14px; font-size:16px;" required>
-        <input type="tel" id="cli-tel" placeholder="Téléphone" style="padding:14px; font-size:16px;" required>
-        <label style="text-align: left; display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: var(--text-secondary);">Date de naissance</label>
-        <input type="date" id="cli-dob" style="padding:14px; font-size:16px; margin-bottom: 20px;" required>
-        
-        <button class="btn btn-black" style="width:100%; padding:14px; font-size:16px;" onclick="registerClient()">Activer ma carte</button>
+
+    <div id="client-auth-box" class="panel" style="width:100%; max-width:400px;">
+        <h2 id="client-auth-title" style="margin-bottom:6px; text-align:center;">Obtenir ma carte</h2>
+        <p id="client-auth-sub" style="font-size:14px; color:var(--text-secondary); margin-bottom:18px; text-align:center;">Créez votre compte en 15 secondes pour cumuler vos avantages. 1ᵉʳ tampon offert !</p>
+
+        <div class="auth-tabs" id="client-auth-tabs">
+            <div class="auth-tab active" id="client-tab-signup" onclick="switchClientAuth('signup')">Créer ma carte</div>
+            <div class="auth-tab" id="client-tab-login" onclick="switchClientAuth('login')">Me connecter</div>
+        </div>
+
+        <div id="client-auth-error" class="form-error"></div>
+
+        <div id="client-field-nom">
+            <label class="field-label">Prénom & Nom</label>
+            <input type="text" id="cli-nom" autocomplete="name">
+        </div>
+
+        <label class="field-label">Email</label>
+        <input type="email" id="cli-email" autocomplete="email">
+
+        <div id="client-field-tel">
+            <label class="field-label">Téléphone</label>
+            <input type="tel" id="cli-tel" autocomplete="tel">
+        </div>
+
+        <div id="client-field-dob">
+            <label class="field-label">Date de naissance</label>
+            <input type="date" id="cli-dob" autocomplete="bday">
+            <p class="field-hint" id="client-dob-hint">Sert uniquement à réinitialiser votre code si vous l'oubliez, et à votre éventuel bonus anniversaire.</p>
+        </div>
+
+        <div id="client-field-code">
+            <label class="field-label" id="client-code-label">Créez un code secret (4 chiffres min.)</label>
+            <input type="password" id="cli-code" inputmode="numeric" autocomplete="new-password" placeholder="Ex : 1234">
+        </div>
+
+        <div id="client-link-forgot" class="hidden" style="text-align:right; margin:-4px 0 12px 0;">
+            <a href="#" onclick="switchClientAuth('reset'); return false;" style="font-size:12px; color:var(--text-secondary); text-decoration:underline;">Code oublié ?</a>
+        </div>
+
+        <div id="client-field-newcode" class="hidden">
+            <label class="field-label">Nouveau code secret (4 chiffres min.)</label>
+            <input type="password" id="cli-newcode" inputmode="numeric" autocomplete="new-password">
+        </div>
+
+        <button class="btn btn-black" id="client-auth-submit" style="width:100%; padding:14px; font-size:16px; margin-top:6px;" onclick="submitClientAuth()">Activer ma carte</button>
+
+        <div id="client-link-back" class="hidden" style="text-align:center; margin-top:14px;">
+            <a href="#" onclick="switchClientAuth('login'); return false;" style="font-size:12.5px; color:var(--text-secondary); text-decoration:underline;">← Retour à la connexion</a>
+        </div>
+
+        <p style="font-size:11px; color:var(--text-secondary); text-align:center; margin-top:16px; margin-bottom:0;">🔒 Vos identifiants sont chiffrés. Vous pourrez retrouver votre carte sur n'importe quel appareil avec votre email et votre code.</p>
     </div>
 
     <div id="client-card-box" class="hidden" style="width:100%; max-width:400px;">
+        <div id="client-birthday-banner" class="hidden" style="background: linear-gradient(135deg,#ff9a9e,#fecfef); color:#5c1a3a; padding:14px; border-radius:16px; margin-bottom:14px; text-align:center; font-weight:800; font-size:.9rem; box-shadow: var(--shadow-sm);">
+            🎂 Joyeux anniversaire ! Un tampon bonus vous attend.
+            <div style="margin-top:8px;"><button class="btn" style="padding:8px 18px; font-size:13px;" onclick="claimBirthdayBonus()" type="button">Réclamer mon cadeau</button></div>
+        </div>
+
         <div class="card-preview" id="render-card" style="box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
             <img id="render-logo" src="" class="logo-img hidden">
             <h3 id="render-shop" style="margin:0 0 5px 0; font-size:1rem; z-index:2; position:relative;"></h3>
             <div id="render-title" class="card-title"></div>
-            
+
             <div class="stamps-grid" id="render-stamps"></div>
-            
+
             <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 25px; z-index:2; position:relative;">
                 <span id="render-count">0</span> / <span id="render-max">10</span> visites
             </div>
-            
+
             <p style="font-size:12px; font-weight: bold; margin-top:10px; color:var(--text-secondary); z-index:2; position:relative;">Points totaux : <span id="render-points">0</span></p>
 
             <div class="reward-box">
                 🎁 <span id="render-reward"></span>
+                <div class="mid-reward-note hidden" id="render-mid-note"></div>
             </div>
-            
-            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 10px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Soutenez-nous sur Google</a>
+
+            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 10px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis Google</a>
 
             <div id="render-watermark" style="font-size:10px; color:#999; margin-top:15px; font-weight: 600; z-index:2; position:relative;">⚡ Propulsé par Fidélité Pro</div>
         </div>
 
-        <div style="margin-top:30px; background:#fff; padding:20px; border-radius:20px; text-align:center; box-shadow:var(--shadow-sm);">
-            <h4 style="margin:0 0 10px 0;">QR Code d'identification</h4>
-            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">Présentez ce code au commerçant pour valider votre visite.</p>
+        <div style="margin-top:20px; background:#fff; padding:20px; border-radius:20px; text-align:center; box-shadow:var(--shadow-sm);">
+            <h4 style="margin:0 0 10px 0;">Mon code carte</h4>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">Présentez ce QR code au commerçant pour valider votre visite.</p>
             <div id="client-personal-qr" style="display:inline-block; padding:10px; border:1px solid #eee; border-radius:10px;"></div>
+            <div style="margin-top:14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn-ghost" onclick="shareClientCard()" type="button">📤 Partager ma carte</button>
+            </div>
+        </div>
+
+        <div id="wallet-box" style="margin-top:16px; background:#fff; padding:20px; border-radius:20px; text-align:center; box-shadow:var(--shadow-sm);">
+            <h4 style="margin:0 0 4px 0;">Ajouter à mon portefeuille</h4>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:14px;">Retrouvez votre carte directement depuis Apple Wallet ou Google Wallet, sans rouvrir cette page.</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button id="btn-apple-wallet" class="btn-ghost" onclick="addToAppleWallet()" type="button"> Apple Wallet</button>
+                <button id="btn-google-wallet" class="btn-ghost" onclick="addToGoogleWallet()" type="button">G Google Wallet</button>
+            </div>
+            <p style="font-size:11px; color:var(--text-secondary); margin-top:12px; margin-bottom:0;">Votre carte dans le portefeuille reflète votre solde au moment de l'ajout. Revenez ici et réappuyez sur le bouton pour la mettre à jour après une nouvelle visite.</p>
+        </div>
+
+        <div style="text-align:center; margin-top:16px;">
+            <a href="#" onclick="clientLogout(); return false;" style="font-size:12.5px; color:var(--text-secondary); text-decoration:underline;">Se déconnecter de ce compte</a>
         </div>
     </div>
 </div>
@@ -528,21 +1055,27 @@
     <div style="background: #2c2c2e; padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
         <h2 style="color:#fff; margin-bottom:5px;">Validation</h2>
         <p style="color:#aaa; font-size:14px; margin-bottom:20px;">Espace réservé au commerçant</p>
-        
+
         <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:16px; margin-bottom:25px;">
             <p style="margin:0; font-size:13px; color:#aaa; text-transform:uppercase; font-weight:bold;">Client</p>
             <p id="merchant-cli-name" style="margin:5px 0 15px 0; font-size:22px; font-weight:bold;">...</p>
-            
+
             <p style="margin:0; font-size:13px; color:#aaa; text-transform:uppercase; font-weight:bold;">Visites actuelles</p>
             <p id="merchant-cli-progress" style="margin:5px 0 0 0; font-size:18px; color:var(--accent-color); font-weight:bold;">X / Y</p>
         </div>
 
+        <div id="scan-error" class="form-error" style="display:none; text-align:left;"></div>
+
         <div id="action-stamp">
             <label style="display:block; text-align:left; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:8px; text-transform:uppercase;">Code PIN Admin</label>
-            <input type="password" id="merchant-pin" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:20px;">
+            <input type="password" id="merchant-pin" inputmode="numeric" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:12px; width:100%;">
+            <div class="checkbox-row" style="justify-content:center; margin-bottom:14px;">
+                <input type="checkbox" id="merchant-remember-pin">
+                <label for="merchant-remember-pin" style="color:#aaa;">Se souvenir sur cet appareil (le temps de cet onglet)</label>
+            </div>
             <div style="display:flex; gap:10px;">
-                <button class="btn" style="flex:1; background:var(--danger); padding:16px;" onclick="validateAction('remove')">➖ Retirer</button>
-                <button class="btn" style="flex:2; background:var(--success); padding:16px;" onclick="validateAction('stamp')">➕ Ajouter Visite</button>
+                <button class="btn" style="flex:1; background:var(--danger); padding:16px;" onclick="validateAction('remove')" type="button">➖ Retirer</button>
+                <button class="btn" style="flex:2; background:var(--success); padding:16px;" onclick="validateAction('stamp')" type="button">➕ Ajouter Visite</button>
             </div>
         </div>
 
@@ -551,8 +1084,8 @@
                 🎉 Objectif atteint ! Le client a droit à sa récompense.
             </div>
             <label style="display:block; text-align:left; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:8px; text-transform:uppercase;">Code PIN Admin</label>
-            <input type="password" id="merchant-pin-reward" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:20px;">
-            <button class="btn" style="width:100%; padding:16px; font-size:16px; background:var(--accent-color);" onclick="validateAction('reward')">🎁 Valider la récompense & Réinitialiser</button>
+            <input type="password" id="merchant-pin-reward" inputmode="numeric" placeholder="****" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:16px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:12px; margin-bottom:20px; width:100%;">
+            <button class="btn" style="width:100%; padding:16px; font-size:16px; background:var(--accent-color);" onclick="validateAction('reward')" type="button">🎁 Valider la récompense & Réinitialiser</button>
         </div>
     </div>
 </div>
@@ -561,29 +1094,29 @@
 <!-- MODALS -->
 <div class="modal-overlay" id="auth-modal">
     <div class="modal-box">
-        <button class="modal-close" onclick="closeModal('auth-modal')">×</button>
+        <button class="modal-close" onclick="closeModal('auth-modal')" type="button">×</button>
         <h2 id="auth-title" style="margin-bottom:5px;">Connexion</h2>
         <p id="auth-subtitle" style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Gérez vos cartes de fidélité.</p>
-        
+
         <div class="auth-tabs" id="auth-tabs">
             <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Se connecter</div>
             <div class="auth-tab" id="tab-signup" onclick="switchAuth('signup')">S'inscrire</div>
         </div>
-        
+
         <div id="auth-error" class="form-error"></div>
-        
+
         <label class="field-label">Email</label>
-        <input type="email" id="auth-email" placeholder="contact@boutique.com">
-        
+        <input type="email" id="auth-email" placeholder="contact@boutique.com" autocomplete="email">
+
         <div id="field-password">
             <label class="field-label">Mot de passe</label>
-            <input type="password" id="auth-password" placeholder="6 caractères min.">
+            <input type="password" id="auth-password" placeholder="6 caractères min." autocomplete="current-password">
         </div>
 
         <div id="field-birthdate" style="display:none;">
             <label class="field-label">Date de naissance</label>
-            <input type="date" id="auth-birthdate">
-            <p style="font-size:11px; color:var(--text-secondary); margin-top:-5px; margin-bottom:10px;">Utilisée pour réinitialiser votre mot de passe de façon sécurisée.</p>
+            <input type="date" id="auth-birthdate" autocomplete="bday">
+            <p class="field-hint" id="auth-birthdate-hint">Utilisée pour réinitialiser votre mot de passe de façon sécurisée.</p>
         </div>
 
         <div id="link-forgot" style="text-align:right; margin: -5px 0 15px 0;">
@@ -592,10 +1125,10 @@
 
         <div id="field-new-password" style="display: none;">
             <label class="field-label">Nouveau mot de passe</label>
-            <input type="password" id="auth-new-password" placeholder="6 caractères min.">
+            <input type="password" id="auth-new-password" placeholder="6 caractères min." autocomplete="new-password">
         </div>
 
-        <button class="btn btn-black" id="auth-btn" style="width:100%; margin-top:10px; padding:14px;" onclick="processAuth()">Se connecter</button>
+        <button class="btn btn-black" id="auth-btn" style="width:100%; margin-top:10px; padding:14px;" onclick="processAuth()" type="button">Se connecter</button>
 
         <div id="link-back-to-login" style="display: none; text-align:center; margin-top:15px;">
             <a href="#" onclick="switchAuth('login'); return false;" style="font-size:13px; color:var(--text-secondary); text-decoration:underline;">← Retour à la connexion</a>
@@ -605,22 +1138,25 @@
 
 <div class="modal-overlay" id="premium-modal">
     <div class="modal-box" style="text-align:center;">
-        <button class="modal-close" onclick="closeModal('premium-modal')">×</button>
+        <button class="modal-close" onclick="closeModal('premium-modal')" type="button">×</button>
         <h2>Passer Premium ⭐</h2>
-        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Débloquez l'export CRM complet (emails/téléphones), les graphiques détaillés, la Marque Blanche (votre fond de carte), le Boost Google Avis et l'édition du fichier client.</p>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Débloquez l'export CRM complet, les graphiques détaillés, la Marque Blanche, le palier intermédiaire, le bonus anniversaire et le Boost Avis Google.</p>
         <div style="background:var(--premium-bg); border:2px solid #f0d68a; border-radius:16px; padding:20px; margin-bottom:20px;">
             <div style="font-size:2.5rem; font-weight:800; color:#5c4400;">9,90 €<span style="font-size:1rem; font-weight:600;">/mois</span></div>
             <p style="margin:5px 0 0 0; font-size:13px; font-weight:bold; color:#7a5c00;">Sans engagement</p>
         </div>
-        
+        <div id="premium-login-required" style="display:none; background:var(--danger-bg); color:var(--danger); font-size:12.5px; padding:12px; border-radius:10px; margin-bottom:14px;">
+            Connectez-vous ou créez un compte avant de payer, pour rattacher Premium à votre compte.
+        </div>
+
         <div id="paypal-button-container" style="min-height: 45px; margin-bottom: 20px;"></div>
 
         <div style="border-top: 1px solid var(--line); padding-top: 15px;">
-            <button class="btn-ghost" onclick="togglePromoBox()" style="font-size: 12px; border:none; text-decoration: underline;">J'ai un code promo</button>
+            <button class="btn-ghost" onclick="togglePromoBox()" style="font-size: 12px; border:none; text-decoration: underline;" type="button">J'ai un code promo</button>
             <div id="promo-code-fields" style="display:none; margin-top:10px;">
                 <div style="display:flex; gap:8px;">
                     <input type="text" id="promo-code-input" placeholder="Code promo" style="text-transform:uppercase; text-align:center; font-weight:bold; margin:0; flex:1;">
-                    <button class="btn-black" onclick="redeemPromoCode()">Valider</button>
+                    <button class="btn-black" onclick="redeemPromoCode()" type="button">Valider</button>
                 </div>
                 <div id="promo-code-error" class="form-error" style="margin-top:10px;"></div>
             </div>
@@ -628,12 +1164,13 @@
     </div>
 </div>
 
-
 <script>
-    // --- 1. CONFIGURATION SUPABASE ET CHARGEMENT ASYNCHRONE ---
+    // --- 1. CONFIGURATION SUPABASE & CHARGEMENT PARESSEUX DES LIBRAIRIES ---
+    // Même projet Supabase que Spin To Keep (comptes commerçants, Premium et
+    // codes promo partagés — voir le bloc SQL en haut du fichier).
     const SB_URL = "https://drscbjrshjhupvrrzqec.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyc2NianJzaGpodXB2cnJ6cWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDM2NDUsImV4cCI6MjA4NTExOTY0NX0.t15POxBSoA0bmQ0WXEBN0sClGRtvxc1JKYGeaY65Y7g";
-    
+
     const LIB_URLS = {
         qrcode: 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
         confetti: 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js',
@@ -645,12 +1182,30 @@
         if (_loadedScripts[src]) return _loadedScripts[src];
         _loadedScripts[src] = new Promise((resolve, reject) => {
             const s = document.createElement('script'); s.src = src;
-            s.onload = () => resolve(); s.onerror = () => { delete _loadedScripts[src]; reject(); };
+            s.onload = () => resolve(); s.onerror = () => { delete _loadedScripts[src]; reject(new Error('Échec de chargement du script : ' + src)); };
             document.head.appendChild(s);
         });
         return _loadedScripts[src];
     }
-    
+    async function fireConfetti(opts) {
+        try { await loadScriptOnce(LIB_URLS.confetti); if (window.confetti) window.confetti(opts); } catch (e) { /* purement décoratif */ }
+    }
+
+    // ------------------------------------------------------------------
+    // PAYPAL : bascule LIVE / SANDBOX (même logique que Spin To Keep).
+    // Le plan est partagé entre les deux produits : activer Premium ici
+    // active aussi is_premium sur le compte partagé `profiles`, et
+    // inversement. Pour facturer/compter séparément les deux produits,
+    // créez un PAYPAL_LIVE_PLAN_ID dédié à Fidélité Pro côté PayPal.
+    // ------------------------------------------------------------------
+    const PAYPAL_TEST_MODE = false;
+    const PAYPAL_LIVE_CLIENT_ID = "Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak";
+    const PAYPAL_LIVE_PLAN_ID = "P-16K40079FK484592LNF4PL2Q";
+    const PAYPAL_SANDBOX_CLIENT_ID = "ASc59-JlaBgcQHuPlBGH72iJVuyONvZDwmuEuc-SMrRgP_LR98txizXKuuJnoXda1PdkGR0jD1gQXf1Q";
+    const PAYPAL_SANDBOX_PLAN_ID = "P-6TM45236VA047520RNKHLOTI";
+    const PAYPAL_CLIENT_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_CLIENT_ID : PAYPAL_LIVE_CLIENT_ID;
+    const PREMIUM_PLAN_ID = PAYPAL_TEST_MODE ? PAYPAL_SANDBOX_PLAN_ID : PAYPAL_LIVE_PLAN_ID;
+
     let sb = null;
     async function ensureSupabase() {
         await loadScriptOnce(LIB_URLS.supabase);
@@ -664,13 +1219,17 @@
     let authMode = 'login';
     let chartInstance = null;
     let paypalLoaded = false;
-    // Flag to detect if we need to auto-save after login/signup
-    let pendingSaveAction = false; 
+    let pendingSaveAction = false;
+    let clientAuthMode = 'signup';
+    let currentClientId = null;
+    let currentClientCard = null;
+    let currentShopId = null;
+    let dashClientsCache = [];
 
-    // --- 2. TRAITEMENT ET UPLOAD D'IMAGES (Méthode index 28.html)[cite: 1] ---
+    // --- 2. TRAITEMENT ET UPLOAD D'IMAGES ---
     function resizeImageForMobile(file) {
         return new Promise((resolve) => {
-            const MAX_DIM = 900; 
+            const MAX_DIM = 900;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -707,41 +1266,32 @@
         const status = document.getElementById(statusId);
         status.innerText = "⏳ Optimisation de l'image...";
         status.style.color = "var(--accent-color)";
+        try { file = await resizeImageForMobile(file); } catch (e) { /* on garde l'original si l'optimisation échoue */ }
 
-        try { file = await resizeImageForMobile(file); } catch(e) { }
-
-        // Si non connecté on génère un prefix guest, bien que les policies supabase doivent l'autoriser
         const prefix = currentUser ? currentUser.id : 'guest';
         const fileName = `${prefix}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-        
         status.innerText = "⏳ Envoi au serveur...";
-
         try {
-            // Utilisation exacte du fetch de index (28).html[cite: 1]
             const response = await fetch(`${SB_URL}/storage/v1/object/logos/${fileName}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY, 'Content-Type': file.type },
                 body: file
             });
-
             if (response.ok) {
                 const publicUrl = `${SB_URL}/storage/v1/object/public/logos/${fileName}`;
                 document.getElementById(targetId).value = publicUrl;
                 status.innerText = "✅ Image ajoutée avec succès !";
                 status.style.color = "var(--success)";
                 updatePreview();
-            } else {
-                throw new Error("Erreur serveur");
-            }
+            } else { throw new Error("Erreur serveur"); }
         } catch (e) {
             console.error("Upload error:", e);
-            status.innerText = "❌ Erreur. Taille max 2Mo.";
+            status.innerText = "❌ Erreur. Réessayez avec une image plus légère.";
             status.style.color = "var(--danger)";
         }
     }
 
-
-    // --- 3. DEGRADES ET TEXTURES (Issu de index(28).html)[cite: 1] ---
+    // --- 3. DÉGRADÉS & TEXTURES ---
     const GRADIENT_PRESETS = {
         sunset: { label: 'Coucher de soleil', css: 'linear-gradient(135deg, #FF512F, #F09819)' },
         ocean: { label: 'Océan', css: 'linear-gradient(135deg, #2193b0, #6dd5ed)' },
@@ -758,7 +1308,7 @@
         grille: { label: 'Grille', css: 'repeating-linear-gradient(0deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px), repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px)', size: 'auto' },
         vagues: { label: 'Vagues', css: 'repeating-radial-gradient(circle at 0 0, transparent 0, transparent 9px, rgba(255,255,255,.14) 9px, rgba(255,255,255,.14) 11px)', size: '22px 22px' }
     };
-    
+
     let selectedGradient = 'none';
     let selectedTexture = 'none';
 
@@ -775,11 +1325,12 @@
                 updatePreview();
             };
             gradWrap.appendChild(noneGradSw);
-            
+
             Object.keys(GRADIENT_PRESETS).forEach(key => {
                 const sw = document.createElement('div');
                 sw.className = 'swatch' + (key === selectedGradient ? ' active' : '');
                 sw.style.background = GRADIENT_PRESETS[key].css;
+                sw.dataset.key = key;
                 sw.onclick = () => {
                     selectedGradient = key;
                     Array.from(gradWrap.children).forEach(c => c.classList.remove('active'));
@@ -802,13 +1353,14 @@
                 updatePreview();
             };
             texWrap.appendChild(noneSw);
-            
+
             Object.keys(TEXTURE_PRESETS).forEach(key => {
                 const sw = document.createElement('div');
                 sw.className = 'swatch';
                 sw.style.backgroundColor = '#8a8a92';
                 sw.style.backgroundImage = TEXTURE_PRESETS[key].css;
                 sw.style.backgroundSize = TEXTURE_PRESETS[key].size;
+                sw.dataset.key = key;
                 sw.onclick = () => {
                     selectedTexture = key;
                     Array.from(texWrap.children).forEach(c => c.classList.remove('active'));
@@ -823,7 +1375,6 @@
     function computeScreenBackground(bgUrl, gradientKey, textureKey, bgColor, isPremiumUser) {
         let images = [];
         let sizes = [];
-
         if (bgUrl && isPremiumUser) {
             images.push(`url('${bgUrl}')`);
             sizes.push('cover');
@@ -833,24 +1384,24 @@
             if (tex && tex !== 'none') { images.push(tex.css); sizes.push(tex.size); }
             if (grad) { images.push(grad); sizes.push('cover'); }
         }
-
         if (images.length === 0) return { image: 'none', size: 'auto', color: bgColor };
         return { image: images.join(', '), size: sizes.join(', '), color: bgColor };
     }
 
-    // --- 4. UTILITAIRES & ROUTAGE ---
-    function showToast(msg) {
+    // --- 4. UTILITAIRES ---
+    function showToast(msg, type) {
         const c = document.getElementById('toast-container');
         const el = document.createElement('div');
-        el.className = 'toast'; el.innerText = msg;
+        el.className = 'toast' + (type ? ' ' + type : ''); el.innerText = msg;
         c.appendChild(el);
         setTimeout(() => el.classList.add('show'), 10);
-        setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3000);
+        setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3400);
     }
-    function openModal(id) { 
-        document.getElementById(id).classList.add('show'); 
-        if(id === 'premium-modal' && !paypalLoaded) {
-            renderPaypalButton();
+    function openModal(id) {
+        document.getElementById(id).classList.add('show');
+        if (id === 'premium-modal') {
+            document.getElementById('premium-login-required').style.display = currentUser ? 'none' : 'block';
+            if (currentUser) loadPaypalSdk();
         }
     }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -861,19 +1412,33 @@
         hideAllViews();
         document.getElementById('landing-view').classList.remove('hidden');
         document.getElementById('main-header').classList.remove('hidden');
+        closeMenu();
     }
-    function showDashboard() {
+    async function showDashboard() {
         hideAllViews();
         document.getElementById('dash-view').classList.remove('hidden');
         document.getElementById('main-header').classList.remove('hidden');
-        loadDashboard();
+        closeMenu();
+        await loadDashboard();
+    }
+
+    // Menu ☰ mobile
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navMenuEl = document.getElementById('nav-links');
+    hamburgerBtn.addEventListener('click', () => {
+        hamburgerBtn.classList.toggle('active');
+        navMenuEl.classList.toggle('active');
+    });
+    function closeMenu() {
+        hamburgerBtn.classList.remove('active');
+        navMenuEl.classList.remove('active');
     }
 
     window.onload = async () => {
         buildSwatchPickers();
         const params = new URLSearchParams(window.location.search);
-        
-        await ensureSupabase(); // Initialize sb
+
+        await ensureSupabase();
 
         if (params.get('scan')) {
             hideAllViews();
@@ -884,7 +1449,8 @@
             hideAllViews();
             document.getElementById('main-header').classList.add('hidden');
             document.getElementById('client-view').classList.remove('hidden');
-            initClientCard(params.get('shop'));
+            currentShopId = params.get('shop');
+            initClientCard(currentShopId);
         } else {
             showLandingView();
             await checkSession();
@@ -893,18 +1459,21 @@
         }
     };
 
-    // --- 5. AUTHENTIFICATION & SÉCURITÉ DE HAUT NIVEAU (Issu de index(28).html)[cite: 1] ---
+    // --- 5. AUTHENTIFICATION COMMERÇANT ---
     function switchAuth(mode) {
         authMode = mode;
         document.getElementById('tab-login').classList.toggle('active', mode === 'login');
         document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-        
+
         document.getElementById('field-password').style.display = (mode === 'login' || mode === 'signup') ? 'block' : 'none';
         document.getElementById('field-birthdate').style.display = (mode === 'signup' || mode === 'reset') ? 'block' : 'none';
         document.getElementById('link-forgot').style.display = (mode === 'login') ? 'block' : 'none';
         document.getElementById('field-new-password').style.display = (mode === 'reset') ? 'block' : 'none';
         document.getElementById('link-back-to-login').style.display = (mode === 'reset') ? 'block' : 'none';
         document.getElementById('auth-tabs').style.display = (mode === 'reset') ? 'none' : 'flex';
+        document.getElementById('auth-birthdate-hint').innerText = (mode === 'reset')
+            ? "Renseignez la même date de naissance que celle donnée à l'inscription."
+            : "Utilisée pour réinitialiser votre mot de passe de façon sécurisée.";
 
         const title = document.getElementById('auth-title');
         const subtitle = document.getElementById('auth-subtitle');
@@ -913,7 +1482,7 @@
         if (mode === 'login') {
             title.innerText = 'Connexion'; subtitle.innerText = "Gérez vos cartes de fidélité."; btn.innerText = 'Se connecter';
         } else if (mode === 'signup') {
-            title.innerText = 'Inscription'; subtitle.innerText = "Créez un compte pour sauvegarder la carte."; btn.innerText = 'Créer mon compte';
+            title.innerText = 'Inscription'; subtitle.innerText = "Créez un compte pour sauvegarder votre carte."; btn.innerText = 'Créer mon compte';
         } else {
             title.innerText = 'Réinitialisation'; subtitle.innerText = "Entrez votre email, date de naissance et nouveau mot de passe."; btn.innerText = 'Mettre à jour';
         }
@@ -921,40 +1490,36 @@
     }
 
     function openAuthModal(mode) {
-        switchAuth(mode);
+        switchAuth(mode || 'login');
         openModal('auth-modal');
     }
 
     async function processAuth() {
-        const email = document.getElementById('auth-email').value;
+        const email = document.getElementById('auth-email').value.trim();
         const err = document.getElementById('auth-error');
         const btn = document.getElementById('auth-btn');
         err.style.display = 'none';
 
-        // --- Réinitialisation sécurisée par date de naissance (RPC Custom) ---
         if (authMode === 'reset') {
             const birthdate = document.getElementById('auth-birthdate').value;
             const newPassword = document.getElementById('auth-new-password').value;
-
-            if(!email || !birthdate || !newPassword || newPassword.length < 6) {
+            if (!email || !birthdate || !newPassword || newPassword.length < 6) {
                 err.innerText = "Email, date de naissance et mot de passe (6 car. min) requis.";
                 err.style.display = 'block'; return;
             }
             btn.disabled = true; btn.innerText = "⏳...";
-            
             try {
                 const { data, error } = await sb.rpc('reset_password_with_birthdate', {
                     p_email: email, p_birthdate: birthdate, p_new_password: newPassword
                 });
-                
                 if (error) throw error;
-                if (!data || !data.success) throw new Error(data?.message || "Email ou date de naissance incorrect.");
+                if (!data || !data.success) throw new Error((data && data.message) || "Email ou date de naissance incorrect.");
 
-                showToast("Mot de passe mis à jour. Connexion en cours...");
+                showToast("Mot de passe mis à jour. Connexion en cours...", "success");
                 await sb.auth.signInWithPassword({ email, password: newPassword });
                 closeModal('auth-modal');
                 checkSession();
-            } catch(e) {
+            } catch (e) {
                 err.innerText = e.message;
                 err.style.display = 'block';
             }
@@ -963,100 +1528,34 @@
         }
 
         const password = document.getElementById('auth-password').value;
-        if(!email || !password || password.length < 6) { err.innerText = "Champs requis (6 car. min)."; err.style.display = 'block'; return; }
-        
-        if(authMode === 'signup') {
+        if (!email || !password || password.length < 6) { err.innerText = "Champs requis (6 car. min)."; err.style.display = 'block'; return; }
+
+        if (authMode === 'signup') {
             const birthdate = document.getElementById('auth-birthdate').value;
-            if(!birthdate) { err.innerText = "Date de naissance requise pour sécuriser le compte."; err.style.display = 'block'; return; }
+            if (!birthdate) { err.innerText = "Date de naissance requise pour sécuriser le compte."; err.style.display = 'block'; return; }
         }
 
         btn.disabled = true; btn.innerText = "⏳...";
-
         try {
             if (authMode === 'signup') {
                 const { data, error } = await sb.auth.signUp({ email, password });
                 if (error) throw error;
                 const birthdate = document.getElementById('auth-birthdate').value;
-                await sb.from('profiles').insert({ id: data.user.id, email, birthdate });
-                showToast("Compte créé !");
+                if (data.user) await sb.from('profiles').upsert({ id: data.user.id, email, birthdate }).select();
+                showToast("Compte créé !", "success");
             } else {
                 const { error } = await sb.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                showToast("Connexion réussie");
+                showToast("Connexion réussie", "success");
             }
             closeModal('auth-modal');
             await checkSession();
-            
-            // Si l'utilisateur avait cliqué sur Sauvegarder avant de s'inscrire, on exécute l'action
-            if(pendingSaveAction) {
-                pendingSaveAction = false;
-                saveConfig();
-            }
+            if (pendingSaveAction) { pendingSaveAction = false; saveConfig(); }
         } catch (e) {
             err.innerText = e.message === "Invalid login credentials" ? "Identifiants incorrects" : e.message;
             err.style.display = 'block';
         }
         btn.disabled = false; btn.innerText = authMode === 'login' ? 'Se connecter' : 'Créer mon compte';
-    }
-
-    async function checkSession() {
-        const { data: { session } } = await sb.auth.getSession();
-        currentUser = session ? session.user : null;
-        const authArea = document.getElementById('nav-auth-area');
-        const publicLinks = document.getElementById('nav-links-public');
-
-        if (currentUser) {
-            publicLinks.classList.add('hidden'); 
-
-            const { data: profile } = await sb.from('profiles').select('is_premium').eq('id', currentUser.id).single();
-            isPremium = profile?.is_premium || false;
-            
-            let premiumBtn = isPremium ? '<span class="btn-premium" style="box-shadow:none; cursor:default; margin-right:10px;">⭐ Compte Premium</span>' : '<button class="btn-premium" style="margin-right:10px;" onclick="openModal(\'premium-modal\')">⭐ Débloquer Premium</button>';
-
-            authArea.innerHTML = `
-                ${premiumBtn}
-                <button class="btn-ghost" onclick="showDashboard()" style="margin-right:10px;">📊 Dashboard</button>
-                <button class="btn-ghost" onclick="handleLogout()">Déconnexion</button>
-            `;
-            
-            if(isPremium) {
-                document.getElementById('bg_input').disabled = false;
-                document.getElementById('conf_google_url').disabled = false;
-                document.getElementById('btn-unlock-premium-1').classList.add('hidden');
-                document.getElementById('btn-unlock-premium-2').classList.add('hidden');
-                
-                const btnExport = document.getElementById('btn-export-csv');
-                btnExport.className = 'btn-ghost';
-                btnExport.innerText = '⬇️ Exporter CSV';
-                document.getElementById('chart-premium-overlay').classList.add('hidden');
-                document.getElementById('chart-blur-wrapper').style.filter = 'none';
-                document.getElementById('chart-blur-wrapper').style.pointerEvents = 'auto';
-            } else {
-                document.getElementById('bg_input').disabled = true;
-                document.getElementById('conf_google_url').disabled = true;
-                document.getElementById('btn-unlock-premium-1').classList.remove('hidden');
-                document.getElementById('btn-unlock-premium-2').classList.remove('hidden');
-                
-                const btnExport = document.getElementById('btn-export-csv');
-                btnExport.className = 'btn-premium';
-                btnExport.innerText = '🔒 Exporter CSV (Premium)';
-                document.getElementById('chart-premium-overlay').classList.remove('hidden');
-                document.getElementById('chart-blur-wrapper').style.filter = 'blur(4px)';
-                document.getElementById('chart-blur-wrapper').style.pointerEvents = 'none';
-            }
-
-            loadConfigData();
-        } else {
-            publicLinks.classList.remove('hidden');
-            authArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')">Espace Commerçant</button>`;
-            
-            document.getElementById('bg_input').disabled = true;
-            document.getElementById('conf_google_url').disabled = true;
-            document.getElementById('btn-unlock-premium-1').classList.remove('hidden');
-            document.getElementById('btn-unlock-premium-2').classList.remove('hidden');
-            
-            currentConfigId = null;
-        }
     }
 
     async function handleLogout() {
@@ -1066,8 +1565,59 @@
         showToast("Déconnecté");
     }
 
+    async function checkSession() {
+        const { data: { session } } = await sb.auth.getSession();
+        currentUser = session ? session.user : null;
+        const authArea = document.getElementById('nav-auth-area');
+        const mobileArea = document.getElementById('nav-auth-mobile');
+
+        if (currentUser) {
+            const { data: profile } = await sb.from('profiles').select('is_premium').eq('id', currentUser.id).maybeSingle();
+            isPremium = (profile && profile.is_premium) || false;
+
+            const premiumBtn = isPremium
+                ? '<span class="chip-premium">⭐ Premium</span>'
+                : '<button class="btn-premium" onclick="openModal(\'premium-modal\')" type="button">⭐ Débloquer Premium</button>';
+
+            const html = `
+                ${premiumBtn}
+                <button class="btn-ghost" onclick="showDashboard()" type="button">📊 Dashboard</button>
+                <button class="btn-ghost" onclick="handleLogout()" type="button">Déconnexion</button>
+            `;
+            authArea.innerHTML = html;
+            mobileArea.innerHTML = html;
+
+            const premiumInputs = [
+                ['bg_input', false], ['conf_google_url', false],
+                ['conf_mid_seuil', false], ['conf_mid_reward', false], ['conf_birthday_bonus', false]
+            ];
+            premiumInputs.forEach(([id]) => { document.getElementById(id).disabled = !isPremium; });
+            ['btn-unlock-premium-1', 'btn-unlock-premium-2', 'btn-unlock-premium-3'].forEach(id => {
+                document.getElementById(id).classList.toggle('hidden', isPremium);
+            });
+
+            const btnExport = document.getElementById('btn-export-csv');
+            btnExport.className = isPremium ? 'btn-ghost' : 'btn-premium';
+            btnExport.innerText = isPremium ? '⬇️ Exporter CSV' : '🔒 Exporter CSV (Premium)';
+            document.getElementById('chart-premium-overlay').classList.toggle('hidden', isPremium);
+
+            await loadOwnedConfig();
+        } else {
+            authArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')" type="button">Espace Commerçant</button>`;
+            mobileArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')" type="button">Espace Commerçant</button>`;
+
+            ['bg_input', 'conf_google_url', 'conf_mid_seuil', 'conf_mid_reward', 'conf_birthday_bonus'].forEach(id => {
+                document.getElementById(id).disabled = true;
+            });
+            ['btn-unlock-premium-1', 'btn-unlock-premium-2', 'btn-unlock-premium-3'].forEach(id => {
+                document.getElementById(id).classList.remove('hidden');
+            });
+            currentConfigId = null;
+        }
+    }
+
     function openPremiumAction() {
-        if(!currentUser) {
+        if (!currentUser) {
             showToast("Créez d'abord un compte gratuit.");
             openAuthModal('signup');
         } else {
@@ -1075,51 +1625,52 @@
         }
     }
 
-    // --- 6. INTÉGRATION PAYPAL & SÉCURITÉ EDGE FUNCTION (Issu de index(28).html)[cite: 1] ---
+    // --- 6. PAYPAL & CODE PROMO ---
+    function loadPaypalSdk() {
+        if (paypalLoaded) { renderPaypalButton(); return; }
+        const s = document.createElement('script');
+        s.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
+        s.onload = () => { paypalLoaded = true; renderPaypalButton(); };
+        s.onerror = () => showToast("Impossible de charger PayPal. Vérifiez votre connexion.", "error");
+        document.head.appendChild(s);
+    }
+
     function renderPaypalButton() {
         const container = document.getElementById('paypal-button-container');
-        if (paypalLoaded || !window.paypal) return;
-        
+        container.innerHTML = '';
+        if (!window.paypal) { showToast("PayPal indisponible pour le moment.", "error"); return; }
         window.paypal.Buttons({
             style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
-            createSubscription: (data, actions) => actions.subscription.create({
-                plan_id: 'P-16K40079FK484592LNF4PL2Q' 
-            }),
-            onApprove: async (data) => {
-                try {
-                    const { data: { session } } = await sb.auth.getSession();
-                    if (!session) throw new Error("Session expirée");
-
-                    const res = await fetch(`${SB_URL}/functions/v1/verify-paypal-subscription`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${session.access_token}`,
-                            'apikey': SB_KEY,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ subscriptionID: data.subscriptionID })
-                    });
-
-                    let result;
-                    const rawText = await res.text();
-                    try { result = JSON.parse(rawText); } catch { throw new Error("Erreur de l'Edge Function."); }
-
-                    if (!res.ok || !result.success) throw new Error(result.message || "Activation refusée");
-
-                    showToast("🎉 Abonnement Premium activé !");
-                    closeModal('premium-modal');
-                    checkSession();
-                    if(document.getElementById('dash-view').classList.contains('hidden') === false) loadDashboard();
-
-                } catch (e) {
-                    console.error('Erreur PayPal:', e);
-                    showToast("Erreur lors de l'activation : " + e.message);
-                }
-            },
-            onError: () => showToast("Le paiement PayPal a échoué. Réessayez.")
+            createSubscription: (data, actions) => actions.subscription.create({ plan_id: PREMIUM_PLAN_ID }),
+            onApprove: async (data) => { await activatePremium(data.subscriptionID); },
+            onError: () => showToast("Le paiement PayPal a échoué. Réessayez.", "error")
         }).render('#paypal-button-container');
-        
-        paypalLoaded = true;
+    }
+
+    async function activatePremium(subscriptionId) {
+        try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) throw new Error("Session expirée, reconnectez-vous.");
+
+            const res = await fetch(`${SB_URL}/functions/v1/verify-paypal-subscription`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subscriptionID: subscriptionId })
+            });
+            let result;
+            const rawText = await res.text();
+            try { result = JSON.parse(rawText); }
+            catch { throw new Error(`Réponse inattendue (HTTP ${res.status}) : la fonction verify-paypal-subscription est-elle bien déployée ? Détail : ${rawText.slice(0, 200)}`); }
+            if (!res.ok || !result.success) throw new Error(result.message || `Activation refusée (HTTP ${res.status}).`);
+
+            showToast("🎉 Abonnement Premium activé !", "success");
+            closeModal('premium-modal');
+            await checkSession();
+            if (!document.getElementById('dash-view').classList.contains('hidden')) loadDashboard();
+        } catch (e) {
+            console.error('Erreur PayPal :', e);
+            showToast("Le paiement a réussi mais l'activation a échoué : " + e.message, "error");
+        }
     }
 
     function togglePromoBox() {
@@ -1128,18 +1679,16 @@
     }
 
     async function redeemPromoCode() {
+        if (!currentUser) { openAuthModal('login'); showToast("Connectez-vous d'abord."); return; }
         const code = document.getElementById('promo-code-input').value.trim().toUpperCase();
         const errBox = document.getElementById('promo-code-error');
         errBox.style.display = 'none';
-
         if (!code) { errBox.innerText = "Entrez un code promo."; errBox.style.display = 'block'; return; }
-
         try {
             const { data, error } = await sb.rpc('redeem_promo_code', { p_code: code });
             if (error) throw error;
-            if (!data || !data.success) throw new Error(data?.message || "Code promo invalide.");
-            
-            showToast("🎉 Code promo appliqué : accès Premium débloqué !");
+            if (!data || !data.success) throw new Error((data && data.message) || "Code promo invalide.");
+            showToast("🎉 Code promo appliqué : accès Premium débloqué !", "success");
             closeModal('premium-modal');
             checkSession();
         } catch (e) {
@@ -1148,19 +1697,17 @@
         }
     }
 
-
     // --- 7. CONFIGURATEUR ---
     function applyStyleToCard(prefix, config, bypassPremium = false) {
         const card = document.getElementById(prefix + 'card');
-        if(!card) return;
-        
+        if (!card) return;
+
         card.style.setProperty('--c-btn', config.btn);
         card.style.setProperty('--c-btn-tx', config.btn_tx);
-        
+
         const isUserPremium = bypassPremium || isPremium;
-        
         const bgData = computeScreenBackground(config.bg_img, config.gradient, config.texture, config.bg, isUserPremium);
-        
+
         card.style.backgroundImage = bgData.image;
         card.style.backgroundSize = bgData.size;
         card.style.backgroundColor = bgData.color;
@@ -1176,9 +1723,18 @@
         document.getElementById(prefix + 'name').innerText = config.name;
         document.getElementById(prefix + 'title').innerText = config.title;
         document.getElementById(prefix + 'max').innerText = config.max;
-        
+
         if (document.getElementById(prefix + 'reward')) {
             document.getElementById(prefix + 'reward').innerText = config.reward;
+        }
+        const midNote = document.getElementById(prefix + 'mid-note');
+        if (midNote) {
+            if (config.mid_seuil && config.mid_reward) {
+                midNote.innerText = `🎁 Palier ${config.mid_seuil}ᵉ visite : ${config.mid_reward}`;
+                midNote.classList.remove('hidden');
+            } else {
+                midNote.classList.add('hidden');
+            }
         }
 
         const logo = document.getElementById(prefix + 'logo');
@@ -1186,26 +1742,24 @@
         else { logo.classList.add('hidden'); }
 
         const watermark = document.getElementById(prefix + 'watermark');
-        if(watermark) {
-            if(isUserPremium) watermark.classList.add('hidden');
-            else watermark.classList.remove('hidden');
-        }
+        if (watermark) watermark.classList.toggle('hidden', !!isUserPremium);
 
         const grid = document.getElementById(prefix + 'stamps');
         grid.innerHTML = '';
         const currentStamps = config.current_stamps || 0;
-        
-        for(let i=0; i<config.max; i++) {
+
+        for (let i = 0; i < config.max; i++) {
             const slot = document.createElement('div');
-            slot.className = "stamp-slot" + (i < currentStamps ? " stamp-active" : "");
+            const isMid = config.mid_seuil && (i + 1) === parseInt(config.mid_seuil);
+            slot.className = "stamp-slot" + (i < currentStamps ? " stamp-active" : "") + (isMid ? " stamp-mid" : "");
             slot.innerHTML = config.emoji || '⭐';
             slot.style.borderColor = (bgData.image !== 'none') ? '#fff' : config.tx;
             grid.appendChild(slot);
         }
     }
 
-    function updatePreview() {
-        const conf = {
+    function readConfigForm() {
+        return {
             name: document.getElementById('conf_name').value || "Boutique",
             title: document.getElementById('conf_title').value || "Fidélité",
             logo: document.getElementById('conf_logo').value,
@@ -1213,24 +1767,32 @@
             tx: document.getElementById('conf_tx').value,
             btn: document.getElementById('conf_btn').value,
             btn_tx: document.getElementById('conf_btn_tx').value,
-            bg_img: document.getElementById('conf_bg_img').value, 
+            bg_img: document.getElementById('conf_bg_img').value,
             gradient: selectedGradient,
             texture: selectedTexture,
             max: parseInt(document.getElementById('conf_seuil').value) || 10,
             emoji: document.getElementById('conf_emoji').value,
             reward: document.getElementById('conf_reward').value,
-            current_stamps: 1 // 1 tampon d'aperçu par defaut (et 1er tampon offert)
+            mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
+            mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null
         };
+    }
+
+    function updatePreview() {
+        const conf = readConfigForm();
+        conf.current_stamps = 1; // 1 tampon d'aperçu (le 1er tampon est offert à l'inscription)
         applyStyleToCard('live-', conf);
     }
 
-    async function loadConfigData() {
-        const { data: configs } = await sb.from('fidelite_configs').select('*').limit(1); 
+    async function loadOwnedConfig() {
+        const { data: configs } = await sb.from('fidelite_configs')
+            .select('id, data, seuil_visites, ratio_points, mid_seuil, mid_reward, birthday_bonus')
+            .eq('owner_id', currentUser.id).limit(1);
         if (configs && configs.length > 0) {
             const row = configs[0];
             const d = row.data || {};
             currentConfigId = row.id;
-            
+
             document.getElementById('conf_name').value = d.name || '';
             document.getElementById('conf_title').value = d.title || '';
             document.getElementById('conf_logo').value = d.logo || '';
@@ -1240,133 +1802,150 @@
             document.getElementById('conf_btn_tx').value = d.btn_tx || '#ffffff';
             document.getElementById('conf_bg_img').value = d.bg_img || '';
             document.getElementById('conf_google_url').value = d.google_url || '';
-            
+
             selectedGradient = d.gradient || 'none';
             selectedTexture = d.texture || 'none';
-
             Array.from(document.getElementById('gradient-swatches').children).forEach(sw => {
-                sw.classList.remove('active');
-                if(sw.classList.contains('swatch-none') && selectedGradient === 'none') sw.classList.add('active');
-                else if(sw.style.background.includes(selectedGradient) && selectedGradient !== 'none') sw.classList.add('active');
+                sw.classList.toggle('active', (sw.classList.contains('swatch-none') && selectedGradient === 'none') || sw.dataset.key === selectedGradient);
             });
             Array.from(document.getElementById('texture-swatches').children).forEach(sw => {
-                sw.classList.remove('active');
-                if(sw.classList.contains('swatch-none') && selectedTexture === 'none') sw.classList.add('active');
-                else if(sw.style.backgroundImage.includes(selectedTexture) && selectedTexture !== 'none') sw.classList.add('active');
+                sw.classList.toggle('active', (sw.classList.contains('swatch-none') && selectedTexture === 'none') || sw.dataset.key === selectedTexture);
             });
-            
+
             document.getElementById('conf_seuil').value = row.seuil_visites || 10;
             document.getElementById('conf_ratio').value = row.ratio_points || 1;
-            document.getElementById('conf_pin').value = row.admin_pin || '';
-            
+            document.getElementById('conf_mid_seuil').value = row.mid_seuil || '';
+            document.getElementById('conf_mid_reward').value = row.mid_reward || '';
+            document.getElementById('conf_birthday_bonus').checked = !!row.birthday_bonus;
+            document.getElementById('conf_pin').value = '';
+            document.getElementById('conf_pin').placeholder = 'Laisser vide pour conserver le code actuel';
+
             document.getElementById('conf_emoji').value = d.emoji || '⭐';
             document.getElementById('conf_reward').value = d.reward || '';
-            
+
             updatePreview();
             generateAdminQR();
+        } else {
+            document.getElementById('conf_pin').placeholder = 'Ex : 1234';
         }
     }
 
     async function saveConfig() {
         if (!currentUser) {
-            pendingSaveAction = true; // Auto-save after successful registration
+            pendingSaveAction = true;
             openAuthModal('signup');
             return;
         }
-
         const pin = document.getElementById('conf_pin').value;
         const seuil = parseInt(document.getElementById('conf_seuil').value) || 10;
         const ratio = parseFloat(document.getElementById('conf_ratio').value) || 1;
 
-        if(!pin) return showToast("Le Code PIN Admin est obligatoire !");
+        if (!currentConfigId && !pin) return showToast("Le Code PIN Admin est obligatoire à la création !");
+        if (pin && pin.length < 4) return showToast("Le Code PIN doit contenir au moins 4 caractères.");
 
+        const conf = readConfigForm();
         const dataJson = {
-            name: document.getElementById('conf_name').value,
-            title: document.getElementById('conf_title').value,
-            logo: document.getElementById('conf_logo').value,
-            bg: document.getElementById('conf_bg').value,
-            tx: document.getElementById('conf_tx').value,
-            btn: document.getElementById('conf_btn').value,
-            btn_tx: document.getElementById('conf_btn_tx').value,
-            bg_img: isPremium ? document.getElementById('conf_bg_img').value : '',
-            gradient: selectedGradient,
-            texture: selectedTexture,
-            emoji: document.getElementById('conf_emoji').value,
-            reward: document.getElementById('conf_reward').value,
+            name: conf.name, title: conf.title, logo: conf.logo, bg: conf.bg, tx: conf.tx,
+            btn: conf.btn, btn_tx: conf.btn_tx,
+            bg_img: isPremium ? conf.bg_img : '',
+            gradient: selectedGradient, texture: selectedTexture,
+            emoji: conf.emoji, reward: conf.reward,
             google_url: isPremium ? document.getElementById('conf_google_url').value : ''
         };
 
         const shopId = currentConfigId || "shop_" + Math.random().toString(36).substring(2, 9);
-        
-        const rowToInsert = {
-            id: shopId,
-            data: dataJson,
-            seuil_visites: seuil,
-            ratio_points: ratio,
-            admin_pin: pin
-        };
+        const btn = document.getElementById('btn-save-config');
+        const originalText = btn.innerText;
+        btn.disabled = true; btn.innerText = "⏳ Enregistrement...";
 
-        const { error } = await sb.from('fidelite_configs').upsert([rowToInsert]);
+        try {
+            const { data, error } = await sb.rpc('fidelite_save_config', {
+                p_id: shopId, p_data: dataJson, p_seuil: seuil, p_ratio: ratio,
+                p_mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
+                p_mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null,
+                p_birthday_bonus: isPremium ? document.getElementById('conf_birthday_bonus').checked : false,
+                p_pin: pin || null
+            });
+            if (error) throw error;
+            if (!data || !data.success) throw new Error((data && data.message) || "Erreur d'enregistrement.");
 
-        if(!error) {
             currentConfigId = shopId;
-            showToast("Carte sauvegardée !");
+            document.getElementById('conf_pin').value = '';
+            document.getElementById('conf_pin').placeholder = 'Laisser vide pour conserver le code actuel';
+            showToast("Carte sauvegardée !", "success");
             generateAdminQR();
-        } else {
-            showToast("Erreur: " + error.message);
+        } catch (e) {
+            showToast("Erreur : " + e.message, "error");
         }
+        btn.disabled = false; btn.innerText = originalText;
     }
 
     async function generateAdminQR() {
-        if(!currentConfigId) return;
+        if (!currentConfigId) return;
         document.getElementById('qr-result-box').classList.remove('hidden');
         const url = window.location.origin + window.location.pathname + "?shop=" + currentConfigId;
         document.getElementById('admin-qrcode').innerHTML = "";
-        
         await loadScriptOnce(LIB_URLS.qrcode);
         new QRCode(document.getElementById('admin-qrcode'), { text: url, width: 200, height: 200, colorDark: "#000" });
         document.getElementById('admin-preview-link').href = url;
     }
 
-    // --- 8. DASHBOARD CRM (Freemium logic & Edition) ---
+    function downloadAdminQR() {
+        const img = document.querySelector('#admin-qrcode img') || document.querySelector('#admin-qrcode canvas');
+        if (!img) return showToast("QR code introuvable.", "error");
+        const link = document.createElement('a');
+        link.download = 'qr-code-fidelite-' + currentConfigId + '.png';
+        link.href = img.tagName === 'CANVAS' ? img.toDataURL('image/png') : img.src;
+        link.click();
+    }
+
+    function copyAdminLink() {
+        const url = window.location.origin + window.location.pathname + "?shop=" + currentConfigId;
+        navigator.clipboard.writeText(url).then(() => showToast("Lien copié !", "success")).catch(() => showToast("Impossible de copier le lien.", "error"));
+    }
+
+    // --- 8. DASHBOARD CRM ---
     function maskEmail(email) {
-        if(!email) return '-';
+        if (!email) return '-';
         const [name, domain] = email.split('@');
-        if(!domain) return email;
+        if (!domain) return email;
         return `${name.charAt(0)}***@${domain}`;
     }
-    
     function maskPhone(tel) {
-        if(!tel || tel.length < 4) return '-';
-        return tel.substring(0,2) + ' ** ** ** **';
+        if (!tel || tel.length < 4) return '-';
+        return tel.substring(0, 2) + ' ** ** ** **';
     }
 
     async function loadDashboard() {
-        if(!currentConfigId) return;
+        if (!currentConfigId) return;
+        const [{ data: clients }, { data: events }] = await Promise.all([
+            sb.from('fidelite_clients').select('*').eq('config_id', currentConfigId).order('created_at', { ascending: false }),
+            sb.from('fidelite_events').select('type, created_at').eq('config_id', currentConfigId).gte('created_at', new Date(Date.now() - 30 * 86400000).toISOString())
+        ]);
+        dashClientsCache = clients || [];
+        renderCrmTable(dashClientsCache);
+        renderChart(events || []);
+    }
 
-        const { data: clients } = await sb.from('fidelite_clients')
-                                          .select('*')
-                                          .eq('config_id', currentConfigId)
-                                          .order('created_at', { ascending: false });
-        if(!clients) return;
-
-        let totalVisites = 0;
-        let totalPoints = 0;
+    function renderCrmTable(clients) {
+        let totalVisites = 0, totalPoints = 0, totalRewards = 0;
         const tbody = document.getElementById('crm-tbody');
         tbody.innerHTML = '';
-
         const maxVisites = parseInt(document.getElementById('conf_seuil').value) || 10;
+        const midSeuil = parseInt(document.getElementById('conf_mid_seuil').value) || null;
 
         clients.forEach(c => {
             totalVisites += (c.nb_visites || 0);
             totalPoints += (c.total_points || 0);
-            
+            totalRewards += (c.used_rewards ? c.used_rewards.length : 0);
+
             const dateCrea = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '-';
             const isEligible = c.nb_visites >= maxVisites;
+            const isMid = midSeuil && c.nb_visites >= midSeuil && c.nb_visites < maxVisites;
             const nbRewards = c.used_rewards ? c.used_rewards.length : 0;
-            const statusBadge = isEligible 
-                ? '<span class="badge badge-success">🎁 Récompense dispo</span>' 
-                : '<span class="badge badge-pending">En cours</span>';
+            let statusBadge = '<span class="badge badge-pending">En cours</span>';
+            if (isEligible) statusBadge = '<span class="badge badge-success">🎁 Récompense dispo</span>';
+            else if (isMid) statusBadge = '<span class="badge badge-mid">🎁 Palier atteint</span>';
 
             const displayEmail = isPremium ? (c.email || '-') : maskEmail(c.email);
             const displayTel = isPremium ? (c.tel || '-') : maskPhone(c.tel);
@@ -1374,6 +1953,7 @@
 
             const tr = document.createElement('tr');
             tr.id = `crm-row-${c.id}`;
+            tr.dataset.search = `${c.nom || ''} ${c.email || ''}`.toLowerCase();
             tr.innerHTML = `
                 <td>${dateCrea}</td>
                 <td class="crm-editable" data-field="nom">${c.nom || '-'}</td>
@@ -1382,8 +1962,8 @@
                 <td class="crm-editable" data-field="date_naissance">${c.date_naissance || '-'}</td>
                 <td class="crm-editable" data-field="nb_visites">${c.nb_visites || 0}</td>
                 <td class="crm-editable" data-field="total_points">${c.total_points || 0}</td>
-                <td>${statusBadge} <br><span style="font-size:10px; color:#888;">(Déjà réclamé: ${nbRewards})</span></td>
-                <td><button class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="editCrmRow('${c.id}')">✏️</button></td>
+                <td>${statusBadge} <br><span style="font-size:10px; color:#888;">(Déjà réclamé : ${nbRewards})</span></td>
+                <td><button class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="editCrmRow('${c.id}')" type="button">✏️</button></td>
             `;
             tbody.appendChild(tr);
         });
@@ -1391,21 +1971,21 @@
         document.getElementById('stat-clients').innerText = clients.length;
         document.getElementById('stat-stamps').innerText = totalVisites;
         document.getElementById('stat-points').innerText = totalPoints;
+        document.getElementById('stat-rewards').innerText = totalRewards;
+        filterCrmTable();
+    }
 
-        renderChart();
+    function filterCrmTable() {
+        const q = (document.getElementById('crm-search').value || '').toLowerCase().trim();
+        document.querySelectorAll('#crm-tbody tr').forEach(tr => {
+            tr.style.display = (!q || (tr.dataset.search || '').includes(q)) ? '' : 'none';
+        });
     }
 
     function editCrmRow(id) {
-        if(!isPremium) {
-            showToast("La modification du fichier client est une option Premium.");
-            openModal('premium-modal');
-            return;
-        }
+        if (!isPremium) { showToast("La modification du fichier client est une option Premium."); openModal('premium-modal'); return; }
         const tr = document.getElementById(`crm-row-${id}`);
-        if(tr.dataset.editing === 'true') {
-            saveCrmRow(id);
-            return;
-        }
+        if (tr.dataset.editing === 'true') { saveCrmRow(id); return; }
         tr.dataset.editing = 'true';
         tr.querySelectorAll('.crm-editable').forEach(td => {
             const field = td.dataset.field;
@@ -1414,9 +1994,7 @@
             td.innerHTML = `<input type="${type}" value="${val}" style="padding:4px; font-size:12px; width:100%; min-width:80px;">`;
         });
         const btn = tr.querySelector('button');
-        btn.innerText = '💾';
-        btn.style.background = 'var(--success)';
-        btn.style.color = '#fff';
+        btn.innerText = '💾'; btn.style.background = 'var(--success)'; btn.style.color = '#fff';
     }
 
     async function saveCrmRow(id) {
@@ -1425,66 +2003,57 @@
         tr.querySelectorAll('.crm-editable').forEach(td => {
             const field = td.dataset.field;
             const input = td.querySelector('input');
-            if(input) {
+            if (input) {
                 let val = input.value;
-                if(field === 'nb_visites' || field === 'total_points') val = parseFloat(val) || 0;
+                if (field === 'nb_visites' || field === 'total_points') val = parseFloat(val) || 0;
                 updates[field] = val;
             }
         });
-        
         const btn = tr.querySelector('button');
         btn.innerText = '⏳';
-        
         const { error } = await sb.from('fidelite_clients').update(updates).eq('id', id);
-        if(error) {
-            showToast("Erreur de sauvegarde");
-            btn.innerText = '💾';
-        } else {
-            showToast("Client mis à jour !");
-            loadDashboard(); // reload table
-        }
+        if (error) { showToast("Erreur de sauvegarde", "error"); btn.innerText = '💾'; }
+        else { showToast("Client mis à jour !", "success"); loadDashboard(); }
     }
 
-    async function renderChart() {
+    async function renderChart(events) {
         await loadScriptOnce(LIB_URLS.chartjs);
         const ctx = document.getElementById('dash-chart').getContext('2d');
-        if(chartInstance) chartInstance.destroy();
+        if (chartInstance) chartInstance.destroy();
 
-        const labels = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Aujourd\'hui'];
-        const data = [2, 5, 3, 8, 4, 12, 6];
+        const days = [];
+        const counts = {};
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(Date.now() - i * 86400000);
+            const key = d.toISOString().slice(0, 10);
+            days.push(key);
+            counts[key] = 0;
+        }
+        events.forEach(e => {
+            if (e.type !== 'stamp' && e.type !== 'reward') return;
+            const key = (e.created_at || '').slice(0, 10);
+            if (key in counts) counts[key]++;
+        });
+
+        const labels = days.map(d => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+        const data = days.map(d => counts[d]);
 
         chartInstance = new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Visites validées',
-                    data: data,
-                    borderColor: '#0071e3',
-                    backgroundColor: 'rgba(0,113,227,0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
+            data: { labels, datasets: [{ label: 'Visites validées', data, borderColor: '#0071e3', backgroundColor: 'rgba(0,113,227,0.1)', fill: true, tension: 0.35, pointRadius: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 8 } } } }
         });
     }
 
     function handleExportCSV() {
-        if(!isPremium) {
-            openModal('premium-modal');
-            return;
-        }
-        const rows = document.querySelectorAll('#crm-tbody tr');
-        let csv = "Date Inscription;Nom;Email;Telephone;Date Naissance;Visites;Points;Statut\n";
-        rows.forEach(r => {
-            const cols = r.querySelectorAll('td');
-            // Excluding the action button column
-            const data = Array.from(cols).slice(0, 8).map(c => c.innerText.replace(/\n/g, ' ')).join(';');
-            csv += data + "\n";
+        if (!isPremium) { openModal('premium-modal'); return; }
+        let csv = "Date Inscription;Nom;Email;Telephone;Date Naissance;Visites;Points;Recompenses reclamees\n";
+        dashClientsCache.forEach(c => {
+            const dateCrea = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '-';
+            const nbRewards = c.used_rewards ? c.used_rewards.length : 0;
+            const row = [dateCrea, c.nom || '', c.email || '', c.tel || '', c.date_naissance || '', c.nb_visites || 0, c.total_points || 0, nbRewards]
+                .map(v => String(v).replace(/;/g, ',')).join(';');
+            csv += row + "\n";
         });
         const blob = new Blob(["\ufeff", csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -1494,145 +2063,321 @@
         link.click(); document.body.removeChild(link);
     }
 
-    // --- 9. VUE CLIENT ---
-    async function initClientCard(shopId) {
-        const { data: configRow } = await sb.from('fidelite_configs').select('*').eq('id', shopId).single();
-        if(!configRow) return alert("Boutique introuvable");
-        
-        const { data: ownerProfile } = await sb.from('profiles').select('is_premium').eq('id', configRow.owner_id || '').maybeSingle();
-        const shopIsPremium = ownerProfile?.is_premium || false;
+    // --- 9. VUE CLIENT (porteur de carte) ---
+    function switchClientAuth(mode) {
+        clientAuthMode = mode;
+        document.getElementById('client-tab-login').classList.toggle('active', mode === 'login');
+        document.getElementById('client-tab-signup').classList.toggle('active', mode === 'signup');
+        document.getElementById('client-auth-tabs').style.display = (mode === 'reset') ? 'none' : 'flex';
 
-        const confObj = {
-            ...configRow.data,
-            bg_img: shopIsPremium ? configRow.data.bg_img : '',
-            max: configRow.seuil_visites || 10
-        };
+        document.getElementById('client-field-nom').style.display = (mode === 'signup') ? 'block' : 'none';
+        document.getElementById('client-field-tel').style.display = (mode === 'signup') ? 'block' : 'none';
+        document.getElementById('client-field-dob').style.display = (mode === 'signup' || mode === 'reset') ? 'block' : 'none';
+        document.getElementById('client-field-code').style.display = (mode === 'signup' || mode === 'login') ? 'block' : 'none';
+        document.getElementById('client-link-forgot').classList.toggle('hidden', mode !== 'login');
+        document.getElementById('client-field-newcode').classList.toggle('hidden', mode !== 'reset');
+        document.getElementById('client-link-back').classList.toggle('hidden', mode !== 'reset');
 
-        const myId = localStorage.getItem('fid_cli_' + shopId);
-        
-        if (myId) {
-            const { data: client } = await sb.from('fidelite_clients').select('*').eq('id', myId).single();
-            if (client) {
-                document.getElementById('client-auth-box').classList.add('hidden');
-                document.getElementById('client-card-box').classList.remove('hidden');
+        const title = document.getElementById('client-auth-title');
+        const sub = document.getElementById('client-auth-sub');
+        const submitBtn = document.getElementById('client-auth-submit');
+        const codeLabel = document.getElementById('client-code-label');
+        const dobHint = document.getElementById('client-dob-hint');
 
-                confObj.current_stamps = client.nb_visites;
-                applyStyleToCard('render-', confObj, shopIsPremium);
-                
-                document.getElementById('render-count').innerText = client.nb_visites;
-                document.getElementById('render-points').innerText = client.total_points || 0;
-
-                const scanUrl = window.location.origin + window.location.pathname + "?scan=" + myId;
-                document.getElementById('client-personal-qr').innerHTML = "";
-                
-                await loadScriptOnce(LIB_URLS.qrcode);
-                new QRCode(document.getElementById('client-personal-qr'), { text: scanUrl, width: 160, height: 160 });
-                
-                if (client.nb_visites >= confObj.max) {
-                    await loadScriptOnce(LIB_URLS.confetti);
-                    confetti({ particleCount: 150, spread: 70 });
-                    
-                    if (shopIsPremium && confObj.google_url) {
-                        const btnGoogle = document.getElementById('client-google-btn');
-                        btnGoogle.href = confObj.google_url;
-                        btnGoogle.classList.remove('hidden');
-                    }
-                }
-            } else {
-                localStorage.removeItem('fid_cli_' + shopId);
-            }
+        if (mode === 'signup') {
+            title.innerText = 'Obtenir ma carte';
+            sub.innerText = "Créez votre compte en 15 secondes pour cumuler vos avantages. 1ᵉʳ tampon offert !";
+            submitBtn.innerText = 'Activer ma carte';
+            codeLabel.innerText = 'Créez un code secret (4 chiffres min.)';
+            dobHint.innerText = "Sert uniquement à réinitialiser votre code si vous l'oubliez, et à votre éventuel bonus anniversaire.";
+        } else if (mode === 'login') {
+            title.innerText = 'Retrouver ma carte';
+            sub.innerText = "Déjà inscrit ? Connectez-vous avec votre email et votre code.";
+            submitBtn.innerText = 'Me connecter';
+            codeLabel.innerText = 'Votre code secret';
+        } else {
+            title.innerText = 'Code oublié';
+            sub.innerText = "Entrez votre email, votre date de naissance et un nouveau code.";
+            submitBtn.innerText = 'Réinitialiser mon code';
         }
+        document.getElementById('client-auth-error').style.display = 'none';
     }
 
-    async function registerClient() {
-        const shopId = new URLSearchParams(window.location.search).get('shop');
-        const nom = document.getElementById('cli-nom').value;
-        const email = document.getElementById('cli-email').value;
-        const tel = document.getElementById('cli-tel').value;
-        const dob = document.getElementById('cli-dob').value;
-        
-        if(!nom || !email || !tel || !dob) return showToast("Veuillez remplir tous les champs.");
+    async function submitClientAuth() {
+        const err = document.getElementById('client-auth-error');
+        const btn = document.getElementById('client-auth-submit');
+        err.style.display = 'none';
+        const email = document.getElementById('cli-email').value.trim();
 
-        const newId = crypto.randomUUID();
-        const { error } = await sb.from('fidelite_clients').insert([{ 
-            id: newId, 
-            config_id: shopId,
-            nom: nom,
-            email: email, 
-            tel: tel, 
-            date_naissance: dob,
-            nb_visites: 1, // <--- PREMIER TAMPON OFFERT
-            total_points: 0,
-            used_rewards: []
-        }]);
+        if (clientAuthMode === 'reset') {
+            const dob = document.getElementById('cli-dob').value;
+            const newCode = document.getElementById('cli-newcode').value;
+            if (!email || !dob || !newCode || newCode.length < 4) {
+                err.innerText = "Email, date de naissance et nouveau code (4 car. min) requis.";
+                err.style.display = 'block'; return;
+            }
+            btn.disabled = true; btn.innerText = "⏳...";
+            try {
+                const { data, error } = await sb.rpc('fidelite_reset_client_code', {
+                    p_config_id: currentShopId, p_email: email, p_birthdate: dob, p_new_code: newCode
+                });
+                if (error) throw error;
+                if (!data || !data.success) throw new Error((data && data.message) || "Email ou date de naissance incorrect.");
+                showToast("Code réinitialisé. Connexion en cours...", "success");
+                await loadClientCardById(data.client_id, true);
+            } catch (e) {
+                err.innerText = e.message; err.style.display = 'block';
+            }
+            btn.disabled = false; btn.innerText = "Réinitialiser mon code";
+            return;
+        }
 
-        if(!error) {
-            localStorage.setItem('fid_cli_' + shopId, newId);
-            location.reload();
+        const code = document.getElementById('cli-code').value;
+        if (!email || !code || code.length < 4) {
+            err.innerText = "Email et code (4 caractères min.) requis.";
+            err.style.display = 'block'; return;
+        }
+
+        btn.disabled = true; btn.innerText = "⏳...";
+        try {
+            if (clientAuthMode === 'signup') {
+                const nom = document.getElementById('cli-nom').value.trim();
+                const tel = document.getElementById('cli-tel').value.trim();
+                const dob = document.getElementById('cli-dob').value;
+                if (!nom || !tel || !dob) throw new Error("Veuillez remplir tous les champs.");
+
+                const { data, error } = await sb.rpc('fidelite_register_client', {
+                    p_config_id: currentShopId, p_nom: nom, p_email: email, p_tel: tel, p_birthdate: dob, p_code: code
+                });
+                if (error) throw error;
+                if (!data || !data.success) throw new Error((data && data.message) || "Erreur d'inscription.");
+                showToast("Carte activée ! 🎉", "success");
+                await loadClientCardById(data.client_id, true);
+            } else {
+                const { data, error } = await sb.rpc('fidelite_client_login', { p_config_id: currentShopId, p_email: email, p_code: code });
+                if (error) throw error;
+                if (!data || !data.success) throw new Error((data && data.message) || "Email ou code incorrect.");
+                showToast("Connexion réussie !", "success");
+                await loadClientCardById(data.client_id, true);
+            }
+        } catch (e) {
+            err.innerText = e.message; err.style.display = 'block';
+        }
+        btn.disabled = false; btn.innerText = clientAuthMode === 'signup' ? 'Activer ma carte' : 'Me connecter';
+    }
+
+    async function initClientCard(shopId) {
+        document.getElementById('client-auth-box').classList.add('hidden');
+        document.getElementById('client-card-box').classList.add('hidden');
+        switchClientAuth('signup');
+
+        const myId = localStorage.getItem('fid_cli_' + shopId);
+        if (myId) {
+            const ok = await loadClientCardById(myId, false);
+            if (ok) return;
+            localStorage.removeItem('fid_cli_' + shopId);
+        }
+        document.getElementById('client-auth-box').classList.remove('hidden');
+    }
+
+    async function loadClientCardById(clientId, persist) {
+        const { data, error } = await sb.rpc('fidelite_get_card', { p_client_id: clientId });
+        if (error || !data || !data.success) return false;
+
+        currentClientId = clientId;
+        currentClientCard = data;
+        if (persist) localStorage.setItem('fid_cli_' + currentShopId, clientId);
+
+        const cfg = data.config || {};
+        const d = cfg.data || {};
+        const confObj = {
+            name: d.name, title: d.title, logo: d.logo, bg: d.bg, tx: d.tx, btn: d.btn, btn_tx: d.btn_tx,
+            bg_img: cfg.is_premium ? d.bg_img : '',
+            gradient: d.gradient, texture: d.texture, emoji: d.emoji, reward: d.reward,
+            mid_seuil: cfg.mid_seuil, mid_reward: cfg.mid_reward,
+            max: cfg.seuil_visites || 10,
+            current_stamps: data.nb_visites || 0
+        };
+
+        document.getElementById('client-auth-box').classList.add('hidden');
+        document.getElementById('client-card-box').classList.remove('hidden');
+        applyStyleToCard('render-', confObj, cfg.is_premium);
+
+        document.getElementById('render-count').innerText = data.nb_visites || 0;
+        document.getElementById('render-points').innerText = data.total_points || 0;
+
+        const scanUrl = window.location.origin + window.location.pathname + "?scan=" + clientId;
+        document.getElementById('client-personal-qr').innerHTML = "";
+        await loadScriptOnce(LIB_URLS.qrcode);
+        new QRCode(document.getElementById('client-personal-qr'), { text: scanUrl, width: 160, height: 160 });
+
+        if ((data.nb_visites || 0) >= (cfg.seuil_visites || 10)) {
+            await fireConfetti({ particleCount: 150, spread: 70 });
+            if (cfg.is_premium && d.google_url) {
+                const btnGoogle = document.getElementById('client-google-btn');
+                btnGoogle.href = d.google_url;
+                btnGoogle.classList.remove('hidden');
+            }
+        }
+
+        // Bandeau anniversaire (Premium)
+        const banner = document.getElementById('client-birthday-banner');
+        const currentYear = new Date().getFullYear();
+        const dob = data.date_naissance ? new Date(data.date_naissance) : null;
+        const isBirthdayMonth = cfg.birthday_bonus && dob && (dob.getMonth() === new Date().getMonth());
+        const alreadyClaimed = data.birthday_bonus_year === currentYear;
+        banner.classList.toggle('hidden', !(isBirthdayMonth && !alreadyClaimed));
+
+        return true;
+    }
+
+    async function claimBirthdayBonus() {
+        if (!currentClientId) return;
+        const { data, error } = await sb.rpc('fidelite_claim_birthday_bonus', { p_client_id: currentClientId });
+        if (error || !data || !data.success) {
+            showToast((data && data.message) || "Bonus indisponible pour le moment.", "error");
+            return;
+        }
+        showToast("🎂 Bonus anniversaire ajouté !", "success");
+        await fireConfetti({ particleCount: 120, spread: 90 });
+        await loadClientCardById(currentClientId, true);
+    }
+
+    function clientLogout() {
+        localStorage.removeItem('fid_cli_' + currentShopId);
+        currentClientId = null; currentClientCard = null;
+        document.getElementById('client-card-box').classList.add('hidden');
+        document.getElementById('client-auth-box').classList.remove('hidden');
+        switchClientAuth('login');
+    }
+
+    function shareClientCard() {
+        const url = window.location.href;
+        const shopName = (currentClientCard && currentClientCard.config && currentClientCard.config.data && currentClientCard.config.data.name) || 'cette boutique';
+        const text = `Ma carte de fidélité chez ${shopName} 🎫`;
+        if (navigator.share) {
+            navigator.share({ title: text, url }).catch(() => {});
         } else {
-            showToast("Erreur d'activation.");
+            navigator.clipboard.writeText(url).then(() => showToast("Lien de votre carte copié !", "success")).catch(() => showToast("Impossible de copier le lien.", "error"));
         }
     }
 
     // --- 10. VUE COMMERÇANT (Scan & Validation) ---
-    let currentScannedClient = null;
-    let merchantConfigData = null;
-    let merchantConfigRow = null;
+    let currentScannedClientId = null;
+    let currentScanInfo = null;
 
     async function initMerchantScan(cliId) {
-        const { data: client } = await sb.from('fidelite_clients').select('*').eq('id', cliId).single();
-        if(!client) {
+        currentScannedClientId = cliId;
+        const { data, error } = await sb.rpc('fidelite_get_scan_info', { p_client_id: cliId });
+        if (error || !data || !data.success) {
             document.getElementById('merchant-cli-name').innerText = "Client introuvable";
             return;
         }
-        currentScannedClient = client;
-        
-        const { data: confRow } = await sb.from('fidelite_configs').select('*').eq('id', client.config_id).single();
-        merchantConfigRow = confRow;
-        merchantConfigData = confRow.data;
+        currentScanInfo = data;
+        document.getElementById('merchant-cli-name').innerText = data.nom || '—';
+        document.getElementById('merchant-cli-progress').innerText = `${data.nb_visites} / ${data.seuil_visites}`;
 
-        document.getElementById('merchant-cli-name').innerText = client.nom;
-        document.getElementById('merchant-cli-progress').innerText = `${client.nb_visites} / ${confRow.seuil_visites}`;
-
-        if (client.nb_visites >= confRow.seuil_visites) {
+        if (data.nb_visites >= data.seuil_visites) {
             document.getElementById('action-stamp').classList.add('hidden');
             document.getElementById('action-reward').classList.remove('hidden');
+        } else {
+            document.getElementById('action-stamp').classList.remove('hidden');
+            document.getElementById('action-reward').classList.add('hidden');
         }
+
+        // Confort commerçant : préremplit le PIN mémorisé sur cet appareil pour la
+        // boutique de ce client (stocké en sessionStorage — effacé à la fermeture
+        // de l'onglet), si l'option a été cochée lors d'un scan précédent.
+        try {
+            const remembered = JSON.parse(sessionStorage.getItem('fid_pin_remember') || 'null');
+            if (remembered && remembered.shopKey === (data.nom || '') + '_' + data.seuil_visites) {
+                document.getElementById('merchant-pin').value = remembered.pin;
+                document.getElementById('merchant-pin-reward').value = remembered.pin;
+                document.getElementById('merchant-remember-pin').checked = true;
+            }
+        } catch (e) { /* pas grave si absent */ }
     }
 
     async function validateAction(type) {
+        const errBox = document.getElementById('scan-error');
+        errBox.style.display = 'none';
         const pinInput = type === 'reward' ? document.getElementById('merchant-pin-reward').value : document.getElementById('merchant-pin').value;
-        
-        if (pinInput !== merchantConfigRow.admin_pin) return showToast("Code PIN incorrect ❌");
+        if (!pinInput) { errBox.innerText = "Entrez le code PIN."; errBox.style.display = 'block'; return; }
 
-        if (type === 'stamp' || type === 'remove') {
-            const increment = type === 'stamp' ? 1 : -1;
-            const newVisites = Math.max(0, currentScannedClient.nb_visites + increment);
-            
-            const pointsInc = type === 'stamp' ? (merchantConfigRow.ratio_points || 1) : -(merchantConfigRow.ratio_points || 1);
-            const newPoints = Math.max(0, currentScannedClient.total_points + pointsInc);
-            
-            await sb.from('fidelite_clients').update({ 
-                nb_visites: newVisites, 
-                total_points: newPoints 
-            }).eq('id', currentScannedClient.id);
-            
-            showToast(type === 'stamp' ? "Visite validée ✅" : "Visite retirée ➖");
-            setTimeout(() => { location.href = "?shop=" + currentScannedClient.config_id; }, 1500);
-        } 
-        else if (type === 'reward') {
-            const remainingVisits = currentScannedClient.nb_visites - merchantConfigRow.seuil_visites;
-            const rewardsArray = currentScannedClient.used_rewards || [];
-            rewardsArray.push({ date: new Date().toISOString() });
-            
-            await sb.from('fidelite_clients').update({ 
-                nb_visites: Math.max(0, remainingVisits),
-                used_rewards: rewardsArray
-            }).eq('id', currentScannedClient.id);
-            
-            showToast("Récompense validée ✅");
-            setTimeout(() => { location.href = "?shop=" + currentScannedClient.config_id; }, 1500);
+        const { data, error } = await sb.rpc('fidelite_merchant_action', {
+            p_client_id: currentScannedClientId, p_pin: pinInput, p_action: type
+        });
+        if (error || !data || !data.success) {
+            errBox.innerText = (data && data.message) || "Erreur de validation.";
+            errBox.style.display = 'block';
+            return;
         }
+
+        if (document.getElementById('merchant-remember-pin').checked && currentScanInfo) {
+            sessionStorage.setItem('fid_pin_remember', JSON.stringify({
+                shopKey: (currentScanInfo.nom || '') + '_' + currentScanInfo.seuil_visites, pin: pinInput
+            }));
+        } else {
+            sessionStorage.removeItem('fid_pin_remember');
+        }
+
+        showToast(type === 'stamp' ? "Visite validée ✅" : type === 'remove' ? "Visite retirée ➖" : "Récompense validée ✅", "success");
+        setTimeout(() => { location.href = "?scan=" + currentScannedClientId; }, 1200);
+    }
+
+    // --- 11. WALLET NATIF (Apple Wallet / Google Wallet) ---
+    // Ces deux boutons appellent des Edge Functions Supabase (à déployer
+    // séparément — voir WALLET_SETUP.md) qui génèrent un .pkpass signé
+    // (Apple) ou un lien de sauvegarde signé (Google). Le pass reflète le
+    // solde au moment de l'appel ; le client le régénère en réappuyant sur
+    // le bouton après une nouvelle visite (voir WALLET_SETUP.md pour la
+    // mise à jour automatique en push, une amélioration future optionnelle).
+    const WALLET_FN_URL = SB_URL + '/functions/v1/';
+
+    async function addToAppleWallet() {
+        if (!currentClientId) return;
+        const btn = document.getElementById('btn-apple-wallet');
+        const original = btn.innerText; btn.disabled = true; btn.innerText = '⏳...';
+        try {
+            const res = await fetch(WALLET_FN_URL + 'generate-apple-pass', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
+                body: JSON.stringify({ client_id: currentClientId })
+            });
+            if (!res.ok) {
+                const t = await res.text().catch(() => '');
+                throw new Error(t || `Le service Apple Wallet n'est pas encore déployé (HTTP ${res.status}).`);
+            }
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'carte-fidelite.pkpass';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+        } catch (e) {
+            showToast("Apple Wallet indisponible pour le moment : " + e.message, "error");
+        }
+        btn.disabled = false; btn.innerText = original;
+    }
+
+    async function addToGoogleWallet() {
+        if (!currentClientId) return;
+        const btn = document.getElementById('btn-google-wallet');
+        const original = btn.innerText; btn.disabled = true; btn.innerText = '⏳...';
+        try {
+            const res = await fetch(WALLET_FN_URL + 'generate-google-wallet-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
+                body: JSON.stringify({ client_id: currentClientId })
+            });
+            let result;
+            try { result = await res.json(); } catch { throw new Error(`Le service Google Wallet n'est pas encore déployé (HTTP ${res.status}).`); }
+            if (!res.ok || !result.url) throw new Error(result.message || `Erreur (HTTP ${res.status}).`);
+            window.open(result.url, '_blank');
+        } catch (e) {
+            showToast("Google Wallet indisponible pour le moment : " + e.message, "error");
+        }
+        btn.disabled = false; btn.innerText = original;
     }
 </script>
 
