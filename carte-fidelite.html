@@ -441,24 +441,22 @@
         nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; position: relative; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.5px; cursor:pointer; background:none; border:none; padding:0; }
         .logo span { color: var(--accent-color); }
-        .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0; }
+        /* Menu unique (☰) : un seul point d'entrée pour les liens ET les actions
+           de compte, sur toutes les tailles d'écran — plus jamais de boutons
+           dupliqués entre une zone "desktop" et une zone "mobile" séparées. */
+        .nav-links { display: none; flex-direction: column; align-items: flex-start; position: absolute; top: 58px; right: 0; min-width: 240px; background: rgba(255,255,255,.98); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 14px; padding: 1rem 1.2rem; gap: .85rem; box-shadow: var(--shadow-md); list-style: none; margin: 0; z-index: 999; }
+        .nav-links.active { display: flex; }
+        .nav-links li { width: 100%; }
         .nav-links a { text-decoration: none; color: var(--text-primary); font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
         .nav-links a:hover { color: var(--accent-color); }
-        .nav-auth { display: flex; align-items: center; gap: 10px; margin-left: 1rem; flex-shrink: 0; }
+        .nav-links .nav-auth-mobile-item { display: flex; flex-direction: column; gap: .6rem; width: 100%; padding-top: .85rem; margin-top: .15rem; border-top: 1px solid var(--border-color); }
+        .nav-links .nav-auth-mobile-item button { width: 100%; }
 
-        .hamburger-btn { display: none; flex-direction: column; justify-content: space-between; width: 24px; height: 17px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
+        .hamburger-btn { display: flex; flex-direction: column; justify-content: space-between; width: 24px; height: 17px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
         .hamburger-btn span { width: 100%; height: 2px; background-color: var(--text-primary); border-radius: 2px; transition: all .25s ease; }
         .hamburger-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         .hamburger-btn.active span:nth-child(2) { opacity: 0; }
         .hamburger-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-        @media (max-width: 900px) {
-            .hamburger-btn { display: flex; }
-            .nav-links { display: none; flex-direction: column; align-items: flex-start; position: absolute; top: 58px; left: -2rem; right: -2rem; background: rgba(255,255,255,.98); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 1.3rem 2rem; gap: 1rem; box-shadow: var(--shadow-md); }
-            .nav-links.active { display: flex; }
-            .nav-links .nav-auth-mobile-item { display: flex; flex-direction: column; gap: .6rem; width: 100%; padding-top: .8rem; margin-top: .3rem; border-top: 1px solid var(--border-color); }
-            .nav-links .nav-auth-mobile-item button { width: 100%; }
-            .nav-auth.desktop-only { display: none; }
-        }
 
         .btn { display: inline-flex; align-items: center; justify-content: center; background-color: var(--accent-color); color: #fff; padding: 12px 24px; border-radius: 50px; font-size: 1rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; }
         .btn:hover { background-color: var(--accent-hover); transform: scale(1.02); }
@@ -521,15 +519,37 @@
         .swatch.active { border-color: var(--ink); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ink); }
         .swatch-none { display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text-secondary); background: #f4f4f5; font-weight: 700; }
 
-        .card-preview { background: var(--c-bg, #fff); color: var(--c-tx, #1d1d1f); padding: 25px; border-radius: 20px; text-align: center; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-        .logo-img { max-width: 90px; max-height: 90px; margin-bottom: 15px; object-fit: contain; border-radius: 12px; z-index: 2; position: relative; }
-        .card-title { font-size: 1.4rem; font-weight: 800; margin: 0 0 20px 0; z-index: 2; position: relative; }
-        .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; z-index: 2; position: relative; }
-        .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; opacity: 0.3; transition: all 0.3s; position: relative; }
-        .stamp-active { opacity: 1; border-style: solid; border-color: inherit; background: rgba(0,0,0,0.05); transform: scale(1.05); }
+        /* ---- Carte au format "carte bancaire" ---- */
+        .bank-card { background: var(--c-bg, #fff); color: var(--c-tx, #1d1d1f); position: relative; width: 100%; max-width: 380px; aspect-ratio: 1.586 / 1; margin: 0 auto; padding: 20px 22px; border-radius: 20px; box-shadow: 0 16px 34px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+        .bank-card-top { display: flex; align-items: flex-start; justify-content: space-between; z-index: 2; position: relative; }
+        .bank-card-logo { max-width: 42px; max-height: 42px; object-fit: contain; border-radius: 8px; background: #fff; padding: 3px; }
+        .bank-card-chip { width: 36px; height: 27px; border-radius: 6px; flex-shrink: 0; background: linear-gradient(135deg, #f4e4ab, #c9a227 60%, #a9820f); position: relative; }
+        .bank-card-chip::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(0,0,0,0.25); border-radius: 3px; }
+        .bank-card-id { z-index: 2; position: relative; margin-top: 4px; }
+        .bank-card-shop { font-size: 1rem; font-weight: 800; line-height: 1.15; }
+        .bank-card-title { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; opacity: .75; margin-top: 2px; }
+        .bank-card-number { font-family: 'SFMono-Regular', 'Courier New', Consolas, monospace; font-size: clamp(.95rem, 4vw, 1.2rem); font-weight: 600; letter-spacing: .1em; z-index: 2; position: relative; }
+        .bank-card-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; z-index: 2; position: relative; }
+        .bank-card-label { display: block; font-size: .55rem; text-transform: uppercase; opacity: .65; letter-spacing: .05em; margin-bottom: 2px; }
+        .bank-card-holder { font-size: .82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        .bank-card-network { font-size: .72rem; font-weight: 800; opacity: .85; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+        .bank-card-watermark { position: absolute; bottom: 6px; right: 14px; font-size: 9px; opacity: .55; font-weight: 600; z-index: 2; }
+
+        /* ---- Encarts sous la carte (tampons, récompenses, messages) ---- */
+        .marketing-banner { background: var(--bg-secondary); border: 1px dashed var(--border-color); border-radius: 14px; padding: 12px 16px; font-size: .85rem; font-weight: 600; text-align: center; line-height: 1.4; }
+        .marketing-banner + .bank-card, .bank-card + .marketing-banner { margin-top: 14px; }
+        .insert-panel { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; margin-top: 16px; text-align: center; box-shadow: var(--shadow-sm); }
+        .insert-panel-head { display: inline-flex; background: var(--bg-secondary); padding: 8px 20px; border-radius: 50px; font-weight: 800; font-size: .9rem; margin-bottom: 14px; }
+        .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; }
+        .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; opacity: 0.3; filter: grayscale(1); transition: all 0.3s; position: relative; background: rgba(0,0,0,0.03); }
+        .stamp-active { opacity: 1; filter: none; border-style: solid; border-color: var(--accent-color); background: rgba(0,113,227,0.08); transform: scale(1.05); }
         .stamp-mid::after { content: '🎁'; position:absolute; top:-9px; right:-6px; font-size: .7rem; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
-        .reward-box { background: var(--c-btn, #000); color: var(--c-btn-tx, #fff); padding: 15px; border-radius: 14px; width: 100%; margin-top: auto; font-weight: 700; font-size: 0.9rem; z-index: 2; position: relative; margin-bottom: 10px; }
-        .mid-reward-note { font-size: 11.5px; font-weight: 700; opacity: .85; z-index:2; position:relative; margin-top: 4px; }
+        .insert-points { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin: 12px 0 0 0; }
+        .reward-panel { background: var(--premium-bg); border-color: #f0d68a; }
+        .reward-panel h4 { margin: 0 0 8px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--premium); }
+        .reward-panel p { margin: 0; font-weight: 700; font-size: .95rem; }
+        .mid-reward-note { font-size: 12px; font-weight: 700; opacity: .85; margin-top: 8px; }
+        .qr-panel { text-align: center; }
         .birthday-banner { background: linear-gradient(135deg,#ff9a9e,#fecfef 60%,#fbc2eb); color:#5c1a3a; padding: 12px 14px; border-radius: 14px; margin-bottom: 14px; font-weight: 800; font-size: .85rem; text-align:center; z-index:2; position:relative; box-shadow: var(--shadow-sm); }
 
         .skeleton { background: linear-gradient(90deg, #eee 25%, #f6f6f6 37%, #eee 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; border-radius: 10px; }
@@ -597,8 +617,6 @@
             <li><a href="#avantages" onclick="closeMenu()">Avantages CRM</a></li>
             <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
-
-        <div class="nav-auth desktop-only" id="nav-auth-area"></div>
     </nav>
 </header>
 
@@ -641,6 +659,12 @@
 
                             <label class="field-label">Titre de la carte</label>
                             <input type="text" id="conf_title" value="Carte de fidélité" oninput="updatePreview()">
+
+                            <label class="field-label" style="margin-top:15px;">Message marketing (au-dessus de la carte)</label>
+                            <input type="text" id="conf_msg_top" placeholder="Ex : 🔥 Offre du mois : -10% dès 5 visites !" maxlength="120" oninput="updatePreview()">
+
+                            <label class="field-label">Message marketing (en dessous de la carte)</label>
+                            <input type="text" id="conf_msg_bottom" placeholder="Ex : 📍 Ouvert du mardi au samedi, 9h-19h" maxlength="120" oninput="updatePreview()">
                         </div>
                     </details>
 
@@ -698,15 +722,11 @@
                             </div>
 
                             <label class="field-label">Emoji du tampon</label>
-                            <select id="conf_emoji" onchange="updatePreview()">
-                                <option value="⭐">⭐ Étoile</option>
-                                <option value="☕">☕ Café</option>
-                                <option value="🍕">🍕 Pizza</option>
-                                <option value="✂️">✂️ Ciseaux</option>
-                                <option value="🎁">🎁 Cadeau</option>
-                                <option value="🍺">🍺 Bière</option>
-                                <option value="🚗">🚗 Voiture</option>
-                            </select>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <input type="text" id="conf_emoji" value="⭐" maxlength="4" oninput="updatePreview()" style="width:70px; text-align:center; font-size:1.4rem; flex-shrink:0;">
+                                <div class="swatch-grid" id="emoji-suggestions" style="flex:1; display:flex; gap:6px; flex-wrap:wrap;"></div>
+                            </div>
+                            <p class="field-hint">Tapez ou collez n'importe quel emoji : c'est lui qui illustrera chaque tampon.</p>
 
                             <label class="field-label">La récompense finale</label>
                             <input type="text" id="conf_reward" value="Un café offert ! ☕" oninput="updatePreview()">
@@ -757,22 +777,40 @@
 
                 <div class="panel panel-preview">
                     <h2 class="title" style="text-align: center; margin-bottom: 20px; font-size:1.4rem;">Aperçu Client</h2>
-                    <div class="card-preview" id="live-card">
-                        <img id="live-logo" src="" class="logo-img hidden">
-                        <h3 id="live-name" style="margin:0 0 5px 0; font-size:1.1rem; z-index:2; position:relative;"></h3>
-                        <div id="live-title" class="card-title"></div>
+
+                    <div id="live-msg-top" class="marketing-banner hidden"></div>
+
+                    <div class="bank-card" id="live-card">
+                        <div class="bank-card-top">
+                            <img id="live-logo" src="" class="bank-card-logo hidden">
+                            <div class="bank-card-chip"></div>
+                        </div>
+                        <div class="bank-card-id">
+                            <div id="live-name" class="bank-card-shop"></div>
+                            <div id="live-title" class="bank-card-title"></div>
+                            <div id="live-cardnumber" class="bank-card-number">•••• •••• •••• ••••</div>
+                        </div>
+                        <div class="bank-card-bottom">
+                            <div>
+                                <span class="bank-card-label">Titulaire</span>
+                                <div id="live-holder" class="bank-card-holder">Aperçu</div>
+                            </div>
+                            <div class="bank-card-network">Fidélité</div>
+                        </div>
+                        <div id="live-watermark" class="bank-card-watermark">⚡ Fidélité Pro</div>
+                    </div>
+
+                    <div id="live-msg-bottom" class="marketing-banner hidden"></div>
+
+                    <div class="insert-panel">
+                        <div class="insert-panel-head"><span id="live-count">1</span> / <span id="live-max">10</span> tampons</div>
                         <div class="stamps-grid" id="live-stamps"></div>
+                    </div>
 
-                        <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 20px; z-index:2; position:relative;">
-                            1 / <span id="live-max">10</span> tampons
-                        </div>
-
-                        <div class="reward-box">
-                            🎁 <span id="live-reward"></span>
-                            <div class="mid-reward-note hidden" id="live-mid-note"></div>
-                        </div>
-
-                        <div id="live-watermark" style="font-size:10px; color:#999; margin-top:10px; font-weight: 600; z-index:2; position:relative;">⚡ Propulsé par Fidélité Pro</div>
+                    <div class="insert-panel reward-panel">
+                        <h4>🎁 À gagner</h4>
+                        <p id="live-reward"></p>
+                        <div class="mid-reward-note hidden" id="live-mid-note"></div>
                     </div>
                 </div>
             </div>
@@ -917,6 +955,7 @@
                     <thead>
                         <tr>
                             <th>Date d'inscription</th>
+                            <th>N° Carte</th>
                             <th>Nom</th>
                             <th>Email</th>
                             <th>Téléphone</th>
@@ -999,31 +1038,45 @@
             <div style="margin-top:8px;"><button class="btn" style="padding:8px 18px; font-size:13px;" onclick="claimBirthdayBonus()" type="button">Réclamer mon cadeau</button></div>
         </div>
 
-        <div class="card-preview" id="render-card" style="box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-            <img id="render-logo" src="" class="logo-img hidden">
-            <h3 id="render-shop" style="margin:0 0 5px 0; font-size:1rem; z-index:2; position:relative;"></h3>
-            <div id="render-title" class="card-title"></div>
+        <div id="render-msg-top" class="marketing-banner hidden" style="margin-bottom:14px;"></div>
 
-            <div class="stamps-grid" id="render-stamps"></div>
-
-            <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; font-weight: 800; margin-top: 25px; z-index:2; position:relative;">
-                <span id="render-count">0</span> / <span id="render-max">10</span> visites
+        <div class="bank-card" id="render-card">
+            <div class="bank-card-top">
+                <img id="render-logo" src="" class="bank-card-logo hidden">
+                <div class="bank-card-chip"></div>
             </div>
-
-            <p style="font-size:12px; font-weight: bold; margin-top:10px; color:var(--text-secondary); z-index:2; position:relative;">Points totaux : <span id="render-points">0</span></p>
-
-            <div class="reward-box">
-                🎁 <span id="render-reward"></span>
-                <div class="mid-reward-note hidden" id="render-mid-note"></div>
+            <div class="bank-card-id">
+                <div id="render-name" class="bank-card-shop"></div>
+                <div id="render-title" class="bank-card-title"></div>
+                <div id="render-cardnumber" class="bank-card-number">•••• •••• •••• ••••</div>
             </div>
-
-            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 10px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis Google</a>
-
-            <div id="render-watermark" style="font-size:10px; color:#999; margin-top:15px; font-weight: 600; z-index:2; position:relative;">⚡ Propulsé par Fidélité Pro</div>
+            <div class="bank-card-bottom">
+                <div>
+                    <span class="bank-card-label">Titulaire</span>
+                    <div id="render-holder" class="bank-card-holder">—</div>
+                </div>
+                <div class="bank-card-network">Fidélité</div>
+            </div>
+            <div id="render-watermark" class="bank-card-watermark">⚡ Fidélité Pro</div>
         </div>
 
-        <div style="margin-top:20px; background:#fff; padding:20px; border-radius:20px; text-align:center; box-shadow:var(--shadow-sm);">
-            <h4 style="margin:0 0 10px 0;">Mon code carte</h4>
+        <div id="render-msg-bottom" class="marketing-banner hidden" style="margin-top:14px;"></div>
+
+        <div class="insert-panel">
+            <div class="insert-panel-head"><span id="render-count">0</span> / <span id="render-max">10</span> visites</div>
+            <div class="stamps-grid" id="render-stamps"></div>
+            <p class="insert-points">Points totaux : <span id="render-points">0</span></p>
+        </div>
+
+        <div class="insert-panel reward-panel">
+            <h4>🎁 À gagner</h4>
+            <p id="render-reward"></p>
+            <div class="mid-reward-note hidden" id="render-mid-note"></div>
+            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 14px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis Google</a>
+        </div>
+
+        <div class="insert-panel qr-panel">
+            <h4 style="margin:0 0 8px 0;">📷 Mon QR Code</h4>
             <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">Présentez ce QR code au commerçant pour valider votre visite.</p>
             <div id="client-personal-qr" style="display:inline-block; padding:10px; border:1px solid #eee; border-radius:10px;"></div>
             <div style="margin-top:14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
@@ -1370,6 +1423,19 @@
                 texWrap.appendChild(sw);
             });
         }
+
+        const emojiWrap = document.getElementById('emoji-suggestions');
+        if (emojiWrap && !emojiWrap.children.length) {
+            ['⭐', '☕', '🍕', '✂️', '🎁', '🍺', '🚗', '🍔', '💆', '🐾'].forEach(em => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn-ghost';
+                btn.style.cssText = 'padding:6px 10px; font-size:1.1rem; line-height:1;';
+                btn.innerText = em;
+                btn.onclick = () => { document.getElementById('conf_emoji').value = em; updatePreview(); };
+                emojiWrap.appendChild(btn);
+            });
+        }
     }
 
     function computeScreenBackground(bgUrl, gradientKey, textureKey, bgColor, isPremiumUser) {
@@ -1422,12 +1488,18 @@
         await loadDashboard();
     }
 
-    // Menu ☰ mobile
+    // Menu ☰ (unique, mobile + desktop)
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const navMenuEl = document.getElementById('nav-links');
-    hamburgerBtn.addEventListener('click', () => {
+    hamburgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         hamburgerBtn.classList.toggle('active');
         navMenuEl.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+        if (navMenuEl.classList.contains('active') && !navMenuEl.contains(e.target) && e.target !== hamburgerBtn) {
+            closeMenu();
+        }
     });
     function closeMenu() {
         hamburgerBtn.classList.remove('active');
@@ -1568,7 +1640,6 @@
     async function checkSession() {
         const { data: { session } } = await sb.auth.getSession();
         currentUser = session ? session.user : null;
-        const authArea = document.getElementById('nav-auth-area');
         const mobileArea = document.getElementById('nav-auth-mobile');
 
         if (currentUser) {
@@ -1577,14 +1648,13 @@
 
             const premiumBtn = isPremium
                 ? '<span class="chip-premium">⭐ Premium</span>'
-                : '<button class="btn-premium" onclick="openModal(\'premium-modal\')" type="button">⭐ Débloquer Premium</button>';
+                : '<button class="btn-premium" onclick="closeMenu(); openModal(\'premium-modal\')" type="button">⭐ Débloquer Premium</button>';
 
             const html = `
                 ${premiumBtn}
                 <button class="btn-ghost" onclick="showDashboard()" type="button">📊 Dashboard</button>
                 <button class="btn-ghost" onclick="handleLogout()" type="button">Déconnexion</button>
             `;
-            authArea.innerHTML = html;
             mobileArea.innerHTML = html;
 
             const premiumInputs = [
@@ -1603,7 +1673,6 @@
 
             await loadOwnedConfig();
         } else {
-            authArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')" type="button">Espace Commerçant</button>`;
             mobileArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')" type="button">Espace Commerçant</button>`;
 
             ['bg_input', 'conf_google_url', 'conf_mid_seuil', 'conf_mid_reward', 'conf_birthday_bonus'].forEach(id => {
@@ -1698,6 +1767,27 @@
     }
 
     // --- 7. CONFIGURATEUR ---
+    // Formate une chaîne de 16 chiffres façon carte bancaire : "1234 5678 9012 3456"
+    function formatCardNumber(digits) {
+        const d = (digits || '').replace(/\D/g, '').padEnd(16, '0').slice(0, 16);
+        return d.match(/.{1,4}/g).join(' ');
+    }
+
+    // Dérive un numéro de carte à 16 chiffres, stable et unique par client,
+    // à partir de son UUID (aucune donnée sensible, aucun appel serveur requis).
+    function deriveCardNumber(clientId) {
+        if (!clientId) return '0000000000000000';
+        let digits = '';
+        let h1 = 0, h2 = 0;
+        for (let i = 0; i < clientId.length; i++) {
+            const c = clientId.charCodeAt(i);
+            h1 = (h1 * 31 + c) >>> 0;
+            h2 = (h2 * 131 + c * (i + 7)) >>> 0;
+        }
+        digits = (h1.toString().padStart(10, '0') + h2.toString().padStart(10, '0')).slice(0, 16);
+        return digits;
+    }
+
     function applyStyleToCard(prefix, config, bypassPremium = false) {
         const card = document.getElementById(prefix + 'card');
         if (!card) return;
@@ -1723,6 +1813,23 @@
         document.getElementById(prefix + 'name').innerText = config.name;
         document.getElementById(prefix + 'title').innerText = config.title;
         document.getElementById(prefix + 'max').innerText = config.max;
+
+        const cardNumberEl = document.getElementById(prefix + 'cardnumber');
+        if (cardNumberEl) cardNumberEl.innerText = formatCardNumber(config.card_number || '0000000000000000');
+
+        const holderEl = document.getElementById(prefix + 'holder');
+        if (holderEl) holderEl.innerText = config.holder || 'Aperçu';
+
+        const msgTop = document.getElementById(prefix + 'msg-top');
+        if (msgTop) {
+            if (config.msg_top) { msgTop.innerText = config.msg_top; msgTop.classList.remove('hidden'); }
+            else { msgTop.classList.add('hidden'); }
+        }
+        const msgBottom = document.getElementById(prefix + 'msg-bottom');
+        if (msgBottom) {
+            if (config.msg_bottom) { msgBottom.innerText = config.msg_bottom; msgBottom.classList.remove('hidden'); }
+            else { msgBottom.classList.add('hidden'); }
+        }
 
         if (document.getElementById(prefix + 'reward')) {
             document.getElementById(prefix + 'reward').innerText = config.reward;
@@ -1771,8 +1878,10 @@
             gradient: selectedGradient,
             texture: selectedTexture,
             max: parseInt(document.getElementById('conf_seuil').value) || 10,
-            emoji: document.getElementById('conf_emoji').value,
+            emoji: document.getElementById('conf_emoji').value || '⭐',
             reward: document.getElementById('conf_reward').value,
+            msg_top: document.getElementById('conf_msg_top').value.trim(),
+            msg_bottom: document.getElementById('conf_msg_bottom').value.trim(),
             mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
             mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null
         };
@@ -1781,6 +1890,8 @@
     function updatePreview() {
         const conf = readConfigForm();
         conf.current_stamps = 1; // 1 tampon d'aperçu (le 1er tampon est offert à l'inscription)
+        conf.card_number = deriveCardNumber(currentConfigId || 'apercu');
+        conf.holder = 'Aperçu';
         applyStyleToCard('live-', conf);
     }
 
@@ -1822,6 +1933,8 @@
 
             document.getElementById('conf_emoji').value = d.emoji || '⭐';
             document.getElementById('conf_reward').value = d.reward || '';
+            document.getElementById('conf_msg_top').value = d.msg_top || '';
+            document.getElementById('conf_msg_bottom').value = d.msg_bottom || '';
 
             updatePreview();
             generateAdminQR();
@@ -1850,6 +1963,7 @@
             bg_img: isPremium ? conf.bg_img : '',
             gradient: selectedGradient, texture: selectedTexture,
             emoji: conf.emoji, reward: conf.reward,
+            msg_top: conf.msg_top, msg_bottom: conf.msg_bottom,
             google_url: isPremium ? document.getElementById('conf_google_url').value : ''
         };
 
@@ -1956,6 +2070,7 @@
             tr.dataset.search = `${c.nom || ''} ${c.email || ''}`.toLowerCase();
             tr.innerHTML = `
                 <td>${dateCrea}</td>
+                <td style="font-family:monospace; font-size:12px; white-space:nowrap;">${formatCardNumber(deriveCardNumber(c.id))}</td>
                 <td class="crm-editable" data-field="nom">${c.nom || '-'}</td>
                 <td class="crm-editable" data-field="email"><span class="${blurClass}">${displayEmail}</span></td>
                 <td class="crm-editable" data-field="tel"><span class="${blurClass}">${displayTel}</span></td>
@@ -2047,11 +2162,11 @@
 
     function handleExportCSV() {
         if (!isPremium) { openModal('premium-modal'); return; }
-        let csv = "Date Inscription;Nom;Email;Telephone;Date Naissance;Visites;Points;Recompenses reclamees\n";
+        let csv = "Date Inscription;N Carte;Nom;Email;Telephone;Date Naissance;Visites;Points;Recompenses reclamees\n";
         dashClientsCache.forEach(c => {
             const dateCrea = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '-';
             const nbRewards = c.used_rewards ? c.used_rewards.length : 0;
-            const row = [dateCrea, c.nom || '', c.email || '', c.tel || '', c.date_naissance || '', c.nb_visites || 0, c.total_points || 0, nbRewards]
+            const row = [dateCrea, formatCardNumber(deriveCardNumber(c.id)), c.nom || '', c.email || '', c.tel || '', c.date_naissance || '', c.nb_visites || 0, c.total_points || 0, nbRewards]
                 .map(v => String(v).replace(/;/g, ',')).join(';');
             csv += row + "\n";
         });
@@ -2194,9 +2309,12 @@
             name: d.name, title: d.title, logo: d.logo, bg: d.bg, tx: d.tx, btn: d.btn, btn_tx: d.btn_tx,
             bg_img: cfg.is_premium ? d.bg_img : '',
             gradient: d.gradient, texture: d.texture, emoji: d.emoji, reward: d.reward,
+            msg_top: d.msg_top, msg_bottom: d.msg_bottom,
             mid_seuil: cfg.mid_seuil, mid_reward: cfg.mid_reward,
             max: cfg.seuil_visites || 10,
-            current_stamps: data.nb_visites || 0
+            current_stamps: data.nb_visites || 0,
+            card_number: deriveCardNumber(clientId),
+            holder: data.nom || '—'
         };
 
         document.getElementById('client-auth-box').classList.add('hidden');
