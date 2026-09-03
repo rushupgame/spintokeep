@@ -21,7 +21,8 @@
     <meta name="apple-mobile-web-app-title" content="Ma Carte">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎫</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230071e3%22/><text x=%2250%22 y=%2268%22 font-size=%2255%22 text-anchor=%22middle%22>🎫</text></svg>">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
 
     <meta property="og:title" content="Fidélité Pro | Carte de fidélité digitale par QR Code">
     <meta property="og:description" content="Créez votre carte de fidélité en 2 minutes, sans application à installer. Vos clients scannent, cumulent, reviennent.">
@@ -206,6 +207,9 @@
   grant execute on function fidelite_save_config(text, jsonb, int, numeric, int, text, boolean, text) to authenticated;
 
   -- 5. fidelite_register_client : inscription d'un client (1er tampon offert).
+  --    Gratuit pour les 2 premiers clients d'un commerçant non-Premium ;
+  --    à partir du 3e client, l'inscription est bloquée tant que le
+  --    commerçant n'est pas passé Premium (is_premium sur son profil).
   create or replace function fidelite_register_client(
     p_config_id text, p_nom text, p_email text, p_tel text, p_birthdate date, p_code text
   ) returns json
@@ -213,10 +217,23 @@
   as $$
   declare
     v_id uuid;
+    v_owner uuid;
+    v_is_premium boolean;
+    v_count int;
   begin
-    if not exists (select 1 from fidelite_configs where id = p_config_id) then
+    select owner_id into v_owner from fidelite_configs where id = p_config_id;
+    if v_owner is null then
       return json_build_object('success', false, 'message', 'Boutique introuvable.');
     end if;
+
+    select coalesce(is_premium, false) into v_is_premium from profiles where id = v_owner;
+    if not v_is_premium then
+      select count(*) into v_count from fidelite_clients where config_id = p_config_id;
+      if v_count >= 2 then
+        return json_build_object('success', false, 'message', 'Ce programme de fidélité est momentanément en pause. Merci de repasser un peu plus tard !', 'code', 'FREE_LIMIT_REACHED');
+      end if;
+    end if;
+
     if p_code is null or length(p_code) < 4 then
       return json_build_object('success', false, 'message', 'Le code doit contenir au moins 4 caractères.');
     end if;
@@ -523,6 +540,7 @@
         .bank-card { background: var(--c-bg, #fff); color: var(--c-tx, #1d1d1f); position: relative; width: 100%; max-width: 380px; aspect-ratio: 1.586 / 1; margin: 0 auto; padding: 20px 22px; border-radius: 20px; box-shadow: 0 16px 34px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
         .bank-card-top { display: flex; align-items: flex-start; justify-content: space-between; z-index: 2; position: relative; }
         .bank-card-logo { max-width: 42px; max-height: 42px; object-fit: contain; border-radius: 8px; background: #fff; padding: 3px; }
+        .bank-card-logo-emoji { width: 42px; height: 42px; border-radius: 8px; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
         .bank-card-chip { width: 36px; height: 27px; border-radius: 6px; flex-shrink: 0; background: linear-gradient(135deg, #f4e4ab, #c9a227 60%, #a9820f); position: relative; }
         .bank-card-chip::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(0,0,0,0.25); border-radius: 3px; }
         .bank-card-id { z-index: 2; position: relative; margin-top: 4px; }
@@ -551,6 +569,10 @@
         .reward-condition { font-size: 11.5px; font-weight: 600; opacity: .75; margin-top: 8px !important; }
         .address-panel h4 { margin: 0 0 6px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); }
         .address-panel p { margin: 0; font-weight: 600; font-size: .9rem; color: var(--text-primary); }
+        #rgpd-modal-body h4 { margin: 0 0 12px 0; font-size: 1.05rem; color: var(--text-primary); }
+        #rgpd-modal-body p { margin: 0 0 12px 0; }
+        #rgpd-modal-body ul { margin: 0 0 12px 0; padding-left: 20px; }
+        #rgpd-modal-body li { margin-bottom: 6px; }
         .mid-reward-note { font-size: 12px; font-weight: 700; opacity: .85; margin-top: 8px; }
         .qr-panel { text-align: center; }
         .birthday-banner { background: linear-gradient(135deg,#ff9a9e,#fecfef 60%,#fbc2eb); color:#5c1a3a; padding: 12px 14px; border-radius: 14px; margin-bottom: 14px; font-weight: 800; font-size: .85rem; text-align:center; z-index:2; position:relative; box-shadow: var(--shadow-sm); }
@@ -641,7 +663,8 @@
         <!-- CONFIGURATEUR -->
         <section id="configurateur-section" class="bg-gray">
             <h2 style="margin-bottom: 0.5rem;">Configurez votre carte de fidélité</h2>
-            <p style="text-align: center; margin-bottom: 3rem;">C'est 100% gratuit à créer. L'aperçu se met à jour en temps réel.</p>
+            <p style="text-align: center; margin-bottom: 1rem;">C'est 100% gratuit à créer. L'aperçu se met à jour en temps réel.</p>
+            <p style="text-align: center; margin-bottom: 3rem; font-size: 0.95rem; color: var(--text-secondary);">🎉 Gratuit pour vos 2 premiers clients. Ensuite, passez Premium (9,90 €/mois, sans engagement) pour continuer à faire grandir votre programme.</p>
 
             <div class="config-wrapper">
                 <div class="panel panel-config">
@@ -659,6 +682,33 @@
                                 <div id="logo-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Formats acceptés : PNG, JPG. Taille max conseillée : 2 Mo.</div>
                             </div>
                             <input type="hidden" id="conf_logo" value="">
+                            <button type="button" id="btn-clear-logo" class="btn-ghost hidden" onclick="clearLogoImage()" style="margin-top:8px; font-size:12px; padding:6px 12px;">🗑️ Retirer l'image et utiliser un emoji</button>
+
+                            <p class="field-hint" style="margin-top:14px;">Pas de logo sous la main ? Choisissez un emoji selon votre activité — il sera utilisé tant qu'aucune image n'est envoyée.</p>
+                            <select id="conf_logo_business" onchange="applyLogoBusinessPreset()">
+                                <option value="">— Choisir un type d'activité —</option>
+                                <option value="☕">☕ Café / Salon de thé</option>
+                                <option value="🍽️">🍽️ Restaurant</option>
+                                <option value="🍕">🍕 Restauration rapide / Pizzeria</option>
+                                <option value="🥐">🥐 Boulangerie / Pâtisserie</option>
+                                <option value="🍺">🍺 Bar</option>
+                                <option value="💇">💇 Coiffure</option>
+                                <option value="💅">💅 Institut de beauté / Onglerie</option>
+                                <option value="💆">💆 Spa / Massage</option>
+                                <option value="✂️">✂️ Pressing / Retouches</option>
+                                <option value="🏋️">🏋️ Salle de sport / Coach</option>
+                                <option value="🧘">🧘 Yoga / Bien-être</option>
+                                <option value="🚗">🚗 Garage automobile</option>
+                                <option value="🐾">🐾 Animalerie / Toilettage</option>
+                                <option value="🛍️">🛍️ Commerce / Boutique</option>
+                                <option value="📚">📚 Librairie / Papeterie</option>
+                                <option value="💐">💐 Fleuriste</option>
+                                <option value="⭐">⭐ Autre</option>
+                            </select>
+                            <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                                <input type="text" id="conf_logo_emoji" maxlength="4" placeholder="Emoji" oninput="updatePreview()" style="width:70px; text-align:center; font-size:1.4rem; flex-shrink:0;">
+                                <p class="field-hint" style="margin:0;">Ou tapez/collez directement l'emoji de votre choix.</p>
+                            </div>
 
                             <label class="field-label">Titre de la carte</label>
                             <input type="text" id="conf_title" value="Carte de fidélité" oninput="updatePreview()">
@@ -672,6 +722,10 @@
                             <label class="field-label" style="margin-top:15px;">Adresse de l'établissement</label>
                             <input type="text" id="conf_address" placeholder="Ex : 12 rue de la Paix, 75002 Paris" maxlength="160" oninput="updatePreview()">
                             <p class="field-hint">Affichée sur la carte du client, sous ses tampons. Laissez vide pour ne rien afficher.</p>
+
+                            <label class="field-label">Email de contact (RGPD)</label>
+                            <input type="email" id="conf_contact_email" placeholder="Ex : contact@monboutique.com" oninput="updatePreview()">
+                            <p class="field-hint">Affiché dans les mentions légales que vos clients acceptent à l'inscription.</p>
                         </div>
                     </details>
 
@@ -779,6 +833,28 @@
                             <button class="btn-ghost" onclick="downloadAdminQR()" type="button">⬇️ Télécharger le QR</button>
                             <button class="btn-ghost" onclick="copyAdminLink()" type="button">📋 Copier le lien</button>
                         </div>
+
+                        <div style="margin-top:22px; padding-top:18px; border-top:1px solid var(--border-color); text-align:left;">
+                            <h4 style="margin:0 0 4px 0; text-align:center;">🖨️ Affiches gratuites pour votre vitrine</h4>
+                            <p style="font-size:12.5px; color:var(--text-secondary); text-align:center; margin-bottom:14px;">Téléchargez une affiche prête à imprimer, avec votre logo, votre récompense et votre QR Code — 100% gratuit, aucun filigrane.</p>
+                            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+                                <div style="text-align:center;">
+                                    <div style="font-weight:700; font-size:12px; margin-bottom:6px;">A4</div>
+                                    <button class="btn-ghost" style="width:100%; margin-bottom:6px; font-size:12px; padding:8px 4px;" onclick="downloadPoster('A4','portrait',this)">↕️ Portrait</button>
+                                    <button class="btn-ghost" style="width:100%; font-size:12px; padding:8px 4px;" onclick="downloadPoster('A4','landscape',this)">↔️ Paysage</button>
+                                </div>
+                                <div style="text-align:center;">
+                                    <div style="font-weight:700; font-size:12px; margin-bottom:6px;">A5</div>
+                                    <button class="btn-ghost" style="width:100%; margin-bottom:6px; font-size:12px; padding:8px 4px;" onclick="downloadPoster('A5','portrait',this)">↕️ Portrait</button>
+                                    <button class="btn-ghost" style="width:100%; font-size:12px; padding:8px 4px;" onclick="downloadPoster('A5','landscape',this)">↔️ Paysage</button>
+                                </div>
+                                <div style="text-align:center;">
+                                    <div style="font-weight:700; font-size:12px; margin-bottom:6px;">A6</div>
+                                    <button class="btn-ghost" style="width:100%; margin-bottom:6px; font-size:12px; padding:8px 4px;" onclick="downloadPoster('A6','portrait',this)">↕️ Portrait</button>
+                                    <button class="btn-ghost" style="width:100%; font-size:12px; padding:8px 4px;" onclick="downloadPoster('A6','landscape',this)">↔️ Paysage</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -790,6 +866,7 @@
                     <div class="bank-card" id="live-card">
                         <div class="bank-card-top">
                             <img id="live-logo" src="" class="bank-card-logo hidden">
+                            <span id="live-logo-emoji" class="bank-card-logo-emoji hidden"></span>
                             <div class="bank-card-chip"></div>
                         </div>
                         <div class="bank-card-id">
@@ -924,6 +1001,14 @@
             <button class="btn-ghost" onclick="showLandingView()">✏️ Modifier ma carte</button>
         </div>
 
+        <div id="free-tier-banner" class="hidden" style="background:var(--premium-bg); border:1px solid #f0d68a; border-radius:16px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div>
+                <p style="margin:0; font-weight:800; color:#5c4400;" id="free-tier-title">🎉 100% gratuit pour vos 2 premiers clients</p>
+                <p style="margin:4px 0 0 0; font-size:13px; color:#7a5c00;" id="free-tier-sub">Il vous reste <strong id="free-tier-remaining">2</strong> client(s) gratuit(s) avant de passer Premium.</p>
+            </div>
+            <button class="btn-premium" onclick="openModal('premium-modal')" type="button">Voir Premium ⭐</button>
+        </div>
+
         <div class="dash-cards">
             <div class="dash-card">
                 <div class="lbl">Clients Inscrits</div>
@@ -1000,9 +1085,14 @@
 <!-- ==========================================
      VUE 3 : CLIENT (Mobile - Scan du QR Code)
 =========================================== -->
-<div id="client-view" class="hidden" style="min-height: 100vh; background: #f0f0f5; display: flex; align-items: center; justify-content: center; padding: 20px;">
+<div id="client-view" class="hidden" style="min-height: 100vh; background: #f0f0f5; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 16px;">
 
     <div id="client-auth-box" class="panel" style="width:100%; max-width:400px;">
+        <div id="client-auth-brand" class="hidden" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px;">
+            <img id="client-auth-brand-logo-img" src="" class="hidden" style="width:36px; height:36px; border-radius:9px; object-fit:contain;">
+            <span id="client-auth-brand-logo-emoji" class="hidden" style="font-size:1.7rem; line-height:1;"></span>
+            <span id="client-auth-brand-name" style="font-weight:800; font-size:1.05rem;"></span>
+        </div>
         <h2 id="client-auth-title" style="margin-bottom:6px; text-align:center;">Obtenir ma carte</h2>
         <p id="client-auth-sub" style="font-size:14px; color:var(--text-secondary); margin-bottom:18px; text-align:center;">Créez votre compte en 15 secondes pour cumuler vos avantages. 1ᵉʳ tampon offert !</p>
 
@@ -1046,6 +1136,11 @@
             <input type="password" id="cli-newcode" inputmode="numeric" autocomplete="new-password">
         </div>
 
+        <div id="client-field-rgpd" style="display:flex; align-items:flex-start; gap:8px; margin: 4px 0 14px 0;">
+            <input type="checkbox" id="rgpd-checkbox" style="width:auto; margin-top:3px; flex-shrink:0;">
+            <label for="rgpd-checkbox" id="rgpd-checkbox-label" style="font-size:12px; color:var(--text-secondary); line-height:1.5; cursor:pointer;"></label>
+        </div>
+
         <button class="btn btn-black" id="client-auth-submit" style="width:100%; padding:14px; font-size:16px; margin-top:6px;" onclick="submitClientAuth()">Activer ma carte</button>
 
         <div id="client-link-back" class="hidden" style="text-align:center; margin-top:14px;">
@@ -1066,6 +1161,7 @@
         <div class="bank-card" id="render-card">
             <div class="bank-card-top">
                 <img id="render-logo" src="" class="bank-card-logo hidden">
+                <span id="render-logo-emoji" class="bank-card-logo-emoji hidden"></span>
                 <div class="bank-card-chip"></div>
             </div>
             <div class="bank-card-id">
@@ -1116,6 +1212,16 @@
         <div style="text-align:center; margin-top:16px;">
             <a href="#" onclick="clientLogout(); return false;" style="font-size:12.5px; color:var(--text-secondary); text-decoration:underline;">Se déconnecter de ce compte</a>
         </div>
+    </div>
+
+    <div id="install-footer" class="panel hidden" style="width:100%; max-width:400px; text-align:center;">
+        <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:8px;">
+            <img id="install-footer-logo-img" src="" class="hidden" style="width:32px; height:32px; border-radius:8px; object-fit:contain;">
+            <span id="install-footer-logo-emoji" class="hidden" style="font-size:1.6rem; line-height:1;"></span>
+            <h4 style="margin:0;">Installer <span id="install-footer-shopname">l'application</span></h4>
+        </div>
+        <p id="install-footer-text" style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;"></p>
+        <button id="install-footer-btn" class="btn-ghost hidden" onclick="triggerPwaInstall()" type="button">📲 Installer l'application</button>
     </div>
 </div>
 
@@ -1208,11 +1314,18 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="rgpd-modal">
+    <div class="modal-box" style="text-align:left; max-height:80vh; overflow-y:auto;">
+        <button class="modal-close" onclick="closeModal('rgpd-modal')" type="button">×</button>
+        <div id="rgpd-modal-body" style="font-size:13px; color:var(--text-secondary); line-height:1.6;"></div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="premium-modal">
     <div class="modal-box" style="text-align:center;">
         <button class="modal-close" onclick="closeModal('premium-modal')" type="button">×</button>
         <h2>Passer Premium ⭐</h2>
-        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;">Débloquez l'export CRM complet, les graphiques détaillés, la Marque Blanche, le palier intermédiaire, le bonus anniversaire et le Boost Avis Google.</p>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:14px;">100% gratuit pour créer votre carte et vos <strong>2 premiers clients</strong>. Au 3ᵉ client, passez Premium pour continuer à faire grandir votre programme — et débloquez en prime l'export CRM complet, les graphiques détaillés, la Marque Blanche, le palier intermédiaire, le bonus anniversaire et le Boost Avis Google.</p>
         <div style="background:var(--premium-bg); border:2px solid #f0d68a; border-radius:16px; padding:20px; margin-bottom:20px;">
             <div style="font-size:2.5rem; font-weight:800; color:#5c4400;">9,90 €<span style="font-size:1rem; font-weight:600;">/mois</span></div>
             <p style="margin:5px 0 0 0; font-size:13px; font-weight:bold; color:#7a5c00;">Sans engagement</p>
@@ -1296,6 +1409,7 @@
     let currentClientId = null;
     let currentClientCard = null;
     let currentShopId = null;
+    let currentShopConfig = null;
     let dashClientsCache = [];
 
     // --- 2. TRAITEMENT ET UPLOAD D'IMAGES ---
@@ -1354,6 +1468,7 @@
                 document.getElementById(targetId).value = publicUrl;
                 status.innerText = "✅ Image ajoutée avec succès !";
                 status.style.color = "var(--success)";
+                if (targetId === 'conf_logo') document.getElementById('btn-clear-logo').classList.remove('hidden');
                 updatePreview();
             } else { throw new Error("Erreur serveur"); }
         } catch (e) {
@@ -1361,6 +1476,21 @@
             status.innerText = "❌ Erreur. Réessayez avec une image plus légère.";
             status.style.color = "var(--danger)";
         }
+    }
+
+    function applyLogoBusinessPreset() {
+        const val = document.getElementById('conf_logo_business').value;
+        if (val) { document.getElementById('conf_logo_emoji').value = val; updatePreview(); }
+    }
+
+    function clearLogoImage() {
+        document.getElementById('conf_logo').value = '';
+        document.getElementById('logo_input').value = '';
+        const status = document.getElementById('logo-status');
+        status.innerText = "Formats acceptés : PNG, JPG. Taille max conseillée : 2 Mo.";
+        status.style.color = "var(--text-secondary)";
+        document.getElementById('btn-clear-logo').classList.add('hidden');
+        updatePreview();
     }
 
     // --- 3. DÉGRADÉS & TEXTURES ---
@@ -1876,8 +2006,17 @@
         }
 
         const logo = document.getElementById(prefix + 'logo');
-        if (config.logo) { logo.src = config.logo; logo.classList.remove('hidden'); }
-        else { logo.classList.add('hidden'); }
+        const logoEmoji = document.getElementById(prefix + 'logo-emoji');
+        if (config.logo) {
+            logo.src = config.logo; logo.classList.remove('hidden');
+            if (logoEmoji) logoEmoji.classList.add('hidden');
+        } else if (config.logo_emoji) {
+            logo.classList.add('hidden');
+            if (logoEmoji) { logoEmoji.innerText = config.logo_emoji; logoEmoji.classList.remove('hidden'); }
+        } else {
+            logo.classList.add('hidden');
+            if (logoEmoji) logoEmoji.classList.add('hidden');
+        }
 
         const watermark = document.getElementById(prefix + 'watermark');
         if (watermark) watermark.classList.toggle('hidden', !!isUserPremium);
@@ -1901,6 +2040,7 @@
             name: document.getElementById('conf_name').value || "Boutique",
             title: document.getElementById('conf_title').value || "Fidélité",
             logo: document.getElementById('conf_logo').value,
+            logo_emoji: document.getElementById('conf_logo_emoji').value.trim(),
             bg: document.getElementById('conf_bg').value,
             tx: document.getElementById('conf_tx').value,
             btn: document.getElementById('conf_btn').value,
@@ -1914,6 +2054,7 @@
             msg_top: document.getElementById('conf_msg_top').value.trim(),
             msg_bottom: document.getElementById('conf_msg_bottom').value.trim(),
             address: document.getElementById('conf_address').value.trim(),
+            contact_email: document.getElementById('conf_contact_email').value.trim(),
             mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
             mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null
         };
@@ -1939,6 +2080,8 @@
             document.getElementById('conf_name').value = d.name || '';
             document.getElementById('conf_title').value = d.title || '';
             document.getElementById('conf_logo').value = d.logo || '';
+            document.getElementById('conf_logo_emoji').value = d.logo_emoji || '';
+            if (d.logo) document.getElementById('btn-clear-logo').classList.remove('hidden');
             document.getElementById('conf_bg').value = d.bg || '#ffffff';
             document.getElementById('conf_tx').value = d.tx || '#1d1d1f';
             document.getElementById('conf_btn').value = d.btn || '#0071e3';
@@ -1968,6 +2111,7 @@
             document.getElementById('conf_msg_top').value = d.msg_top || '';
             document.getElementById('conf_msg_bottom').value = d.msg_bottom || '';
             document.getElementById('conf_address').value = d.address || '';
+            document.getElementById('conf_contact_email').value = d.contact_email || '';
 
             updatePreview();
             generateAdminQR();
@@ -1991,12 +2135,12 @@
 
         const conf = readConfigForm();
         const dataJson = {
-            name: conf.name, title: conf.title, logo: conf.logo, bg: conf.bg, tx: conf.tx,
+            name: conf.name, title: conf.title, logo: conf.logo, logo_emoji: conf.logo_emoji, bg: conf.bg, tx: conf.tx,
             btn: conf.btn, btn_tx: conf.btn_tx,
             bg_img: isPremium ? conf.bg_img : '',
             gradient: selectedGradient, texture: selectedTexture,
             emoji: conf.emoji, reward: conf.reward,
-            msg_top: conf.msg_top, msg_bottom: conf.msg_bottom, address: conf.address,
+            msg_top: conf.msg_top, msg_bottom: conf.msg_bottom, address: conf.address, contact_email: conf.contact_email,
             google_url: isPremium ? document.getElementById('conf_google_url').value : ''
         };
 
@@ -2051,6 +2195,176 @@
         navigator.clipboard.writeText(url).then(() => showToast("Lien copié !", "success")).catch(() => showToast("Impossible de copier le lien.", "error"));
     }
 
+    // --- 7bis. AFFICHES À TÉLÉCHARGER (A4 / A5 / A6, portrait & paysage) ---
+    // Générées entièrement côté navigateur via <canvas>, à 200 dpi (bonne
+    // qualité d'impression), avec le logo, le nom, la récompense, l'adresse
+    // et un grand QR Code pointant vers la page d'inscription de la boutique.
+    const POSTER_SIZES = { A4: { w: 1654, h: 2339 }, A5: { w: 1165, h: 1654 }, A6: { w: 827, h: 1165 } };
+
+    function getPosterDims(sizeKey, orientation) {
+        const base = POSTER_SIZES[sizeKey];
+        return orientation === 'landscape' ? { w: base.h, h: base.w } : { w: base.w, h: base.h };
+    }
+
+    function drawRoundedClipPath(ctx, x, y, size, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + size, y, x + size, y + size, r);
+        ctx.arcTo(x + size, y + size, x, y + size, r);
+        ctx.arcTo(x, y + size, x, y, r);
+        ctx.arcTo(x, y, x + size, y, r);
+        ctx.closePath();
+    }
+
+    function wrapCenteredText(ctx, text, cx, y, maxWidth, lineHeight) {
+        const words = String(text).split(' ');
+        let line = '', lines = [];
+        words.forEach(word => {
+            const test = line ? line + ' ' + word : word;
+            if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = word; }
+            else line = test;
+        });
+        if (line) lines.push(line);
+        lines.forEach((l, i) => ctx.fillText(l, cx, y + i * lineHeight));
+        return y + lines.length * lineHeight;
+    }
+
+    function loadImageSafe(url) {
+        return new Promise((resolve) => {
+            if (!url) { resolve(null); return; }
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }
+
+    async function generateQrCanvas(text, size) {
+        await loadScriptOnce(LIB_URLS.qrcode);
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:fixed; left:-9999px; top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, { text, width: size, height: size, correctLevel: QRCode.CorrectLevel.M });
+        const canvasEl = tmp.querySelector('canvas');
+        document.body.removeChild(tmp);
+        return canvasEl || null;
+    }
+
+    async function generatePosterCanvas(sizeKey, orientation, skipLogoImage) {
+        const conf = readConfigForm();
+        const { w, h } = getPosterDims(sizeKey, orientation);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        const accent = conf.btn || '#0071e3';
+        const textColor = '#1d1d1f';
+        const font = (weight, sizePx) => `${weight} ${Math.round(sizePx)}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = accent;
+        ctx.fillRect(0, 0, w, h * 0.018);
+        ctx.fillRect(0, h - h * 0.018, w, h * 0.018);
+
+        const cx = w / 2;
+        let y = h * 0.09;
+        const logoSize = Math.min(w, h) * 0.16;
+
+        let img = (!skipLogoImage && conf.logo) ? await loadImageSafe(conf.logo) : null;
+        if (img) {
+            ctx.save();
+            drawRoundedClipPath(ctx, cx - logoSize / 2, y, logoSize, logoSize * 0.18);
+            ctx.clip();
+            ctx.drawImage(img, cx - logoSize / 2, y, logoSize, logoSize);
+            ctx.restore();
+            y += logoSize + h * 0.03;
+        } else if (conf.logo_emoji) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,0.05)';
+            drawRoundedClipPath(ctx, cx - logoSize / 2, y, logoSize, logoSize * 0.22);
+            ctx.fill();
+            ctx.font = font(400, logoSize * 0.55);
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(conf.logo_emoji, cx, y + logoSize / 2 + logoSize * 0.02);
+            ctx.textBaseline = 'alphabetic';
+            ctx.restore();
+            y += logoSize + h * 0.03;
+        }
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = textColor;
+        ctx.font = font(800, w * 0.075);
+        y += w * 0.07;
+        y = wrapCenteredText(ctx, conf.name || 'Ma Boutique', cx, y, w * 0.85, w * 0.085);
+
+        y += h * 0.018;
+        ctx.font = font(700, w * 0.032);
+        ctx.fillStyle = accent;
+        ctx.fillText('PROGRAMME DE FIDÉLITÉ', cx, y);
+
+        if (conf.reward) {
+            y += h * 0.045;
+            ctx.font = font(700, w * 0.038);
+            ctx.fillStyle = textColor;
+            y = wrapCenteredText(ctx, '🎁 ' + conf.reward, cx, y, w * 0.8, w * 0.048);
+        }
+
+        const qrSize = Math.min(w, h) * 0.32;
+        y += h * 0.045;
+        const qrUrl = `${window.location.origin}${window.location.pathname}?shop=${currentConfigId}`;
+        const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
+        if (qrCanvas) {
+            ctx.drawImage(qrCanvas, cx - qrSize / 2, y, qrSize, qrSize);
+            y += qrSize + h * 0.035;
+        }
+
+        ctx.font = font(800, w * 0.044);
+        ctx.fillStyle = textColor;
+        y = wrapCenteredText(ctx, '📱 Scannez-moi pour rejoindre le programme !', cx, y, w * 0.85, w * 0.05);
+
+        y += h * 0.022;
+        ctx.font = font(700, w * 0.03);
+        ctx.fillStyle = accent;
+        ctx.fillText('1ᵉʳ tampon offert !', cx, y);
+
+        if (conf.address) {
+            ctx.font = font(500, w * 0.024);
+            ctx.fillStyle = '#6e6e73';
+            ctx.fillText('📍 ' + conf.address, cx, h - h * 0.045);
+        }
+
+        return canvas;
+    }
+
+    async function downloadPoster(sizeKey, orientation, btnEl) {
+        if (!currentConfigId) { showToast("Enregistrez d'abord votre carte pour débloquer vos affiches.", "error"); return; }
+        const original = btnEl ? btnEl.innerText : null;
+        if (btnEl) { btnEl.disabled = true; btnEl.innerText = '⏳...'; }
+        try {
+            let canvas;
+            let dataUrl;
+            try {
+                canvas = await generatePosterCanvas(sizeKey, orientation, false);
+                dataUrl = canvas.toDataURL('image/png');
+            } catch (e) {
+                // Canvas "taintée" par une image cross-origin sans en-têtes CORS : on
+                // régénère sans l'image du logo (l'emoji de secours reste affiché).
+                canvas = await generatePosterCanvas(sizeKey, orientation, true);
+                dataUrl = canvas.toDataURL('image/png');
+            }
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `affiche-fidelite-${sizeKey}-${orientation}.png`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            showToast('Affiche téléchargée ! 🎉', 'success');
+        } catch (e) {
+            console.error(e);
+            showToast("Erreur lors de la génération de l'affiche.", "error");
+        }
+        if (btnEl) { btnEl.disabled = false; btnEl.innerText = original; }
+    }
+
     // --- 8. DASHBOARD CRM ---
     function maskEmail(email) {
         if (!email) return '-';
@@ -2080,8 +2394,25 @@
             eventsQuery
         ]);
         dashClientsCache = clients || [];
+        updateFreeTierBanner(dashClientsCache.length);
         renderCrmTable(dashClientsCache);
         renderChart(events || [], periodVal);
+    }
+
+    function updateFreeTierBanner(clientCount) {
+        const banner = document.getElementById('free-tier-banner');
+        if (!banner) return;
+        if (isPremium) { banner.classList.add('hidden'); return; }
+        const remaining = Math.max(0, 2 - clientCount);
+        document.getElementById('free-tier-remaining').innerText = remaining;
+        if (remaining > 0) {
+            document.getElementById('free-tier-title').innerText = '🎉 100% gratuit pour vos 2 premiers clients';
+            document.getElementById('free-tier-sub').innerHTML = `Il vous reste <strong>${remaining}</strong> client${remaining > 1 ? 's' : ''} gratuit${remaining > 1 ? 's' : ''} avant de passer Premium.`;
+        } else {
+            document.getElementById('free-tier-title').innerText = '⏸️ Inscriptions en pause';
+            document.getElementById('free-tier-sub').innerHTML = `Vous avez atteint vos 2 clients gratuits. Passez Premium pour rouvrir les inscriptions et continuer à faire grandir votre programme.`;
+        }
+        banner.classList.remove('hidden');
     }
 
     function renderCrmTable(clients) {
@@ -2263,6 +2594,7 @@
         document.getElementById('client-field-tel').style.display = (mode === 'signup') ? 'block' : 'none';
         document.getElementById('client-field-dob').style.display = (mode === 'signup' || mode === 'reset') ? 'block' : 'none';
         document.getElementById('client-field-code').style.display = (mode === 'signup' || mode === 'login') ? 'block' : 'none';
+        document.getElementById('client-field-rgpd').style.display = (mode === 'signup') ? 'flex' : 'none';
         document.getElementById('client-link-forgot').classList.toggle('hidden', mode !== 'login');
         document.getElementById('client-field-newcode').classList.toggle('hidden', mode !== 'reset');
         document.getElementById('client-link-back').classList.toggle('hidden', mode !== 'reset');
@@ -2334,6 +2666,7 @@
                 const tel = document.getElementById('cli-tel').value.trim();
                 const dob = document.getElementById('cli-dob').value;
                 if (!nom || !tel || !dob) throw new Error("Veuillez remplir tous les champs.");
+                if (!document.getElementById('rgpd-checkbox').checked) throw new Error("Merci d'accepter les conditions du programme de fidélité pour continuer.");
 
                 const { data, error } = await sb.rpc('fidelite_register_client', {
                     p_config_id: currentShopId, p_nom: nom, p_email: email, p_tel: tel, p_birthdate: dob, p_code: code
@@ -2360,6 +2693,11 @@
         document.getElementById('client-card-box').classList.add('hidden');
         switchClientAuth('signup');
 
+        const { data: cfgRow } = await sb.from('fidelite_configs').select('*').eq('id', shopId).maybeSingle();
+        currentShopConfig = cfgRow || null;
+        applyShopBrandingToAuthScreen();
+        setupInstallFooter();
+
         const myId = localStorage.getItem('fid_cli_' + shopId);
         if (myId) {
             const ok = await loadClientCardById(myId, false);
@@ -2367,6 +2705,128 @@
             localStorage.removeItem('fid_cli_' + shopId);
         }
         document.getElementById('client-auth-box').classList.remove('hidden');
+    }
+
+    // --- Installation "à l'écran d'accueil" (PWA) côté client ---
+    // Une vraie icône d'app par commerce nécessiterait un manifest.json
+    // dynamique par boutique (hors de portée d'une page unique) : on
+    // propose donc le meilleur équivalent réalisable ici, avec les
+    // instructions adaptées à l'appareil et le nom / logo du commerce.
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        const btn = document.getElementById('install-footer-btn');
+        if (btn) btn.classList.remove('hidden');
+    });
+
+    function setupInstallFooter() {
+        const d = (currentShopConfig && currentShopConfig.data) || {};
+        const footer = document.getElementById('install-footer');
+        if (!footer || !d.name) return;
+
+        document.getElementById('install-footer-shopname').innerText = d.name;
+        const logoImg = document.getElementById('install-footer-logo-img');
+        const logoEmoji = document.getElementById('install-footer-logo-emoji');
+        if (d.logo) { logoImg.src = d.logo; logoImg.classList.remove('hidden'); logoEmoji.classList.add('hidden'); }
+        else if (d.logo_emoji) { logoEmoji.innerText = d.logo_emoji; logoEmoji.classList.remove('hidden'); logoImg.classList.add('hidden'); }
+
+        const ua = navigator.userAgent || '';
+        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) { footer.classList.add('hidden'); return; }
+
+        const textEl = document.getElementById('install-footer-text');
+        if (isIOS) {
+            textEl.innerHTML = 'Sur iPhone : appuyez sur <strong>Partager</strong> (icône ⬆️ en bas de Safari), puis <strong>"Sur l\'écran d\'accueil"</strong>.';
+        } else {
+            textEl.innerText = "Retrouvez votre carte en un clic depuis votre écran d'accueil, sans repasser par cette page.";
+        }
+        footer.classList.remove('hidden');
+    }
+
+    async function triggerPwaInstall() {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        document.getElementById('install-footer-btn').classList.add('hidden');
+    }
+
+    // d'inscription/connexion client, et met à jour le texte RGPD avec le
+    // nom réel du commerçant.
+    function applyShopBrandingToAuthScreen() {
+        const d = (currentShopConfig && currentShopConfig.data) || {};
+        const shopName = d.name || 'ce commerce';
+
+        const brandBox = document.getElementById('client-auth-brand');
+        const brandLogoImg = document.getElementById('client-auth-brand-logo-img');
+        const brandLogoEmoji = document.getElementById('client-auth-brand-logo-emoji');
+        if (brandBox) {
+            if (d.name) {
+                brandBox.classList.remove('hidden');
+                document.getElementById('client-auth-brand-name').innerText = d.name;
+                if (d.logo) {
+                    brandLogoImg.src = d.logo; brandLogoImg.classList.remove('hidden');
+                    brandLogoEmoji.classList.add('hidden');
+                } else if (d.logo_emoji) {
+                    brandLogoEmoji.innerText = d.logo_emoji; brandLogoEmoji.classList.remove('hidden');
+                    brandLogoImg.classList.add('hidden');
+                } else {
+                    brandLogoImg.classList.add('hidden'); brandLogoEmoji.classList.add('hidden');
+                }
+            } else {
+                brandBox.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('rgpd-checkbox-label').innerHTML =
+            `J'accepte de rejoindre le programme de fidélité de <strong>${escapeHtml(shopName)}</strong> et de recevoir ses offres exclusives. ` +
+            `J'ai pris connaissance des <a href="#" onclick="openModal('rgpd-modal'); return false;">mentions légales (RGPD)</a>.`;
+
+        const contactEmail = d.contact_email || '';
+        document.getElementById('rgpd-modal-body').innerHTML = buildRgpdText(shopName, contactEmail);
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.innerText = str;
+        return div.innerHTML;
+    }
+
+    function buildRgpdText(shopName, contactEmail) {
+        const contactLine = contactEmail
+            ? `Contacter directement le commerçant à l'adresse suivante : <a href="mailto:${escapeHtml(contactEmail)}">${escapeHtml(contactEmail)}</a>.`
+            : `Contacter directement le commerçant via ses coordonnées habituelles.`;
+        return `
+            <h4>Protection de vos données personnelles (RGPD)</h4>
+            <p><strong>Responsable du traitement</strong><br>
+            Les informations recueillies lors de votre inscription au programme de fidélité sont enregistrées par <strong>${escapeHtml(shopName)}</strong> (le "Commerçant"). L'outil technique permettant la gestion de ce programme est fourni par <strong>Spintokeep</strong>, agissant en tant que sous-traitant informatique.</p>
+
+            <p><strong>Finalités de la collecte</strong><br>
+            Vos données (nom, prénom, adresse email, numéro de téléphone, date de naissance) sont collectées dans le but de :</p>
+            <ul>
+                <li>Créer et gérer votre compte de fidélité digital.</li>
+                <li>Vous attribuer des points ou des récompenses suite à vos passages en caisse.</li>
+                <li>Vous envoyer des communications commerciales, des offres promotionnelles et une attention particulière pour votre anniversaire.</li>
+            </ul>
+
+            <p><strong>Base légale</strong><br>
+            Le traitement de vos données repose sur votre consentement explicite (Article 6.1.a du RGPD), recueilli lors de votre inscription. Vous pouvez retirer ce consentement à tout moment.</p>
+
+            <p><strong>Durée de conservation</strong><br>
+            Vos données personnelles sont conservées pendant une durée de trois (3) ans à compter de votre dernière interaction avec le programme de fidélité (dernier scan, dernier achat ou clic sur un email/SMS). Au-delà de ce délai, vos données seront effacées ou anonymisées.</p>
+
+            <p><strong>Destinataires des données</strong><br>
+            Vos données sont strictement destinées à ${escapeHtml(shopName)}. Elles sont hébergées de manière sécurisée par notre prestataire technique Spintokeep et ne seront jamais revendues ou cédées à des tiers à des fins de prospection commerciale.</p>
+
+            <p><strong>Vos droits (Accès, Rectification, Suppression)</strong><br>
+            Conformément à la réglementation européenne (RGPD) et à la loi Informatique et Libertés, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et d'opposition au traitement de vos données. Pour exercer vos droits ou vous désinscrire du programme de fidélité, vous pouvez :</p>
+            <ul>
+                <li>Cliquer sur le lien de désinscription présent en bas de chaque email envoyé.</li>
+                <li>${contactLine}</li>
+            </ul>
+        `;
     }
 
     async function loadClientCardById(clientId, persist) {
@@ -2381,7 +2841,7 @@
         const d = cfg.data || {};
         const isEligible = (data.nb_visites || 0) >= (cfg.seuil_visites || 10);
         const confObj = {
-            name: d.name, title: d.title, logo: d.logo, bg: d.bg, tx: d.tx, btn: d.btn, btn_tx: d.btn_tx,
+            name: d.name, title: d.title, logo: d.logo, logo_emoji: d.logo_emoji, bg: d.bg, tx: d.tx, btn: d.btn, btn_tx: d.btn_tx,
             bg_img: cfg.is_premium ? d.bg_img : '',
             gradient: d.gradient, texture: d.texture, emoji: d.emoji, reward: d.reward,
             msg_top: d.msg_top, msg_bottom: d.msg_bottom, address: d.address,
