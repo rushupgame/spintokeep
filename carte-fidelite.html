@@ -548,6 +548,9 @@
         .reward-panel { background: var(--premium-bg); border-color: #f0d68a; }
         .reward-panel h4 { margin: 0 0 8px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--premium); }
         .reward-panel p { margin: 0; font-weight: 700; font-size: .95rem; }
+        .reward-condition { font-size: 11.5px; font-weight: 600; opacity: .75; margin-top: 8px !important; }
+        .address-panel h4 { margin: 0 0 6px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); }
+        .address-panel p { margin: 0; font-weight: 600; font-size: .9rem; color: var(--text-primary); }
         .mid-reward-note { font-size: 12px; font-weight: 700; opacity: .85; margin-top: 8px; }
         .qr-panel { text-align: center; }
         .birthday-banner { background: linear-gradient(135deg,#ff9a9e,#fecfef 60%,#fbc2eb); color:#5c1a3a; padding: 12px 14px; border-radius: 14px; margin-bottom: 14px; font-weight: 800; font-size: .85rem; text-align:center; z-index:2; position:relative; box-shadow: var(--shadow-sm); }
@@ -665,6 +668,10 @@
 
                             <label class="field-label">Message marketing (en dessous de la carte)</label>
                             <input type="text" id="conf_msg_bottom" placeholder="Ex : 📍 Ouvert du mardi au samedi, 9h-19h" maxlength="120" oninput="updatePreview()">
+
+                            <label class="field-label" style="margin-top:15px;">Adresse de l'établissement</label>
+                            <input type="text" id="conf_address" placeholder="Ex : 12 rue de la Paix, 75002 Paris" maxlength="160" oninput="updatePreview()">
+                            <p class="field-hint">Affichée sur la carte du client, sous ses tampons. Laissez vide pour ne rien afficher.</p>
                         </div>
                     </details>
 
@@ -807,9 +814,15 @@
                         <div class="stamps-grid" id="live-stamps"></div>
                     </div>
 
+                    <div id="live-address-panel" class="insert-panel address-panel hidden">
+                        <h4>📍 Nous retrouver</h4>
+                        <p id="live-address"></p>
+                    </div>
+
                     <div class="insert-panel reward-panel">
                         <h4>🎁 À gagner</h4>
                         <p id="live-reward"></p>
+                        <p class="reward-condition">Débloqué une fois les <span id="live-reward-max">10</span> tampons complétés</p>
                         <div class="mid-reward-note hidden" id="live-mid-note"></div>
                     </div>
                 </div>
@@ -936,7 +949,16 @@
                 <p style="font-size: 13px; color: var(--text-secondary); margin-top:0; margin-bottom: 15px;">Suivez vos pics d'affluence et l'évolution réelle de vos visites.</p>
                 <button class="btn-premium" onclick="openModal('premium-modal')" type="button">Débloquer les Statistiques</button>
             </div>
-            <h3 style="margin-top:0; margin-bottom:15px;">Évolution des visites (30 derniers jours)</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                <h3 style="margin:0;">Évolution des visites (<span id="dash-period-label">30 derniers jours</span>)</h3>
+                <select id="dash-period" onchange="loadDashboard()" style="width:auto; padding:8px 12px;">
+                    <option value="7">7 derniers jours</option>
+                    <option value="30" selected>30 derniers jours</option>
+                    <option value="90">90 derniers jours</option>
+                    <option value="365">12 derniers mois</option>
+                    <option value="all">Depuis le début</option>
+                </select>
+            </div>
             <div style="height: 250px; position: relative;" id="chart-blur-wrapper">
                 <canvas id="dash-chart"></canvas>
             </div>
@@ -955,6 +977,7 @@
                     <thead>
                         <tr>
                             <th>Date d'inscription</th>
+                            <th>Dernière visite</th>
                             <th>N° Carte</th>
                             <th>Nom</th>
                             <th>Email</th>
@@ -1068,11 +1091,17 @@
             <p class="insert-points">Points totaux : <span id="render-points">0</span></p>
         </div>
 
+        <div id="render-address-panel" class="insert-panel address-panel hidden">
+            <h4>📍 Nous retrouver</h4>
+            <p id="render-address"></p>
+            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 14px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis Google</a>
+        </div>
+
         <div class="insert-panel reward-panel">
             <h4>🎁 À gagner</h4>
             <p id="render-reward"></p>
+            <p class="reward-condition">Débloqué une fois les <span id="render-reward-max">10</span> tampons complétés</p>
             <div class="mid-reward-note hidden" id="render-mid-note"></div>
-            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 14px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis Google</a>
         </div>
 
         <div class="insert-panel qr-panel">
@@ -1082,16 +1111,6 @@
             <div style="margin-top:14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
                 <button class="btn-ghost" onclick="shareClientCard()" type="button">📤 Partager ma carte</button>
             </div>
-        </div>
-
-        <div id="wallet-box" style="margin-top:16px; background:#fff; padding:20px; border-radius:20px; text-align:center; box-shadow:var(--shadow-sm);">
-            <h4 style="margin:0 0 4px 0;">Ajouter à mon portefeuille</h4>
-            <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:14px;">Retrouvez votre carte directement depuis Apple Wallet ou Google Wallet, sans rouvrir cette page.</p>
-            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                <button id="btn-apple-wallet" class="btn-ghost" onclick="addToAppleWallet()" type="button"> Apple Wallet</button>
-                <button id="btn-google-wallet" class="btn-ghost" onclick="addToGoogleWallet()" type="button">G Google Wallet</button>
-            </div>
-            <p style="font-size:11px; color:var(--text-secondary); margin-top:12px; margin-bottom:0;">Votre carte dans le portefeuille reflète votre solde au moment de l'ajout. Revenez ici et réappuyez sur le bouton pour la mettre à jour après une nouvelle visite.</p>
         </div>
 
         <div style="text-align:center; margin-top:16px;">
@@ -1820,6 +1839,9 @@
         const holderEl = document.getElementById(prefix + 'holder');
         if (holderEl) holderEl.innerText = config.holder || 'Aperçu';
 
+        const rewardMaxEl = document.getElementById(prefix + 'reward-max');
+        if (rewardMaxEl) rewardMaxEl.innerText = config.max;
+
         const msgTop = document.getElementById(prefix + 'msg-top');
         if (msgTop) {
             if (config.msg_top) { msgTop.innerText = config.msg_top; msgTop.classList.remove('hidden'); }
@@ -1829,6 +1851,15 @@
         if (msgBottom) {
             if (config.msg_bottom) { msgBottom.innerText = config.msg_bottom; msgBottom.classList.remove('hidden'); }
             else { msgBottom.classList.add('hidden'); }
+        }
+
+        const addressPanel = document.getElementById(prefix + 'address-panel');
+        if (addressPanel) {
+            const addressEl = document.getElementById(prefix + 'address');
+            if (config.address) { addressEl.innerText = '📍 ' + config.address; addressEl.classList.remove('hidden'); }
+            else if (addressEl) { addressEl.classList.add('hidden'); }
+            if (config.address || config.show_google) addressPanel.classList.remove('hidden');
+            else addressPanel.classList.add('hidden');
         }
 
         if (document.getElementById(prefix + 'reward')) {
@@ -1882,6 +1913,7 @@
             reward: document.getElementById('conf_reward').value,
             msg_top: document.getElementById('conf_msg_top').value.trim(),
             msg_bottom: document.getElementById('conf_msg_bottom').value.trim(),
+            address: document.getElementById('conf_address').value.trim(),
             mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
             mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null
         };
@@ -1935,6 +1967,7 @@
             document.getElementById('conf_reward').value = d.reward || '';
             document.getElementById('conf_msg_top').value = d.msg_top || '';
             document.getElementById('conf_msg_bottom').value = d.msg_bottom || '';
+            document.getElementById('conf_address').value = d.address || '';
 
             updatePreview();
             generateAdminQR();
@@ -1963,7 +1996,7 @@
             bg_img: isPremium ? conf.bg_img : '',
             gradient: selectedGradient, texture: selectedTexture,
             emoji: conf.emoji, reward: conf.reward,
-            msg_top: conf.msg_top, msg_bottom: conf.msg_bottom,
+            msg_top: conf.msg_top, msg_bottom: conf.msg_bottom, address: conf.address,
             google_url: isPremium ? document.getElementById('conf_google_url').value : ''
         };
 
@@ -2032,13 +2065,23 @@
 
     async function loadDashboard() {
         if (!currentConfigId) return;
+        const periodSel = document.getElementById('dash-period');
+        const periodVal = periodSel ? periodSel.value : '30';
+        const periodLabels = { '7': '7 derniers jours', '30': '30 derniers jours', '90': '90 derniers jours', '365': '12 derniers mois', 'all': 'depuis le début' };
+        document.getElementById('dash-period-label').innerText = periodLabels[periodVal] || '30 derniers jours';
+
+        let eventsQuery = sb.from('fidelite_events').select('type, created_at').eq('config_id', currentConfigId);
+        if (periodVal !== 'all') {
+            eventsQuery = eventsQuery.gte('created_at', new Date(Date.now() - parseInt(periodVal) * 86400000).toISOString());
+        }
+
         const [{ data: clients }, { data: events }] = await Promise.all([
             sb.from('fidelite_clients').select('*').eq('config_id', currentConfigId).order('created_at', { ascending: false }),
-            sb.from('fidelite_events').select('type, created_at').eq('config_id', currentConfigId).gte('created_at', new Date(Date.now() - 30 * 86400000).toISOString())
+            eventsQuery
         ]);
         dashClientsCache = clients || [];
         renderCrmTable(dashClientsCache);
-        renderChart(events || []);
+        renderChart(events || [], periodVal);
     }
 
     function renderCrmTable(clients) {
@@ -2054,6 +2097,7 @@
             totalRewards += (c.used_rewards ? c.used_rewards.length : 0);
 
             const dateCrea = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '-';
+            const dateLastVisit = c.last_visit_at ? new Date(c.last_visit_at).toLocaleDateString('fr-FR') : '-';
             const isEligible = c.nb_visites >= maxVisites;
             const isMid = midSeuil && c.nb_visites >= midSeuil && c.nb_visites < maxVisites;
             const nbRewards = c.used_rewards ? c.used_rewards.length : 0;
@@ -2070,6 +2114,7 @@
             tr.dataset.search = `${c.nom || ''} ${c.email || ''}`.toLowerCase();
             tr.innerHTML = `
                 <td>${dateCrea}</td>
+                <td>${dateLastVisit}</td>
                 <td style="font-family:monospace; font-size:12px; white-space:nowrap;">${formatCardNumber(deriveCardNumber(c.id))}</td>
                 <td class="crm-editable" data-field="nom">${c.nom || '-'}</td>
                 <td class="crm-editable" data-field="email"><span class="${blurClass}">${displayEmail}</span></td>
@@ -2131,27 +2176,55 @@
         else { showToast("Client mis à jour !", "success"); loadDashboard(); }
     }
 
-    async function renderChart(events) {
+    async function renderChart(events, periodVal) {
         await loadScriptOnce(LIB_URLS.chartjs);
         const ctx = document.getElementById('dash-chart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
 
-        const days = [];
-        const counts = {};
-        for (let i = 29; i >= 0; i--) {
-            const d = new Date(Date.now() - i * 86400000);
-            const key = d.toISOString().slice(0, 10);
-            days.push(key);
-            counts[key] = 0;
+        let granularity = 'day', bucketCount = parseInt(periodVal) || 30;
+        if (periodVal === '365') { granularity = 'month'; bucketCount = 12; }
+        else if (periodVal === 'all') {
+            granularity = 'month';
+            if (events.length) {
+                const minTime = Math.min(...events.map(e => new Date(e.created_at).getTime()));
+                const minDate = new Date(minTime);
+                const now = new Date();
+                bucketCount = (now.getFullYear() - minDate.getFullYear()) * 12 + (now.getMonth() - minDate.getMonth()) + 1;
+                bucketCount = Math.min(Math.max(bucketCount, 1), 36);
+            } else bucketCount = 12;
         }
-        events.forEach(e => {
-            if (e.type !== 'stamp' && e.type !== 'reward') return;
-            const key = (e.created_at || '').slice(0, 10);
-            if (key in counts) counts[key]++;
-        });
 
-        const labels = days.map(d => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
-        const data = days.map(d => counts[d]);
+        const buckets = [];
+        const counts = {};
+        let labels;
+
+        if (granularity === 'day') {
+            for (let i = bucketCount - 1; i >= 0; i--) {
+                const d = new Date(Date.now() - i * 86400000);
+                const key = d.toISOString().slice(0, 10);
+                buckets.push(key); counts[key] = 0;
+            }
+            events.forEach(e => {
+                if (e.type !== 'stamp' && e.type !== 'reward') return;
+                const key = (e.created_at || '').slice(0, 10);
+                if (key in counts) counts[key]++;
+            });
+            labels = buckets.map(d => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+        } else {
+            for (let i = bucketCount - 1; i >= 0; i--) {
+                const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i);
+                const key = d.toISOString().slice(0, 7);
+                buckets.push(key); counts[key] = 0;
+            }
+            events.forEach(e => {
+                if (e.type !== 'stamp' && e.type !== 'reward') return;
+                const key = (e.created_at || '').slice(0, 7);
+                if (key in counts) counts[key]++;
+            });
+            labels = buckets.map(k => { const [y, m] = k.split('-'); return new Date(y, m - 1, 1).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }); });
+        }
+
+        const data = buckets.map(k => counts[k]);
 
         chartInstance = new Chart(ctx, {
             type: 'line',
@@ -2162,11 +2235,12 @@
 
     function handleExportCSV() {
         if (!isPremium) { openModal('premium-modal'); return; }
-        let csv = "Date Inscription;N Carte;Nom;Email;Telephone;Date Naissance;Visites;Points;Recompenses reclamees\n";
+        let csv = "Date Inscription;Derniere visite;N Carte;Nom;Email;Telephone;Date Naissance;Visites;Points;Recompenses reclamees\n";
         dashClientsCache.forEach(c => {
             const dateCrea = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '-';
+            const dateLastVisit = c.last_visit_at ? new Date(c.last_visit_at).toLocaleDateString('fr-FR') : '-';
             const nbRewards = c.used_rewards ? c.used_rewards.length : 0;
-            const row = [dateCrea, formatCardNumber(deriveCardNumber(c.id)), c.nom || '', c.email || '', c.tel || '', c.date_naissance || '', c.nb_visites || 0, c.total_points || 0, nbRewards]
+            const row = [dateCrea, dateLastVisit, formatCardNumber(deriveCardNumber(c.id)), c.nom || '', c.email || '', c.tel || '', c.date_naissance || '', c.nb_visites || 0, c.total_points || 0, nbRewards]
                 .map(v => String(v).replace(/;/g, ',')).join(';');
             csv += row + "\n";
         });
@@ -2305,16 +2379,18 @@
 
         const cfg = data.config || {};
         const d = cfg.data || {};
+        const isEligible = (data.nb_visites || 0) >= (cfg.seuil_visites || 10);
         const confObj = {
             name: d.name, title: d.title, logo: d.logo, bg: d.bg, tx: d.tx, btn: d.btn, btn_tx: d.btn_tx,
             bg_img: cfg.is_premium ? d.bg_img : '',
             gradient: d.gradient, texture: d.texture, emoji: d.emoji, reward: d.reward,
-            msg_top: d.msg_top, msg_bottom: d.msg_bottom,
+            msg_top: d.msg_top, msg_bottom: d.msg_bottom, address: d.address,
             mid_seuil: cfg.mid_seuil, mid_reward: cfg.mid_reward,
             max: cfg.seuil_visites || 10,
             current_stamps: data.nb_visites || 0,
             card_number: deriveCardNumber(clientId),
-            holder: data.nom || '—'
+            holder: data.nom || '—',
+            show_google: !!(cfg.is_premium && d.google_url && isEligible)
         };
 
         document.getElementById('client-auth-box').classList.add('hidden');
@@ -2329,9 +2405,9 @@
         await loadScriptOnce(LIB_URLS.qrcode);
         new QRCode(document.getElementById('client-personal-qr'), { text: scanUrl, width: 160, height: 160 });
 
-        if ((data.nb_visites || 0) >= (cfg.seuil_visites || 10)) {
+        if (isEligible) {
             await fireConfetti({ particleCount: 150, spread: 70 });
-            if (cfg.is_premium && d.google_url) {
+            if (confObj.show_google) {
                 const btnGoogle = document.getElementById('client-google-btn');
                 btnGoogle.href = d.google_url;
                 btnGoogle.classList.remove('hidden');
@@ -2441,61 +2517,6 @@
 
         showToast(type === 'stamp' ? "Visite validée ✅" : type === 'remove' ? "Visite retirée ➖" : "Récompense validée ✅", "success");
         setTimeout(() => { location.href = "?scan=" + currentScannedClientId; }, 1200);
-    }
-
-    // --- 11. WALLET NATIF (Apple Wallet / Google Wallet) ---
-    // Ces deux boutons appellent des Edge Functions Supabase (à déployer
-    // séparément — voir WALLET_SETUP.md) qui génèrent un .pkpass signé
-    // (Apple) ou un lien de sauvegarde signé (Google). Le pass reflète le
-    // solde au moment de l'appel ; le client le régénère en réappuyant sur
-    // le bouton après une nouvelle visite (voir WALLET_SETUP.md pour la
-    // mise à jour automatique en push, une amélioration future optionnelle).
-    const WALLET_FN_URL = SB_URL + '/functions/v1/';
-
-    async function addToAppleWallet() {
-        if (!currentClientId) return;
-        const btn = document.getElementById('btn-apple-wallet');
-        const original = btn.innerText; btn.disabled = true; btn.innerText = '⏳...';
-        try {
-            const res = await fetch(WALLET_FN_URL + 'generate-apple-pass', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
-                body: JSON.stringify({ client_id: currentClientId })
-            });
-            if (!res.ok) {
-                const t = await res.text().catch(() => '');
-                throw new Error(t || `Le service Apple Wallet n'est pas encore déployé (HTTP ${res.status}).`);
-            }
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'carte-fidelite.pkpass';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 4000);
-        } catch (e) {
-            showToast("Apple Wallet indisponible pour le moment : " + e.message, "error");
-        }
-        btn.disabled = false; btn.innerText = original;
-    }
-
-    async function addToGoogleWallet() {
-        if (!currentClientId) return;
-        const btn = document.getElementById('btn-google-wallet');
-        const original = btn.innerText; btn.disabled = true; btn.innerText = '⏳...';
-        try {
-            const res = await fetch(WALLET_FN_URL + 'generate-google-wallet-link', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
-                body: JSON.stringify({ client_id: currentClientId })
-            });
-            let result;
-            try { result = await res.json(); } catch { throw new Error(`Le service Google Wallet n'est pas encore déployé (HTTP ${res.status}).`); }
-            if (!res.ok || !result.url) throw new Error(result.message || `Erreur (HTTP ${res.status}).`);
-            window.open(result.url, '_blank');
-        } catch (e) {
-            showToast("Google Wallet indisponible pour le moment : " + e.message, "error");
-        }
-        btn.disabled = false; btn.innerText = original;
     }
 </script>
 
