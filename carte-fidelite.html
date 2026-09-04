@@ -566,7 +566,6 @@
         .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; }
         .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; opacity: 0.3; filter: grayscale(1); transition: all 0.3s; position: relative; background: rgba(0,0,0,0.03); }
         .stamp-active { opacity: 1; filter: none; border-style: solid; border-color: var(--accent-color); background: rgba(0,113,227,0.08); transform: scale(1.05); }
-        .stamp-mid { box-shadow: 0 0 0 2px var(--accent-color, #0071e3) inset; }
         .insert-points { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin: 12px 0 0 0; }
         .reward-panel { background: var(--premium-bg); border-color: #f0d68a; }
         .reward-panel h4 { margin: 0 0 8px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--premium); }
@@ -897,6 +896,7 @@
                         <p id="live-reward"></p>
                         <p class="reward-condition">Débloqué une fois les <span id="live-reward-max">10</span> tampons complétés</p>
                         <div class="mid-reward-note hidden" id="live-mid-note"></div>
+                        <a id="live-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 14px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis</a>
                     </div>
                 </div>
             </div>
@@ -1498,7 +1498,15 @@
         rosegold: { label: 'Rose doré', css: 'linear-gradient(135deg, #ee9ca7, #ffdde1)' },
         midnight: { label: 'Minuit', css: 'linear-gradient(135deg, #232526, #414345)' },
         peach: { label: 'Pêche', css: 'linear-gradient(135deg, #ffecd2, #fcb69f)' },
-        royal: { label: 'Royal', css: 'linear-gradient(135deg, #141e30, #243b55)' }
+        royal: { label: 'Royal', css: 'linear-gradient(135deg, #141e30, #243b55)' },
+        corail: { label: 'Corail', css: 'linear-gradient(135deg, #ff9a9e, #fecfef)' },
+        lagon: { label: 'Lagon', css: 'linear-gradient(135deg, #43cea2, #185a9d)' },
+        aurore: { label: 'Aurore', css: 'linear-gradient(135deg, #a18cd1, #fbc2eb)' },
+        foret: { label: 'Forêt', css: 'linear-gradient(135deg, #134e5e, #71b280)' },
+        feu: { label: 'Feu', css: 'linear-gradient(135deg, #f83600, #f9d423)' },
+        nuit: { label: 'Nuit étoilée', css: 'linear-gradient(135deg, #0f2027, #2c5364)' },
+        miel: { label: 'Miel', css: 'linear-gradient(135deg, #f2994a, #f2c94c)' },
+        bubblegum: { label: 'Bubblegum', css: 'linear-gradient(135deg, #ff6a95, #6a82fb)' }
     };
     const TEXTURE_PRESETS = {
         points: { label: 'Points', css: 'radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.6px)', size: '14px 14px' },
@@ -1589,11 +1597,15 @@
         if (bgUrl) {
             images.push(`url('${bgUrl}')`);
             sizes.push('cover');
-        } else if (gradientKey && gradientKey !== 'none') {
-            const grad = GRADIENT_PRESETS[gradientKey] ? GRADIENT_PRESETS[gradientKey].css : '';
+        } else {
+            // La texture s'applique par-dessus le fond, que ce soit un
+            // dégradé ou une simple couleur unie.
             const tex = TEXTURE_PRESETS[textureKey];
-            if (tex && tex !== 'none') { images.push(tex.css); sizes.push(tex.size); }
-            if (grad) { images.push(grad); sizes.push('cover'); }
+            if (tex) { images.push(tex.css); sizes.push(tex.size); }
+            if (gradientKey && gradientKey !== 'none' && GRADIENT_PRESETS[gradientKey]) {
+                images.push(GRADIENT_PRESETS[gradientKey].css);
+                sizes.push('cover');
+            }
         }
         if (images.length === 0) return { image: 'none', size: 'auto', color: bgColor };
         return { image: images.join(', '), size: sizes.join(', '), color: bgColor };
@@ -1983,6 +1995,21 @@
             }
         }
 
+        // Bouton "Boost Avis" : visible dès qu'un lien est renseigné (utilisé
+        // par l'aperçu admin ; côté vraie carte client, ce même bouton est
+        // géré séparément dans loadClientCardById car il ne doit apparaître
+        // qu'une fois la récompense débloquée par le client).
+        const googleBtn = document.getElementById(prefix + 'google-btn');
+        if (googleBtn) {
+            if (config.google_url) {
+                googleBtn.href = config.google_url;
+                googleBtn.innerText = config.google_label || '⭐ Laissez-nous un avis';
+                googleBtn.classList.remove('hidden');
+            } else {
+                googleBtn.classList.add('hidden');
+            }
+        }
+
         const logo = document.getElementById(prefix + 'logo');
         const logoEmoji = document.getElementById(prefix + 'logo-emoji');
         if (config.logo) {
@@ -2187,7 +2214,10 @@
     const GRADIENT_CANVAS = {
         sunset: ['#FF512F', '#F09819'], ocean: ['#2193b0', '#6dd5ed'], violet: ['#654ea3', '#eaafc8'],
         emerald: ['#11998e', '#38ef7d'], rosegold: ['#ee9ca7', '#ffdde1'], midnight: ['#232526', '#414345'],
-        peach: ['#ffecd2', '#fcb69f'], royal: ['#141e30', '#243b55']
+        peach: ['#ffecd2', '#fcb69f'], royal: ['#141e30', '#243b55'],
+        corail: ['#ff9a9e', '#fecfef'], lagon: ['#43cea2', '#185a9d'], aurore: ['#a18cd1', '#fbc2eb'],
+        foret: ['#134e5e', '#71b280'], feu: ['#f83600', '#f9d423'], nuit: ['#0f2027', '#2c5364'],
+        miel: ['#f2994a', '#f2c94c'], bubblegum: ['#ff6a95', '#6a82fb']
     };
 
     function getPosterDims(sizeKey, orientation) {
@@ -2259,9 +2289,45 @@
         return canvasEl || null;
     }
 
+    // Dessine sur un petit <canvas> une tuile reproduisant approximativement
+    // le motif CSS de TEXTURE_PRESETS, pour pouvoir la répéter en pattern
+    // sur les affiches (un canvas ne sait pas lire du CSS directement).
+    function buildTexturePatternCanvas(key, s) {
+        const tile = document.createElement('canvas');
+        tile.width = s; tile.height = s;
+        const tctx = tile.getContext('2d');
+        if (key === 'points') {
+            tctx.fillStyle = 'rgba(255,255,255,0.45)';
+            tctx.beginPath();
+            tctx.arc(s / 2, s / 2, Math.max(1, s * 0.09), 0, Math.PI * 2);
+            tctx.fill();
+        } else if (key === 'diagonales') {
+            tctx.strokeStyle = 'rgba(255,255,255,0.32)';
+            tctx.lineWidth = Math.max(1, s * 0.14);
+            tctx.beginPath(); tctx.moveTo(0, s); tctx.lineTo(s, 0); tctx.stroke();
+            tctx.beginPath(); tctx.moveTo(-s / 2, s / 2); tctx.lineTo(s / 2, -s / 2); tctx.stroke();
+            tctx.beginPath(); tctx.moveTo(s / 2, s * 1.5); tctx.lineTo(s * 1.5, s / 2); tctx.stroke();
+        } else if (key === 'grille') {
+            tctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            tctx.lineWidth = Math.max(1, s * 0.045);
+            tctx.strokeRect(0, 0, s, s);
+        } else if (key === 'vagues') {
+            tctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            tctx.lineWidth = Math.max(1, s * 0.07);
+            [0, s, -s].forEach(dx => {
+                [0, s, -s].forEach(dy => {
+                    tctx.beginPath();
+                    tctx.arc(dx, dy, s * 0.42, 0, Math.PI * 2);
+                    tctx.stroke();
+                });
+            });
+        }
+        return tile;
+    }
+
     // Reproduit sur le <canvas> le même fond que celui affiché sur la carte
     // (voir computeScreenBackground) : image de fond en priorité, sinon
-    // dégradé, sinon couleur unie.
+    // couleur/dégradé avec la texture appliquée par-dessus.
     async function drawPosterBackground(ctx, w, h, conf) {
         if (conf.bg_img) {
             const bgImg = await loadImageSafe(conf.bg_img);
@@ -2279,10 +2345,29 @@
             grad.addColorStop(1, c2);
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
-            return;
+        } else {
+            ctx.fillStyle = conf.bg || '#ffffff';
+            ctx.fillRect(0, 0, w, h);
         }
-        ctx.fillStyle = conf.bg || '#ffffff';
-        ctx.fillRect(0, 0, w, h);
+        if (conf.texture && conf.texture !== 'none') {
+            const tileSize = Math.max(18, Math.round(w * 0.018));
+            const tile = buildTexturePatternCanvas(conf.texture, tileSize);
+            ctx.fillStyle = ctx.createPattern(tile, 'repeat');
+            ctx.fillRect(0, 0, w, h);
+        }
+    }
+
+    // Dessine un badge blanc à coins arrondis derrière le QR Code, pour
+    // qu'il reste toujours bien lisible et scannable quel que soit le fond
+    // de l'affiche (couleur, dégradé, texture ou image).
+    function drawQrWithFrame(ctx, qrCanvas, x, y, size) {
+        const pad = size * 0.11;
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        drawRoundedClipPath(ctx, x - pad, y - pad, size + pad * 2, pad * 1.3);
+        ctx.fill();
+        ctx.restore();
+        if (qrCanvas) ctx.drawImage(qrCanvas, x, y, size, size);
     }
 
     async function generatePosterCanvas(sizeKey, orientation, skipLogoImage) {
@@ -2364,11 +2449,9 @@
                 drawTextBlock(ctx, addrFit.lines, leftCx, h - h * 0.09, addrFit.lineHeight, 'center', textColor);
             }
 
-            const qrSize = Math.min(w - dividerX, h) * 0.62;
+            const qrSize = Math.min(w - dividerX, h) * 0.58;
             const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
-            if (qrCanvas) {
-                ctx.drawImage(qrCanvas, rightCx - qrSize / 2, h / 2 - qrSize / 2, qrSize, qrSize);
-            }
+            drawQrWithFrame(ctx, qrCanvas, rightCx - qrSize / 2, h / 2 - qrSize / 2, qrSize);
         } else {
             // Portrait : mise en page centrée classique.
             const cx = w / 2;
@@ -2414,13 +2497,11 @@
                 y = drawTextBlock(ctx, rewardFit.lines, cx, y, rewardFit.lineHeight, 'center', textColor);
             }
 
-            const qrSize = Math.min(w, h) * 0.32;
-            y += h * 0.045;
+            const qrSize = Math.min(w, h) * 0.3;
+            y += h * 0.055;
             const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
-            if (qrCanvas) {
-                ctx.drawImage(qrCanvas, cx - qrSize / 2, y, qrSize, qrSize);
-                y += qrSize + h * 0.035;
-            }
+            drawQrWithFrame(ctx, qrCanvas, cx - qrSize / 2, y, qrSize);
+            y += qrSize + h * 0.05;
 
             const scanFit = fitAndWrapText(ctx, '📱 Scannez-moi pour rejoindre le programme !', w * 0.85, 2, 800, w * 0.044, w * 0.026);
             y = drawTextBlock(ctx, scanFit.lines, cx, y, scanFit.lineHeight, 'center', textColor);
