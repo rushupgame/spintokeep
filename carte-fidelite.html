@@ -22,7 +22,7 @@
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎫</text></svg>">
     <link rel="apple-touch-icon" href="/icon-192.png">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json" id="app-manifest-link">
 
     <meta property="og:title" content="Fidélité Pro | Carte de fidélité digitale par QR Code">
     <meta property="og:description" content="Créez votre carte de fidélité en 2 minutes, sans application à installer. Vos clients scannent, cumulent, reviennent.">
@@ -131,6 +131,11 @@
   );
   alter table fidelite_clients add column if not exists birthday_bonus_year int;
   alter table fidelite_clients add column if not exists last_visit_at timestamptz;
+  -- Ajout rétroactif de la date d'inscription : nécessaire si la table
+  -- fidelite_clients existait déjà avant l'ajout de cette colonne (le
+  -- « create table if not exists » plus haut ne touche pas aux tables
+  -- déjà créées, d'où l'absence de la date sur le Dashboard).
+  alter table fidelite_clients add column if not exists created_at timestamptz default now();
   create unique index if not exists fidelite_clients_email_per_shop
     on fidelite_clients (config_id, lower(email));
   alter table fidelite_clients enable row level security;
@@ -561,7 +566,7 @@
         .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; }
         .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; opacity: 0.3; filter: grayscale(1); transition: all 0.3s; position: relative; background: rgba(0,0,0,0.03); }
         .stamp-active { opacity: 1; filter: none; border-style: solid; border-color: var(--accent-color); background: rgba(0,113,227,0.08); transform: scale(1.05); }
-        .stamp-mid::after { content: '🎁'; position:absolute; top:-9px; right:-6px; font-size: .7rem; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
+        .stamp-mid { box-shadow: 0 0 0 2px var(--accent-color, #0071e3) inset; }
         .insert-points { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin: 12px 0 0 0; }
         .reward-panel { background: var(--premium-bg); border-color: #f0d68a; }
         .reward-panel h4 { margin: 0 0 8px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--premium); }
@@ -741,14 +746,6 @@
                                     <label class="field-label">Texte</label>
                                     <input type="color" id="conf_tx" value="#1d1d1f" oninput="updatePreview()">
                                 </div>
-                                <div class="color-item">
-                                    <label class="field-label">Boutons</label>
-                                    <input type="color" id="conf_btn" value="#0071e3" oninput="updatePreview()">
-                                </div>
-                                <div class="color-item">
-                                    <label class="field-label">Texte Btn</label>
-                                    <input type="color" id="conf_btn_tx" value="#ffffff" oninput="updatePreview()">
-                                </div>
                             </div>
 
                             <label class="field-label" style="margin-top:15px;">Fond Dégradé</label>
@@ -757,12 +754,11 @@
                             <label class="field-label">Texture de fond</label>
                             <div class="swatch-grid" id="texture-swatches"></div>
 
-                            <label class="field-label" style="margin-top:20px;">Image de fond (Option Premium ⭐)</label>
-                            <p class="field-hint">Remplace la couleur de fond et le dégradé. Enlève la mention « Propulsé par Fidélité Pro ».</p>
+                            <label class="field-label" style="margin-top:20px;">Image de fond</label>
+                            <p class="field-hint">Remplace la couleur de fond et le dégradé.</p>
                             <div class="upload-area" id="bg-upload-area">
-                                <input type="file" id="bg_input" accept="image/*" onchange="handleImageUpload(this, 'conf_bg_img', 'bg-status')" disabled style="width: 100%; padding: 0; border: none;">
+                                <input type="file" id="bg_input" accept="image/*" onchange="handleImageUpload(this, 'conf_bg_img', 'bg-status')" style="width: 100%; padding: 0; border: none;">
                                 <div id="bg-status" style="font-size:12px; margin-top:5px; color:var(--text-secondary);">Taille idéale : 1080 x 1920 px</div>
-                                <button id="btn-unlock-premium-1" class="btn-premium" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);" onclick="openPremiumAction()" type="button">Débloquer Premium</button>
                             </div>
                             <input type="hidden" id="conf_bg_img" value="">
                         </div>
@@ -793,13 +789,12 @@
                             <input type="text" id="conf_reward" value="Un café offert ! ☕" oninput="updatePreview()">
 
                             <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--line);">
-                                <label class="field-label" style="margin-top:0;">Palier intermédiaire (Option Premium ⭐)</label>
+                                <label class="field-label" style="margin-top:0;">Palier intermédiaire</label>
                                 <p class="field-hint">Un petit bonus à mi-parcours pour garder vos clients motivés (ex : -10% à la 5ᵉ visite).</p>
                                 <div style="display:flex; gap:10px;">
-                                    <input type="number" id="conf_mid_seuil" placeholder="Visite n°" min="1" disabled style="flex:.6" oninput="updatePreview()">
-                                    <input type="text" id="conf_mid_reward" placeholder="Ex : Boisson offerte" disabled style="flex:1.4" oninput="updatePreview()">
+                                    <input type="number" id="conf_mid_seuil" placeholder="Visite n°" min="1" style="flex:.6" oninput="updatePreview()">
+                                    <input type="text" id="conf_mid_reward" placeholder="Ex : Boisson offerte" style="flex:1.4" oninput="updatePreview()">
                                 </div>
-                                <button id="btn-unlock-premium-3" class="btn-premium" onclick="openPremiumAction()" type="button" style="margin-top:8px;">Débloquer</button>
                             </div>
 
                             <div class="checkbox-row" style="margin-top:16px;">
@@ -807,12 +802,13 @@
                                 <label for="conf_birthday_bonus">🎂 Offrir un tampon bonus le mois de l'anniversaire du client (Premium ⭐)</label>
                             </div>
 
-                            <label class="field-label" style="margin-top:20px;">Boost Avis Google (URL - Option Premium ⭐)</label>
-                            <p class="field-hint">Le client sera invité à laisser un avis au moment où il débloque sa récompense.</p>
+                            <label class="field-label" style="margin-top:20px;">Boost Avis (URL de votre choix)</label>
+                            <p class="field-hint">Le client sera invité à cliquer ce lien au moment où il débloque sa récompense. Peut pointer vers votre fiche Google, votre TikTok, votre Instagram…</p>
                             <div style="display:flex; gap:10px;">
-                                <input type="text" id="conf_google_url" placeholder="Lien vers votre fiche Google" disabled oninput="updatePreview()">
-                                <button id="btn-unlock-premium-2" class="btn-premium" onclick="openPremiumAction()" type="button">Débloquer</button>
+                                <input type="text" id="conf_google_url" placeholder="Ex : https://g.page/votre-boutique/review" oninput="updatePreview()">
                             </div>
+                            <label class="field-label" style="margin-top:10px;">Texte du bouton</label>
+                            <input type="text" id="conf_google_label" placeholder="⭐ Laissez-nous un avis Google" maxlength="60" oninput="updatePreview()">
 
                             <div style="margin-top:20px; border-top: 1px solid var(--line); padding-top:15px;">
                                 <label class="field-label" style="color:var(--danger);">Code PIN Admin (Sécurité)</label>
@@ -974,8 +970,8 @@
                     <p>Récupérez les emails, numéros de téléphone et dates de naissance de vos clients pour vos futures campagnes marketing.</p>
                 </div>
                 <div class="card" style="background: transparent; border:none; box-shadow:none; padding: 1rem;">
-                    <h3>🎂 Paliers, anniversaires & Avis Google</h3>
-                    <p>Palier intermédiaire pour garder vos clients motivés, bonus anniversaire automatique, et rappel d'avis Google dès que la récompense est débloquée.</p>
+                    <h3>🎂 Bonus anniversaire (Premium)</h3>
+                    <p>Un tampon bonus offert automatiquement le mois de l'anniversaire du client. Le palier intermédiaire et le lien « Boost Avis » sont inclus gratuitement, dès votre première carte.</p>
                 </div>
             </div>
         </section>
@@ -1190,7 +1186,7 @@
         <div id="render-address-panel" class="insert-panel address-panel hidden">
             <h4>📍 Nous retrouver</h4>
             <p id="render-address"></p>
-            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 14px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis Google</a>
+            <a id="client-google-btn" href="#" target="_blank" class="btn hidden" style="margin-top: 14px; width: 100%; font-size: 14px; background: #fff; color: #1d1d1f; border: 1px solid #d2d2d7;">⭐ Laissez-nous un avis</a>
         </div>
 
         <div class="insert-panel reward-panel">
@@ -1325,7 +1321,7 @@
     <div class="modal-box" style="text-align:center;">
         <button class="modal-close" onclick="closeModal('premium-modal')" type="button">×</button>
         <h2>Passer Premium ⭐</h2>
-        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:14px;">100% gratuit pour créer votre carte et vos <strong>2 premiers clients</strong>. Au 3ᵉ client, passez Premium pour continuer à faire grandir votre programme — et débloquez en prime l'export CRM complet, les graphiques détaillés, la Marque Blanche, le palier intermédiaire, le bonus anniversaire et le Boost Avis Google.</p>
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:14px;">100% gratuit pour créer votre carte et vos <strong>2 premiers clients</strong>. Au 3ᵉ client, passez Premium pour continuer à faire grandir votre programme — et débloquez en prime l'export CRM complet, les graphiques détaillés, la Marque Blanche et le bonus anniversaire.</p>
         <div style="background:var(--premium-bg); border:2px solid #f0d68a; border-radius:16px; padding:20px; margin-bottom:20px;">
             <div style="font-size:2.5rem; font-weight:800; color:#5c4400;">9,90 €<span style="font-size:1rem; font-weight:600;">/mois</span></div>
             <p style="margin:5px 0 0 0; font-size:13px; font-weight:bold; color:#7a5c00;">Sans engagement</p>
@@ -1587,10 +1583,10 @@
         }
     }
 
-    function computeScreenBackground(bgUrl, gradientKey, textureKey, bgColor, isPremiumUser) {
+    function computeScreenBackground(bgUrl, gradientKey, textureKey, bgColor) {
         let images = [];
         let sizes = [];
-        if (bgUrl && isPremiumUser) {
+        if (bgUrl) {
             images.push(`url('${bgUrl}')`);
             sizes.push('cover');
         } else if (gradientKey && gradientKey !== 'none') {
@@ -1806,14 +1802,7 @@
             `;
             mobileArea.innerHTML = html;
 
-            const premiumInputs = [
-                ['bg_input', false], ['conf_google_url', false],
-                ['conf_mid_seuil', false], ['conf_mid_reward', false], ['conf_birthday_bonus', false]
-            ];
-            premiumInputs.forEach(([id]) => { document.getElementById(id).disabled = !isPremium; });
-            ['btn-unlock-premium-1', 'btn-unlock-premium-2', 'btn-unlock-premium-3'].forEach(id => {
-                document.getElementById(id).classList.toggle('hidden', isPremium);
-            });
+            document.getElementById('conf_birthday_bonus').disabled = !isPremium;
 
             const btnExport = document.getElementById('btn-export-csv');
             btnExport.className = isPremium ? 'btn-ghost' : 'btn-premium';
@@ -1824,12 +1813,7 @@
         } else {
             mobileArea.innerHTML = `<button class="btn btn-nav-login" onclick="openAuthModal('login')" type="button">Espace Commerçant</button>`;
 
-            ['bg_input', 'conf_google_url', 'conf_mid_seuil', 'conf_mid_reward', 'conf_birthday_bonus'].forEach(id => {
-                document.getElementById(id).disabled = true;
-            });
-            ['btn-unlock-premium-1', 'btn-unlock-premium-2', 'btn-unlock-premium-3'].forEach(id => {
-                document.getElementById(id).classList.remove('hidden');
-            });
+            document.getElementById('conf_birthday_bonus').disabled = true;
             currentConfigId = null;
         }
     }
@@ -1941,23 +1925,17 @@
         const card = document.getElementById(prefix + 'card');
         if (!card) return;
 
-        card.style.setProperty('--c-btn', config.btn);
-        card.style.setProperty('--c-btn-tx', config.btn_tx);
-
         const isUserPremium = bypassPremium || isPremium;
-        const bgData = computeScreenBackground(config.bg_img, config.gradient, config.texture, config.bg, isUserPremium);
+        const bgData = computeScreenBackground(config.bg_img, config.gradient, config.texture, config.bg);
 
         card.style.backgroundImage = bgData.image;
         card.style.backgroundSize = bgData.size;
         card.style.backgroundColor = bgData.color;
 
-        if (bgData.image !== 'none') {
-            card.style.color = '#fff';
-            document.getElementById(prefix + 'name').style.color = '#fff';
-        } else {
-            card.style.color = config.tx;
-            document.getElementById(prefix + 'name').style.color = config.tx;
-        }
+        // Cohérence : le texte garde toujours la couleur choisie par le
+        // commerçant, y compris par-dessus une image de fond ou un dégradé.
+        card.style.color = config.tx;
+        document.getElementById(prefix + 'name').style.color = config.tx;
 
         document.getElementById(prefix + 'name').innerText = config.name;
         document.getElementById(prefix + 'title').innerText = config.title;
@@ -2030,7 +2008,7 @@
             const isMid = config.mid_seuil && (i + 1) === parseInt(config.mid_seuil);
             slot.className = "stamp-slot" + (i < currentStamps ? " stamp-active" : "") + (isMid ? " stamp-mid" : "");
             slot.innerHTML = config.emoji || '⭐';
-            slot.style.borderColor = (bgData.image !== 'none') ? '#fff' : config.tx;
+            slot.style.borderColor = config.tx;
             grid.appendChild(slot);
         }
     }
@@ -2043,8 +2021,6 @@
             logo_emoji: document.getElementById('conf_logo_emoji').value.trim(),
             bg: document.getElementById('conf_bg').value,
             tx: document.getElementById('conf_tx').value,
-            btn: document.getElementById('conf_btn').value,
-            btn_tx: document.getElementById('conf_btn_tx').value,
             bg_img: document.getElementById('conf_bg_img').value,
             gradient: selectedGradient,
             texture: selectedTexture,
@@ -2055,8 +2031,10 @@
             msg_bottom: document.getElementById('conf_msg_bottom').value.trim(),
             address: document.getElementById('conf_address').value.trim(),
             contact_email: document.getElementById('conf_contact_email').value.trim(),
-            mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
-            mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null
+            google_url: document.getElementById('conf_google_url').value.trim(),
+            google_label: document.getElementById('conf_google_label').value.trim(),
+            mid_seuil: parseInt(document.getElementById('conf_mid_seuil').value) || null,
+            mid_reward: document.getElementById('conf_mid_reward').value || null
         };
     }
 
@@ -2084,10 +2062,9 @@
             if (d.logo) document.getElementById('btn-clear-logo').classList.remove('hidden');
             document.getElementById('conf_bg').value = d.bg || '#ffffff';
             document.getElementById('conf_tx').value = d.tx || '#1d1d1f';
-            document.getElementById('conf_btn').value = d.btn || '#0071e3';
-            document.getElementById('conf_btn_tx').value = d.btn_tx || '#ffffff';
             document.getElementById('conf_bg_img').value = d.bg_img || '';
             document.getElementById('conf_google_url').value = d.google_url || '';
+            document.getElementById('conf_google_label').value = d.google_label || '';
 
             selectedGradient = d.gradient || 'none';
             selectedTexture = d.texture || 'none';
@@ -2136,12 +2113,11 @@
         const conf = readConfigForm();
         const dataJson = {
             name: conf.name, title: conf.title, logo: conf.logo, logo_emoji: conf.logo_emoji, bg: conf.bg, tx: conf.tx,
-            btn: conf.btn, btn_tx: conf.btn_tx,
-            bg_img: isPremium ? conf.bg_img : '',
+            bg_img: conf.bg_img,
             gradient: selectedGradient, texture: selectedTexture,
             emoji: conf.emoji, reward: conf.reward,
             msg_top: conf.msg_top, msg_bottom: conf.msg_bottom, address: conf.address, contact_email: conf.contact_email,
-            google_url: isPremium ? document.getElementById('conf_google_url').value : ''
+            google_url: conf.google_url, google_label: conf.google_label
         };
 
         const shopId = currentConfigId || "shop_" + Math.random().toString(36).substring(2, 9);
@@ -2152,8 +2128,8 @@
         try {
             const { data, error } = await sb.rpc('fidelite_save_config', {
                 p_id: shopId, p_data: dataJson, p_seuil: seuil, p_ratio: ratio,
-                p_mid_seuil: isPremium ? (parseInt(document.getElementById('conf_mid_seuil').value) || null) : null,
-                p_mid_reward: isPremium ? (document.getElementById('conf_mid_reward').value || null) : null,
+                p_mid_seuil: conf.mid_seuil,
+                p_mid_reward: conf.mid_reward,
                 p_birthday_bonus: isPremium ? document.getElementById('conf_birthday_bonus').checked : false,
                 p_pin: pin || null
             });
@@ -2199,7 +2175,20 @@
     // Générées entièrement côté navigateur via <canvas>, à 200 dpi (bonne
     // qualité d'impression), avec le logo, le nom, la récompense, l'adresse
     // et un grand QR Code pointant vers la page d'inscription de la boutique.
+    // Le fond et la couleur de texte reprennent exactement le paramétrage de
+    // la carte (couleur unie / dégradé / texture / image), pour garder une
+    // cohérence visuelle entre l'aperçu, la vraie carte et les affiches.
     const POSTER_SIZES = { A4: { w: 1654, h: 2339 }, A5: { w: 1165, h: 1654 }, A6: { w: 827, h: 1165 } };
+
+    // Mêmes couleurs que GRADIENT_PRESETS (voir plus haut), sous forme de
+    // paire [couleur1, couleur2] directement exploitable par un
+    // ctx.createLinearGradient (les dégradés CSS ne sont pas lisibles par
+    // un <canvas>, il faut donc dupliquer les teintes ici).
+    const GRADIENT_CANVAS = {
+        sunset: ['#FF512F', '#F09819'], ocean: ['#2193b0', '#6dd5ed'], violet: ['#654ea3', '#eaafc8'],
+        emerald: ['#11998e', '#38ef7d'], rosegold: ['#ee9ca7', '#ffdde1'], midnight: ['#232526', '#414345'],
+        peach: ['#ffecd2', '#fcb69f'], royal: ['#141e30', '#243b55']
+    };
 
     function getPosterDims(sizeKey, orientation) {
         const base = POSTER_SIZES[sizeKey];
@@ -2216,16 +2205,35 @@
         ctx.closePath();
     }
 
-    function wrapCenteredText(ctx, text, cx, y, maxWidth, lineHeight) {
-        const words = String(text).split(' ');
-        let line = '', lines = [];
-        words.forEach(word => {
-            const test = line ? line + ' ' + word : word;
-            if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = word; }
-            else line = test;
-        });
-        if (line) lines.push(line);
-        lines.forEach((l, i) => ctx.fillText(l, cx, y + i * lineHeight));
+    // Découpe le texte en lignes qui tiennent dans maxWidth, en réduisant
+    // progressivement la taille de police si besoin (jamais plus de
+    // maxLines lignes) : c'est ce qui permet au texte de s'adapter à la
+    // place disponible sur chaque format/orientation d'affiche.
+    function fitAndWrapText(ctx, text, maxWidth, maxLines, weight, startSizePx, minSizePx) {
+        let sizePx = startSizePx;
+        let lines = [String(text)];
+        while (sizePx >= minSizePx) {
+            ctx.font = `${weight} ${Math.round(sizePx)}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+            const words = String(text).split(' ');
+            let line = '';
+            lines = [];
+            words.forEach(word => {
+                const test = line ? line + ' ' + word : word;
+                if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = word; }
+                else line = test;
+            });
+            if (line) lines.push(line);
+            if (lines.length <= maxLines) break;
+            sizePx -= Math.max(2, startSizePx * 0.05);
+        }
+        ctx.font = `${weight} ${Math.round(sizePx)}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+        return { lines, sizePx, lineHeight: sizePx * 1.18 };
+    }
+
+    function drawTextBlock(ctx, lines, x, y, lineHeight, align, color) {
+        ctx.textAlign = align;
+        ctx.fillStyle = color;
+        lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
         return y + lines.length * lineHeight;
     }
 
@@ -2251,87 +2259,182 @@
         return canvasEl || null;
     }
 
+    // Reproduit sur le <canvas> le même fond que celui affiché sur la carte
+    // (voir computeScreenBackground) : image de fond en priorité, sinon
+    // dégradé, sinon couleur unie.
+    async function drawPosterBackground(ctx, w, h, conf) {
+        if (conf.bg_img) {
+            const bgImg = await loadImageSafe(conf.bg_img);
+            if (bgImg) {
+                const scale = Math.max(w / bgImg.width, h / bgImg.height);
+                const iw = bgImg.width * scale, ih = bgImg.height * scale;
+                ctx.drawImage(bgImg, (w - iw) / 2, (h - ih) / 2, iw, ih);
+                return;
+            }
+        }
+        if (conf.gradient && conf.gradient !== 'none' && GRADIENT_CANVAS[conf.gradient]) {
+            const [c1, c2] = GRADIENT_CANVAS[conf.gradient];
+            const grad = ctx.createLinearGradient(0, 0, w, h);
+            grad.addColorStop(0, c1);
+            grad.addColorStop(1, c2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            return;
+        }
+        ctx.fillStyle = conf.bg || '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+    }
+
     async function generatePosterCanvas(sizeKey, orientation, skipLogoImage) {
         const conf = readConfigForm();
         const { w, h } = getPosterDims(sizeKey, orientation);
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
-        const accent = conf.btn || '#0071e3';
-        const textColor = '#1d1d1f';
+        const textColor = conf.tx || '#1d1d1f';
         const font = (weight, sizePx) => `${weight} ${Math.round(sizePx)}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+        const qrUrl = `${window.location.origin}${window.location.pathname}?shop=${currentConfigId}`;
 
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = accent;
-        ctx.fillRect(0, 0, w, h * 0.018);
-        ctx.fillRect(0, h - h * 0.018, w, h * 0.018);
-
-        const cx = w / 2;
-        let y = h * 0.09;
-        const logoSize = Math.min(w, h) * 0.16;
+        await drawPosterBackground(ctx, w, h, conf);
 
         let img = (!skipLogoImage && conf.logo) ? await loadImageSafe(conf.logo) : null;
-        if (img) {
-            ctx.save();
-            drawRoundedClipPath(ctx, cx - logoSize / 2, y, logoSize, logoSize * 0.18);
-            ctx.clip();
-            ctx.drawImage(img, cx - logoSize / 2, y, logoSize, logoSize);
-            ctx.restore();
-            y += logoSize + h * 0.03;
-        } else if (conf.logo_emoji) {
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.05)';
-            drawRoundedClipPath(ctx, cx - logoSize / 2, y, logoSize, logoSize * 0.22);
-            ctx.fill();
-            ctx.font = font(400, logoSize * 0.55);
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(conf.logo_emoji, cx, y + logoSize / 2 + logoSize * 0.02);
-            ctx.textBaseline = 'alphabetic';
-            ctx.restore();
-            y += logoSize + h * 0.03;
-        }
 
-        ctx.textAlign = 'center';
-        ctx.fillStyle = textColor;
-        ctx.font = font(800, w * 0.075);
-        y += w * 0.07;
-        y = wrapCenteredText(ctx, conf.name || 'Ma Boutique', cx, y, w * 0.85, w * 0.085);
+        if (orientation === 'landscape') {
+            // Paysage : logo + texte à gauche, QR Code à droite.
+            const marginX = w * 0.055;
+            const dividerX = w * 0.60;
+            const leftW = dividerX - marginX * 1.4;
+            const leftCx = marginX + leftW / 2;
+            const rightCx = dividerX + (w - dividerX) / 2;
 
-        y += h * 0.018;
-        ctx.font = font(700, w * 0.032);
-        ctx.fillStyle = accent;
-        ctx.fillText('PROGRAMME DE FIDÉLITÉ', cx, y);
+            let y = h * 0.11;
+            const logoSize = Math.min(leftW, h) * 0.24;
 
-        if (conf.reward) {
-            y += h * 0.045;
-            ctx.font = font(700, w * 0.038);
+            if (img) {
+                ctx.save();
+                drawRoundedClipPath(ctx, leftCx - logoSize / 2, y, logoSize, logoSize * 0.18);
+                ctx.clip();
+                ctx.drawImage(img, leftCx - logoSize / 2, y, logoSize, logoSize);
+                ctx.restore();
+                y += logoSize + h * 0.035;
+            } else if (conf.logo_emoji) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.06)';
+                drawRoundedClipPath(ctx, leftCx - logoSize / 2, y, logoSize, logoSize * 0.22);
+                ctx.fill();
+                ctx.font = font(400, logoSize * 0.55);
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillStyle = textColor;
+                ctx.fillText(conf.logo_emoji, leftCx, y + logoSize / 2 + logoSize * 0.02);
+                ctx.textBaseline = 'alphabetic';
+                ctx.restore();
+                y += logoSize + h * 0.035;
+            }
+
+            const nameFit = fitAndWrapText(ctx, conf.name || 'Ma Boutique', leftW, 2, 800, w * 0.05, w * 0.024);
+            y += nameFit.sizePx * 0.9;
+            y = drawTextBlock(ctx, nameFit.lines, leftCx, y, nameFit.lineHeight, 'center', textColor);
+
+            y += h * 0.022;
+            ctx.font = font(700, w * 0.02);
+            ctx.textAlign = 'center';
+            ctx.globalAlpha = 0.85;
             ctx.fillStyle = textColor;
-            y = wrapCenteredText(ctx, '🎁 ' + conf.reward, cx, y, w * 0.8, w * 0.048);
-        }
+            ctx.fillText('PROGRAMME DE FIDÉLITÉ', leftCx, y);
+            ctx.globalAlpha = 1;
 
-        const qrSize = Math.min(w, h) * 0.32;
-        y += h * 0.045;
-        const qrUrl = `${window.location.origin}${window.location.pathname}?shop=${currentConfigId}`;
-        const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
-        if (qrCanvas) {
-            ctx.drawImage(qrCanvas, cx - qrSize / 2, y, qrSize, qrSize);
-            y += qrSize + h * 0.035;
-        }
+            if (conf.reward) {
+                y += h * 0.05;
+                const rewardFit = fitAndWrapText(ctx, '🎁 ' + conf.reward, leftW, 3, 700, w * 0.026, w * 0.014);
+                y = drawTextBlock(ctx, rewardFit.lines, leftCx, y, rewardFit.lineHeight, 'center', textColor);
+            }
 
-        ctx.font = font(800, w * 0.044);
-        ctx.fillStyle = textColor;
-        y = wrapCenteredText(ctx, '📱 Scannez-moi pour rejoindre le programme !', cx, y, w * 0.85, w * 0.05);
+            y += h * 0.05;
+            const scanFit = fitAndWrapText(ctx, '📱 Scannez pour rejoindre !', leftW, 2, 800, w * 0.028, w * 0.016);
+            y = drawTextBlock(ctx, scanFit.lines, leftCx, y, scanFit.lineHeight, 'center', textColor);
 
-        y += h * 0.022;
-        ctx.font = font(700, w * 0.03);
-        ctx.fillStyle = accent;
-        ctx.fillText('1ᵉʳ tampon offert !', cx, y);
+            y += h * 0.02;
+            ctx.font = font(700, w * 0.02);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = textColor;
+            ctx.fillText('1ᵉʳ tampon offert !', leftCx, y);
 
-        if (conf.address) {
-            ctx.font = font(500, w * 0.024);
-            ctx.fillStyle = '#6e6e73';
-            ctx.fillText('📍 ' + conf.address, cx, h - h * 0.045);
+            if (conf.address) {
+                const addrFit = fitAndWrapText(ctx, '📍 ' + conf.address, leftW, 2, 500, w * 0.016, w * 0.011);
+                drawTextBlock(ctx, addrFit.lines, leftCx, h - h * 0.09, addrFit.lineHeight, 'center', textColor);
+            }
+
+            const qrSize = Math.min(w - dividerX, h) * 0.62;
+            const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
+            if (qrCanvas) {
+                ctx.drawImage(qrCanvas, rightCx - qrSize / 2, h / 2 - qrSize / 2, qrSize, qrSize);
+            }
+        } else {
+            // Portrait : mise en page centrée classique.
+            const cx = w / 2;
+            let y = h * 0.09;
+            const logoSize = Math.min(w, h) * 0.16;
+
+            if (img) {
+                ctx.save();
+                drawRoundedClipPath(ctx, cx - logoSize / 2, y, logoSize, logoSize * 0.18);
+                ctx.clip();
+                ctx.drawImage(img, cx - logoSize / 2, y, logoSize, logoSize);
+                ctx.restore();
+                y += logoSize + h * 0.03;
+            } else if (conf.logo_emoji) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.06)';
+                drawRoundedClipPath(ctx, cx - logoSize / 2, y, logoSize, logoSize * 0.22);
+                ctx.fill();
+                ctx.font = font(400, logoSize * 0.55);
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillStyle = textColor;
+                ctx.fillText(conf.logo_emoji, cx, y + logoSize / 2 + logoSize * 0.02);
+                ctx.textBaseline = 'alphabetic';
+                ctx.restore();
+                y += logoSize + h * 0.03;
+            }
+
+            const nameFit = fitAndWrapText(ctx, conf.name || 'Ma Boutique', w * 0.85, 2, 800, w * 0.075, w * 0.035);
+            y += nameFit.sizePx * 0.95;
+            y = drawTextBlock(ctx, nameFit.lines, cx, y, nameFit.lineHeight, 'center', textColor);
+
+            y += h * 0.018;
+            ctx.font = font(700, w * 0.032);
+            ctx.textAlign = 'center';
+            ctx.globalAlpha = 0.85;
+            ctx.fillStyle = textColor;
+            ctx.fillText('PROGRAMME DE FIDÉLITÉ', cx, y);
+            ctx.globalAlpha = 1;
+
+            if (conf.reward) {
+                y += h * 0.045;
+                const rewardFit = fitAndWrapText(ctx, '🎁 ' + conf.reward, w * 0.8, 3, 700, w * 0.038, w * 0.02);
+                y = drawTextBlock(ctx, rewardFit.lines, cx, y, rewardFit.lineHeight, 'center', textColor);
+            }
+
+            const qrSize = Math.min(w, h) * 0.32;
+            y += h * 0.045;
+            const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
+            if (qrCanvas) {
+                ctx.drawImage(qrCanvas, cx - qrSize / 2, y, qrSize, qrSize);
+                y += qrSize + h * 0.035;
+            }
+
+            const scanFit = fitAndWrapText(ctx, '📱 Scannez-moi pour rejoindre le programme !', w * 0.85, 2, 800, w * 0.044, w * 0.026);
+            y = drawTextBlock(ctx, scanFit.lines, cx, y, scanFit.lineHeight, 'center', textColor);
+
+            y += h * 0.022;
+            ctx.font = font(700, w * 0.03);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = textColor;
+            ctx.fillText('1ᵉʳ tampon offert !', cx, y);
+
+            if (conf.address) {
+                const addrFit = fitAndWrapText(ctx, '📍 ' + conf.address, w * 0.85, 2, 500, w * 0.024, w * 0.015);
+                drawTextBlock(ctx, addrFit.lines, cx, h - h * 0.06, addrFit.lineHeight, 'center', textColor);
+            }
         }
 
         return canvas;
@@ -2695,6 +2798,7 @@
 
         const { data: cfgRow } = await sb.from('fidelite_configs').select('*').eq('id', shopId).maybeSingle();
         currentShopConfig = cfgRow || null;
+        applyDynamicManifest((cfgRow && cfgRow.data) || null);
         applyShopBrandingToAuthScreen();
         setupInstallFooter();
 
@@ -2708,10 +2812,39 @@
     }
 
     // --- Installation "à l'écran d'accueil" (PWA) côté client ---
-    // Une vraie icône d'app par commerce nécessiterait un manifest.json
-    // dynamique par boutique (hors de portée d'une page unique) : on
-    // propose donc le meilleur équivalent réalisable ici, avec les
-    // instructions adaptées à l'appareil et le nom / logo du commerce.
+    // Le manifest.json est régénéré dynamiquement (via un Blob) avec le nom
+    // et le logo réels de la boutique dès qu'on connaît sa config, afin que
+    // l'icône ajoutée à l'écran d'accueil soit celle du commerçant plutôt
+    // que celle, générique, de Fidélité Pro.
+    // Limite technique à connaître : certains navigateurs (notamment iOS/
+    // Safari) lisent le manifest une seule fois très tôt dans le
+    // chargement de la page ; le remplacement est donc fiable pour Chrome/
+    // Android (icône du raccourci Chrome + prompt d'installation), mais sur
+    // iOS "Sur l'écran d'accueil" peut continuer à utiliser le favicon par
+    // défaut dans de rares cas — le fallback /manifest.json statique reste
+    // donc nécessaire en filet de sécurité.
+    function applyDynamicManifest(d) {
+        const manifestLink = document.getElementById('app-manifest-link');
+        if (!manifestLink || !d || !d.name) return;
+
+        const iconUrl = d.logo || manifestLink.href;
+        const manifest = {
+            name: d.name,
+            short_name: d.name.slice(0, 30),
+            start_url: window.location.pathname + window.location.search,
+            scope: window.location.pathname,
+            display: 'standalone',
+            background_color: d.bg || '#ffffff',
+            theme_color: d.bg || '#ffffff',
+            icons: [
+                { src: iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
+                { src: iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any' }
+            ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        manifestLink.setAttribute('href', URL.createObjectURL(blob));
+    }
+
     let deferredInstallPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -2841,8 +2974,8 @@
         const d = cfg.data || {};
         const isEligible = (data.nb_visites || 0) >= (cfg.seuil_visites || 10);
         const confObj = {
-            name: d.name, title: d.title, logo: d.logo, logo_emoji: d.logo_emoji, bg: d.bg, tx: d.tx, btn: d.btn, btn_tx: d.btn_tx,
-            bg_img: cfg.is_premium ? d.bg_img : '',
+            name: d.name, title: d.title, logo: d.logo, logo_emoji: d.logo_emoji, bg: d.bg, tx: d.tx,
+            bg_img: d.bg_img,
             gradient: d.gradient, texture: d.texture, emoji: d.emoji, reward: d.reward,
             msg_top: d.msg_top, msg_bottom: d.msg_bottom, address: d.address,
             mid_seuil: cfg.mid_seuil, mid_reward: cfg.mid_reward,
@@ -2850,7 +2983,7 @@
             current_stamps: data.nb_visites || 0,
             card_number: deriveCardNumber(clientId),
             holder: data.nom || '—',
-            show_google: !!(cfg.is_premium && d.google_url && isEligible)
+            show_google: !!(d.google_url && isEligible)
         };
 
         document.getElementById('client-auth-box').classList.add('hidden');
@@ -2870,6 +3003,7 @@
             if (confObj.show_google) {
                 const btnGoogle = document.getElementById('client-google-btn');
                 btnGoogle.href = d.google_url;
+                btnGoogle.innerText = d.google_label || '⭐ Laissez-nous un avis';
                 btnGoogle.classList.remove('hidden');
             }
         }
