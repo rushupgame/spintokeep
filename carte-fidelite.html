@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-title" content="Ma Carte">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎫</text></svg>">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.png" id="apple-touch-icon-link">
     <link rel="manifest" href="/manifest.json" id="app-manifest-link">
 
     <meta property="og:title" content="Fidélité Pro | Carte de fidélité digitale par QR Code">
@@ -567,6 +567,7 @@
         .stamp-slot { aspect-ratio: 1; border: 2px dashed rgba(0,0,0,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; opacity: 0.3; filter: grayscale(1); transition: all 0.3s; position: relative; background: rgba(0,0,0,0.03); }
         .stamp-active { opacity: 1; filter: none; border-style: solid; border-color: var(--accent-color); background: rgba(0,113,227,0.08); transform: scale(1.05); }
         .insert-points { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin: 12px 0 0 0; }
+        .insert-points-hint { font-size: 11px; color: var(--text-secondary); opacity: .8; margin: 2px 0 0 0; }
         .reward-panel { background: var(--premium-bg); border-color: #f0d68a; }
         .reward-panel h4 { margin: 0 0 8px 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--premium); }
         .reward-panel p { margin: 0; font-weight: 700; font-size: .95rem; }
@@ -692,8 +693,9 @@
                             <select id="conf_logo_business" onchange="applyLogoBusinessPreset()">
                                 <option value="">— Choisir un type d'activité —</option>
                                 <option value="☕">☕ Café / Salon de thé</option>
-                                <option value="🍽️">🍽️ Restaurant</option>
+                                <option value="🍽️" selected>🍽️ Restaurant</option>
                                 <option value="🍕">🍕 Restauration rapide / Pizzeria</option>
+                                <option value="🍔">🍔 Restauration rapide / Burger</option>
                                 <option value="🥐">🥐 Boulangerie / Pâtisserie</option>
                                 <option value="🍺">🍺 Bar</option>
                                 <option value="💇">💇 Coiffure</option>
@@ -710,7 +712,7 @@
                                 <option value="⭐">⭐ Autre</option>
                             </select>
                             <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-                                <input type="text" id="conf_logo_emoji" maxlength="4" placeholder="Emoji" oninput="updatePreview()" style="width:70px; text-align:center; font-size:1.4rem; flex-shrink:0;">
+                                <input type="text" id="conf_logo_emoji" value="🍽️" maxlength="4" placeholder="Emoji" oninput="updatePreview()" style="width:70px; text-align:center; font-size:1.4rem; flex-shrink:0;">
                                 <p class="field-hint" style="margin:0;">Ou tapez/collez directement l'emoji de votre choix.</p>
                             </div>
 
@@ -743,7 +745,7 @@
                                 </div>
                                 <div class="color-item">
                                     <label class="field-label">Texte</label>
-                                    <input type="color" id="conf_tx" value="#1d1d1f" oninput="updatePreview()">
+                                    <input type="color" id="conf_tx" value="#ffffff" oninput="updatePreview()">
                                 </div>
                             </div>
 
@@ -773,9 +775,10 @@
                                 </div>
                                 <div style="flex:1">
                                     <label class="field-label">Ratio Points / Visite</label>
-                                    <input type="number" id="conf_ratio" value="1" step="0.5">
+                                    <input type="number" id="conf_ratio" value="1" step="0.5" oninput="updatePreview()">
                                 </div>
                             </div>
+                            <p class="field-hint">Chaque visite ajoute ce nombre de points au compteur du client (en plus du tampon). C'est un simple repère fidélité affiché sur sa carte et dans votre CRM — la récompense, elle, se débloque uniquement avec le nombre de tampons défini au-dessus.</p>
 
                             <label class="field-label">Emoji du tampon</label>
                             <div style="display:flex; gap:10px; align-items:center;">
@@ -884,6 +887,8 @@
                     <div class="insert-panel">
                         <div class="insert-panel-head"><span id="live-count">1</span> / <span id="live-max">10</span> tampons</div>
                         <div class="stamps-grid" id="live-stamps"></div>
+                        <p class="insert-points">Points totaux : <span id="live-points">1</span></p>
+                        <p class="insert-points-hint" id="live-points-hint"></p>
                     </div>
 
                     <div id="live-address-panel" class="insert-panel address-panel hidden">
@@ -1181,6 +1186,7 @@
             <div class="insert-panel-head"><span id="render-count">0</span> / <span id="render-max">10</span> visites</div>
             <div class="stamps-grid" id="render-stamps"></div>
             <p class="insert-points">Points totaux : <span id="render-points">0</span></p>
+            <p class="insert-points-hint" id="render-points-hint"></p>
         </div>
 
         <div id="render-address-panel" class="insert-panel address-panel hidden">
@@ -1515,8 +1521,10 @@
         vagues: { label: 'Vagues', css: 'repeating-radial-gradient(circle at 0 0, transparent 0, transparent 9px, rgba(255,255,255,.14) 9px, rgba(255,255,255,.14) 11px)', size: '22px 22px' }
     };
 
-    let selectedGradient = 'none';
-    let selectedTexture = 'none';
+    // Par défaut pour une toute nouvelle carte (avant toute sauvegarde) :
+    // dernier dégradé de la liste + 2e texture, pour un rendu prêt à l'emploi.
+    let selectedGradient = 'bubblegum';
+    let selectedTexture = 'diagonales';
 
     function buildSwatchPickers() {
         const gradWrap = document.getElementById('gradient-swatches');
@@ -1550,7 +1558,7 @@
         const texWrap = document.getElementById('texture-swatches');
         if (texWrap && !texWrap.children.length) {
             const noneSw = document.createElement('div');
-            noneSw.className = 'swatch swatch-none active';
+            noneSw.className = 'swatch swatch-none' + (selectedTexture === 'none' ? ' active' : '');
             noneSw.innerText = '✕';
             noneSw.onclick = () => {
                 selectedTexture = 'none';
@@ -1562,7 +1570,7 @@
 
             Object.keys(TEXTURE_PRESETS).forEach(key => {
                 const sw = document.createElement('div');
-                sw.className = 'swatch';
+                sw.className = 'swatch' + (key === selectedTexture ? ' active' : '');
                 sw.style.backgroundColor = '#8a8a92';
                 sw.style.backgroundImage = TEXTURE_PRESETS[key].css;
                 sw.style.backgroundSize = TEXTURE_PRESETS[key].size;
@@ -2010,6 +2018,15 @@
             }
         }
 
+        // Explication claire du compteur de points : à quoi il correspond
+        // et pourquoi il est différent des tampons.
+        const pointsHint = document.getElementById(prefix + 'points-hint');
+        if (pointsHint) {
+            const r = config.ratio || 1;
+            const rTxt = (r % 1 === 0) ? r.toFixed(0) : String(r);
+            pointsHint.innerText = `+${rTxt} point${r > 1 ? 's' : ''} par visite — un simple repère fidélité, votre récompense se débloque avec les tampons ci-dessus.`;
+        }
+
         const logo = document.getElementById(prefix + 'logo');
         const logoEmoji = document.getElementById(prefix + 'logo-emoji');
         if (config.logo) {
@@ -2061,7 +2078,8 @@
             google_url: document.getElementById('conf_google_url').value.trim(),
             google_label: document.getElementById('conf_google_label').value.trim(),
             mid_seuil: parseInt(document.getElementById('conf_mid_seuil').value) || null,
-            mid_reward: document.getElementById('conf_mid_reward').value || null
+            mid_reward: document.getElementById('conf_mid_reward').value || null,
+            ratio: parseFloat(document.getElementById('conf_ratio').value) || 1
         };
     }
 
@@ -2070,6 +2088,7 @@
         conf.current_stamps = 1; // 1 tampon d'aperçu (le 1er tampon est offert à l'inscription)
         conf.card_number = deriveCardNumber(currentConfigId || 'apercu');
         conf.holder = 'Aperçu';
+        document.getElementById('live-points').innerText = (conf.ratio % 1 === 0) ? conf.ratio.toFixed(0) : conf.ratio;
         applyStyleToCard('live-', conf);
     }
 
@@ -2256,6 +2275,7 @@
             if (lines.length <= maxLines) break;
             sizePx -= Math.max(2, startSizePx * 0.05);
         }
+        if (sizePx < minSizePx) sizePx = minSizePx;
         ctx.font = `${weight} ${Math.round(sizePx)}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
         return { lines, sizePx, lineHeight: sizePx * 1.18 };
     }
@@ -2498,10 +2518,12 @@
             }
 
             const qrSize = Math.min(w, h) * 0.3;
+            const qrFramePad = qrSize * 0.11;
             y += h * 0.055;
             const qrCanvas = await generateQrCanvas(qrUrl, Math.round(qrSize * 2));
             drawQrWithFrame(ctx, qrCanvas, cx - qrSize / 2, y, qrSize);
-            y += qrSize + h * 0.05;
+            // Espace généreux entre le cadre blanc du QR et le texte suivant.
+            y += qrSize + qrFramePad + h * 0.075;
 
             const scanFit = fitAndWrapText(ctx, '📱 Scannez-moi pour rejoindre le programme !', w * 0.85, 2, 800, w * 0.044, w * 0.026);
             y = drawTextBlock(ctx, scanFit.lines, cx, y, scanFit.lineHeight, 'center', textColor);
@@ -2909,6 +2931,11 @@
         if (!manifestLink || !d || !d.name) return;
 
         const iconUrl = d.logo || manifestLink.href;
+        const iconType = /\.png(\?|$)/i.test(iconUrl) ? 'image/png'
+            : /\.jpe?g(\?|$)/i.test(iconUrl) ? 'image/jpeg'
+            : /\.webp(\?|$)/i.test(iconUrl) ? 'image/webp'
+            : /\.svg(\?|$)/i.test(iconUrl) ? 'image/svg+xml'
+            : 'image/png';
         const manifest = {
             name: d.name,
             short_name: d.name.slice(0, 30),
@@ -2918,12 +2945,37 @@
             background_color: d.bg || '#ffffff',
             theme_color: d.bg || '#ffffff',
             icons: [
-                { src: iconUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
-                { src: iconUrl, sizes: '512x512', type: 'image/png', purpose: 'any' }
+                { src: iconUrl, sizes: '192x192', type: iconType, purpose: 'any' },
+                { src: iconUrl, sizes: '512x512', type: iconType, purpose: 'any' }
             ]
         };
         const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
         manifestLink.setAttribute('href', URL.createObjectURL(blob));
+
+        // iOS ne lit pas le manifest.json pour son icône "Sur l'écran
+        // d'accueil" : il lit directement ces balises, à jour au moment où
+        // l'utilisateur appuie sur "Partager" (donc modifiables dynamiquement).
+        const appleIcon = document.getElementById('apple-touch-icon-link');
+        if (appleIcon && iconUrl) appleIcon.setAttribute('href', iconUrl);
+        const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+        if (appleTitle) appleTitle.setAttribute('content', d.name);
+
+        // Nécessaire pour que Chrome/Android considère la page "installable"
+        // et déclenche l'évènement beforeinstallprompt (donc le bouton
+        // "Installer l'application" ci-dessous) de façon fiable.
+        registerInstallServiceWorker();
+    }
+
+    let swRegistered = false;
+    function registerInstallServiceWorker() {
+        if (swRegistered || !('serviceWorker' in navigator)) return;
+        swRegistered = true;
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Le fichier /sw.js doit être hébergé à la racine du domaine ;
+            // sans lui, l'installation reste possible manuellement via le
+            // menu du navigateur mais le bouton automatique peut ne pas
+            // apparaître sur Android/Chrome.
+        });
     }
 
     let deferredInstallPrompt = null;
@@ -2932,6 +2984,11 @@
         deferredInstallPrompt = e;
         const btn = document.getElementById('install-footer-btn');
         if (btn) btn.classList.remove('hidden');
+        const ua = navigator.userAgent || '';
+        if (/Android/.test(ua)) {
+            const textEl = document.getElementById('install-footer-text');
+            if (textEl) textEl.innerText = "Ajoutez la carte à votre écran d'accueil en un tap, comme une vraie application.";
+        }
     });
 
     function setupInstallFooter() {
@@ -2947,12 +3004,17 @@
 
         const ua = navigator.userAgent || '';
         const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isAndroid = /Android/.test(ua);
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         if (isStandalone) { footer.classList.add('hidden'); return; }
 
         const textEl = document.getElementById('install-footer-text');
         if (isIOS) {
             textEl.innerHTML = 'Sur iPhone : appuyez sur <strong>Partager</strong> (icône ⬆️ en bas de Safari), puis <strong>"Sur l\'écran d\'accueil"</strong>.';
+        } else if (isAndroid) {
+            textEl.innerHTML = deferredInstallPrompt
+                ? "Ajoutez la carte à votre écran d'accueil en un tap, comme une vraie application."
+                : 'Appuyez sur le menu <strong>⋮</strong> en haut à droite de Chrome, puis <strong>"Installer l\'application"</strong> (ou "Ajouter à l\'écran d\'accueil").';
         } else {
             textEl.innerText = "Retrouvez votre carte en un clic depuis votre écran d'accueil, sans repasser par cette page.";
         }
@@ -3061,6 +3123,7 @@
             msg_top: d.msg_top, msg_bottom: d.msg_bottom, address: d.address,
             mid_seuil: cfg.mid_seuil, mid_reward: cfg.mid_reward,
             max: cfg.seuil_visites || 10,
+            ratio: cfg.ratio_points || 1,
             current_stamps: data.nb_visites || 0,
             card_number: deriveCardNumber(clientId),
             holder: data.nom || '—',
