@@ -40,6 +40,20 @@
     </script>
     
     <title>Spin To Keep | Jeux Concours Commerce, Avis Google & CRM par QR Code</title>
+
+    <!-- Google tag (gtag.js) — suivi des conversions Google Ads.
+         L'événement de conversion "Achat" n'est PAS déclenché ici : il est envoyé
+         uniquement depuis activatePremium(), une fois que le paiement PayPal a été
+         revérifié côté serveur par la fonction Supabase verify-paypal-subscription
+         (donc uniquement si le compte a réellement payé). Voir plus bas dans le
+         fichier, juste après "if (!res.ok || !result.success)". -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18444871564"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-18444871564');
+    </script>
     
     <!-- Connexions anticipées vers les origines externes utilisées (accélère les requêtes
          qui suivront, sans télécharger quoi que ce soit maintenant). -->
@@ -2505,6 +2519,19 @@ if(slider) {
             catch { throw new Error(`Réponse inattendue (HTTP ${res.status}) : la fonction verify-paypal-subscription est-elle bien déployée sur Supabase ? Détail : ${rawText.slice(0, 200)}`); }
 
             if (!res.ok || !result.success) throw new Error(result.message || `Activation refusée (HTTP ${res.status}).`);
+
+            // Conversion Google Ads : on n'arrive ici QUE si verify-paypal-subscription a
+            // confirmé côté serveur, auprès de PayPal, que l'abonnement est bien payé.
+            // transaction_id = l'ID d'abonnement PayPal -> garantit qu'un même paiement
+            // ne peut jamais être compté deux fois, même en cas de rejeu de cette fonction.
+            if (typeof gtag === 'function') {
+                gtag('event', 'conversion', {
+                    'send_to': 'AW-18444871564/g95YCJfQjvQcEIzPmdtE',
+                    'value': 9.90,
+                    'currency': 'EUR',
+                    'transaction_id': subscriptionId
+                });
+            }
 
             await refreshSession();
             closePremiumModal();
