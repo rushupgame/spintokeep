@@ -408,10 +408,13 @@
           if (rawUrl) {
             if (axis.platform === 'instagram' && !displayUrl.includes('/embed')) { 
                 displayUrl = displayUrl.replace(/\/$/, '') + '/embed'; 
-            }
-            if (axis.platform === 'facebook' && !displayUrl.includes('plugins/page.php')) {
+            } else if (axis.platform === 'facebook' && !displayUrl.includes('plugins/page.php')) {
                displayUrl = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(displayUrl)}&tabs=timeline&width=400&height=800&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
                iframeClass = "fb-iframe bg-white";
+            } else if (axis.platform === 'web' || axis.platform === 'news') {
+               // UTILISATION DU PROXY SUPABASE ICI
+               displayUrl = `https://drscbjrshjhupvrrzqec.supabase.co/functions/v1/proxy-iframe?url=${encodeURIComponent(rawUrl)}`;
+               iframeStyle = `width: ${calculatedWidth}%; height: ${calculatedWidth}%; transform: scale(${zoomLevel}); transform-origin: top left;`;
             } else {
                iframeStyle = `width: ${calculatedWidth}%; height: ${calculatedWidth}%; transform: scale(${zoomLevel}); transform-origin: top left;`;
             }
