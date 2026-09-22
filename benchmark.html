@@ -413,7 +413,7 @@
                iframeClass = "fb-iframe bg-white";
             } else if (axis.platform === 'web' || axis.platform === 'news') {
                // UTILISATION DU PROXY SUPABASE ICI
-               displayUrl = `https://drscbjrshjhupvrrzqec.supabase.co/functions/v1/proxy-iframe?url=${encodeURIComponent(rawUrl)}`;
+               displayUrl = `https://drscbjrshjhupvrrzqec.supabase.co/functions/v1/proxy-iframe?url=${encodeURIComponent(rawUrl)}&cb=${Date.now()}`;
                iframeStyle = `width: ${calculatedWidth}%; height: ${calculatedWidth}%; transform: scale(${zoomLevel}); transform-origin: top left;`;
             } else {
                iframeStyle = `width: ${calculatedWidth}%; height: ${calculatedWidth}%; transform: scale(${zoomLevel}); transform-origin: top left;`;
