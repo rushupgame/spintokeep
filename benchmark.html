@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Benchmark Premium - RetailSight</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // Activation du dark mode par classe CSS
+    }
+  </script>
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SortableJS pour Drag & Drop -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  
+  <style>
+    /* Base et Mode Clair (Défaut CSS) */
+    body { 
+      background-color: #f5f5f7; 
+      color: #1d1d1f; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .apple-glass { 
+      background: rgba(255, 255, 255, 0.65); 
+      backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
+      border: 1px solid rgba(0, 0, 0, 0.08); 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    .apple-glass-header {
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    .apple-glass-modal {
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(60px); -webkit-backdrop-filter: blur(60px); 
+      border: 1px solid rgba(0, 0, 0, 0.1); 
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+    }
+    .apple-glass-axis {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-apple-primary {
+      background: #0071e3; color: white; border-radius: 980px; font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .btn-apple-primary:hover { background: #0077ED; transform: scale(1.02); }
+    
+    .btn-apple-secondary {
+      background: rgba(0, 0, 0, 0.05); color: #1d1d1f; border-radius: 980px; font-weight: 600;
+      transition: all 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .btn-apple-secondary:hover { background: rgba(0, 0, 0, 0.1); }
+
+    .monitor-wrapper { 
+      position: relative; width: 100%; height: 460px; overflow: hidden; 
+      background: #e5e5ea; border-radius: 0 0 24px 24px; transition: background-color 0.3s;
+    }
+    
+    .form-input {
+      background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: #1d1d1f;
+      border-radius: 12px; padding: 12px 16px; outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: #0071e3; }
+
+    html.dark body { background-color: #000000; color: #f5f5f7; }
+    html.dark .apple-glass { background: rgba(28, 28, 30, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    html.dark .apple-glass-header { background: rgba(0, 0, 0, 0.75); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    html.dark .apple-glass-modal { background: rgba(30, 30, 32, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+    html.dark .apple-glass-axis { background: rgba(28, 28, 30, 0.85); border: 1px solid rgba(255, 255, 255, 0.05); }
+    html.dark .btn-apple-secondary { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.05); }
+    html.dark .btn-apple-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+    html.dark .monitor-wrapper { background: #111111; }
+    html.dark .form-input { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white; }
+
+    /* Globals */
+    .monitor-iframe { transform-origin: top left; border: none; pointer-events: auto; }
+    .fb-iframe { width: 100%; height: 100%; transform: none; pointer-events: auto; border: none; }
+    [contenteditable="true"] { outline: none; transition: all 0.2s; border-radius: 6px; padding: 2px 6px; margin-left: -6px; cursor: text; }
+    [contenteditable="true"]:hover, [contenteditable="true"]:focus { background: rgba(128, 128, 128, 0.2); }
+    
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input[type=range] { accent-color: #0071e3; cursor: pointer; }
+    
+    .drag-handle { cursor: grab; }
+    .drag-handle:active { cursor: grabbing; }
+    .sortable-ghost { opacity: 0.4; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col h-screen overflow-hidden">
+
+  <header class="apple-glass-header px-6 py-4 sticky top-0 z-50 flex flex-wrap gap-4 justify-between items-center">
+    <div class="flex items-center gap-4">
+      <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+        <i class="fa-solid fa-code-compare text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">RetailSight</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Benchmark Visuel & IA</p>
+      </div>
+    </div>
+    <div class="flex gap-2 lg:gap-3 overflow-x-auto no-scrollbar pb-1 lg:pb-0 items-center">
+      <button onclick="toggleTheme()" class="w-10 h-10 rounded-full btn-apple-secondary flex items-center justify-center mr-2" title="Changer le thème">
+        <i id="theme-icon" class="fa-solid fa-sun"></i>
+      </button>
+      <button onclick="openModal('modal-competitor')" class="btn-apple-secondary px-4 py-2 text-xs lg:text-sm whitespace-nowrap">
+        <i class="fa-solid fa-plus mr-1"></i> Concurrent
+      </button>
+      <button onclick="openModal('modal-axis')" class="btn-apple-primary px-4 py-2 text-xs lg:text-sm whitespace-nowrap shadow-lg shadow-blue-500/20">
+        <i class="fa-solid fa-layer-group mr-1"></i> Axe d'analyse
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 overflow-x-auto overflow-y-auto no-scrollbar pb-24 relative" id="workspace">
+    <div class="p-4 lg:p-8 w-max min-w-full flex flex-col items-start" id="matrix-container">
+      <!-- En-tête des concurrents -->
+      <div id="competitors-header" class="flex gap-6 mb-8 w-max"></div>
+      <!-- Conteneur des axes (Draggable) -->
+      <div id="axes-container" class="space-y-8 w-full min-w-max"></div>
+    </div>
+  </main>
+
+  <div id="modal-competitor" class="fixed inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="apple-glass-modal rounded-3xl p-8 w-full max-w-md mx-4 transform scale-95 transition-transform duration-300 shadow-2xl">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Ajouter un concurrent</h2>
+      <div class="space-y-5 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Nom de l'enseigne</label>
+          <input type="text" id="new-comp-name" class="form-input w-full" placeholder="Ex: Auchan">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Domaine Web (pour le logo)</label>
+          <input type="text" id="new-comp-domain" class="form-input w-full" placeholder="Ex: auchan.fr">
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-8">
+        <button onclick="closeModal('modal-competitor')" class="px-5 py-2.5 rounded-full text-gray-700 dark:text-white font-medium hover:bg-black/5 dark:hover:bg-white/10 transition">Annuler</button>
+        <button onclick="submitCompetitor()" class="btn-apple-primary px-6 py-2.5">Ajouter</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-axis" class="fixed inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="apple-glass-modal rounded-3xl p-8 w-full max-w-md mx-4 transform scale-95 transition-transform duration-300 shadow-2xl">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nouvel axe d'analyse</h2>
+      <div class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Nom de l'axe</label>
+          <input type="text" id="new-axis-name" class="form-input w-full" placeholder="Ex: Campagne de Noël">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Plateforme / Type</label>
+          <select id="new-axis-platform" class="form-input w-full appearance-none">
+            <option value="web">Site Web</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="tiktok">TikTok</option>
+            <option value="bonial">Catalogue (Bonial, etc.)</option>
+            <option value="news">Article / Presse (LSA, etc.)</option>
+            <option value="maps">Google Maps</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-8">
+        <button onclick="closeModal('modal-axis')" class="px-5 py-2.5 rounded-full text-gray-700 dark:text-white font-medium hover:bg-black/5 dark:hover:bg-white/10 transition">Annuler</button>
+        <button onclick="submitAxis()" class="btn-apple-primary px-6 py-2.5">Créer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-edit" class="fixed inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="apple-glass-modal rounded-3xl p-8 w-full max-w-md mx-4 transform scale-95 transition-transform duration-300 shadow-2xl">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Configurer la source</h2>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mb-6" id="edit-modal-subtitle">Modification de l'axe</p>
+      
+      <input type="hidden" id="edit-axis-id">
+      <input type="hidden" id="edit-comp-id">
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">URL source</label>
+          <input type="url" id="edit-url" class="form-input w-full" placeholder="https://...">
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400">Niveau de Zoom</label>
+            <span id="zoom-value-display" class="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-500/10 px-2 py-1 rounded">33%</span>
+          </div>
+          <input type="range" id="edit-zoom" min="0.1" max="2.0" step="0.05" class="w-full" oninput="updateZoomDisplay()">
+          <p class="text-xs text-gray-400 mt-2">Ajustez pour voir l'ensemble de la page dans la carte.</p>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-8">
+        <button onclick="closeModal('modal-edit')" class="px-5 py-2.5 rounded-full text-gray-700 dark:text-white font-medium hover:bg-black/5 dark:hover:bg-white/10 transition">Annuler</button>
+        <button onclick="submitEdit()" class="btn-apple-primary px-6 py-2.5">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme Initialization
+    function initTheme() {
+      const savedTheme = localStorage.getItem('retailsight_theme') || 'light';
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      
+      if (savedTheme === 'dark') {
+        html.classList.add('dark');
+        themeIcon.className = 'fa-solid fa-sun';
+      } else {
+        html.classList.remove('dark');
+        themeIcon.className = 'fa-solid fa-moon';
+      }
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('retailsight_theme', 'light');
+        themeIcon.className = 'fa-solid fa-moon';
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('retailsight_theme', 'dark');
+        themeIcon.className = 'fa-solid fa-sun';
+      }
+    }
+
+    initTheme(); // Run immediately
+
+    // Versioning v17
+    const STORAGE_KEY_COMP = 'matrix_comp_v17';
+    const STORAGE_KEY_AXES = 'matrix_axes_v17';
+
+    const defaultCompetitors = [
+      { id: "c1", name: "E.Leclerc", domain: "e.leclerc", logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/E.Leclerc_logo.svg/512px-E.Leclerc_logo.svg.png" },
+      { id: "c2", name: "Intermarché", domain: "intermarche.com", logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Logo_Intermarch%C3%A9.svg/512px-Logo_Intermarch%C3%A9.svg.png" },
+      { id: "c3", name: "Carrefour", domain: "carrefour.fr", logoUrl: "https://upload.wikimedia.org/wikipedia/fr/thumb/3/3b/Logo_Carrefour.svg/512px-Logo_Carrefour.svg.png" },
+      { id: "c4", name: "Coopérative U", domain: "magasins-u.com", logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Logo_Syst%C3%A8me_U.svg/512px-Logo_Syst%C3%A8me_U.svg.png" },
+      { id: "c5", name: "Lidl", domain: "lidl.fr", logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Lidl_Logo.svg/512px-Lidl_Logo.svg.png" }
+    ];
+
+    const defaultAxes = [
+      { 
+        id: "a1", name: "Site Web", platform: "web", 
+        urls: { "c1": "https://www.e.leclerc/", "c2": "https://www.intermarche.com/", "c3": "https://www.carrefour.fr/", "c4": "https://www.magasins-u.com/accueil.m90273", "c5": "https://www.lidl.fr/" }, zooms: {} 
+      },
+      { 
+        id: "a2", name: "TikTok", platform: "tiktok", 
+        urls: { "c1": "https://www.tiktok.com/@leclerc", "c2": "https://www.tiktok.com/@intermarche_france", "c3": "https://www.tiktok.com/@carrefourfrance", "c4": "https://www.tiktok.com/@cooperativeu", "c5": "https://www.tiktok.com/@lidlfrance" }, 
+        zooms: { "c1": 0.50, "c2": 0.50, "c3": 0.50, "c4": 0.50, "c5": 0.50 } 
+      },
+      { 
+        id: "a3", name: "Bonial", platform: "bonial", 
+        urls: { "c1": "https://www.bonial.fr/Enseignes/E-Leclerc", "c2": "https://www.bonial.fr/Enseignes/Intermarche", "c3": "https://www.bonial.fr/Enseignes/Carrefour", "c4": "https://www.bonial.fr/Enseignes/Super-U", "c5": "https://www.bonial.fr/Enseignes/Lidl" }, 
+        zooms: { "c1": 0.55, "c2": 0.55, "c3": 0.55, "c4": 0.55, "c5": 0.55 } 
+      },
+      { 
+        id: "a4", name: "LinkedIn", platform: "linkedin", 
+        urls: { "c1": "https://www.linkedin.com/company/e-leclerc/posts/", "c2": "https://www.linkedin.com/company/intermarche/posts/", "c3": "https://www.linkedin.com/company/carrefour/posts/", "c4": "https://www.linkedin.com/company/coop%C3%A9rative-u/posts/", "c5": "https://www.linkedin.com/company/lidl-france/posts/" }, 
+        zooms: { "c1": 0.45, "c2": 0.45, "c3": 0.45, "c4": 0.45, "c5": 0.45 } 
+      },
+      { 
+        id: "a5", name: "LSA (Presse)", platform: "news", 
+        urls: { "c1": "https://www.lsa-conso.fr/distributeurs-alimentaires/e-leclerc/", "c2": "https://www.lsa-conso.fr/distributeurs-alimentaires/les-mousquetaires/", "c3": "https://www.lsa-conso.fr/distributeurs-alimentaires/carrefour/", "c4": "https://www.lsa-conso.fr/distributeurs-alimentaires/cooperative-u/", "c5": "https://www.lsa-conso.fr/distributeurs-alimentaires/lidl/" }, zooms: {} 
+      },
+      { 
+        id: "a6", name: "Instagram", platform: "instagram", 
+        urls: { "c1": "https://www.instagram.com/leclerc/", "c2": "https://www.instagram.com/intermarche/", "c3": "https://www.instagram.com/carrefourfrance/", "c4": "https://www.instagram.com/cooperativeu/", "c5": "https://www.instagram.com/lidlfrance/" }, 
+        zooms: { "c1": 0.65, "c2": 0.65, "c3": 0.65, "c4": 0.65, "c5": 0.65 } 
+      },
+      { 
+        id: "a7", name: "Google Maps", platform: "maps", 
+        urls: { "c1": "https://maps.app.goo.gl/BZRafiCVaoxzB9DBA", "c2": "https://maps.app.goo.gl/5RfK2JFgw5a1M78m7", "c3": "https://maps.app.goo.gl/iKLWLm6qwZix9rxB7", "c4": "https://maps.app.goo.gl/GbCWnGQt2H8tEvps8", "c5": "https://maps.app.goo.gl/1sBd7PjimA4m53Bk7" }, 
+        zooms: { "c1": 0.75, "c2": 0.75, "c3": 0.75, "c4": 0.75, "c5": 0.75 } 
+      }
+    ];
+
+    let competitors = JSON.parse(localStorage.getItem(STORAGE_KEY_COMP)) || JSON.parse(JSON.stringify(defaultCompetitors));
+    let axes = JSON.parse(localStorage.getItem(STORAGE_KEY_AXES)) || JSON.parse(JSON.stringify(defaultAxes));
+    
+    let openAxes = {};
+    axes.forEach(a => { openAxes[a.id] = (a.id === "a1"); });
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY_COMP, JSON.stringify(competitors));
+      localStorage.setItem(STORAGE_KEY_AXES, JSON.stringify(axes));
+    }
+
+    function getPlatformIcon(platform) {
+      const icons = { 
+        'bonial': '<i class="fa-solid fa-book-open text-orange-400"></i>', 
+        'facebook': '<i class="fa-brands fa-facebook text-blue-500"></i>', 
+        'instagram': '<i class="fa-brands fa-instagram text-pink-500"></i>', 
+        'tiktok': '<i class="fa-brands fa-tiktok text-gray-900 dark:text-white"></i>', 
+        'linkedin': '<i class="fa-brands fa-linkedin text-blue-500"></i>', 
+        'web': '<i class="fa-solid fa-globe text-emerald-500"></i>', 
+        'news': '<i class="fa-solid fa-newspaper text-gray-400"></i>',
+        'maps': '<i class="fa-solid fa-map-location-dot text-red-500"></i>'
+      };
+      return icons[platform] || '<i class="fa-solid fa-link text-gray-400"></i>';
+    }
+
+    function toggleAccordion(axisId) {
+      openAxes[axisId] = !openAxes[axisId];
+      const contentRow = document.getElementById('content-' + axisId);
+      const icon = document.getElementById('icon-' + axisId);
+      if (openAxes[axisId]) {
+        contentRow.classList.remove('hidden'); contentRow.classList.add('flex');
+        icon.classList.add('rotate-90');
+      } else {
+        contentRow.classList.add('hidden'); contentRow.classList.remove('flex');
+        icon.classList.remove('rotate-90');
+      }
+    }
+
+    function renderBoard() {
+      const headerContainer = document.getElementById('competitors-header');
+      const axesContainer = document.getElementById('axes-container');
+      
+      headerContainer.innerHTML = '';
+      axesContainer.innerHTML = '';
+
+      const cardWidthClass = "w-[320px] shrink-0";
+
+      // Construction des en-têtes (Concurrents)
+      let headerHtml = ``; 
+      competitors.forEach((comp, cIdx) => {
+        let fallbackFavicon = `https://www.google.com/s2/favicons?domain=${comp.domain || 'example.com'}&sz=128`;
+        let fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(comp.name)}&background=333&color=fff&rounded=true`;
+        let primarySrc = comp.logoUrl ? comp.logoUrl : fallbackFavicon;
+        
+        let logoHtml = `
+          <div class="w-10 h-10 rounded-full bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm border border-gray-200 dark:border-none mr-3 overflow-hidden">
+            <img src="${primarySrc}" 
+                 onerror="if(this.src !== '${fallbackFavicon}') { this.src='${fallbackFavicon}'; } else { this.onerror=null; this.src='${fallbackAvatar}'; }" 
+                 class="w-full h-full object-contain" alt="${comp.name}">
+          </div>
+        `;
+
+        headerHtml += `
+          <div class="${cardWidthClass} apple-glass p-4 rounded-2xl flex justify-between items-center z-30">
+            <div class="flex items-center w-full min-w-0">
+              ${logoHtml}
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white truncate flex-1" contenteditable="true" onblur="updateCompetitor(${cIdx}, this.innerText)">${comp.name}</h2>
+            </div>
+            <button onclick="deleteCompetitor('${comp.id}')" class="w-8 h-8 ml-2 rounded-full hover:bg-rose-100 dark:hover:bg-rose-500/20 text-rose-500 flex items-center justify-center transition shrink-0" title="Supprimer"><i class="fa-solid fa-trash text-sm"></i></button>
+          </div>
+        `;
+      });
+      headerContainer.innerHTML = headerHtml;
+
+      axes.forEach((axis) => {
+        const isOpen = openAxes[axis.id];
+        let row = document.createElement('div');
+        row.className = "axis-item relative w-full mb-10";
+        row.dataset.id = axis.id;
+
+        let rowHtml = `
+          <div class="w-full apple-glass-axis mb-6 rounded-2xl flex items-center justify-between shadow-sm group relative">
+            <div class="flex items-center gap-4 p-3 md:p-4 sticky left-4 z-20">
+              <div class="drag-handle w-8 h-8 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 flex items-center justify-center text-gray-500 transition">
+                <i class="fa-solid fa-grip-vertical"></i>
+              </div>
+              <button onclick="toggleAccordion('${axis.id}')" class="w-8 h-8 rounded-full hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-300 transition">
+                <i id="icon-${axis.id}" class="fa-solid fa-chevron-right transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}"></i>
+              </button>
+              <div class="flex items-center gap-3 cursor-pointer" onclick="toggleAccordion('${axis.id}')">
+                <span class="text-xl w-6 text-center shrink-0">${getPlatformIcon(axis.platform)}</span>
+                <h3 class="font-bold text-gray-900 dark:text-white text-lg min-w-[150px] whitespace-nowrap" contenteditable="true" onblur="updateAxisTitle('${axis.id}', this.innerText)" onclick="event.stopPropagation()">${axis.name}</h3>
+              </div>
+            </div>
+            <div class="pr-4 md:pr-6 z-10 sticky right-4">
+              <button onclick="deleteAxis('${axis.id}')" class="w-9 h-9 rounded-full hover:bg-rose-100 dark:hover:bg-rose-500/20 text-rose-500 flex items-center justify-center transition" title="Supprimer l'axe">
+                <i class="fa-solid fa-trash text-sm"></i>
+              </button>
+            </div>
+          </div>
+        `;
+
+        rowHtml += `<div id="content-${axis.id}" class="${isOpen ? 'flex' : 'hidden'} gap-6 w-max items-start">`;
+
+        competitors.forEach(comp => {
+          let rawUrl = axis.urls[comp.id] || "";
+          let displayUrl = rawUrl;
+          let iframeClass = "monitor-iframe";
+          let zoomLevel = axis.zooms[comp.id] || 0.33;
+          let calculatedWidth = 100 / zoomLevel;
+          let iframeStyle = "";
+
+          if (rawUrl) {
+            if (axis.platform === 'instagram' && !displayUrl.includes('/embed')) { 
+                displayUrl = displayUrl.replace(/\/$/, '') + '/embed'; 
+            }
+            if (axis.platform === 'facebook' && !displayUrl.includes('plugins/page.php')) {
+               displayUrl = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(displayUrl)}&tabs=timeline&width=400&height=800&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
+               iframeClass = "fb-iframe bg-white";
+            } else {
+               iframeStyle = `width: ${calculatedWidth}%; height: ${calculatedWidth}%; transform: scale(${zoomLevel}); transform-origin: top left;`;
+            }
+          }
+
+          rowHtml += `
+            <div class="${cardWidthClass} apple-glass rounded-[24px] overflow-hidden group relative">
+              <div class="px-4 py-3 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-gray-100/80 dark:bg-black/40">
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 truncate max-w-[140px]">${rawUrl ? new URL(rawUrl).hostname.replace('www.', '') : "Aucune source"}</span>
+                <div class="flex gap-1 items-center">
+                  ${rawUrl ? `<button onclick="copyAIPrompt('${comp.name}', '${axis.name}', '${axis.platform}')" class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-purple-500 hover:text-white text-purple-600 dark:text-purple-400 flex items-center justify-center transition" title="Copier le prompt IA"><i class="fa-solid fa-robot text-xs"></i></button>` : ''}
+                  <button onclick="openEditUrlModal('${axis.id}', '${comp.id}')" class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-blue-500 hover:text-white text-blue-600 dark:text-blue-400 flex items-center justify-center transition" title="Paramètres"><i class="fa-solid fa-pen text-xs"></i></button>
+                  ${rawUrl ? `<a href="${rawUrl}" target="_blank" class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-gray-600 dark:text-gray-300 flex items-center justify-center transition" title="Ouvrir"><i class="fa-solid fa-external-link-alt text-xs"></i></a>` : ''}
+                </div>
+              </div>
+              <div class="monitor-wrapper ${axis.platform === 'facebook' ? 'bg-white' : ''}">
+                ${displayUrl 
+                  ? `<iframe class="${iframeClass}" src="${displayUrl}" style="${iframeStyle}" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>` 
+                  : `<div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 flex-col gap-3 p-6 text-center bg-black/5 dark:bg-black/20"><i class="fa-solid fa-link-slash text-2xl mb-2 opacity-50"></i><span class="text-sm font-medium">Source manquante</span><button onclick="openEditUrlModal('${axis.id}', '${comp.id}')" class="mt-2 text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition underline">Ajouter une URL</button></div>`
+                }
+              </div>
+            </div>
+          `;
+        });
+
+        rowHtml += `</div>`;
+        row.innerHTML = rowHtml;
+        axesContainer.appendChild(row);
+      });
+
+      new Sortable(axesContainer, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+          const item = axes.splice(evt.oldIndex, 1)[0];
+          axes.splice(evt.newIndex, 0, item);
+          saveData();
+        }
+      });
+    }
+
+    function copyAIPrompt(compName, axisName, platform) {
+      const prompt = `Agis comme un directeur de la stratégie retail de haut niveau. Je te fournis ci-joint une capture d'écran de l'axe de communication "${axisName}" (${platform}) pour l'enseigne ${compName}.
+Objectif :
+1. Analyse l'offre ou le message principal mis en avant.
+2. Décrypte le ton, le ciblage et la stratégie sous-jacente.
+3. Propose 2 actions offensives immédiates que je pourrais mettre en place dans mon magasin concurrent pour contrer cette communication.`;
+      
+      try {
+        navigator.clipboard.writeText(prompt).then(() => {
+          showToast("Prompt IA copié ! Prenez votre capture d'écran et collez-la dans votre IA.");
+        });
+      } catch (e) {
+        const textArea = document.createElement("textarea");
+        textArea.value = prompt;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          showToast("Prompt IA copié !");
+        } catch (err) {
+          console.error('Failed to copy', err);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
+
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-5 right-5 bg-blue-600 text-white px-6 py-3 rounded-xl shadow-2xl z-[200] transform transition-all duration-300 translate-y-10 opacity-0 font-medium';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
+        setTimeout(() => {
+            toast.classList.add('translate-y-10', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('div').classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0');
+      modal.querySelector('div').classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function submitCompetitor() {
+      const nameInput = document.getElementById('new-comp-name');
+      const domainInput = document.getElementById('new-comp-domain');
+      if (nameInput.value.trim()) {
+        const newId = 'c' + Date.now();
+        competitors.push({ 
+          id: newId, 
+          name: nameInput.value.trim(), 
+          domain: domainInput.value.trim().replace(/^https?:\/\//,'').replace(/^www\./,'')
+        });
+        saveData(); renderBoard();
+        nameInput.value = ''; domainInput.value = '';
+        closeModal('modal-competitor'); showToast("Nouveau concurrent ajouté.");
+      }
+    }
+
+    function submitAxis() {
+      const nameInput = document.getElementById('new-axis-name');
+      const platformSelect = document.getElementById('new-axis-platform');
+      if (nameInput.value.trim()) {
+        const newId = 'a' + Date.now();
+        axes.push({ id: newId, name: nameInput.value.trim(), platform: platformSelect.value, urls: {}, zooms: {} });
+        openAxes[newId] = true;
+        saveData(); renderBoard();
+        nameInput.value = '';
+        closeModal('modal-axis'); showToast("Nouvel axe d'analyse créé.");
+      }
+    }
+
+    function openEditUrlModal(axisId, compId) {
+      const axis = axes.find(a => a.id === axisId);
+      const comp = competitors.find(c => c.id === compId);
+      document.getElementById('edit-axis-id').value = axisId;
+      document.getElementById('edit-comp-id').value = compId;
+      document.getElementById('edit-modal-subtitle').innerText = `${comp.name} - ${axis.name}`;
+      document.getElementById('edit-url').value = axis.urls[compId] || '';
+      document.getElementById('edit-zoom').value = axis.zooms[compId] || 0.33;
+      updateZoomDisplay();
+      openModal('modal-edit');
+    }
+
+    function updateZoomDisplay() {
+      const val = parseFloat(document.getElementById('edit-zoom').value);
+      document.getElementById('zoom-value-display').innerText = Math.round(val * 100) + '%';
+    }
+
+    function submitEdit() {
+      const axisId = document.getElementById('edit-axis-id').value;
+      const compId = document.getElementById('edit-comp-id').value;
+      const url = document.getElementById('edit-url').value.trim();
+      const zoom = parseFloat(document.getElementById('edit-zoom').value);
+      const axis = axes.find(a => a.id === axisId);
+      if (axis) {
+        axis.urls[compId] = url; axis.zooms[compId] = zoom;
+        saveData(); renderBoard(); closeModal('modal-edit'); showToast("Source mise à jour.");
+      }
+    }
+
+    function updateCompetitor(idx, newName) { if(newName.trim()) { competitors[idx].name = newName.trim(); saveData(); } }
+    function updateAxisTitle(id, newTitle) { const axis = axes.find(a => a.id === id); if(axis && newTitle.trim()) { axis.name = newTitle.trim(); saveData(); } }
+    function deleteCompetitor(id) { competitors = competitors.filter(c => c.id !== id); saveData(); renderBoard(); showToast("Concurrent supprimé."); }
+    function deleteAxis(id) { axes = axes.filter(a => a.id !== id); delete openAxes[id]; saveData(); renderBoard(); showToast("Axe supprimé."); }
+
+    window.onload = function() {
+      renderBoard();
+    };
+  </script>
+</body>
+</html>
