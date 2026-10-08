@@ -24,7 +24,7 @@ Renvoie UNIQUEMENT un objet JSON valide avec les clés exactes suivantes, sans a
 try:
     # 4. Demander à l'IA (Nouvelle syntaxe)
     response = client.models.generate_content(
-        model='gemini-2.0-flash',
+        model='gemini-3.8-flash',
         contents=prompt,
     )
     
