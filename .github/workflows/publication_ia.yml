@@ -1,0 +1,35 @@
+name: Agent SEO Spin To Keep
+
+on:
+  schedule:
+    # S'exécute automatiquement toutes les 4 heures
+    - cron: '0 */4 * * *'
+  workflow_dispatch: # Permet de lancer le script manuellement en un clic
+
+permissions:
+  contents: write # Autorise le robot à sauvegarder le fichier sur ton GitHub
+
+jobs:
+  creation_page:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Installer l'outil Google
+        run: pip install google-generativeai
+
+      - name: Lancer l'Agent IA
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python agent_seo.py
+
+      - name: Sauvegarder et publier sur le site
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 SEO Auto: Nouvelle landing page générée par IA"
