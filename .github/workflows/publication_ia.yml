@@ -22,7 +22,7 @@ jobs:
           python-version: '3.10'
 
       - name: Installer l'outil Google
-        run: pip install google-generativeai
+        run: pip install google-genai
 
       - name: Lancer l'Agent IA
         env:
