@@ -1,14 +1,13 @@
 import os
 import json
 import random
-import google.generativeai as genai
+from google import genai
 
-# 1. Configurer l'accès à Gemini
+# 1. Configurer l'accès avec la NOUVELLE librairie
 api_key = os.environ.get("GEMINI_API_KEY")
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-flash')
+client = genai.Client(api_key=api_key)
 
-# 2. Liste des métiers à cibler (tu peux en ajouter d'autres ici !)
+# 2. Liste des métiers à cibler
 niches = ["Boulangerie", "Coiffeur", "Fleuriste", "Restaurant", "Garage automobile", "Institut de beaute", "Pharmacie", "Opticien", "Agence immobiliere", "Salle de sport"]
 niche = random.choice(niches)
 
@@ -23,8 +22,11 @@ Renvoie UNIQUEMENT un objet JSON valide avec les clés exactes suivantes, sans a
 """
 
 try:
-    # 4. Demander à l'IA
-    response = model.generate_content(prompt)
+    # 4. Demander à l'IA (Nouvelle syntaxe)
+    response = client.models.generate_content(
+        model='gemini-2.0-flash',
+        contents=prompt,
+    )
     
     # Nettoyer la réponse pour garder juste le JSON
     texte_json = response.text.replace('```json', '').replace('```', '').strip()
