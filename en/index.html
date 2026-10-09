@@ -1226,6 +1226,29 @@
         .nav-links a.lang-switch { margin-left: 0; padding: 6px 12px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border-color); }
         .nav-links a.lang-switch:hover { color: var(--text-primary); border-color: var(--accent-color); }
         @media (max-width: 640px) { .lang-switch { margin-left: 0.5rem; padding: 5px 9px; font-size: 0.78rem; } }
+
+        /* Menu desktop compact : pas de retour à la ligne, liens secondaires dans "Plus" */
+        nav { max-width: 1320px; }
+        .logo { white-space: nowrap; flex-shrink: 0; }
+        .nav-links { gap: 1.3rem; align-items: center; }
+        .nav-links a, .nav-more-btn { white-space: nowrap; font-size: 0.9rem; }
+        .nav-more { position: relative; }
+        .nav-more-btn { background: none; border: none; padding: 8px 0; font-family: inherit; font-weight: 500; color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .nav-more-btn::after { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+        .nav-more:hover .nav-more-btn, .nav-more:focus-within .nav-more-btn { color: var(--accent-color); }
+        .nav-more-menu { display: none; position: absolute; top: 100%; right: -12px; min-width: 190px; margin: 0; padding: 8px; list-style: none; flex-direction: column; gap: 2px; background: #fff; border: 1px solid var(--border-color); border-radius: 14px; box-shadow: var(--shadow-md); z-index: 1100; }
+        .nav-more:hover .nav-more-menu, .nav-more:focus-within .nav-more-menu { display: flex; }
+        .nav-more-menu a { display: block; padding: 10px 14px; border-radius: 10px; }
+        .nav-more-menu a:hover { background: var(--bg-secondary); }
+        .nav-links a.lang-switch { gap: 7px; }
+        .lang-switch .flag { display: block; border-radius: 3px; flex-shrink: 0; }
+        @media (max-width: 1300px) {
+            .nav-more, .nav-more-menu, .nav-more:hover .nav-more-menu, .nav-more:focus-within .nav-more-menu { display: contents; }
+            .nav-more-btn { display: none; }
+            .nav-more-menu a { padding: 0; border-radius: 0; }
+            .nav-more-menu a:hover { background: none; }
+            .nav-links a, .nav-more-btn { white-space: normal; font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
@@ -1245,14 +1268,18 @@
             <li><a href="#concept" onclick="closeMenu()">How it works</a></li>
             <li><a href="#configurateur" onclick="closeMenu()">Game builder</a></li>
             <li><a href="#enjeux-seo" onclick="closeMenu()">Why reviews?</a></li>
-            <li><a href="#fonctionnalites" onclick="closeMenu()">Tool & CRM</a></li>
-            <li><a href="#secteurs" onclick="closeMenu()">Industries</a></li>
             <li><a href="#guides" onclick="closeMenu()">Guides</a></li>
-            <li><a href="#lexique" onclick="closeMenu()">Glossary</a></li>
             <li><a href="#cas-usage" onclick="closeMenu()">Use cases</a></li>
             <li><a href="#tarifs" onclick="closeMenu()">Pricing</a></li>
             <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
-            <li class="nav-lang-item"><a href="https://www.spintokeep.com" class="lang-switch" hreflang="fr" lang="fr" title="Passer en français" aria-label="Passer en français"><span class="flag" aria-hidden="true">🇫🇷</span>FR</a></li>
+            <li class="nav-more"><button type="button" class="nav-more-btn" aria-haspopup="true">More</button>
+                <ul class="nav-more-menu">
+                    <li><a href="#fonctionnalites" onclick="closeMenu()">Tool & CRM</a></li>
+                    <li><a href="#secteurs" onclick="closeMenu()">Industries</a></li>
+                    <li><a href="#lexique" onclick="closeMenu()">Glossary</a></li>
+                </ul>
+            </li>
+            <li class="nav-lang-item"><a href="https://www.spintokeep.com" class="lang-switch" hreflang="fr" lang="fr" title="Passer en français" aria-label="Passer en français"><svg class="flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><clipPath id="frc"><rect width="60" height="40" rx="4"/></clipPath><g clip-path="url(#frc)"><rect width="20" height="40" fill="#0055A4"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#EF4135"/></g><rect width="60" height="40" rx="4" fill="none" stroke="rgba(0,0,0,.15)" stroke-width="1.5"/></svg>FR</a></li>
             <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
         <div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button></div>
@@ -1281,7 +1308,7 @@
 <div class="topbar" id="topbar" style="display:none;">
     <div class="topbar-brand"><span class="dot"></span> SpinToKeep</div>
     <div class="topbar-actions" id="topbar-actions">
-        <button class="btn-ghost" id="btn-login-open" onclick="openAuthModal('login')">Se connecter</button>
+        <button class="btn-ghost" id="btn-login-open" onclick="openAuthModal('login')">Log in</button>
     </div>
     <div class="topbar-menu-mobile" id="topbar-menu-mobile"></div>
 </div>
@@ -1290,60 +1317,60 @@
 <div class="main-wrapper" id="main-content">
     <div class="panel panel-config">
         <div class="panel-heading">
-            <h2 class="title" id="conf-title">Configuration de votre jeu</h2>
+            <h2 class="title" id="conf-title">Configure your game</h2>
         </div>
-        <p class="subtitle" id="conf-subtitle">Suivez les étapes ci-dessous, l'aperçu à droite se met à jour en direct.</p>
+        <p class="subtitle" id="conf-subtitle">Follow the steps below, the preview on the right updates live.</p>
 
         <div id="edit-mode-banner" style="display:none; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; background:#eef6ff; border:1px solid #cfe4fb; border-radius:12px; padding:10px 14px; margin-bottom:16px; font-size:12.5px; color:#0a4a8a;">
-            <span>✏️ Modification de la roulette <strong id="edit-mode-id"></strong> — cliquez sur « Générer » pour enregistrer vos changements.</span>
-            <button class="btn-ghost" onclick="startNewConfig()" style="white-space:nowrap;">+ Nouvelle roulette</button>
+            <span>✏️ Editing your game <strong id="edit-mode-id"></strong> — click “Generate” to save your changes.</span>
+            <button class="btn-ghost" onclick="startNewConfig()" style="white-space:nowrap;">+ New game</button>
         </div>
 
-        <input type="hidden" id="game_lang" value="fr">
+        <input type="hidden" id="game_lang" value="en">
 
         <details class="step" id="step-sector">
-            <summary><span class="num">1</span><span class="label" id="sum-sector">Votre secteur d'activité</span><span class="chev">▾</span></summary>
+            <summary><span class="num">1</span><span class="label" id="sum-sector">Your business sector</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help">Pré-remplit des lots adaptés à votre activité (tout reste modifiable ensuite).</p>
+                <p class="step-help">Pre-fills prizes suited to your business (everything stays editable afterwards).</p>
                 <select id="sector_select" class="full-width" style="margin-bottom:0;" onchange="applySectorPreset(this.value)">
-                    <option value="">— Sélectionner —</option>
-                    <option value="fastfood">🍔 Restauration rapide</option>
-                    <option value="restaurant">🍽️ Restaurant traditionnel</option>
-                    <option value="hotel">🏨 Hôtellerie</option>
-                    <option value="coiffure">✂️ Coiffure & Barbier</option>
-                    <option value="beaute">💆 Institut de beauté / Spa</option>
-                    <option value="garage">🔧 Garage / Mécanique auto</option>
-                    <option value="immobilier">🏠 Agence immobilière</option>
-                    <option value="fitness">🏋️ Salle de sport / Fitness</option>
-                    <option value="boulangerie">🥐 Boulangerie-Pâtisserie</option>
-                    <option value="medical">🩺 Médecin / Dentiste / Clinique</option>
-                    <option value="grandedistrib">🛒 Grande distribution</option>
+                    <option value="">— Select —</option>
+                    <option value="fastfood">🍔 Fast food</option>
+                    <option value="restaurant">🍽️ Traditional restaurant</option>
+                    <option value="hotel">🏨 Hotels</option>
+                    <option value="coiffure">✂️ Hair salon & barber</option>
+                    <option value="beaute">💆 Beauty salon / Spa</option>
+                    <option value="garage">🔧 Garage / Auto repair</option>
+                    <option value="immobilier">🏠 Real estate agency</option>
+                    <option value="fitness">🏋️ Gym / Fitness</option>
+                    <option value="boulangerie">🥐 Bakery & pastry shop</option>
+                    <option value="medical">🩺 Doctor / Dentist / Clinic</option>
+                    <option value="grandedistrib">🛒 Supermarkets</option>
                 </select>
             </div>
         </details>
 
         <details class="step" open id="step-gametype">
-            <summary><span class="num">2</span><span class="label" id="sum-gametype">Format du jeu</span><span class="chev">▾</span></summary>
+            <summary><span class="num">2</span><span class="label" id="sum-gametype">Game format</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-gametype">Choisissez comment vos clients vont tenter de gagner.</p>
+                <p class="step-help" id="lbl-gametype">Choose how your customers will try to win.</p>
                 <div class="gametype-grid">
                     <div class="gametype-card active" id="gtcard-wheel" onclick="setGameType('wheel')">
-                        <span class="ic">🎡</span><span class="lbl" id="gt-lbl-wheel">Roue de la fortune</span>
+                        <span class="ic">🎡</span><span class="lbl" id="gt-lbl-wheel">Prize wheel</span>
                     </div>
                     <div class="gametype-card" id="gtcard-slot" onclick="setGameType('slot')">
-                        <span class="ic">🎰</span><span class="lbl" id="gt-lbl-slot">Bandit manchot</span>
+                        <span class="ic">🎰</span><span class="lbl" id="gt-lbl-slot">Slot machine</span>
                     </div>
                     <div class="gametype-card" id="gtcard-scratch" onclick="setGameType('scratch')">
-                        <span class="ic">🎫</span><span class="lbl" id="gt-lbl-scratch">Ticket à gratter</span>
+                        <span class="ic">🎫</span><span class="lbl" id="gt-lbl-scratch">Scratch card</span>
                     </div>
                     <div class="gametype-card" id="gtcard-boxes" onclick="setGameType('boxes')">
-                        <span class="ic">🎁</span><span class="lbl" id="gt-lbl-boxes">Coffres mystères</span>
+                        <span class="ic">🎁</span><span class="lbl" id="gt-lbl-boxes">Mystery chests</span>
                     </div>
                     <div class="gametype-card" id="gtcard-plinko" onclick="setGameType('plinko')">
                         <span class="ic">🎯</span><span class="lbl" id="gt-lbl-plinko">Plinko</span>
                     </div>
                     <div class="gametype-card" id="gtcard-cups" onclick="setGameType('cups')">
-                        <span class="ic">🥤</span><span class="lbl" id="gt-lbl-cups">Bonneteau</span>
+                        <span class="ic">🥤</span><span class="lbl" id="gt-lbl-cups">Shell game</span>
                     </div>
                 </div>
             </div>
@@ -1352,28 +1379,28 @@
         <details class="step">
             <summary><span class="num">3</span><span class="label" id="sum-logo">Logo & branding</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-logo-file">Ajoutez le logo qui apparaîtra sur les 4 écrans du jeu.</p>
+                <p class="step-help" id="lbl-logo-file">Add the logo that will appear on the 4 game screens.</p>
                 <div class="upload-wrapper">
                     <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')">
-                    <div id="upload-status">Formats acceptés : PNG, JPG, WEBP</div>
+                    <div id="upload-status">Accepted formats: PNG, JPG, WEBP</div>
                 </div>
-                <label class="field-label" id="lbl-logo-url" style="display:none;">ou URL du logo si déjà hébergé en ligne</label>
+                <label class="field-label" id="lbl-logo-url" style="display:none;">or logo URL if already hosted online</label>
                 <input type="text" id="logo_url" class="full-width" oninput="update()" value="" style="display:none;">
             </div>
         </details>
 
         <details class="step">
-            <summary><span class="num">4</span><span class="label" id="sum-screen">Écrans & couleurs</span><span class="chev">▾</span></summary>
+            <summary><span class="num">4</span><span class="label" id="sum-screen">Screens & colors</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-screen-cust">Image de fond et couleurs des 4 écrans vus par le client.</p>
+                <p class="step-help" id="lbl-screen-cust">Background image and colors of the 4 screens seen by the customer.</p>
                 <div class="upload-wrapper">
-                    <button class="delete-bg" onclick="document.getElementById('bg_url').value=''; update();" title="Supprimer l'image">×</button>
+                    <button class="delete-bg" onclick="document.getElementById('bg_url').value=''; update();" title="Remove image">×</button>
                     <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')">
-                    <div id="bg-upload-status">Taille idéale : 1080 × 1920 px (format 9:16)</div>
+                    <div id="bg-upload-status">Ideal size: 1080 × 1920 px (9:16 format)</div>
                 </div>
                 <input type="hidden" id="bg_url" oninput="update()" value="">
 
-                <label class="field-label">Fond dégradé <span style="font-weight:400;color:var(--muted);">(utilisé tant qu'aucune image n'est ajoutée)</span></label>
+                <label class="field-label">Gradient background <span style="font-weight:400;color:var(--muted);">(used until an image is added)</span></label>
                 <div class="swatch-grid" id="gradient-swatches" style="margin-bottom:14px;"></div>
 
                 <label class="field-label">Texture</label>
@@ -1387,162 +1414,162 @@
                             <input type="checkbox" id="bg_color_none" checked onchange="toggleBgColorNone(this)"> aucun
                         </label>
                     </div>
-                    <div class="color-input-group"><input type="range" id="bg_opacity" min="0" max="1" step="0.1" value="0.4" oninput="update()" style="width:56px;vertical-align:middle;" disabled><div id="lbl-col-op">OPACITÉ DU FOND</div></div>
+                    <div class="color-input-group"><input type="range" id="bg_opacity" min="0" max="1" step="0.1" value="0.4" oninput="update()" style="width:56px;vertical-align:middle;" disabled><div id="lbl-col-op">BACKGROUND OPACITY</div></div>
                     <div class="color-input-group"><input type="color" id="text_color" value="#ffffff" oninput="update()"><div id="lbl-col-txt">TEXTE</div></div>
-                    <div class="color-input-group"><input type="color" id="button_color" value="#046A38" oninput="update()"><div id="lbl-col-btn">BOUTONS</div></div>
-                    <div class="color-input-group"><input type="color" id="button_text_color" value="#ffffff" oninput="update()"><div id="lbl-col-btn-txt">TEXTE BOUTONS</div></div>
+                    <div class="color-input-group"><input type="color" id="button_color" value="#046A38" oninput="update()"><div id="lbl-col-btn">BUTTONS</div></div>
+                    <div class="color-input-group"><input type="color" id="button_text_color" value="#ffffff" oninput="update()"><div id="lbl-col-btn-txt">BUTTON TEXT</div></div>
                 </div>
             </div>
         </details>
 
         <details class="step">
-            <summary><span class="num">5</span><span class="label" id="sum-wheel">Design du jeu</span><span class="chev">▾</span></summary>
+            <summary><span class="num">5</span><span class="label" id="sum-wheel">Game design</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-wheel-design">Cadre et couleurs de votre jeu.</p>
+                <p class="step-help" id="lbl-wheel-design">Frame and colors of your game.</p>
                 <div class="brand-colors">
-                    <div class="color-input-group"><input type="color" id="wheel_border_color" value="#046A38" oninput="update()"><div id="lbl-col-bord">CADRE</div></div>
-                    <div class="color-input-group" id="bulb-color-group"><input type="color" id="wheel_bulb_color" value="#C4D600" oninput="update()"><div id="lbl-col-bulb">LUMIÈRES</div></div>
-                    <div class="color-input-group" id="bulb-size-group"><input type="number" id="wheel_bulb_size" value="16" min="2" max="20" oninput="update()" style="width:52px;padding:6px;"><div id="lbl-size-bulb">TAILLE (px)</div></div>
+                    <div class="color-input-group"><input type="color" id="wheel_border_color" value="#046A38" oninput="update()"><div id="lbl-col-bord">FRAME</div></div>
+                    <div class="color-input-group" id="bulb-color-group"><input type="color" id="wheel_bulb_color" value="#C4D600" oninput="update()"><div id="lbl-col-bulb">LIGHTS</div></div>
+                    <div class="color-input-group" id="bulb-size-group"><input type="number" id="wheel_bulb_size" value="16" min="2" max="20" oninput="update()" style="width:52px;padding:6px;"><div id="lbl-size-bulb">SIZE (px)</div></div>
                 </div>
-                <label class="field-label" id="lbl-brand-quick">Couleurs de marque rapides</label>
-                <p class="step-help" id="lbl-brand-quick-help" style="margin-top:-6px;">Appliquées aux lots, et aussi au décor du bandit manchot / ticket à gratter.</p>
+                <label class="field-label" id="lbl-brand-quick">Quick brand colors</label>
+                <p class="step-help" id="lbl-brand-quick-help" style="margin-top:-6px;">Applied to prizes, and also to the slot machine / scratch card decor.</p>
                 <div class="brand-colors">
-                    <div class="color-input-group"><input type="color" id="color1" value="#046A38" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def1">COULEUR 1</div></div>
+                    <div class="color-input-group"><input type="color" id="color1" value="#046A38" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def1">COLOR 1</div></div>
                     <div style="font-size:18px;">🔄</div>
-                    <div class="color-input-group"><input type="color" id="color2" value="#C4D600" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def2">COULEUR 2</div></div>
+                    <div class="color-input-group"><input type="color" id="color2" value="#C4D600" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def2">COLOR 2</div></div>
                 </div>
             </div>
         </details>
 
         <details class="step">
-            <summary><span class="num">6</span><span class="label" id="sum-lots">Lots & probabilités</span><span class="chev">▾</span></summary>
+            <summary><span class="num">6</span><span class="label" id="sum-lots">Prizes & probabilities</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-lots-cust">Le total des probabilités doit toujours faire 100 %. Astuce : commencez le nom du lot par un emoji (🎁, 💸, 🥹...), il reste visible quel que soit le thème choisi.</p>
+                <p class="step-help" id="lbl-lots-cust">Probabilities must always total 100%. Tip: start each prize name with an emoji (🎁, 💸, 🥹...) so it stays visible whatever theme you pick.</p>
                 <input type="hidden" id="lot_count" min="2" max="12" value="4">
-                <div class="prob-bar-label"><span id="prob-bar-txt">Total : 100%</span></div>
+                <div class="prob-bar-label"><span id="prob-bar-txt">Total: 100%</span></div>
                 <div class="prob-bar-track"><div class="prob-bar-fill" id="prob-bar-fill" style="width:100%;background:var(--success);"></div></div>
                 <div class="labels-row">
-                    <div class="ln-label" id="lbl-row-name">NOM DU LOT</div>
-                    <div class="lp-label" id="lbl-row-prob">PROBABILITÉ</div>
-                    <div class="ls-label" id="lbl-row-size">TAILLE</div>
+                    <div class="ln-label" id="lbl-row-name">PRIZE NAME</div>
+                    <div class="lp-label" id="lbl-row-prob">PROBABILITY</div>
+                    <div class="ls-label" id="lbl-row-size">SIZE</div>
                     <div class="lc-label" id="lbl-row-bg">FOND</div>
                     <div class="lc-label" id="lbl-row-txt">TEXTE</div>
                 </div>
                 <div id="lots-inputs"></div>
                 <div class="btn-add-container">
-                    <button type="button" class="btn-add" id="btn-add-lot" onclick="addNewLotManual()">+ <span id="btn-add-lot-lbl">rajouter un lot</span></button>
+                    <button type="button" class="btn-add" id="btn-add-lot" onclick="addNewLotManual()">+ <span id="btn-add-lot-lbl">add a prize</span></button>
                 </div>
                 <div id="prob-info"></div>
             </div>
         </details>
 
         <details class="step" id="details_texts">
-            <summary><span class="num">7</span><span class="label" id="sum-texts">Textes & conditions</span><span class="chev">▾</span></summary>
+            <summary><span class="num">7</span><span class="label" id="sum-texts">Texts & conditions</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <label class="field-label" id="lbl-txt-cust">Textes affichés au client</label>
-                <input type="text" id="t1" class="full-width" value="Cadeaux à gagner ! ✨" oninput="update()">
-                <input type="text" id="t2" class="full-width" value="Laissez un avis pour débloquer la roue. Voir conditions* dans votre point de vente." oninput="update()">
-                <input type="text" id="t3" class="full-width" value="LAISSEZ UN AVIS" oninput="update()">
-                <input type="text" id="t_wheel" class="full-width" value="Tournez la roue et tentez de gagner* de nombreux cadeaux !" oninput="update()">
+                <label class="field-label" id="lbl-txt-cust">Customer-facing texts</label>
+                <input type="text" id="t1" class="full-width" value="Gifts to win! ✨" oninput="update()">
+                <input type="text" id="t2" class="full-width" value="Leave a review to unlock the wheel. See conditions* at your point of sale." oninput="update()">
+                <input type="text" id="t3" class="full-width" value="LEAVE A REVIEW" oninput="update()">
+                <input type="text" id="t_wheel" class="full-width" value="Spin the wheel and try to win* lots of gifts!" oninput="update()">
 
-                <label class="field-label" id="lbl-qr-scanner">Texte affiche QR (Scannez-moi)</label>
-                <input type="text" id="t_qr_scan" class="full-width" value="Scannez-moi" oninput="update()">
+                <label class="field-label" id="lbl-qr-scanner">QR poster text (Scan me)</label>
+                <input type="text" id="t_qr_scan" class="full-width" value="Scan me" oninput="update()">
 
-                <label class="field-label" id="lbl-form-fields">Champs & boutons du formulaire</label>
-                <input type="text" id="t_last_step" class="full-width" value="Dernière étape !" oninput="update()" placeholder="Titre formulaire">
-                <input type="text" id="t_name" class="full-width" value="Nom complet" oninput="update()" placeholder="Placeholder Nom">
-                <input type="text" id="t_email" class="full-width" value="Email" oninput="update()" placeholder="Placeholder Email">
-                <input type="text" id="t_phone" class="full-width" value="Téléphone" oninput="update()" placeholder="Placeholder Téléphone">
+                <label class="field-label" id="lbl-form-fields">Form fields & buttons</label>
+                <input type="text" id="t_last_step" class="full-width" value="Last step!" oninput="update()" placeholder="Form title">
+                <input type="text" id="t_name" class="full-width" value="Full name" oninput="update()" placeholder="Name placeholder">
+                <input type="text" id="t_email" class="full-width" value="Email" oninput="update()" placeholder="Email placeholder">
+                <input type="text" id="t_phone" class="full-width" value="Phone" oninput="update()" placeholder="Phone placeholder">
 
-                <label class="field-label">Champs supplémentaires du formulaire</label>
-                <p class="step-help" style="margin-top:-6px;">Ajoutez vos propres champs (ex : date de naissance, code postal...). Ils apparaîtront aussi comme colonnes dans le Dashboard.</p>
+                <label class="field-label">Extra form fields</label>
+                <p class="step-help" style="margin-top:-6px;">Add your own fields (e.g. date of birth, postcode...). They will also appear as columns in the Dashboard.</p>
                 <div id="extra-fields-inputs"></div>
-                <button type="button" class="btn-ghost" style="margin-bottom:14px;" onclick="addExtraFieldRow()">+ Ajouter un champ</button>
+                <button type="button" class="btn-ghost" style="margin-bottom:14px;" onclick="addExtraFieldRow()">+ Add a field</button>
 
-                <input type="text" id="t_btn_validate" class="full-width" value="VALIDER ET JOUER" oninput="update()" placeholder="Texte bouton valider">
+                <input type="text" id="t_btn_validate" class="full-width" value="VALIDATE AND PLAY" oninput="update()" placeholder="Validate button text">
 
-                <label class="field-label" id="lbl-end-msg">Boutons & messages de fin</label>
-                <input type="text" id="t_btn_spin" class="full-width" value="LANCEZ LA ROUE" oninput="update()" placeholder="Texte bouton lancer">
-                <input type="text" id="t_thanks" class="full-width" value="Merci pour votre participation ! 🎉" oninput="update()" placeholder="Message merci">
-                <input type="text" id="t_res_label" class="full-width" value="Résultat :" oninput="update()" placeholder="Texte avant résultat">
+                <label class="field-label" id="lbl-end-msg">End buttons & messages</label>
+                <input type="text" id="t_btn_spin" class="full-width" value="SPIN THE WHEEL" oninput="update()" placeholder="Launch button text">
+                <input type="text" id="t_thanks" class="full-width" value="Thank you for participating! 🎉" oninput="update()" placeholder="Thank-you message">
+                <input type="text" id="t_res_label" class="full-width" value="Result:" oninput="update()" placeholder="Text before result">
 
-                <label class="field-label" id="lbl-cond-part">Conditions de participation</label>
-                <textarea id="t_cond" class="full-width" rows="6" oninput="update()">Si vous avez gagné, présenter cet écran à l’accueil. Le jeu est ouvert à toute personne physique majeure, sans obligation d’achat. La participation est strictement limitée à un seul lancer par personne. Les gains obtenus doivent être réclamés ou consommés immédiatement et ne peuvent être reportés à une date ultérieure en fonction des conditions. Les lots gagnés ne sont pas cumulables avec d'autres offres promotionnelles, réductions en cours dans l'établissement. Les lots sont proposés dans la limite des stocks disponibles. Les gains ne sont ni échangeables, ni remboursables en espèces. Vos données sont traitées pour la gestion du jeu.</textarea>
+                <label class="field-label" id="lbl-cond-part">Terms of participation</label>
+                <textarea id="t_cond" class="full-width" rows="6" oninput="update()">If you have won, present this screen at the reception. The game is open to any adult individual, without obligation to purchase. Participation is strictly limited to one spin per person. Winnings must be claimed or consumed immediately and cannot be postponed. Prizes cannot be combined with other ongoing promotions. Prizes are available while supplies last. Winnings are neither exchangeable nor refundable in cash. Your data is processed for game management.</textarea>
             </div>
         </details>
 
         <details class="step">
-            <summary><span class="num">8</span><span class="label" id="sum-actions">Action avant de jouer</span><span class="chev">▾</span></summary>
+            <summary><span class="num">8</span><span class="label" id="sum-actions">Action before playing</span><span class="chev">▾</span></summary>
             <div class="step-body">
-                <p class="step-help" id="lbl-google-url">Où le client atterrit avant de jouer (votre fiche Google, site, Insta...)</p>
+                <p class="step-help" id="lbl-google-url">Where the customer lands before playing (your Google listing, website, Insta...)</p>
                 <div class="field-lockable">
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </div>
                 <div class="lock-overlay" id="url-lock-overlay">
-                    <div class="lock-text">🔒 <strong>URL personnalisée</strong> réservée à Premium. Passez Premium pour rediriger vers votre propre lien.</div>
-                    <button class="btn-premium" onclick="openPremiumFlow()">Débloquer</button>
+                    <div class="lock-text">🔒 <strong>Custom URL</strong> reserved for Premium. Go Premium to redirect to your own link.</div>
+                    <button class="btn-premium" onclick="openPremiumFlow()">Unlock</button>
                 </div>
 
                 <div style="background:#eef6ff; border:1px solid #cfe4fb; border-radius:12px; padding:12px 14px; margin-top:14px; font-size:12px; color:#0a4a8a; line-height:1.5;">
-                    💡 <strong>Comment récupérer le lien de votre fiche Google My Business ?</strong><br>
-                    Ouvrez Google Maps, recherchez votre établissement, cliquez sur « Demander des avis » (ou « Partager ») : un lien court est généré. Copiez-collez ce lien ci-dessus pour que vos clients atterrissent directement sur le formulaire d'avis.
+                    💡 <strong>How do I get the link to my Google Business Profile?</strong><br>
+                    Open Google Maps, search for your business, click “Ask for reviews” (or “Share”): a short link is generated. Copy and paste that link above so your customers land directly on the review form.
                 </div>
 
                 <label class="opt-check-row">
                     <input type="checkbox" id="opt_skip_avis" onchange="update()">
-                    <span>Autoriser le client à continuer sans laisser d'avis</span>
+                    <span>Allow the customer to continue without leaving a review</span>
                 </label>
 
-                <label class="opt-check-row" title="Réservé aux comptes Premium">
+                <label class="opt-check-row" title="Reserved for Premium accounts">
                     <input type="checkbox" id="opt_avis_end" onchange="handleAvisEndToggle(this)">
-                    <span>⭐ Demander l'avis à la fin du jeu plutôt qu'au début (Premium)</span>
+                    <span>⭐ Ask for the review at the end of the game rather than at the start (Premium)</span>
                 </label>
             </div>
         </details>
 
-        <button id="btn-gen" class="btn-black btn-gen-inline" style="width:100%; margin-top:8px;" onclick="saveAndGenerate()">Générer le QR Code</button>
+        <button id="btn-gen" class="btn-black btn-gen-inline" style="width:100%; margin-top:8px;" onclick="saveAndGenerate()">Generate the QR Code</button>
 
         <div id="qr-display">
             <div id="qrcode-area">
                 <img id="qr-logo-top" src="" style="max-width:150px; max-height:80px; margin-bottom:10px; display:block; margin-left:auto; margin-right:auto;" loading="lazy">
-                <h3 id="qr-title" style="margin:0; font-size:22px; color:#000; font-weight:bold;">Cadeau à gagner ! ✨</h3>
-                <p id="qr-scan-text" style="margin:5px 0 0 0; font-size:16px; font-weight:bold; color:#333;">Scannez-moi</p>
+                <h3 id="qr-title" style="margin:0; font-size:22px; color:#000; font-weight:bold;">Gift to win! ✨</h3>
+                <p id="qr-scan-text" style="margin:5px 0 0 0; font-size:16px; font-weight:bold; color:#333;">Scan me</p>
                 <div id="qrcode"></div>
                 <p id="qr-id-display" style="font-family:monospace; font-weight:bold; margin-top:5px; color:#555;"></p>
             </div>
             <div class="qr-actions">
-                <button class="btn-download" id="btn-dl-png" onclick="downloadQR('png')">Télécharger PNG</button>
-                <button class="btn-download" id="btn-dl-pdf" onclick="downloadQR('pdf')">Télécharger PDF</button>
+                <button class="btn-download" id="btn-dl-png" onclick="downloadQR('png')">Download PNG</button>
+                <button class="btn-download" id="btn-dl-pdf" onclick="downloadQR('pdf')">Download PDF</button>
             </div>
             <div id="poster-area" style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
-                <p id="poster-status" style="font-size:12.5px; color:var(--muted); margin:0 0 10px 0;">🖼️ Préparation de vos 3 affiches A4 / A5 / A6...</p>
-                <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Aperçu de mes affiches (PDF, A4+A5+A6+Paysage)</button>
+                <p id="poster-status" style="font-size:12.5px; color:var(--muted); margin:0 0 10px 0;">🖼️ Preparing your 3 A4 / A5 / A6 posters...</p>
+                <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Preview my posters (PDF, A4+A5+A6+Landscape)</button>
             </div>
             <div style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
-                <button class="btn-download" style="width:100%;" onclick="downloadReglementJeu()">⚖️ Télécharger le règlement du jeu (PDF)</button>
-                <p style="font-size:11.5px; color:var(--muted); margin:8px 0 0 0;">Document légal prêt à compléter : il vous suffit d'indiquer votre raison sociale, SIREN, adresse du siège, etc.</p>
+                <button class="btn-download" style="width:100%;" onclick="downloadReglementJeu()">⚖️ Download the game rules (PDF)</button>
+                <p style="font-size:11.5px; color:var(--muted); margin:8px 0 0 0;">Legal document ready to complete: just enter your company name, registration number, registered address, etc.</p>
             </div>
         </div>
     </div>
 
     <div class="panel panel-preview">
-        <h2 class="title" id="prev-title">Aperçu du parcours client</h2>
-        <p class="subtitle">Ce que verra la personne qui scanne le QR code, en direct.</p>
+        <h2 class="title" id="prev-title">Customer journey preview</h2>
+        <p class="subtitle">What the person scanning the QR code will see, live.</p>
         <div class="preview-grid">
             <div class="screen-mockup-wrap" id="pre-wrap1"><div class="screen-mockup" id="pre-s1">
-                <span class="screen-label" id="stp1-lbl">Étape 1 : Avis</span>
+                <span class="screen-label" id="stp1-lbl">Step 1: Review</span>
                 <div style="margin-top:40px;">
                     <img id="pre-logo-pop" src="" style="max-width:100px; margin-bottom:15px;" loading="lazy">
                     <div style="padding:15px;">
                         <h4 id="pre-t1" style="margin:0 0 10px 0; font-size:14px;"></h4>
                         <p id="pre-t2" style="font-size:10px;"></p>
                         <div class="btn-black" id="pre-t3" style="font-size:10px; padding:8px 15px;"></div>
-                        <p id="pre-skip-avis-link-avis" style="display:none; font-size:9.5px; text-align:center; margin-top:10px; text-decoration:underline; color:var(--muted); cursor:pointer;">Continuer sans laisser d'avis</p>
+                        <p id="pre-skip-avis-link-avis" style="display:none; font-size:9.5px; text-align:center; margin-top:10px; text-decoration:underline; color:var(--muted); cursor:pointer;">Continue without leaving a review</p>
                     </div>
                 </div>
             </div></div>
             <div class="screen-mockup-wrap" id="pre-wrap2"><div class="screen-mockup" id="pre-s2">
-                <span class="screen-label" id="stp2-lbl">Étape 2 : Formulaire</span>
+                <span class="screen-label" id="stp2-lbl">Step 2: Form</span>
                 <div style="margin-top:30px; text-align:left; padding:0 10px;">
                     <h5 id="pre-t-last" style="margin:0 0 10px 0; text-align:center;"></h5>
                     <div class="mock-form">
@@ -1554,14 +1581,14 @@
                             <input type="checkbox" style="width:auto;">
                             <span id="pre-rgpd-text"></span>
                         </div>
-                        <p style="font-size:8.5px; text-align:left; opacity:.75; margin:8px 0 0 0;">En validant ma participation, j'accepte le règlement du jeu (disponible en point de vente) et l'utilisation de mes données pour m'informer si je gagne.</p>
+                        <p style="font-size:8.5px; text-align:left; opacity:.75; margin:8px 0 0 0;">By submitting my participation, I accept the game rules (available at the point of sale) and the use of my data to inform me if I win.</p>
                         <div class="btn-black" id="pre-btn-val" style="font-size:10px; padding:10px; width:100%; margin-top:15px;"></div>
-                        <p id="pre-skip-avis-link" style="display:none; font-size:9.5px; text-align:center; margin-top:8px; text-decoration:underline; color:var(--muted); cursor:pointer;">Continuer sans laisser d'avis</p>
+                        <p id="pre-skip-avis-link" style="display:none; font-size:9.5px; text-align:center; margin-top:8px; text-decoration:underline; color:var(--muted); cursor:pointer;">Continue without leaving a review</p>
                     </div>
                 </div>
             </div></div>
             <div class="screen-mockup-wrap" id="pre-wrap3"><div class="screen-mockup" id="pre-s3">
-                <span class="screen-label" id="stp3-lbl">Étape 3 : Jeu</span>
+                <span class="screen-label" id="stp3-lbl">Step 3: Game</span>
                 <h4 id="pre-twheel" style="margin:10px 0; font-size:14px;"></h4>
 
                 <div id="pre-block-wheel">
@@ -1586,15 +1613,15 @@
 
                 <div id="pre-block-scratch" style="display:none;">
                     <div class="scratch-card" style="max-width:190px;">
-                        <div class="scratch-result"><div class="ic">🎁</div><div class="txt" id="pre-scratch-result-text">Lot</div></div>
+                        <div class="scratch-result"><div class="ic">🎁</div><div class="txt" id="pre-scratch-result-text">Prize</div></div>
                         <canvas id="pre-scratch-canvas" width="190" height="120"></canvas>
                     </div>
-                    <p class="scratch-hint" id="pre-scratch-hint">👆 Grattez pour découvrir</p>
+                    <p class="scratch-hint" id="pre-scratch-hint">👆 Scratch to reveal</p>
                 </div>
 
                 <div id="pre-block-boxes" style="display:none;">
                     <div class="mystery-grid" id="pre-boxes-grid"></div>
-                    <p class="mystery-hint">👆 Touchez un coffre</p>
+                    <p class="mystery-hint">👆 Tap a chest</p>
                 </div>
 
                 <div id="pre-block-plinko" style="display:none;">
@@ -1609,17 +1636,17 @@
 
                 <div id="pre-block-cups" style="display:none;">
                     <div class="cups-row" id="pre-cups-row"></div>
-                    <p class="cups-hint" id="pre-cups-hint">Un jeton est caché sous l'un des gobelets...</p>
+                    <p class="cups-hint" id="pre-cups-hint">A token is hidden under one of the cups...</p>
                 </div>
 
                 <div class="btn-black" id="pre-btn-spin" onclick="spinPreview()" style="font-size:10px; padding:10px 20px; width:150px; margin-top:8px;"></div>
             </div></div>
             <div class="screen-mockup-wrap" id="pre-wrap4"><div class="screen-mockup" id="pre-s4">
-                <span class="screen-label" id="stp4-lbl">Étape 4 : Résultat</span>
+                <span class="screen-label" id="stp4-lbl">Step 4: Result</span>
                 <div class="gain-box" style="margin-top:30px;">
                     <img id="pre-logo-gain" src="" style="max-width:50px; margin-bottom:10px;" loading="lazy">
                     <h4 id="pre-t-thanks" style="margin:0; font-size:13px;"></h4>
-                    <p style="font-size:12px; font-weight:bold; margin:10px 0;"><span id="pre-t-res"></span> <span id="preview-win-txt">[Nom du gain]</span></p>
+                    <p style="font-size:12px; font-weight:bold; margin:10px 0;"><span id="pre-t-res"></span> <span id="preview-win-txt">[Prize name]</span></p>
                     <div class="btn-black" id="pre-avis-end-btn" style="display:none; font-size:9.5px; padding:8px 14px; margin:8px auto 0 auto; width:fit-content;"></div>
                     <p id="pre-cond" style="font-size:8px; border-top:1px solid rgba(0,0,0,.1); padding-top:10px; margin-top:10px; text-align:justify; line-height:1.2;"></p>
                 </div>
@@ -1629,60 +1656,60 @@
 </div>
 
 <div class="sticky-cta">
-    <button class="btn-black" onclick="saveAndGenerate()">Générer le QR Code</button>
+    <button class="btn-black" onclick="saveAndGenerate()">Generate the QR Code</button>
 </div>
 
 <!-- ============ DASHBOARD ============ -->
 <div id="dashboard-view">
     <div class="dash-header">
-        <h1>Mon Dashboard</h1>
+        <h1>My Dashboard</h1>
         <div class="dash-header-actions">
-            <button class="btn-ghost" onclick="startNewConfig()">+ Nouvelle roulette</button>
-            <button class="btn-ghost" onclick="exportAllParticipantsCSV()">⬇️ Exporter tous mes clients (CSV)</button>
-            <button class="btn-ghost" onclick="closeDashboard()">← Retour au configurateur</button>
+            <button class="btn-ghost" onclick="startNewConfig()">+ New game</button>
+            <button class="btn-ghost" onclick="exportAllParticipantsCSV()">⬇️ Export all my customers (CSV)</button>
+            <button class="btn-ghost" onclick="closeDashboard()">← Back to the builder</button>
         </div>
     </div>
 
     <div class="dash-upsell" id="dash-upsell" style="display:none;">
-        <div class="txt"><strong>🔒 Débloquez l'URL personnalisée</strong><span>Passez Premium (9,90 €/mois) pour rediriger vos roulettes vers votre propre lien.</span></div>
-        <button class="btn-premium" onclick="openPremiumFlow()">Voir Premium</button>
+        <div class="txt"><strong>🔒 Unlock the custom URL</strong><span>Go Premium (€9.90/month) to redirect your games to your own link.</span></div>
+        <button class="btn-premium" onclick="openPremiumFlow()">See Premium</button>
     </div>
 
     <div class="dash-body">
         <div class="dash-col-list">
-            <h3 class="dash-section-title">Historique de mes roulettes</h3>
+            <h3 class="dash-section-title">My games history</h3>
             <div id="dash-list" class="dash-list"></div>
         </div>
         <div class="dash-col-stats">
             <div class="dash-cards">
-                <div class="dash-card"><div class="num" id="dash-count-configs">0</div><div class="lbl">Roulettes créées</div></div>
-                <div class="dash-card"><div class="num" id="dash-count-scans">0</div><div class="lbl">Scans QR code</div></div>
-                <div class="dash-card"><div class="num" id="dash-count-avis-clicks">0</div><div class="lbl">Visiteur sur votre page</div></div>
-                <div class="dash-card"><div class="num" id="dash-count-participants">0</div><div class="lbl">Parties jouées</div></div>
-                <div class="dash-card"><div class="num" id="dash-count-conversion">0%</div><div class="lbl">Taux de participation</div></div>
-                <div class="dash-card win"><div class="num" id="dash-count-wins">0</div><div class="lbl">Gains</div></div>
-                <div class="dash-card loss"><div class="num" id="dash-count-losses">0</div><div class="lbl">Perdus</div></div>
-                <div class="dash-card"><div class="num" id="dash-status-premium">Free</div><div class="lbl">Statut du compte</div></div>
+                <div class="dash-card"><div class="num" id="dash-count-configs">0</div><div class="lbl">Games created</div></div>
+                <div class="dash-card"><div class="num" id="dash-count-scans">0</div><div class="lbl">QR code scans</div></div>
+                <div class="dash-card"><div class="num" id="dash-count-avis-clicks">0</div><div class="lbl">Visitors on your page</div></div>
+                <div class="dash-card"><div class="num" id="dash-count-participants">0</div><div class="lbl">Games played</div></div>
+                <div class="dash-card"><div class="num" id="dash-count-conversion">0%</div><div class="lbl">Participation rate</div></div>
+                <div class="dash-card win"><div class="num" id="dash-count-wins">0</div><div class="lbl">Wins</div></div>
+                <div class="dash-card loss"><div class="num" id="dash-count-losses">0</div><div class="lbl">Lost</div></div>
+                <div class="dash-card"><div class="num" id="dash-status-premium">Free</div><div class="lbl">Account status</div></div>
             </div>
 
             <div class="dash-charts">
                 <div class="dash-chart-box" style="grid-column: 1 / -1;">
                     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-                        <h4 style="margin:0;">📈 Évolution sur une période</h4>
+                        <h4 style="margin:0;">📈 Trend over a period</h4>
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                             <label style="font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:5px;">Du <input type="date" id="dash-date-start" style="padding:6px 8px; font-size:12.5px; width:auto;"></label>
                             <label style="font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:5px;">au <input type="date" id="dash-date-end" style="padding:6px 8px; font-size:12.5px; width:auto;"></label>
-                            <button class="btn-ghost" style="padding:7px 14px; font-size:12.5px;" onclick="loadDashboardEvolution()">Appliquer</button>
+                            <button class="btn-ghost" style="padding:7px 14px; font-size:12.5px;" onclick="loadDashboardEvolution()">Apply</button>
                         </div>
                     </div>
                     <div class="chart-wrap"><canvas id="dash-chart-evolution"></canvas></div>
                 </div>
                 <div class="dash-chart-box">
-                    <h4>📊 Répartition Gagné / Perdu</h4>
+                    <h4>📊 Won / Lost breakdown</h4>
                     <div class="chart-wrap"><canvas id="dash-chart-winloss"></canvas></div>
                 </div>
                 <div class="dash-chart-box">
-                    <h4>🏆 Top des lots distribués</h4>
+                    <h4>🏆 Top prizes awarded</h4>
                     <div class="chart-wrap"><canvas id="dash-chart-toplots"></canvas></div>
                 </div>
             </div>
@@ -1694,48 +1721,48 @@
 <div class="modal-overlay" id="auth-modal">
     <div class="modal-box">
         <button class="modal-close" onclick="closeAuthModal()">×</button>
-        <h3 class="modal-title" id="auth-modal-title">Accéder à votre compte</h3>
-        <p class="modal-sub" id="auth-modal-sub">Créez un compte pour débloquer l'URL personnalisée et suivre vos roulettes.</p>
+        <h3 class="modal-title" id="auth-modal-title">Access your account</h3>
+        <p class="modal-sub" id="auth-modal-sub">Create an account to unlock the custom URL and track your games.</p>
         <div class="auth-tabs" id="auth-tabs">
-            <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Se connecter</div>
-            <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</div>
+            <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Log in</div>
+            <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create an account</div>
         </div>
         <div class="form-error" id="auth-error"></div>
 
         <div id="field-email">
             <label class="field-label">Email</label>
-            <input type="email" id="auth-email" class="full-width" placeholder="vous@exemple.com" autocomplete="email">
+            <input type="email" id="auth-email" class="full-width" placeholder="you@example.com" autocomplete="email">
         </div>
 
         <div id="field-password">
-            <label class="field-label">Mot de passe</label>
-            <input type="password" id="auth-password" class="full-width" placeholder="6 caractères minimum" autocomplete="current-password">
+            <label class="field-label">Password</label>
+            <input type="password" id="auth-password" class="full-width" placeholder="6 characters minimum" autocomplete="current-password">
         </div>
 
         <div id="link-forgot" style="text-align:right; margin:-10px 0 14px 0;">
-            <a href="#" onclick="switchAuthTab('reset'); return false;" style="font-size:12px; color:var(--muted); text-decoration:underline; cursor:pointer;">Mot de passe oublié ?</a>
+            <a href="#" onclick="switchAuthTab('reset'); return false;" style="font-size:12px; color:var(--muted); text-decoration:underline; cursor:pointer;">Forgot your password?</a>
         </div>
 
         <div id="field-birthdate">
-            <label class="field-label">Date de naissance</label>
+            <label class="field-label">Date of birth</label>
             <input type="date" id="auth-birthdate" class="full-width" autocomplete="bday">
-            <p style="font-size:11.5px; color:var(--muted); margin:6px 0 14px 0;" id="birthdate-help">Elle ne sera utilisée que pour vérifier votre identité si vous oubliez votre mot de passe.</p>
+            <p style="font-size:11.5px; color:var(--muted); margin:6px 0 14px 0;" id="birthdate-help">It will only be used to verify your identity if you forget your password.</p>
         </div>
 
         <div id="field-new-password">
-            <label class="field-label">Nouveau mot de passe</label>
-            <input type="password" id="auth-new-password" class="full-width" placeholder="6 caractères minimum" autocomplete="new-password">
+            <label class="field-label">New password</label>
+            <input type="password" id="auth-new-password" class="full-width" placeholder="6 characters minimum" autocomplete="new-password">
         </div>
 
         <div id="field-confirm-password">
-            <label class="field-label">Confirmer le nouveau mot de passe</label>
-            <input type="password" id="auth-confirm-password" class="full-width" placeholder="6 caractères minimum" autocomplete="new-password">
+            <label class="field-label">Confirm new password</label>
+            <input type="password" id="auth-confirm-password" class="full-width" placeholder="6 characters minimum" autocomplete="new-password">
         </div>
 
-        <button class="btn-black" id="auth-submit-btn" style="width:100%;" onclick="handleAuthSubmit()">Se connecter</button>
+        <button class="btn-black" id="auth-submit-btn" style="width:100%;" onclick="handleAuthSubmit()">Log in</button>
 
         <div id="link-back-to-login" style="text-align:center; margin-top:14px;">
-            <a href="#" onclick="switchAuthTab('login'); return false;" style="font-size:12.5px; color:var(--muted); text-decoration:underline; cursor:pointer;">← Retour à la connexion</a>
+            <a href="#" onclick="switchAuthTab('login'); return false;" style="font-size:12.5px; color:var(--muted); text-decoration:underline; cursor:pointer;">← Back to login</a>
         </div>
     </div>
 </div>
@@ -1744,12 +1771,12 @@
 <div class="modal-overlay" id="poster-preview-modal">
     <div class="modal-box wide">
         <button class="modal-close" onclick="closePosterPreview()">×</button>
-        <h3 class="modal-title">Aperçu de vos affiches</h3>
-        <p class="modal-sub">Vérifiez le rendu avant de télécharger le PDF (A4, A5, A6, A4 Paysage).</p>
+        <h3 class="modal-title">Your posters preview</h3>
+        <p class="modal-sub">Check the result before downloading the PDF (A4, A5, A6, A4 Landscape).</p>
         <div id="poster-preview-images" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:14px; margin-bottom:18px;"></div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn-black" style="flex:1; min-width:180px;" onclick="downloadPostersPdf()">📄 Télécharger le PDF</button>
-            <button class="btn-black" style="flex:1; min-width:180px; background:#d24726;" onclick="downloadPostersPptx()">📊 Télécharger en PowerPoint</button>
+            <button class="btn-black" style="flex:1; min-width:180px;" onclick="downloadPostersPdf()">📄 Download the PDF</button>
+            <button class="btn-black" style="flex:1; min-width:180px; background:#d24726;" onclick="downloadPostersPptx()">📊 Download as PowerPoint</button>
         </div>
     </div>
 </div>
@@ -1758,26 +1785,26 @@
 <div class="modal-overlay" id="premium-modal">
     <div class="modal-box">
         <button class="modal-close" onclick="closePremiumModal()">×</button>
-        <h3 class="modal-title">Passer Premium</h3>
-        <p class="modal-sub">Débloquez l'URL de destination personnalisée et le dashboard complet.</p>
-        <div class="premium-price"><div class="amount">9,90 € <span>TTC / mois</span></div></div>
+        <h3 class="modal-title">Go Premium</h3>
+        <p class="modal-sub">Unlock the custom destination URL and the full dashboard.</p>
+        <div class="premium-price"><div class="amount">9,90 € <span>incl. VAT / month</span></div></div>
         <ul class="premium-benefits">
-            <li>✅ URL de redirection 100% personnalisable</li>
-            <li>✅ Dashboard complet : stats, graphiques, historique clients</li>
-            <li>✅ Modification de vos roulettes après création</li>
-            <li>✅ Sans engagement, résiliable à tout moment</li>
+            <li>✅ 100% customizable redirect URL</li>
+            <li>✅ Full dashboard: stats, charts, customer history</li>
+            <li>✅ Edit your games after creation</li>
+            <li>✅ No commitment, cancel any time</li>
         </ul>
         <div id="paypal-login-required" style="display:none; background:#fdecea; color:#d93025; font-size:12.5px; padding:12px; border-radius:10px; margin-bottom:14px;">
-            Connectez-vous ou créez un compte avant de payer, pour rattacher Premium à votre compte.
+            Log in or create an account before paying, so Premium is attached to your account.
         </div>
         <div id="paypal-button-container"></div>
 
         <div class="promo-code-box">
-            <button type="button" class="promo-toggle" onclick="togglePromoBox()">J'ai un code promo</button>
+            <button type="button" class="promo-toggle" onclick="togglePromoBox()">I have a promo code</button>
             <div id="promo-code-fields" style="display:none;">
                 <div style="display:flex; gap:8px; margin-top:10px;">
-                    <input type="text" id="promo-code-input" placeholder="Code promo" style="text-transform:uppercase;" onkeydown="if(event.key==='Enter'){event.preventDefault();redeemPromoCode();}">
-                    <button type="button" class="btn-ghost" onclick="redeemPromoCode()">Valider</button>
+                    <input type="text" id="promo-code-input" placeholder="Promo code" style="text-transform:uppercase;" onkeydown="if(event.key==='Enter'){event.preventDefault();redeemPromoCode();}">
+                    <button type="button" class="btn-ghost" onclick="redeemPromoCode()">Apply</button>
                 </div>
                 <p id="promo-code-error" style="display:none; color:var(--danger); font-size:12px; margin:8px 0 0 0;"></p>
             </div>
@@ -2714,7 +2741,7 @@ function loadScriptOnce(src) {
         const s = document.createElement('script');
         s.src = src;
         s.onload = () => resolve();
-        s.onerror = () => { delete _loadedScripts[src]; reject(new Error('Échec de chargement du script : ' + src)); };
+        s.onerror = () => { delete _loadedScripts[src]; reject(new Error('Script failed to load: ' + src)); };
         document.head.appendChild(s);
     });
     return _loadedScripts[src];
@@ -2865,21 +2892,21 @@ if(slider) {
         document.getElementById('link-back-to-login').style.display = (mode === 'reset') ? 'block' : 'none';
 
         document.getElementById('birthdate-help').innerText = (mode === 'reset')
-            ? "Renseignez la même date de naissance que celle donnée à l'inscription."
-            : "Elle ne sera utilisée que pour vérifier votre identité si vous oubliez votre mot de passe.";
+            ? "Enter the same date of birth you gave at sign-up."
+            : "It will only be used to verify your identity if you forget your password.";
 
         if (mode === 'login') {
-            document.getElementById('auth-modal-title').innerText = 'Accéder à votre compte';
-            document.getElementById('auth-modal-sub').innerText = "Créez un compte pour débloquer l'URL personnalisée et suivre vos roulettes.";
-            document.getElementById('auth-submit-btn').innerText = 'Se connecter';
+            document.getElementById('auth-modal-title').innerText = 'Access your account';
+            document.getElementById('auth-modal-sub').innerText = "Create an account to unlock the custom URL and track your games.";
+            document.getElementById('auth-submit-btn').innerText = 'Log in';
         } else if (mode === 'signup') {
-            document.getElementById('auth-modal-title').innerText = 'Accéder à votre compte';
-            document.getElementById('auth-modal-sub').innerText = "Créez un compte pour débloquer l'URL personnalisée et suivre vos roulettes.";
-            document.getElementById('auth-submit-btn').innerText = 'Créer mon compte';
+            document.getElementById('auth-modal-title').innerText = 'Access your account';
+            document.getElementById('auth-modal-sub').innerText = "Create an account to unlock the custom URL and track your games.";
+            document.getElementById('auth-submit-btn').innerText = 'Create my account';
         } else {
-            document.getElementById('auth-modal-title').innerText = 'Mot de passe oublié';
-            document.getElementById('auth-modal-sub').innerText = "Entrez votre email, votre date de naissance et votre nouveau mot de passe.";
-            document.getElementById('auth-submit-btn').innerText = 'Réinitialiser le mot de passe';
+            document.getElementById('auth-modal-title').innerText = 'Forgot password';
+            document.getElementById('auth-modal-sub').innerText = "Enter your email, date of birth and new password.";
+            document.getElementById('auth-submit-btn').innerText = 'Reset password';
         }
     }
 
@@ -2896,34 +2923,34 @@ if(slider) {
             const confirmPassword = document.getElementById('auth-confirm-password').value;
 
             if (!email || !birthdate) {
-                errBox.innerText = "Entrez votre email et votre date de naissance.";
+                errBox.innerText = "Enter your email and date of birth.";
                 errBox.classList.add('show');
                 return;
             }
             if (!newPassword || newPassword.length < 6) {
-                errBox.innerText = "Le nouveau mot de passe doit contenir au moins 6 caractères.";
+                errBox.innerText = "The new password must be at least 6 characters long.";
                 errBox.classList.add('show');
                 return;
             }
             if (newPassword !== confirmPassword) {
-                errBox.innerText = "Les deux mots de passe ne correspondent pas.";
+                errBox.innerText = "The two passwords do not match.";
                 errBox.classList.add('show');
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "⏳ Un instant...";
+            btn.innerText = "⏳ One moment...";
             try {
                 const { data, error } = await sb.rpc('reset_password_with_birthdate', {
                     p_email: email, p_birthdate: birthdate, p_new_password: newPassword
                 });
                 if (error) throw error;
                 if (!data || !data.success) {
-                    errBox.innerText = (data && data.message) || "Email ou date de naissance incorrect.";
+                    errBox.innerText = (data && data.message) || "Incorrect email or date of birth.";
                     errBox.classList.add('show');
                     return;
                 }
-                toast("Mot de passe réinitialisé. Connexion en cours...", "success");
+                toast("Password reset. Signing you in...", "success");
                 const { error: signInError } = await sb.auth.signInWithPassword({ email, password: newPassword });
                 closeAuthModal();
                 if (!signInError) {
@@ -2931,14 +2958,14 @@ if(slider) {
                     goToConfiguratorAfterAuth();
                 } else {
                     openAuthModal('login');
-                    toast("Mot de passe réinitialisé. Connectez-vous avec votre nouveau mot de passe.", "success");
+                    toast("Password reset. Log in with your new password.", "success");
                 }
             } catch (e) {
-                errBox.innerText = e.message || "Une erreur est survenue.";
+                errBox.innerText = e.message || "An error occurred.";
                 errBox.classList.add('show');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Réinitialiser le mot de passe';
+                btn.innerText = 'Reset password';
             }
             return;
         }
@@ -2947,18 +2974,18 @@ if(slider) {
         const birthdate = document.getElementById('auth-birthdate').value;
 
         if (!email || !password || password.length < 6) {
-            errBox.innerText = "Entrez un email valide et un mot de passe d'au moins 6 caractères.";
+            errBox.innerText = "Enter a valid email and a password of at least 6 characters.";
             errBox.classList.add('show');
             return;
         }
         if (authMode === 'signup' && !birthdate) {
-            errBox.innerText = "Renseignez votre date de naissance (utile en cas de mot de passe oublié).";
+            errBox.innerText = "Enter your date of birth (useful if you forget your password).";
             errBox.classList.add('show');
             return;
         }
 
         btn.disabled = true;
-        btn.innerText = "⏳ Un instant...";
+        btn.innerText = "⏳ One moment...";
 
         try {
             if (authMode === 'signup') {
@@ -2969,21 +2996,21 @@ if(slider) {
                 }
                 // La confirmation d'email est désactivée côté Supabase : signUp() renvoie
                 // directement une session active, l'utilisateur est donc déjà connecté.
-                toast("Compte créé ! Vous êtes connecté.", "success");
+                toast("Account created! You are logged in.", "success");
             } else {
                 const { data, error } = await sb.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                toast("Connexion réussie.", "success");
+                toast("Login successful.", "success");
             }
             closeAuthModal();
             await refreshSession();
             goToConfiguratorAfterAuth();
         } catch (e) {
-            errBox.innerText = e.message === "Invalid login credentials" ? "Email ou mot de passe incorrect." : (e.message || "Une erreur est survenue.");
+            errBox.innerText = e.message === "Invalid login credentials" ? "Incorrect email or password." : (e.message || "An error occurred.");
             errBox.classList.add('show');
         } finally {
             btn.disabled = false;
-            btn.innerText = authMode === 'login' ? 'Se connecter' : 'Créer mon compte';
+            btn.innerText = authMode === 'login' ? 'Log in' : 'Create my account';
         }
     }
 
@@ -2995,7 +3022,7 @@ if(slider) {
         closeDashboard();
         renderAuthUI();
         renderUrlGate();
-        toast("Vous êtes déconnecté.");
+        toast("You are logged out.");
     }
 
     async function refreshSession() {
@@ -3042,10 +3069,10 @@ if(slider) {
         const navAuth = document.getElementById('nav-auth');
         const navEl = document.querySelector('header nav');
         if (!currentUser) {
-            const html = `<button class="btn-ghost" onclick="openAuthModal('login')">Se connecter</button>`;
+            const html = `<button class="btn-ghost" onclick="openAuthModal('login')">Log in</button>`;
             if (actions) actions.innerHTML = html;
             if (mobileActions) mobileActions.innerHTML = html;
-            if (navAuth) navAuth.innerHTML = `<button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button>`;
+            if (navAuth) navAuth.innerHTML = `<button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Log in</button>`;
             const navAuthMobileOut = document.getElementById('nav-auth-mobile');
             if (navAuthMobileOut) navAuthMobileOut.innerHTML = '';
             if (navEl) navEl.classList.remove('logged-in');
@@ -3064,9 +3091,9 @@ if(slider) {
             ${premiumBtn}
             <button class="btn-ghost" onclick="openDashboard()">Dashboard</button>
             <button class="btn-ghost" title="${currentProfile ? currentProfile.email : ''}" onclick="goToMyAccount()">
-                <span class="avatar-btn" style="display:inline-flex; width:22px; height:22px; font-size:11px; margin-right:6px; vertical-align:middle;">${initial}</span>Mon compte
+                <span class="avatar-btn" style="display:inline-flex; width:22px; height:22px; font-size:11px; margin-right:6px; vertical-align:middle;">${initial}</span>My account
             </button>
-            <button class="btn-ghost" onclick="handleLogout()" title="Se déconnecter">Déconnexion</button>
+            <button class="btn-ghost" onclick="handleLogout()" title="Log out">Log out</button>
         `;
         // Sur mobile, ces mêmes actions sont repliées dans un menu déroulant (☰) pour ne
         // jamais déborder du header, quel que soit le nombre de boutons à afficher.
@@ -3074,18 +3101,18 @@ if(slider) {
             ${premiumChip}
             <button class="topbar-menu-btn" onclick="toggleTopbarMenu()" aria-label="Menu">☰</button>
             <div class="topbar-dropdown" id="topbar-dropdown">
-                ${premiumBtn ? `<button onclick="closeTopbarMenu(); openPremiumFlow();">⭐ Passer Premium</button>` : ''}
+                ${premiumBtn ? `<button onclick="closeTopbarMenu(); openPremiumFlow();">⭐ Go Premium</button>` : ''}
                 <button onclick="closeTopbarMenu(); openDashboard();">📊 Dashboard</button>
-                <button onclick="closeTopbarMenu(); goToMyAccount();">👤 Mon compte</button>
-                <button onclick="closeTopbarMenu(); handleLogout();">🚪 Déconnexion</button>
+                <button onclick="closeTopbarMenu(); goToMyAccount();">👤 My account</button>
+                <button onclick="closeTopbarMenu(); handleLogout();">🚪 Log out</button>
             </div>
         `;
         if (navAuth) navAuth.innerHTML = `
             ${premiumChip}
             ${premiumBtn ? `<button class="btn-nav-login" onclick="closeMenu(); openPremiumFlow();">⭐ Premium</button>` : ''}
             <button class="btn-nav-login" onclick="closeMenu(); openDashboard();">Dashboard</button>
-            <button class="btn-nav-login" onclick="closeMenu(); goToMyAccount();">Mon compte</button>
-            <button class="btn-nav-login" onclick="closeMenu(); handleLogout();" style="background:none; color:var(--muted); border:1px solid var(--line);">Déconnexion</button>
+            <button class="btn-nav-login" onclick="closeMenu(); goToMyAccount();">My account</button>
+            <button class="btn-nav-login" onclick="closeMenu(); handleLogout();" style="background:none; color:var(--muted); border:1px solid var(--line);">Log out</button>
         `;
         const navAuthMobile = document.getElementById('nav-auth-mobile');
         if (navAuthMobile) navAuthMobile.innerHTML = navAuth ? navAuth.innerHTML : '';
@@ -3121,7 +3148,7 @@ if(slider) {
     function openPremiumFlow() {
         if (!currentUser) {
             openAuthModal('signup');
-            toast("Créez d'abord un compte, puis choisissez Premium.");
+            toast("Create an account first, then choose Premium.");
             return;
         }
         openPremiumModal();
@@ -3148,14 +3175,14 @@ if(slider) {
         const s = document.createElement('script');
         s.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
         s.onload = () => { paypalLoaded = true; renderPaypalButton(); };
-        s.onerror = () => toast("Impossible de charger PayPal. Vérifiez votre connexion.", "error");
+        s.onerror = () => toast("Unable to load PayPal. Check your connection.", "error");
         document.head.appendChild(s);
     }
 
     function renderPaypalButton() {
         const container = document.getElementById('paypal-button-container');
         container.innerHTML = '';
-        if (!window.paypal) { toast("PayPal indisponible pour le moment.", "error"); return; }
+        if (!window.paypal) { toast("PayPal is currently unavailable.", "error"); return; }
         window.paypal.Buttons({
             style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
             createSubscription: (data, actions) => actions.subscription.create({
@@ -3164,7 +3191,7 @@ if(slider) {
             onApprove: async (data) => {
                 await activatePremium(data.subscriptionID);
             },
-            onError: () => toast("Le paiement PayPal a échoué. Réessayez.", "error")
+            onError: () => toast("The PayPal payment failed. Please try again.", "error")
         }).render('#paypal-button-container');
     }
 
@@ -3175,7 +3202,7 @@ if(slider) {
             // l'ID de l'abonnement à l'Edge Function, qui revérifie tout auprès de
             // PayPal avant d'activer Premium côté serveur (service role).
             const { data: { session } } = await sb.auth.getSession();
-            if (!session) throw new Error("Session expirée, reconnectez-vous.");
+            if (!session) throw new Error("Session expired, please log in again.");
 
             const res = await fetch(`${SB_URL}/functions/v1/verify-paypal-subscription`, {
                 method: 'POST',
@@ -3190,9 +3217,9 @@ if(slider) {
             let result;
             const rawText = await res.text();
             try { result = JSON.parse(rawText); }
-            catch { throw new Error(`Réponse inattendue (HTTP ${res.status}) : la fonction verify-paypal-subscription est-elle bien déployée sur Supabase ? Détail : ${rawText.slice(0, 200)}`); }
+            catch { throw new Error(`Unexpected response (HTTP ${res.status}): is the verify-paypal-subscription function properly deployed on Supabase? Details: ${rawText.slice(0, 200)}`); }
 
-            if (!res.ok || !result.success) throw new Error(result.message || `Activation refusée (HTTP ${res.status}).`);
+            if (!res.ok || !result.success) throw new Error(result.message || `Activation refused (HTTP ${res.status}).`);
 
             // Conversion Google Ads : on n'arrive ici QUE si verify-paypal-subscription a
             // confirmé côté serveur, auprès de PayPal, que l'abonnement est bien payé.
@@ -3209,11 +3236,11 @@ if(slider) {
 
             await refreshSession();
             closePremiumModal();
-            toast("🎉 Abonnement Premium activé ! L'URL personnalisée est débloquée.", "success");
+            toast("🎉 Premium subscription activated! The custom URL is unlocked.", "success");
             if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
         } catch (e) {
-            console.error('Activation Premium échouée :', e);
-            toast("Le paiement a réussi mais l'activation a échoué : " + e.message + " (ID d'abonnement : " + subscriptionId + ")", "error");
+            console.error('Premium activation failed:', e);
+            toast("Payment succeeded but activation failed: " + e.message + " (ID d'abonnement : " + subscriptionId + ")", "error");
         }
     }
 
@@ -3231,7 +3258,7 @@ if(slider) {
     async function redeemPromoCode() {
         if (!currentUser) {
             openAuthModal('login');
-            toast("Connectez-vous d'abord pour appliquer un code promo.");
+            toast("Log in first to apply a promo code.");
             return;
         }
         const input = document.getElementById('promo-code-input');
@@ -3240,7 +3267,7 @@ if(slider) {
         errBox.style.display = 'none';
 
         if (!code) {
-            errBox.innerText = "Entrez un code promo.";
+            errBox.innerText = "Enter a promo code.";
             errBox.style.display = 'block';
             return;
         }
@@ -3250,7 +3277,7 @@ if(slider) {
             const { data, error } = await sb.rpc('redeem_promo_code', { p_code: code });
             if (error) throw error;
             if (!data || !data.success) {
-                errBox.innerText = (data && data.message) || "Code promo invalide.";
+                errBox.innerText = (data && data.message) || "Promo code invalide.";
                 errBox.style.display = 'block';
                 return;
             }
@@ -3258,10 +3285,10 @@ if(slider) {
             renderAuthUI();
             renderUrlGate();
             closePremiumModal();
-            toast("🎉 Code promo appliqué : accès Premium illimité débloqué !", "success");
+            toast("🎉 Promo code applied: unlimited Premium access unlocked!", "success");
             if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
         } catch (e) {
-            errBox.innerText = "Erreur lors de l'application du code. Réessayez.";
+            errBox.innerText = "Error applying the code. Please try again.";
             errBox.style.display = 'block';
         }
     }
@@ -3303,11 +3330,11 @@ if(slider) {
         // avant d'afficher quoi que ce soit : c'est ce qui causait un historique vide qui
         // n'apparaissait "pas toujours" alors que les roulettes existaient bien en base.
         if (error && !isRetry) {
-            console.error('Erreur chargement dashboard, nouvelle tentative :', error);
+            console.error('Dashboard loading error, retrying:', error);
             await new Promise(r => setTimeout(r, 600));
             return loadDashboard(true);
         }
-        if (error) console.error('Erreur chargement dashboard :', error);
+        if (error) console.error('Dashboard loading error:', error);
 
         // On fusionne les roulettes créées dans cette session (voir justCreatedRoulettes)
         // qui ne seraient pas encore ressorties du SELECT, pour ne jamais avoir besoin de
@@ -3323,8 +3350,8 @@ if(slider) {
             ['dash-count-configs', 'dash-count-scans', 'dash-count-avis-clicks', 'dash-count-participants', 'dash-count-wins', 'dash-count-losses'].forEach(id => document.getElementById(id).innerText = '0');
             document.getElementById('dash-count-conversion').innerText = '0%';
             list.innerHTML = error
-                ? `<div class="dash-empty"><div class="big">⚠️</div>Impossible de charger votre historique pour le moment.<br><button class="btn-ghost" style="margin-top:10px;" onclick="loadDashboard()">Réessayer</button></div>`
-                : `<div class="dash-empty"><div class="big">🎡</div>Aucune roulette pour le moment.<br>Créez-en une depuis le configurateur.</div>`;
+                ? `<div class="dash-empty"><div class="big">⚠️</div>Unable to load your history right now.<br><button class="btn-ghost" style="margin-top:10px;" onclick="loadDashboard()">Retry</button></div>`
+                : `<div class="dash-empty"><div class="big">🎡</div>No game yet.<br>Create one from the builder.</div>`;
             renderWinLossChart(0, 0);
             renderTopLotsChart([]);
             renderEvolutionChart([], []);
@@ -3344,7 +3371,7 @@ if(slider) {
             totalScans += count || 0;
         }
 
-        // Clics "Laissez un avis" (= visiteurs envoyés vers la page d'avis)
+        // Clics "Leave a review" (= visiteurs envoyés vers la page d'avis)
         const { count: avisClicksCount } = await sb.from('roulette_avis_clicks').select('*', { count: 'exact', head: true }).in('config_id', configIds);
         document.getElementById('dash-count-avis-clicks').innerText = avisClicksCount || 0;
 
@@ -3398,9 +3425,9 @@ if(slider) {
             const plays = cfgParticipants.length;
             const wins = cfgParticipants.filter(p => p.is_win).length;
             const losses = plays - wins;
-            const name = (cfg.data && (cfg.data.roulette_name || cfg.data.t1)) || 'Roulette sans nom';
+            const name = (cfg.data && (cfg.data.roulette_name || cfg.data.t1)) || 'Untitled game';
             const url = (cfg.data && cfg.data.u) || '';
-            const gameTypeLabels = { wheel: '🎡 Roue', slot: '🎰 Bandit manchot', scratch: '🎫 Grattage', boxes: '🎁 Coffres', plinko: '🔵 Plinko', cups: '🥤 Gobelets' };
+            const gameTypeLabels = { wheel: '🎡 Roue', slot: '🎰 Slot machine', scratch: '🎫 Grattage', boxes: '🎁 Coffres', plinko: '🔵 Plinko', cups: '🥤 Gobelets' };
             const gameLabel = gameTypeLabels[(cfg.data && cfg.data.game_type) || 'wheel'] || '🎡 Roue';
 
             const row = document.createElement('div');
@@ -3411,21 +3438,21 @@ if(slider) {
                         <div class="dash-item-name">${name.replace(/</g, '&lt;')}</div>
                         <span class="dash-item-id">${gameLabel} · ${cfg.id}</span>
                     </div>
-                    <span class="dash-item-count">${plays} partie${plays > 1 ? 's' : ''}</span>
+                    <span class="dash-item-count">${plays} game${plays > 1 ? 's' : ''}</span>
                 </div>
                 <div class="dash-item-mini-stats">
                     <span>👁️ <b>${scans}</b> scans</span>
-                    <span>🎮 <b>${plays}</b> jouées</span>
-                    <span>✅ <b>${wins}</b> gagnées</span>
-                    <span>❌ <b>${losses}</b> perdues</span>
+                    <span>🎮 <b>${plays}</b> played</span>
+                    <span>✅ <b>${wins}</b> won</span>
+                    <span>❌ <b>${losses}</b> lost</span>
                 </div>
                 <div class="dash-item-actions">
-                    <button class="btn-ghost" onclick="loadConfigForEditing('${cfg.id}')">✏️ Éditer</button>
-                    <button class="btn-ghost" onclick="toggleParticipantsTable('${cfg.id}')">👥 Voir les participants (${plays})</button>
-                    <button class="btn-ghost" onclick="exportParticipantsCSV('${cfg.id}')">⬇️ Exporter CSV</button>
+                    <button class="btn-ghost" onclick="loadConfigForEditing('${cfg.id}')">✏️ Edit</button>
+                    <button class="btn-ghost" onclick="toggleParticipantsTable('${cfg.id}')">👥 View participants (${plays})</button>
+                    <button class="btn-ghost" onclick="exportParticipantsCSV('${cfg.id}')">⬇️ Export CSV</button>
                 </div>
                 <div class="dash-item-url">
-                    <input type="text" id="dash-url-${cfg.id}" value="${url.replace(/"/g, '&quot;')}" ${isPremium() ? '' : 'disabled'} placeholder="URL de destination personnalisée">
+                    <input type="text" id="dash-url-${cfg.id}" value="${url.replace(/"/g, '&quot;')}" ${isPremium() ? '' : 'disabled'} placeholder="Custom destination URL">
                     <button class="btn-ghost" ${isPremium() ? `onclick="saveDashboardUrl('${cfg.id}')"` : 'disabled'}>Enregistrer</button>
                 </div>
                 <div class="dash-participants-table-wrap" id="dash-table-${cfg.id}">
@@ -3437,15 +3464,15 @@ if(slider) {
 
     function renderParticipantsTable(rows, extraFieldLabels) {
         extraFieldLabels = extraFieldLabels || [];
-        if (!rows || rows.length === 0) return `<p style="color:var(--muted); font-size:12.5px; margin:0;">Aucun participant pour le moment.</p>`;
+        if (!rows || rows.length === 0) return `<p style="color:var(--muted); font-size:12.5px; margin:0;">No participants yet.</p>`;
         const extraHeaders = extraFieldLabels.map(l => `<th>${String(l).replace(/</g, '&lt;')}</th>`).join('');
         const trs = rows.map(p => {
             const date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
-            const winBadge = p.is_win ? `<span class="badge-win">✅ Gagné</span>` : `<span class="badge-loss">Perdu</span>`;
+            const winBadge = p.is_win ? `<span class="badge-win">✅ Won</span>` : `<span class="badge-loss">Lost</span>`;
             const claimBtn = !p.is_win ? `<span style="color:var(--muted); font-size:11px;">—</span>`
                 : p.lot_recupere
-                    ? `<button class="badge-claimed" onclick="toggleLotRecupere('${p.id}', false, this)" title="Cliquez pour annuler (marqué par erreur ?)">✅ Remis</button>`
-                    : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${p.id}', true, this)">⏳ À remettre</button>`;
+                    ? `<button class="badge-claimed" onclick="toggleLotRecupere('${p.id}', false, this)" title="Click to undo (marked by mistake?)">✅ Handed over</button>`
+                    : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${p.id}', true, this)">⏳ To hand over</button>`;
             const optinBadge = p.OPTIN === 'oui'
                 ? `<span class="badge-win">✅ Oui</span>`
                 : `<span class="badge-loss">Non</span>`;
@@ -3460,11 +3487,11 @@ if(slider) {
                 <td>${claimBtn}</td>
                 <td>${optinBadge}</td>
                 ${extraCells}
-                <td><button class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="editParticipantRow('${p.id}')">✏️ Éditer</button></td>
+                <td><button class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="editParticipantRow('${p.id}')">✏️ Edit</button></td>
             </tr>`;
         }).join('');
         return `<table class="dash-participants-table">
-            <thead><tr><th>Date</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Lot</th><th>Résultat</th><th>Lot remis ?</th><th>Consentement</th>${extraHeaders}<th></th></tr></thead>
+            <thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Phone</th><th>Prize</th><th>Result</th><th>Prize handed over?</th><th>Consent</th>${extraHeaders}<th></th></tr></thead>
             <tbody>${trs}</tbody>
         </table>`;
     }
@@ -3484,7 +3511,7 @@ if(slider) {
                 if (input) updates[cell.dataset.field] = input.value;
             });
             sb.from('roulette_participants').update(updates).eq('id', participantId).then(() => {
-                toast('Informations client mises à jour.', 'success');
+                toast('Customer information updated.', 'success');
                 loadDashboard();
             });
             return;
@@ -3511,7 +3538,7 @@ if(slider) {
 
     function buildCsvFromParticipants(rows, extraFieldLabels) {
         extraFieldLabels = extraFieldLabels || [];
-        const header = ['Date', 'Nom', 'Email', 'Téléphone', 'Lot', 'Résultat', 'Lot remis', 'Consentement', ...extraFieldLabels];
+        const header = ['Date', 'Name', 'Email', 'Phone', 'Prize', 'Result', 'Prize handed over', 'Consent', ...extraFieldLabels];
         const lines = [header.map(csvEscape).join(';')];
         rows.forEach(p => {
             const date = p.created_at ? new Date(p.created_at).toLocaleString('fr-FR') : '';
@@ -3521,8 +3548,8 @@ if(slider) {
                 p.email || '',
                 p.telephone || '',
                 p.lot_gagne || '',
-                p.is_win ? 'Gagné' : 'Perdu',
-                !p.is_win ? '—' : (p.lot_recupere ? 'Remis' : 'À remettre'),
+                p.is_win ? 'Won' : 'Lost',
+                !p.is_win ? '—' : (p.lot_recupere ? 'Handed over' : 'To hand over'),
                 p.OPTIN === 'oui' ? 'Oui' : 'Non',
                 ...extraFieldLabels.map(l => (p.extra_fields && p.extra_fields[l]) || '')
             ].map(csvEscape).join(';'));
@@ -3543,18 +3570,18 @@ if(slider) {
 
     function exportParticipantsCSV(configId) {
         const rows = dashParticipantsCache[configId] || [];
-        if (rows.length === 0) { toast("Aucun participant à exporter pour cette roulette.", "error"); return; }
+        if (rows.length === 0) { toast("No participants to export for this game.", "error"); return; }
         const safeName = (dashConfigNamesCache[configId] || configId).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
         downloadCsv(buildCsvFromParticipants(rows, dashConfigExtraFieldsCache[configId]), `clients-${safeName}.csv`);
-        toast("Export CSV téléchargé ✅", "success");
+        toast("CSV export downloaded ✅", "success");
     }
 
     function exportAllParticipantsCSV() {
         const all = Object.entries(dashParticipantsCache).flatMap(([configId, rows]) =>
             rows.map(p => ({ ...p, roulette_name: dashConfigNamesCache[configId] || configId }))
         );
-        if (all.length === 0) { toast("Aucun participant à exporter pour le moment.", "error"); return; }
-        const header = ['Roulette', 'Date', 'Nom', 'Email', 'Téléphone', 'Lot', 'Résultat', 'Lot remis', 'Consentement'];
+        if (all.length === 0) { toast("No participants to export yet.", "error"); return; }
+        const header = ['Game', 'Date', 'Name', 'Email', 'Phone', 'Prize', 'Result', 'Prize handed over', 'Consent'];
         const lines = [header.map(csvEscape).join(';')];
         all.forEach(p => {
             const date = p.created_at ? new Date(p.created_at).toLocaleString('fr-FR') : '';
@@ -3565,33 +3592,33 @@ if(slider) {
                 p.email || '',
                 p.telephone || '',
                 p.lot_gagne || '',
-                p.is_win ? 'Gagné' : 'Perdu',
-                !p.is_win ? '—' : (p.lot_recupere ? 'Remis' : 'À remettre'),
+                p.is_win ? 'Won' : 'Lost',
+                !p.is_win ? '—' : (p.lot_recupere ? 'Handed over' : 'To hand over'),
                 p.OPTIN === 'oui' ? 'Oui' : 'Non'
             ].map(csvEscape).join(';'));
         });
         downloadCsv(lines.join('\r\n'), `tous-mes-clients.csv`);
-        toast("Export CSV téléchargé ✅", "success");
+        toast("CSV export downloaded ✅", "success");
     }
 
     async function toggleLotRecupere(participantId, newVal, btnEl) {
         if (btnEl) { btnEl.disabled = true; btnEl.innerText = '⏳...'; }
         const { error } = await sb.from('roulette_participants').update({ lot_recupere: newVal }).eq('id', participantId);
         if (error) {
-            toast("Erreur lors de la mise à jour.", "error");
-            if (btnEl) { btnEl.disabled = false; btnEl.innerText = newVal ? '⏳ À remettre' : '✅ Remis'; }
+            toast("Error while updating.", "error");
+            if (btnEl) { btnEl.disabled = false; btnEl.innerText = newVal ? '⏳ To hand over' : '✅ Handed over'; }
             return;
         }
         if (btnEl) {
             btnEl.outerHTML = newVal
-                ? `<button class="badge-claimed" onclick="toggleLotRecupere('${participantId}', false, this)" title="Cliquez pour annuler (marqué par erreur ?)">✅ Remis</button>`
-                : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${participantId}', true, this)">⏳ À remettre</button>`;
+                ? `<button class="badge-claimed" onclick="toggleLotRecupere('${participantId}', false, this)" title="Click to undo (marked by mistake?)">✅ Handed over</button>`
+                : `<button class="badge-unclaimed" onclick="toggleLotRecupere('${participantId}', true, this)">⏳ To hand over</button>`;
         }
         Object.values(dashParticipantsCache).forEach(rows => {
             const p = rows.find(r => r.id === participantId);
             if (p) p.lot_recupere = newVal;
         });
-        toast(newVal ? "Lot marqué comme remis ✅" : "Marquage annulé, lot repassé à \"à remettre\".", "success");
+        toast(newVal ? "Prize marked as handed over ✅" : "Marking undone, prize set back to “to hand over”.", "success");
     }
 
     // ---------------------------------------------------------------
@@ -3607,7 +3634,7 @@ if(slider) {
             return;
         }
         if (startDate > endDate) {
-            toast("La date de début doit être avant la date de fin.", "error");
+            toast("The start date must be before the end date.", "error");
             return;
         }
         await ensureSupabase();
@@ -3644,7 +3671,7 @@ if(slider) {
         const wrap = canvas.closest('.dash-chart-box');
         if (dashEvolutionChart) { dashEvolutionChart.destroy(); dashEvolutionChart = null; }
         if (!startDate || !endDate || (scansRows.length === 0 && participantsRows.length === 0)) {
-            wrap.querySelector('.chart-wrap').innerHTML = `<div class="dash-chart-empty">Aucune donnée sur cette période.</div>`;
+            wrap.querySelector('.chart-wrap').innerHTML = `<div class="dash-chart-empty">No data for this period.</div>`;
             return;
         }
         if (!wrap.querySelector('canvas')) wrap.querySelector('.chart-wrap').innerHTML = `<canvas id="dash-chart-evolution"></canvas>`;
@@ -3659,8 +3686,8 @@ if(slider) {
             data: {
                 labels,
                 datasets: [
-                    { label: 'Scans QR code', data: scanDays.map(d => d.count), borderColor: '#046A38', backgroundColor: 'rgba(4,106,56,.1)', tension: 0.3, fill: true },
-                    { label: 'Parties jouées', data: playDays.map(d => d.count), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.1)', tension: 0.3, fill: true }
+                    { label: 'QR code scans', data: scanDays.map(d => d.count), borderColor: '#046A38', backgroundColor: 'rgba(4,106,56,.1)', tension: 0.3, fill: true },
+                    { label: 'Games played', data: playDays.map(d => d.count), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.1)', tension: 0.3, fill: true }
                 ]
             },
             options: {
@@ -3676,7 +3703,7 @@ if(slider) {
         const wrap = canvas.closest('.dash-chart-box');
         if (dashWinLossChart) { dashWinLossChart.destroy(); dashWinLossChart = null; }
         if (wins + losses === 0) {
-            wrap.querySelector('.chart-wrap').innerHTML = `<div class="dash-chart-empty">Pas encore de partie jouée.</div>`;
+            wrap.querySelector('.chart-wrap').innerHTML = `<div class="dash-chart-empty">No game played yet.</div>`;
             return;
         }
         if (!wrap.querySelector('canvas')) wrap.querySelector('.chart-wrap').innerHTML = `<canvas id="dash-chart-winloss"></canvas>`;
@@ -3684,7 +3711,7 @@ if(slider) {
         dashWinLossChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ['Gagné', 'Perdu'],
+                labels: ['Won', 'Lost'],
                 datasets: [{ data: [wins, losses], backgroundColor: ['#1a9e5c', '#e5e5ea'], borderWidth: 0 }]
             },
             options: {
@@ -3699,7 +3726,7 @@ if(slider) {
         const wrap = canvas.closest('.dash-chart-box');
         if (dashTopLotsChart) { dashTopLotsChart.destroy(); dashTopLotsChart = null; }
         if (!topLots || topLots.length === 0) {
-            wrap.querySelector('.chart-wrap').innerHTML = `<div class="dash-chart-empty">Pas encore de lot distribué.</div>`;
+            wrap.querySelector('.chart-wrap').innerHTML = `<div class="dash-chart-empty">No prize awarded yet.</div>`;
             return;
         }
         if (!wrap.querySelector('canvas')) wrap.querySelector('.chart-wrap').innerHTML = `<canvas id="dash-chart-toplots"></canvas>`;
@@ -3721,11 +3748,11 @@ if(slider) {
     async function saveDashboardUrl(configId) {
         const newUrl = document.getElementById('dash-url-' + configId).value.trim();
         const { data: existing } = await sb.from('roulette_configs').select('data').eq('id', configId).single();
-        if (!existing) return toast("Roulette introuvable.", "error");
+        if (!existing) return toast("Game not found.", "error");
         const updatedData = { ...existing.data, u: newUrl };
         const { error } = await sb.from('roulette_configs').update({ data: updatedData }).eq('id', configId);
-        if (error) return toast("Erreur lors de l'enregistrement.", "error");
-        toast("URL mise à jour ✅", "success");
+        if (error) return toast("Error while saving.", "error");
+        toast("URL updated ✅", "success");
     }
 
     // ---------------------------------------------------------------
@@ -3794,68 +3821,68 @@ if(slider) {
     function changeLanguage(lang) {
         const t = translations[lang];
         if (!t) return;
-        document.getElementById('t1').value = t.t1;
-        document.getElementById('t2').value = t.t2;
-        document.getElementById('t3').value = t.t3;
-        document.getElementById('t_wheel').value = t.tw;
-        document.getElementById('t_last_step').value = t.last;
-        document.getElementById('t_name').value = t.name;
-        document.getElementById('t_email').value = t.email;
-        document.getElementById('t_phone').value = t.phone;
-        document.getElementById('t_btn_validate').value = t.val;
-        document.getElementById('t_btn_spin').value = t.spin;
-        document.getElementById('t_thanks').value = t.thx;
-        document.getElementById('t_res_label').value = t.res;
-        document.getElementById('t_cond').value = t.cond;
-        document.getElementById('t_qr_scan').value = t.qr;
+        { const _e = document.getElementById('t1'); if (_e) _e.value = t.t1; }
+        { const _e = document.getElementById('t2'); if (_e) _e.value = t.t2; }
+        { const _e = document.getElementById('t3'); if (_e) _e.value = t.t3; }
+        { const _e = document.getElementById('t_wheel'); if (_e) _e.value = t.tw; }
+        { const _e = document.getElementById('t_last_step'); if (_e) _e.value = t.last; }
+        { const _e = document.getElementById('t_name'); if (_e) _e.value = t.name; }
+        { const _e = document.getElementById('t_email'); if (_e) _e.value = t.email; }
+        { const _e = document.getElementById('t_phone'); if (_e) _e.value = t.phone; }
+        { const _e = document.getElementById('t_btn_validate'); if (_e) _e.value = t.val; }
+        { const _e = document.getElementById('t_btn_spin'); if (_e) _e.value = t.spin; }
+        { const _e = document.getElementById('t_thanks'); if (_e) _e.value = t.thx; }
+        { const _e = document.getElementById('t_res_label'); if (_e) _e.value = t.res; }
+        { const _e = document.getElementById('t_cond'); if (_e) _e.value = t.cond; }
+        { const _e = document.getElementById('t_qr_scan'); if (_e) _e.value = t.qr; }
 
         const ui = uiTranslations[lang] || uiTranslations.en;
         if (ui) {
-            document.getElementById('conf-title').innerText = ui.confTitle;
-            document.getElementById('conf-subtitle').innerText = ui.confSubtitle;
-            document.getElementById('lbl-lang').innerText = ui.lblLang;
-            document.getElementById('sum-logo').innerText = ui.sumLogo;
-            document.getElementById('lbl-logo-file').innerText = ui.lblLogoFile;
-            document.getElementById('lbl-logo-url').innerText = ui.lblLogoUrl;
-            document.getElementById('sum-screen').innerText = ui.sumScreen;
-            document.getElementById('lbl-screen-cust').innerText = ui.lblScreenCust;
-            document.getElementById('lbl-col-bg').innerText = ui.lblColBg;
-            document.getElementById('lbl-col-op').innerText = ui.lblColOp;
-            document.getElementById('lbl-col-txt').innerText = ui.lblColTxt;
-            document.getElementById('lbl-col-btn').innerText = ui.lblColBtn;
-            document.getElementById('lbl-col-btn-txt').innerText = ui.lblColBtnTxt;
-            document.getElementById('sum-wheel').innerText = ui.sumWheel;
-            document.getElementById('lbl-wheel-design').innerText = ui.lblWheelDesign;
-            document.getElementById('lbl-col-bord').innerText = ui.lblColBord;
-            document.getElementById('lbl-col-bulb').innerText = ui.lblColBulb;
-            document.getElementById('lbl-size-bulb').innerText = ui.lblSizeBulb;
-            document.getElementById('lbl-brand-quick').innerText = ui.lblBrandQuick;
-            document.getElementById('lbl-col-def1').innerText = ui.lblColDef1;
-            document.getElementById('lbl-col-def2').innerText = ui.lblColDef2;
-            document.getElementById('sum-lots').innerText = ui.sumLots;
-            document.getElementById('lbl-lots-cust').innerText = ui.lblLotsCust;
-            document.getElementById('lbl-row-name').innerText = ui.lblRowName;
-            document.getElementById('lbl-row-prob').innerText = ui.lblRowProb;
-            document.getElementById('lbl-row-size').innerText = ui.lblRowSize;
-            document.getElementById('lbl-row-bg').innerText = ui.lblRowBg;
-            document.getElementById('lbl-row-txt').innerText = ui.lblRowTxt;
-            document.getElementById('btn-add-lot-lbl').innerText = ui.btnAddLot || document.getElementById('btn-add-lot-lbl').innerText;
-            document.getElementById('sum-texts').innerText = ui.sumTexts;
-            document.getElementById('lbl-txt-cust').innerText = ui.lblTxtCust;
-            document.getElementById('lbl-qr-scanner').innerText = ui.lblQrScanner;
-            document.getElementById('lbl-form-fields').innerText = ui.lblFormFields;
-            document.getElementById('lbl-end-msg').innerText = ui.lblEndMsg;
-            document.getElementById('lbl-cond-part').innerText = ui.lblCondPart;
-            document.getElementById('sum-actions').innerText = ui.sumActions;
-            document.getElementById('lbl-google-url').innerText = ui.lblGoogleUrl;
-            document.getElementById('btn-gen').innerText = ui.btnGen;
-            document.getElementById('btn-dl-png').innerText = ui.btnDlPng;
-            document.getElementById('btn-dl-pdf').innerText = ui.btnDlPdf;
-            document.getElementById('prev-title').innerText = ui.prevTitle;
-            document.getElementById('stp1-lbl').innerText = ui.stp1Lbl;
-            document.getElementById('stp2-lbl').innerText = ui.stp2Lbl;
-            document.getElementById('stp3-lbl').innerText = ui.stp3Lbl;
-            document.getElementById('stp4-lbl').innerText = ui.stp4Lbl;
+            { const _e = document.getElementById('conf-title'); if (_e) _e.innerText = ui.confTitle; }
+            { const _e = document.getElementById('conf-subtitle'); if (_e) _e.innerText = ui.confSubtitle; }
+            { const _e = document.getElementById('lbl-lang'); if (_e) _e.innerText = ui.lblLang; }
+            { const _e = document.getElementById('sum-logo'); if (_e) _e.innerText = ui.sumLogo; }
+            { const _e = document.getElementById('lbl-logo-file'); if (_e) _e.innerText = ui.lblLogoFile; }
+            { const _e = document.getElementById('lbl-logo-url'); if (_e) _e.innerText = ui.lblLogoUrl; }
+            { const _e = document.getElementById('sum-screen'); if (_e) _e.innerText = ui.sumScreen; }
+            { const _e = document.getElementById('lbl-screen-cust'); if (_e) _e.innerText = ui.lblScreenCust; }
+            { const _e = document.getElementById('lbl-col-bg'); if (_e) _e.innerText = ui.lblColBg; }
+            { const _e = document.getElementById('lbl-col-op'); if (_e) _e.innerText = ui.lblColOp; }
+            { const _e = document.getElementById('lbl-col-txt'); if (_e) _e.innerText = ui.lblColTxt; }
+            { const _e = document.getElementById('lbl-col-btn'); if (_e) _e.innerText = ui.lblColBtn; }
+            { const _e = document.getElementById('lbl-col-btn-txt'); if (_e) _e.innerText = ui.lblColBtnTxt; }
+            { const _e = document.getElementById('sum-wheel'); if (_e) _e.innerText = ui.sumWheel; }
+            { const _e = document.getElementById('lbl-wheel-design'); if (_e) _e.innerText = ui.lblWheelDesign; }
+            { const _e = document.getElementById('lbl-col-bord'); if (_e) _e.innerText = ui.lblColBord; }
+            { const _e = document.getElementById('lbl-col-bulb'); if (_e) _e.innerText = ui.lblColBulb; }
+            { const _e = document.getElementById('lbl-size-bulb'); if (_e) _e.innerText = ui.lblSizeBulb; }
+            { const _e = document.getElementById('lbl-brand-quick'); if (_e) _e.innerText = ui.lblBrandQuick; }
+            { const _e = document.getElementById('lbl-col-def1'); if (_e) _e.innerText = ui.lblColDef1; }
+            { const _e = document.getElementById('lbl-col-def2'); if (_e) _e.innerText = ui.lblColDef2; }
+            { const _e = document.getElementById('sum-lots'); if (_e) _e.innerText = ui.sumLots; }
+            { const _e = document.getElementById('lbl-lots-cust'); if (_e) _e.innerText = ui.lblLotsCust; }
+            { const _e = document.getElementById('lbl-row-name'); if (_e) _e.innerText = ui.lblRowName; }
+            { const _e = document.getElementById('lbl-row-prob'); if (_e) _e.innerText = ui.lblRowProb; }
+            { const _e = document.getElementById('lbl-row-size'); if (_e) _e.innerText = ui.lblRowSize; }
+            { const _e = document.getElementById('lbl-row-bg'); if (_e) _e.innerText = ui.lblRowBg; }
+            { const _e = document.getElementById('lbl-row-txt'); if (_e) _e.innerText = ui.lblRowTxt; }
+            { const _e = document.getElementById('btn-add-lot-lbl'); if (_e) _e.innerText = ui.btnAddLot || document.getElementById('btn-add-lot-lbl').innerText; }
+            { const _e = document.getElementById('sum-texts'); if (_e) _e.innerText = ui.sumTexts; }
+            { const _e = document.getElementById('lbl-txt-cust'); if (_e) _e.innerText = ui.lblTxtCust; }
+            { const _e = document.getElementById('lbl-qr-scanner'); if (_e) _e.innerText = ui.lblQrScanner; }
+            { const _e = document.getElementById('lbl-form-fields'); if (_e) _e.innerText = ui.lblFormFields; }
+            { const _e = document.getElementById('lbl-end-msg'); if (_e) _e.innerText = ui.lblEndMsg; }
+            { const _e = document.getElementById('lbl-cond-part'); if (_e) _e.innerText = ui.lblCondPart; }
+            { const _e = document.getElementById('sum-actions'); if (_e) _e.innerText = ui.sumActions; }
+            { const _e = document.getElementById('lbl-google-url'); if (_e) _e.innerText = ui.lblGoogleUrl; }
+            { const _e = document.getElementById('btn-gen'); if (_e) _e.innerText = ui.btnGen; }
+            { const _e = document.getElementById('btn-dl-png'); if (_e) _e.innerText = ui.btnDlPng; }
+            { const _e = document.getElementById('btn-dl-pdf'); if (_e) _e.innerText = ui.btnDlPdf; }
+            { const _e = document.getElementById('prev-title'); if (_e) _e.innerText = ui.prevTitle; }
+            { const _e = document.getElementById('stp1-lbl'); if (_e) _e.innerText = ui.stp1Lbl; }
+            { const _e = document.getElementById('stp2-lbl'); if (_e) _e.innerText = ui.stp2Lbl; }
+            { const _e = document.getElementById('stp3-lbl'); if (_e) _e.innerText = ui.stp3Lbl; }
+            { const _e = document.getElementById('stp4-lbl'); if (_e) _e.innerText = ui.stp4Lbl; }
         }
         update();
     }
@@ -3882,13 +3909,13 @@ if(slider) {
     // FONDS DÉGRADÉS & TEXTURES (utilisés quand aucune image de fond n'est ajoutée)
     // ---------------------------------------------------------------
     const GRADIENT_PRESETS = {
-        sunset: { label: 'Coucher de soleil', css: 'linear-gradient(135deg, #FF512F, #F09819)' },
-        ocean: { label: 'Océan', css: 'linear-gradient(135deg, #2193b0, #6dd5ed)' },
+        sunset: { label: 'Sunset', css: 'linear-gradient(135deg, #FF512F, #F09819)' },
+        ocean: { label: 'Ocean', css: 'linear-gradient(135deg, #2193b0, #6dd5ed)' },
         violet: { label: 'Violet', css: 'linear-gradient(135deg, #654ea3, #eaafc8)' },
-        emerald: { label: 'Émeraude', css: 'linear-gradient(135deg, #11998e, #38ef7d)' },
-        rosegold: { label: 'Rose doré', css: 'linear-gradient(135deg, #ee9ca7, #ffdde1)' },
-        midnight: { label: 'Minuit', css: 'linear-gradient(135deg, #232526, #414345)' },
-        peach: { label: 'Pêche', css: 'linear-gradient(135deg, #ffecd2, #fcb69f)' },
+        emerald: { label: 'Emerald', css: 'linear-gradient(135deg, #11998e, #38ef7d)' },
+        rosegold: { label: 'Rose gold', css: 'linear-gradient(135deg, #ee9ca7, #ffdde1)' },
+        midnight: { label: 'Midnight', css: 'linear-gradient(135deg, #232526, #414345)' },
+        peach: { label: 'Peach', css: 'linear-gradient(135deg, #ffecd2, #fcb69f)' },
         royal: { label: 'Royal', css: 'linear-gradient(135deg, #141e30, #243b55)' },
         candy: { label: 'Bonbon', css: 'linear-gradient(135deg, #fc466b, #3f5efb)' },
         brand: { label: 'Rouge & Jaune', css: 'linear-gradient(135deg, #DA291C, #FFC72C)' }
@@ -3908,7 +3935,7 @@ if(slider) {
         if (gradWrap && !gradWrap.children.length) {
             const noneGradSw = document.createElement('div');
             noneGradSw.className = 'swatch swatch-none' + (selectedGradient === 'none' ? ' active' : '');
-            noneGradSw.title = 'Aucun fond dégradé';
+            noneGradSw.title = 'No gradient background';
             noneGradSw.dataset.key = 'none';
             noneGradSw.innerText = '✕';
             noneGradSw.onclick = () => {
@@ -4038,38 +4065,38 @@ if(slider) {
     }
 
     const SECTOR_PRESETS = {
-        fastfood: { label: 'Restauration rapide', emoji: '🍔', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['🍔 Menu offert', 10], ['🥹 Raté, retentez votre chance', 40], ["🍟 -20% sur l'addition", 10]
+        fastfood: { label: 'Fast food', emoji: '🍔', lots: [
+            ['😢 Sorry, maybe next time', 40], ['🍔 Free menu', 10], ['🥹 Missed, try again', 40], ["🍟 20% off the bill", 10]
         ]},
-        restaurant: { label: 'Restaurant traditionnel', emoji: '🍽️', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['🍷 Apéritif offert', 10], ['🥹 Raté, retentez votre chance', 40], ['🍰 Dessert offert', 10]
+        restaurant: { label: 'Traditional restaurant', emoji: '🍽️', lots: [
+            ['😢 Sorry, maybe next time', 40], ['🍷 Free aperitif', 10], ['🥹 Missed, try again', 40], ['🍰 Free dessert', 10]
         ]},
-        hotel: { label: 'Hôtellerie', emoji: '🏨', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['🥐 Petit-déjeuner offert', 10], ['🥹 Raté, retentez votre chance', 40], ['⬆️ Surclassement chambre', 10]
+        hotel: { label: 'Hotels', emoji: '🏨', lots: [
+            ['😢 Sorry, maybe next time', 40], ['🥐 Free breakfast', 10], ['🥹 Missed, try again', 40], ['⬆️ Surclassement chambre', 10]
         ]},
-        coiffure: { label: 'Coiffure & Barbier', emoji: '✂️', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['💇 -15% sur votre coupe', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Soin offert', 10]
+        coiffure: { label: 'Hair salon & barber', emoji: '✂️', lots: [
+            ['😢 Sorry, maybe next time', 40], ['💇 15% off your haircut', 10], ['🥹 Missed, try again', 40], ['🎁 Soin offert', 10]
         ]},
-        beaute: { label: 'Institut de beauté / Spa', emoji: '💆', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['💅 Manucure offerte', 10], ['🥹 Raté, retentez votre chance', 40], ['🧖 Accès spa offert', 10]
+        beaute: { label: 'Beauty salon / Spa', emoji: '💆', lots: [
+            ['😢 Sorry, maybe next time', 40], ['💅 Manucure offerte', 10], ['🥹 Missed, try again', 40], ['🧖 Free spa access', 10]
         ]},
-        garage: { label: 'Garage / Mécanique auto', emoji: '🔧', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['🧽 Lavage offert', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Vidange -20%', 10]
+        garage: { label: 'Garage / Auto repair', emoji: '🔧', lots: [
+            ['😢 Sorry, maybe next time', 40], ['🧽 Lavage offert', 10], ['🥹 Missed, try again', 40], ['🎁 Vidange -20%', 10]
         ]},
-        immobilier: { label: 'Agence immobilière', emoji: '🏠', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['📋 Estimation offerte', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Bon cadeau 50€', 10]
+        immobilier: { label: 'Real estate agency', emoji: '🏠', lots: [
+            ['😢 Sorry, maybe next time', 40], ['📋 Estimation offerte', 10], ['🥹 Missed, try again', 40], ['🎁 Bon cadeau 50€', 10]
         ]},
-        fitness: { label: 'Salle de sport / Fitness', emoji: '🏋️', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ["🎟️ Séance d'essai offerte", 10], ['🥹 Raté, retentez votre chance', 40], ["💪 -20% sur l'abonnement", 10]
+        fitness: { label: 'Gym / Fitness', emoji: '🏋️', lots: [
+            ['😢 Sorry, maybe next time', 40], ["🎟️ Free trial session", 10], ['🥹 Missed, try again', 40], ["💪 20% off your membership", 10]
         ]},
-        boulangerie: { label: 'Boulangerie-Pâtisserie', emoji: '🥐', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['🥐 Viennoiserie offerte', 10], ['🥹 Raté, retentez votre chance', 40], ['🍰 Part de gâteau offerte', 10]
+        boulangerie: { label: 'Bakery & pastry shop', emoji: '🥐', lots: [
+            ['😢 Sorry, maybe next time', 40], ['🥐 Viennoiserie offerte', 10], ['🥹 Missed, try again', 40], ['🍰 Free slice of cake', 10]
         ]},
-        medical: { label: 'Médecin / Dentiste / Clinique', emoji: '🩺', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['☕ Café offert en salle d\'attente', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Bon cadeau partenaire', 10]
+        medical: { label: 'Doctor / Dentist / Clinic', emoji: '🩺', lots: [
+            ['😢 Sorry, maybe next time', 40], ['☕ Free coffee in the waiting room', 10], ['🥹 Missed, try again', 40], ['🎁 Bon cadeau partenaire', 10]
         ]},
-        grandedistrib: { label: 'Grande distribution', emoji: '🛒', lots: [
-            ['😢 Dommage, une prochaine fois', 40], ['🛍️ Bon d\'achat 5€', 10], ['🥹 Raté, retentez votre chance', 40], ['🎁 Produit offert', 10]
+        grandedistrib: { label: 'Supermarkets', emoji: '🛒', lots: [
+            ['😢 Sorry, maybe next time', 40], ['🛍️ Bon d\'achat 5€', 10], ['🥹 Missed, try again', 40], ['🎁 Produit offert', 10]
         ]}
     };
 
@@ -4091,7 +4118,7 @@ if(slider) {
             addLotRow(name, prob, 15, bg, getContrastColor(bg), idx !== 0);
         });
         document.getElementById('lot_count').value = preset.lots.length;
-        toast(`Lots pré-remplis pour : ${preset.label}`, 'success');
+        toast(`Prizes pre-filled for: ${preset.label}`, 'success');
         update();
     }
 
@@ -4142,12 +4169,12 @@ if(slider) {
     const GAME_TYPES = ['wheel', 'slot', 'scratch', 'boxes', 'plinko', 'cups'];
     const GAME_NEEDS_BUTTON = { wheel: true, slot: true, scratch: false, boxes: false, plinko: true, cups: true };
     const GAME_DESIGN_HELP = {
-        wheel: 'Cadre, lumières et couleurs par défaut des lots.',
-        slot: 'Couleur du cadre de la machine et couleurs des rouleaux.',
-        scratch: 'Couleur du cadre et du papier à gratter.',
-        boxes: 'Couleur du cadre et dégradé des coffres.',
-        plinko: 'Couleur du cadre et des cases de réception.',
-        cups: 'Couleur du cadre et des gobelets.'
+        wheel: 'Frame, lights and default prize colors.',
+        slot: 'Machine frame color and reel colors.',
+        scratch: 'Frame and scratch-paper color.',
+        boxes: 'Frame color and chest gradient.',
+        plinko: 'Frame color and landing slot colors.',
+        cups: 'Frame and cup colors.'
     };
     let selectedGameType = 'wheel';
     const EMOJI_RE = /(\p{Extended_Pictographic})/u;
@@ -4181,12 +4208,12 @@ if(slider) {
     }
 
     const GAME_DEFAULT_WORDING = {
-        wheel: { header: 'Tournez la roue et tentez de gagner* de nombreux cadeaux !', button: 'LANCEZ LA ROUE' },
-        slot: { header: 'Lancez le bandit manchot et tentez de gagner* de nombreux cadeaux !', button: 'LANCER LA MACHINE' },
-        scratch: { header: 'Grattez le ticket et tentez de gagner* de nombreux cadeaux !', button: 'GRATTER LE TICKET' },
-        boxes: { header: 'Choisissez un coffre et tentez de gagner* de nombreux cadeaux !', button: 'CHOISIR UN COFFRE' },
-        plinko: { header: 'Lâchez la bille et tentez de gagner* de nombreux cadeaux !', button: 'LÂCHER LA BILLE' },
-        cups: { header: 'Trouvez le gobelet gagnant et tentez de gagner* de nombreux cadeaux', button: 'MÉLANGER LES GOBELETS' }
+        wheel: { header: 'Spin the wheel and try to win* lots of gifts!', button: 'SPIN THE WHEEL' },
+        slot: { header: 'Spin the slot machine and try to win* lots of gifts!', button: 'SPIN THE MACHINE' },
+        scratch: { header: 'Scratch the ticket and try to win* lots of gifts!', button: 'SCRATCH THE TICKET' },
+        boxes: { header: 'Pick a chest and try to win* lots of gifts!', button: 'PICK A CHEST' },
+        plinko: { header: 'Drop the ball and try to win* lots of gifts!', button: 'DROP THE BALL' },
+        cups: { header: 'Find the winning cup and try to win* lots of gifts', button: 'SHUFFLE THE CUPS' }
     };
     const KNOWN_DEFAULT_HEADERS = Object.values(GAME_DEFAULT_WORDING).map(w => w.header);
     const KNOWN_DEFAULT_BUTTONS = Object.values(GAME_DEFAULT_WORDING).map(w => w.button);
@@ -4547,7 +4574,7 @@ if(slider) {
         document.documentElement.style.setProperty('--slot-c1', document.getElementById('color1').value);
         document.documentElement.style.setProperty('--slot-c2', document.getElementById('color2').value);
         buildCups('pre-cups-row');
-        document.getElementById('pre-cups-hint').innerText = "Un jeton est caché sous l'un des gobelets...";
+        document.getElementById('pre-cups-hint').innerText = "A token is hidden under one of the cups...";
     }
 
     function spinCupsPreview() {
@@ -4555,9 +4582,9 @@ if(slider) {
         if (lots.n.length === 0) return;
         const btn = document.getElementById('pre-btn-spin');
         btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5';
-        document.getElementById('pre-cups-hint').innerText = 'Mélange en cours...';
+        document.getElementById('pre-cups-hint').innerText = 'Shuffling...';
         shuffleCups('pre-cups-row', () => {
-            document.getElementById('pre-cups-hint').innerText = 'Touchez un gobelet !';
+            document.getElementById('pre-cups-hint').innerText = 'Tap a cup!';
             attachCupHandlers('pre-cups-row', lots, () => {
                 btn.style.pointerEvents = 'auto'; btn.style.opacity = '1';
             });
@@ -4718,11 +4745,11 @@ if(slider) {
         if (!input.files || input.files.length === 0) return;
         let file = input.files[0];
         const status = document.getElementById(statusId);
-        status.innerText = "⏳ Optimisation de l'image...";
+        status.innerText = "⏳ Optimizing image...";
         status.style.color = "blue";
         try { file = await resizeImageForMobile(file); } catch (e) { /* on garde l'original si l'optimisation échoue */ }
         const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-        status.innerText = "⏳ Téléchargement...";
+        status.innerText = "⏳ Uploading...";
         status.style.color = "blue";
         try {
             const response = await fetch(`${SB_URL}/storage/v1/object/logos/${fileName}`, {
@@ -4733,11 +4760,11 @@ if(slider) {
             if (response.ok) {
                 const publicUrl = `${SB_URL}/storage/v1/object/public/logos/${fileName}`;
                 document.getElementById(targetId).value = publicUrl;
-                status.innerText = "✅ Succès !";
+                status.innerText = "✅ Success!";
                 status.style.color = "green";
                 update();
-            } else { status.innerText = "❌ Erreur"; status.style.color = "red"; }
-        } catch (e) { status.innerText = "❌ Erreur réseau"; status.style.color = "red"; }
+            } else { status.innerText = "❌ Error"; status.style.color = "red"; }
+        } catch (e) { status.innerText = "❌ Network error"; status.style.color = "red"; }
     }
 
     function hexToRgb(hex) {
@@ -4755,7 +4782,7 @@ if(slider) {
         const inputs = Array.from(document.querySelectorAll('.lot-row'));
         const total = inputs.reduce((sum, i) => sum + (parseFloat(i.querySelector('.lp').value) || 0), 0);
         if (Math.round(total) !== 100) {
-            toast("Le total des probabilités doit faire 100% avant de générer le QR code.", "error");
+            toast("Probabilities must total 100% before generating the QR code.", "error");
             btn.innerText = originalText;
             btn.disabled = false;
             document.querySelector('#details_texts').previousElementSibling; // no-op, keep step open where lots are
@@ -4806,7 +4833,7 @@ if(slider) {
             ef: getExtraFieldLabels(),
             skip_avis: document.getElementById('opt_skip_avis') ? document.getElementById('opt_skip_avis').checked : false,
             avis_end: (isPremium() && document.getElementById('opt_avis_end')) ? document.getElementById('opt_avis_end').checked : false,
-            roulette_name: document.getElementById('t1').value || 'Roulette sans nom'
+            roulette_name: document.getElementById('t1').value || 'Untitled game'
         };
 
         try {
@@ -4841,9 +4868,9 @@ if(slider) {
             await loadScriptOnce(LIB_URLS.qrcode);
             new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark: "#000000" });
             document.getElementById('qr-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            btn.innerText = "✅ QR code prêt, cliquez ici à nouveau pour toute modification";
+            btn.innerText = "✅ QR code ready, click here again for any change";
             btn.disabled = false;
-            toast(editingConfigId ? "Modifications enregistrées avec succès." : "QR Code généré avec succès.", "success");
+            toast(editingConfigId ? "Changes saved successfully." : "QR Code generated successfully.", "success");
             lastGeneratedConfigId = configId;
             lastGeneratedUrl = url;
             lastGeneratedConfigData = configData;
@@ -4852,7 +4879,7 @@ if(slider) {
             }
             generatePosters();
         } catch (e) {
-            toast("Erreur d'enregistrement. Réessayez.", "error");
+            toast("Save error. Please try again.", "error");
             btn.innerText = originalText;
             btn.disabled = false;
         }
@@ -4950,11 +4977,11 @@ if(slider) {
                     : `<div style="font-size:${emojiSize}px; margin-bottom:${gap}px; line-height:1;">${emoji}</div>`}
                     <h1 id="poster-title" style="font-size:${titleSize}px; font-weight:800; margin:0 0 ${gap}px 0; line-height:1.15; color:${textColor};">${escapeHtml(title)}</h1>
                     <p id="poster-subtitle" style="font-size:${subSize}px; font-weight:600; margin:0 0 ${Math.round(gap * 1.5)}px 0; opacity:.95; line-height:1.4; color:${textColor};">${escapeHtml(subtitle)}</p>
-                    <div style="font-size:${footSize}px; font-weight:600; opacity:.85; color:${textColor};">Jeu gratuit · Sans obligation d'achat*</div>
+                    <div style="font-size:${footSize}px; font-weight:600; opacity:.85; color:${textColor};">Free game · No purchase necessary*</div>
                 </div>
                 <div style="background:#fff; border-radius:${radius}px; padding:${qrCardPad}px; box-shadow:0 ${Math.round(w * 0.01)}px ${Math.round(w * 0.025)}px rgba(0,0,0,.25); display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
                     <img src="${qrDataUrl}" style="width:${qrSize}px; height:${qrSize}px; display:block;">
-                    <div style="margin:${Math.round(gap * 0.7)}px 0 0 0; background:${buttonColor}; color:${buttonTextColor}; font-weight:800; font-size:${captionSize}px; padding:${Math.round(captionSize * 0.55)}px ${Math.round(captionSize * 1.3)}px; border-radius:999px; white-space:nowrap;">📱 ${escapeHtml(scanCaption || 'Scannez pour jouer')}</div>
+                    <div style="margin:${Math.round(gap * 0.7)}px 0 0 0; background:${buttonColor}; color:${buttonTextColor}; font-weight:800; font-size:${captionSize}px; padding:${Math.round(captionSize * 0.55)}px ${Math.round(captionSize * 1.3)}px; border-radius:999px; white-space:nowrap;">📱 ${escapeHtml(scanCaption || 'Scan to play')}</div>
                 </div>
             `;
             return el;
@@ -4989,9 +5016,9 @@ if(slider) {
             </div>
             <div style="background:#fff; border-radius:${radius}px; padding:${qrCardPad}px; box-shadow:0 ${Math.round(w * 0.02)}px ${Math.round(w * 0.06)}px rgba(0,0,0,.25); display:flex; flex-direction:column; align-items:center;">
                 <img src="${qrDataUrl}" style="width:${qrSize}px; height:${qrSize}px; display:block;">
-                <div style="margin:${Math.round(gap * 0.7)}px 0 0 0; background:${buttonColor}; color:${buttonTextColor}; font-weight:800; font-size:${captionSize}px; padding:${Math.round(captionSize * 0.55)}px ${Math.round(captionSize * 1.3)}px; border-radius:999px; white-space:nowrap;">📱 ${escapeHtml(scanCaption || 'Scannez pour jouer')}</div>
+                <div style="margin:${Math.round(gap * 0.7)}px 0 0 0; background:${buttonColor}; color:${buttonTextColor}; font-weight:800; font-size:${captionSize}px; padding:${Math.round(captionSize * 0.55)}px ${Math.round(captionSize * 1.3)}px; border-radius:999px; white-space:nowrap;">📱 ${escapeHtml(scanCaption || 'Scan to play')}</div>
             </div>
-            <div style="font-size:${footSize}px; font-weight:600; opacity:.85; margin-bottom:${Math.round(pad * 0.25)}px; color:${textColor};">Jeu gratuit · Sans obligation d'achat*</div>
+            <div style="font-size:${footSize}px; font-weight:600; opacity:.85; margin-bottom:${Math.round(pad * 0.25)}px; color:${textColor};">Free game · No purchase necessary*</div>
         `;
         return el;
     }
@@ -5025,7 +5052,7 @@ if(slider) {
         if (!lastGeneratedConfigId || !lastGeneratedUrl || !lastGeneratedConfigData) return;
         const statusEl = document.getElementById('poster-status');
         const btnEl = document.getElementById('btn-posters');
-        if (statusEl) { statusEl.style.display = 'block'; statusEl.innerText = '🖼️ Génération de vos 4 affiches (A4, A5, A6, A4 Paysage)...'; }
+        if (statusEl) { statusEl.style.display = 'block'; statusEl.innerText = '🖼️ Generating your 4 posters (A4, A5, A6, A4 Landscape)...'; }
         if (btnEl) btnEl.style.display = 'none';
 
         try {
@@ -5036,9 +5063,9 @@ if(slider) {
             const textColor = live.cust_tx_c || getContrastColor(live.cust_bg_c || '#ffffff');
             const buttonColor = live.cust_btn_c || '#046A38';
             const buttonTextColor = live.cust_btn_tx_c || '#ffffff';
-            const title = document.getElementById('t1').value || configData.tw || 'Tentez votre chance !';
-            const subtitle = document.getElementById('t2').value || 'Scannez le QR code et jouez pour tenter de gagner un lot';
-            const scanCaption = document.getElementById('t_qr_scan').value || 'Scannez pour jouer';
+            const title = document.getElementById('t1').value || configData.tw || 'Try your luck!';
+            const subtitle = document.getElementById('t2').value || 'Scan the QR code and play for a chance to win a prize';
+            const scanCaption = document.getElementById('t_qr_scan').value || 'Scan to play';
             const logoUrl = configData.l || '';
             const emoji = configData.logo_emoji || '🎁';
 
@@ -5063,11 +5090,11 @@ if(slider) {
                 posterFormatsCache.push({ ...f, imgData });
             }
 
-            if (statusEl) statusEl.innerText = '✅ Aperçu prêt. Vérifiez vos affiches avant de les télécharger.';
+            if (statusEl) statusEl.innerText = '✅ Preview ready. Check your posters before downloading them.';
             if (btnEl) btnEl.style.display = 'block';
             openPosterPreview();
         } catch (e) {
-            if (statusEl) statusEl.innerText = "⚠️ Erreur lors de la génération des affiches (souvent liée à un logo externe bloquant l'export). Cliquez pour réessayer.";
+            if (statusEl) statusEl.innerText = "⚠️ Error generating the posters (often caused by an external logo blocking the export). Click to retry.";
             if (btnEl) btnEl.style.display = 'block';
         }
     }
@@ -5101,7 +5128,7 @@ if(slider) {
         pdf.save(`affiches-${lastGeneratedConfigId}.pdf`);
         closePosterPreview();
         const statusEl = document.getElementById('poster-status');
-        if (statusEl) statusEl.innerText = '✅ Vos 4 affiches (A4, A5, A6, A4 Paysage) sont prêtes et téléchargées.';
+        if (statusEl) statusEl.innerText = '✅ Your 4 posters (A4, A5, A6, A4 Landscape) are ready and downloaded.';
     }
 
     async function downloadPostersPptx() {
@@ -5118,7 +5145,7 @@ if(slider) {
         pptx.writeFile({ fileName: `affiches-${lastGeneratedConfigId}.pptx` });
         closePosterPreview();
         const statusEl = document.getElementById('poster-status');
-        if (statusEl) statusEl.innerText = '✅ Vos 4 affiches (A4, A5, A6, A4 Paysage) sont prêtes et téléchargées.';
+        if (statusEl) statusEl.innerText = '✅ Your 4 posters (A4, A5, A6, A4 Landscape) are ready and downloaded.';
     }
 
 
@@ -5141,7 +5168,7 @@ if(slider) {
                 headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY }
             });
             const result = await response.json();
-            if (!result[0]) { toast("Roulette introuvable.", "error"); return; }
+            if (!result[0]) { toast("Game not found.", "error"); return; }
             const c = result[0].data;
             closeDashboard();
             editingConfigId = configId;
@@ -5211,17 +5238,17 @@ if(slider) {
             update();
             document.getElementById('step-gametype').open = true;
             document.getElementById('configurateur').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            toast("Roulette chargée. Modifiez-la puis cliquez sur Générer pour enregistrer.", "success");
+            toast("Game loaded. Edit it, then click Generate to save.", "success");
         } catch (e) {
-            toast("Erreur lors du chargement de la roulette.", "error");
+            toast("Error loading the game.", "error");
         }
     }
 
     const defaultLots = [
-        { n: "🥹 PERDU", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "🎁 -20% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
-        { n: "🥹 RATÉ", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "🎁 -10% REMISE", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
+        { n: "🥹 LOST", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
+        { n: "🎁 20% OFF", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
+        { n: "🥹 SORRY", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
+        { n: "🎁 10% OFF", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
     ];
 
     // ---------------------------------------------------------------
@@ -5232,7 +5259,7 @@ if(slider) {
         const row = document.createElement('div');
         row.className = 'extra-field-row';
         row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:center;';
-        row.innerHTML = `<input type="text" class="full-width extra-field-label" style="margin-bottom:0;" value="${(label || '').replace(/"/g, '&quot;')}" placeholder="Nom du champ (ex : Date de naissance)" oninput="update()">
+        row.innerHTML = `<input type="text" class="full-width extra-field-label" style="margin-bottom:0;" value="${(label || '').replace(/"/g, '&quot;')}" placeholder="Field name (ex : Date of birth)" oninput="update()">
             <button type="button" class="btn-ghost" onclick="this.parentElement.remove(); update();" style="white-space:nowrap;">✕</button>`;
         container.appendChild(row);
     }
@@ -5257,7 +5284,7 @@ if(slider) {
         div.className = 'lot-row-wrapper';
         div.innerHTML = `<div class="lot-row">
             <div class="input-wrapper">
-                <span class="mobile-label">LOT (2 lignes auto)</span>
+                <span class="mobile-label">PRIZE (auto 2 lines)</span>
                 <input type="text" class="ln" value="${n}" oninput="update()">
             </div>
             <div class="input-wrapper small">
@@ -5265,19 +5292,19 @@ if(slider) {
                 <input type="number" class="lp" value="${p}" step="0.1" oninput="handleProbChange(this)">
             </div>
             <div class="input-wrapper small">
-                <span class="mobile-label">TAILLE</span>
+                <span class="mobile-label">SIZE</span>
                 <input type="number" class="ls" value="${s}" oninput="update()">
             </div>
             <div class="input-wrapper color">
-                <span class="mobile-label">FOND</span>
+                <span class="mobile-label">BG</span>
                 <input type="color" class="lc lbg" value="${bg}" oninput="update()">
             </div>
             <div class="input-wrapper color">
-                <span class="mobile-label">TEXTE</span>
+                <span class="mobile-label">TEXT</span>
                 <input type="color" class="lc ltx" value="${tx}" oninput="update()">
             </div>
             <div class="input-wrapper win" style="text-align:center;">
-                <span class="mobile-label">GAGNANT ?</span>
+                <span class="mobile-label">WINNER?</span>
                 <label style="display:flex; align-items:center; justify-content:center; height:38px; cursor:pointer;" title="Ce lot compte-t-il comme un gain dans les statistiques ?">
                     <input type="checkbox" class="lw" ${isWin ? 'checked' : ''} onchange="update()" style="width:19px; height:19px; cursor:pointer;">
                 </label>
@@ -5302,7 +5329,7 @@ if(slider) {
         const c1 = document.getElementById('color1').value;
         const c2 = document.getElementById('color2').value;
         const bg = rows.length % 2 === 0 ? c1 : c2;
-        addLotRow('Nouveau lot', 0, 12, bg, getContrastColor(bg), true);
+        addLotRow('New prize', 0, 12, bg, getContrastColor(bg), true);
         redistributeProbabilities();
         document.getElementById('lot_count').value = document.querySelectorAll('.lot-row-wrapper').length;
         update();
@@ -5332,7 +5359,7 @@ if(slider) {
             const c2 = document.getElementById('color2').value;
             const idx = rows.length;
             const bg = idx % 2 === 0 ? c1 : c2;
-            addLotRow('Nouveau lot', 0, 12, bg, getContrastColor(bg), true);
+            addLotRow('New prize', 0, 12, bg, getContrastColor(bg), true);
             rows = container.querySelectorAll('.lot-row-wrapper');
         }
         while (rows.length > n) {
@@ -5450,10 +5477,10 @@ if(slider) {
         const isValid = Math.round(total) === 100;
         barFill.style.width = Math.min(total, 100) + '%';
         barFill.style.background = isValid ? 'var(--success)' : 'var(--danger)';
-        barTxt.innerText = isValid ? `Total : ${roundedTotal}% ✅` : `Total : ${roundedTotal}% — doit faire 100% ⚠️`;
+        barTxt.innerText = isValid ? `Total: ${roundedTotal}% ✅` : `Total: ${roundedTotal}% — doit faire 100% ⚠️`;
 
         let infoStr = lang === 'fr' ? `Sur 100 participants, environ : ` : `Approx per 100 participants : `;
-        const details = ns.map((n, i) => `<strong>${Math.round(ps[i])}</strong> -> "${(n.trim() || "Lot")}"`);
+        const details = ns.map((n, i) => `<strong>${Math.round(ps[i])}</strong> -> "${(n.trim() || "Prize")}"`);
         document.getElementById('prob-info').innerHTML = infoStr + details.join(', ') + ".";
 
         if (selectedGameType === 'wheel') {
@@ -5476,7 +5503,7 @@ if(slider) {
 
     // ---------------------------------------------------------------
     // Reflète dans l'aperçu : les champs personnalisés du formulaire, l'option
-    // "continuer sans avis" et l'option "avis à la fin du jeu" (Premium).
+    // "continue without review" et l'option "avis à la fin du jeu" (Premium).
     // ---------------------------------------------------------------
     function refreshFormPreviewExtras() {
         const extraWrap = document.getElementById('pre-extra-fields');
@@ -5495,8 +5522,8 @@ if(slider) {
         const skipChecked = document.getElementById('opt_skip_avis') ? document.getElementById('opt_skip_avis').checked : false;
         const avisEndChecked = (isPremium() && document.getElementById('opt_avis_end')) ? document.getElementById('opt_avis_end').checked : false;
 
-        // Flux normal uniquement : le lien "continuer sans avis" apparaît sur l'étape 1 (avis).
-        // Flux "avis à la fin" : pas de lien de ce type — le bouton "Laisser un avis" sur l'écran
+        // Flux normal uniquement : le lien "continue without review" apparaît sur l'étape 1 (avis).
+        // Flux "avis à la fin" : pas de lien de ce type — le bouton "Leave a review" sur l'écran
         // résultat est déjà, par nature, une action facultative.
         const skipLinkAvis = document.getElementById('pre-skip-avis-link-avis');
         if (skipLinkAvis) skipLinkAvis.style.display = (skipChecked && !avisEndChecked) ? 'block' : 'none';
@@ -5511,16 +5538,16 @@ if(slider) {
 
         if (avisEndChecked) {
             if (wrap1) wrap1.style.display = 'none';
-            if (lbl2) lbl2.innerText = 'Étape 1 : Formulaire';
-            if (lbl3) lbl3.innerText = 'Étape 2 : Jeu';
-            if (lbl4) lbl4.innerText = 'Étape 3 : Résultat';
+            if (lbl2) lbl2.innerText = 'Step 1: Form';
+            if (lbl3) lbl3.innerText = 'Step 2: Game';
+            if (lbl4) lbl4.innerText = 'Step 3: Result';
             if (endBtn) endBtn.style.display = 'inline-block';
         } else {
             if (wrap1) wrap1.style.display = '';
-            if (lbl1) lbl1.innerText = 'Étape 1 : Avis';
-            if (lbl2) lbl2.innerText = 'Étape 2 : Formulaire';
-            if (lbl3) lbl3.innerText = 'Étape 3 : Jeu';
-            if (lbl4) lbl4.innerText = 'Étape 4 : Résultat';
+            if (lbl1) lbl1.innerText = 'Step 1: Review';
+            if (lbl2) lbl2.innerText = 'Step 2: Form';
+            if (lbl3) lbl3.innerText = 'Step 3: Game';
+            if (lbl4) lbl4.innerText = 'Step 4: Result';
             if (endBtn) endBtn.style.display = 'none';
         }
     }
@@ -5633,7 +5660,7 @@ if(slider) {
         addParagraph(`Le jeu-concours se déroule exclusivement sur smartphone, en point de vente, via un QR code affiché par la Société organisatrice. Après avoir scanné le QR code, le participant renseigne ses coordonnées puis tente sa chance via ${gameTypeLabel}. Identifiant unique du jeu : ${configId}.`);
 
         checkPageBreak(20);
-        addTitle('Article 3 — Conditions de participation');
+        addTitle('Article 3 — Terms of participation');
         addParagraph("La participation est ouverte à toute personne physique majeure, résidant en France, à l'exclusion des membres du personnel de la Société organisatrice et de leur famille. La participation est strictement personnelle et limitée à une seule tentative par personne et par période définie par la Société organisatrice (ex : par jour), sauf mention contraire affichée en point de vente.");
 
         checkPageBreak(45);
@@ -5715,11 +5742,11 @@ if(slider) {
                     <div class="scratch-result"><div class="ic">🎁</div><div class="txt" id="client-scratch-result-text"></div></div>
                     <canvas id="client-scratch-canvas" width="340" height="220"></canvas>
                 </div>
-                <p class="scratch-hint">👆 Grattez avec le doigt pour révéler votre gain</p>`;
+                <p class="scratch-hint">👆 Scratch with your finger to reveal your prize</p>`;
         } else if (gameType === 'boxes') {
             gameStepHtml = `
                 <div class="mystery-grid" id="client-boxes-grid" style="max-width:min(90vw,340px);"></div>
-                <p class="mystery-hint">👆 Touchez un coffre pour l'ouvrir</p>`;
+                <p class="mystery-hint">👆 Tap a chest to open it</p>`;
         } else if (gameType === 'plinko') {
             gameStepHtml = `
                 <div class="plinko-frame" style="max-width:min(90vw,360px);">
@@ -5733,7 +5760,7 @@ if(slider) {
         } else if (gameType === 'cups') {
             gameStepHtml = `
                 <div class="cups-row" id="client-cups-row"></div>
-                <p class="cups-hint" id="client-cups-hint">Un jeton est caché sous l'un des gobelets...</p>
+                <p class="cups-hint" id="client-cups-hint">A token is hidden under one of the cups...</p>
                 <button id="spin-btn" class="btn-black-c" onclick="spinClient()">${config.t_btn_s || t.spin}</button>`;
         } else {
             gameStepHtml = `
@@ -5754,12 +5781,12 @@ if(slider) {
         const extraFieldsHtml = (config.ef || []).map((label, i) =>
             '<input type="text" class="c-extra-field" data-label="' + String(label).replace(/"/g, '&quot;') + '" id="c_extra_' + i + '" placeholder="' + String(label).replace(/"/g, '&quot;') + '">'
         ).join('');
-        // Flux normal (avis d'abord) : le lien "continuer sans avis" doit être sur l'étape 1
+        // Flux normal (avis d'abord) : le lien "continue without review" doit être sur l'étape 1
         // (avis), pour permettre de sauter directement au formulaire sans cliquer sur le lien
         // d'avis. Flux "avis à la fin" (Premium) : l'étape 1 est le formulaire, donc le lien
         // concerne l'invitation à laisser un avis qui apparaîtra à la toute fin.
         const skipAvisLinkAvis = (config.skip_avis && !avisEnd)
-            ? '<a href="#" onclick="event.preventDefault(); showStep(\'step-form\');" style="display:block; margin-top:14px; font-size:11px; opacity:.6; text-decoration:underline; position:relative; z-index:2; color:inherit;">Continuer sans laisser d\'avis</a>'
+            ? '<a href="#" onclick="event.preventDefault(); showStep(\'step-form\');" style="display:block; margin-top:14px; font-size:11px; opacity:.6; text-decoration:underline; position:relative; z-index:2; color:inherit;">Continue without leaving a review</a>'
             : '';
 
         document.body.innerHTML = `
@@ -5792,7 +5819,7 @@ if(slider) {
         <div id="step-form" class="client-card" style="${avisEnd ? '' : 'display:none;'}">
             ${logoOrEmojiHtml(config.l, config.logo_emoji || '🎁', '70px', '34px', 'max-width:100px; margin-bottom:25px; object-fit: contain;', '25px')}
             <h3>${config.t_last || t.last}</h3>
-            <p>Complétez vos infos pour jouer.</p>
+            <p>Fill in your details to play.</p>
             <input type="text" id="c_nom" placeholder="${config.t_name || t.name}" required>
             <input type="email" id="c_email" placeholder="${config.t_email || t.email}" required>
             <input type="tel" id="c_tel" placeholder="${config.t_phone || t.phone}" required>
@@ -5801,7 +5828,7 @@ if(slider) {
                 <input type="checkbox" id="c_rgpd" style="margin-top:3px; width: 18px; height: 18px;">
                 <span>${t.rgpd}</span>
             </label>
-            <p style="font-size:11px; text-align:left; opacity:.75; margin: 12px 0 0 0; position:relative; z-index:2;">En validant ma participation, j'accepte le règlement du jeu (disponible en point de vente) et l'utilisation de mes données pour m'informer si je gagne.</p>
+            <p style="font-size:11px; text-align:left; opacity:.75; margin: 12px 0 0 0; position:relative; z-index:2;">By submitting my participation, I accept the game rules (available at the point of sale) and the use of my data to inform me if I win.</p>
             <button class="btn-black-c" onclick="validateForm()">${config.t_btn_v || t.val}</button>
         </div>
         <div id="step-game" class="client-card" style="display:none;">
@@ -5876,7 +5903,7 @@ if(slider) {
         }
 
         window.validateForm = () => {
-            if (!document.getElementById('c_nom').value || !document.getElementById('c_email').value) return alert("Merci de renseigner votre nom et votre email.");
+            if (!document.getElementById('c_nom').value || !document.getElementById('c_email').value) return alert("Please enter your name and email.");
             showStep('step-game');
         };
 
@@ -5941,9 +5968,9 @@ if(slider) {
             if (gameType === 'cups') {
                 const btn = document.getElementById('spin-btn');
                 btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5';
-                document.getElementById('client-cups-hint').innerText = 'Mélange en cours...';
+                document.getElementById('client-cups-hint').innerText = 'Shuffling...';
                 shuffleCups('client-cups-row', () => {
-                    document.getElementById('client-cups-hint').innerText = 'Touchez un gobelet !';
+                    document.getElementById('client-cups-hint').innerText = 'Tap a cup!';
                     btn.style.display = 'none';
                     attachCupHandlers('client-cups-row', { n: config.n, p: config.p }, (label) => {
                         document.getElementById('win-txt').innerText = label;
@@ -6010,7 +6037,7 @@ if(slider) {
                 const response = await fetch(`${SB_URL}/rest/v1/roulette_configs?id=eq.${configId}&select=data`, {
                     headers: { 'Authorization': `Bearer ${SB_KEY}`, 'apikey': SB_KEY }
                 });
-                if (!response.ok) throw new Error('Réponse serveur ' + response.status);
+                if (!response.ok) throw new Error('Server response ' + response.status);
                 const result = await response.json();
                 if (result[0]) {
                     renderClient(result[0].data, configId);
@@ -6020,11 +6047,11 @@ if(slider) {
                         body: JSON.stringify({ config_id: configId })
                     }).catch(() => {});
                 } else {
-                    showClientLoadError("Ce jeu n'existe plus ou a été supprimé.");
+                    showClientLoadError("This game no longer exists or has been deleted.");
                 }
             } catch (err) {
                 console.error('Erreur de chargement du jeu (id=' + configId + ') :', err);
-                showClientLoadError("Impossible de charger le jeu. Vérifiez votre connexion et réessayez.");
+                showClientLoadError("Unable to load the game. Check your connection and try again.");
             }
         } else {
             document.getElementById('topbar').style.display = 'flex';
@@ -6046,9 +6073,9 @@ if(slider) {
         document.body.innerHTML = `
             <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px; font-family:'Segoe UI',sans-serif; background:#fff; color:#1d1d1f;">
                 <div style="font-size:44px; margin-bottom:14px;">😕</div>
-                <h2 style="margin:0 0 10px 0; font-size:19px;">Oups, un problème est survenu</h2>
+                <h2 style="margin:0 0 10px 0; font-size:19px;">Oops, something went wrong</h2>
                 <p style="margin:0; max-width:320px; opacity:.75; font-size:14px; line-height:1.5;">${message}</p>
-                <button onclick="location.reload()" style="margin-top:22px; background:#000; color:#fff; border:none; padding:13px 26px; border-radius:50px; font-weight:700; font-size:14px; cursor:pointer;">Réessayer</button>
+                <button onclick="location.reload()" style="margin-top:22px; background:#000; color:#fff; border:none; padding:13px 26px; border-radius:50px; font-weight:700; font-size:14px; cursor:pointer;">Retry</button>
             </div>`;
     }
 
@@ -6071,5 +6098,15 @@ if(slider) {
     })();
 </script>
 
+<script>
+/* EN : interface du configurateur et textes du jeu en anglais au chargement */
+(function () {
+    var prev = window.onload;
+    window.onload = async function (e) {
+        if (typeof prev === 'function') await prev.call(this, e);
+        try { if (!new URLSearchParams(location.search).get('id') && typeof changeLanguage === 'function') changeLanguage('en'); } catch (err) { console.error(err); }
+    };
+})();
+</script>
 </body>
 </html>
