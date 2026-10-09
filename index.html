@@ -1226,6 +1226,29 @@
         .nav-links a.lang-switch { margin-left: 0; padding: 6px 12px; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border-color); }
         .nav-links a.lang-switch:hover { color: var(--text-primary); border-color: var(--accent-color); }
         @media (max-width: 640px) { .lang-switch { margin-left: 0.5rem; padding: 5px 9px; font-size: 0.78rem; } }
+
+        /* Menu desktop compact : pas de retour à la ligne, liens secondaires dans "Plus" */
+        nav { max-width: 1320px; }
+        .logo { white-space: nowrap; flex-shrink: 0; }
+        .nav-links { gap: 1.3rem; align-items: center; }
+        .nav-links a, .nav-more-btn { white-space: nowrap; font-size: 0.9rem; }
+        .nav-more { position: relative; }
+        .nav-more-btn { background: none; border: none; padding: 8px 0; font-family: inherit; font-weight: 500; color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .nav-more-btn::after { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+        .nav-more:hover .nav-more-btn, .nav-more:focus-within .nav-more-btn { color: var(--accent-color); }
+        .nav-more-menu { display: none; position: absolute; top: 100%; right: -12px; min-width: 190px; margin: 0; padding: 8px; list-style: none; flex-direction: column; gap: 2px; background: #fff; border: 1px solid var(--border-color); border-radius: 14px; box-shadow: var(--shadow-md); z-index: 1100; }
+        .nav-more:hover .nav-more-menu, .nav-more:focus-within .nav-more-menu { display: flex; }
+        .nav-more-menu a { display: block; padding: 10px 14px; border-radius: 10px; }
+        .nav-more-menu a:hover { background: var(--bg-secondary); }
+        .nav-links a.lang-switch { gap: 7px; }
+        .lang-switch .flag { display: block; border-radius: 3px; flex-shrink: 0; }
+        @media (max-width: 1300px) {
+            .nav-more, .nav-more-menu, .nav-more:hover .nav-more-menu, .nav-more:focus-within .nav-more-menu { display: contents; }
+            .nav-more-btn { display: none; }
+            .nav-more-menu a { padding: 0; border-radius: 0; }
+            .nav-more-menu a:hover { background: none; }
+            .nav-links a, .nav-more-btn { white-space: normal; font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
@@ -1245,14 +1268,18 @@
             <li><a href="#concept" onclick="closeMenu()">Comment ça marche</a></li>
             <li><a href="#configurateur" onclick="closeMenu()">Configurateur</a></li>
             <li><a href="#enjeux-seo" onclick="closeMenu()">Pourquoi les Avis ?</a></li>
-            <li><a href="#fonctionnalites" onclick="closeMenu()">Outil & CRM</a></li>
-            <li><a href="#secteurs" onclick="closeMenu()">Secteurs</a></li>
             <li><a href="#guides" onclick="closeMenu()">Guides</a></li>
-            <li><a href="#lexique" onclick="closeMenu()">Lexique</a></li>
             <li><a href="#cas-usage" onclick="closeMenu()">Cas d'usage</a></li>
             <li><a href="#tarifs" onclick="closeMenu()">Tarifs</a></li>
             <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
-            <li class="nav-lang-item"><a href="https://www.spintokeep.com/en" class="lang-switch" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English"><span class="flag" aria-hidden="true">🇬🇧</span>EN</a></li>
+            <li class="nav-more"><button type="button" class="nav-more-btn" aria-haspopup="true">Plus</button>
+                <ul class="nav-more-menu">
+                    <li><a href="#fonctionnalites" onclick="closeMenu()">Outil & CRM</a></li>
+                    <li><a href="#secteurs" onclick="closeMenu()">Secteurs</a></li>
+                    <li><a href="#lexique" onclick="closeMenu()">Lexique</a></li>
+                </ul>
+            </li>
+            <li class="nav-lang-item"><a href="https://www.spintokeep.com/en" class="lang-switch" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English"><svg class="flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><clipPath id="gbc"><rect width="60" height="40" rx="4"/></clipPath><g clip-path="url(#gbc)"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#C8102E" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="13"/><path d="M30 0V40M0 20H60" stroke="#C8102E" stroke-width="7"/></g></svg>EN</a></li>
             <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
         <div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button></div>
@@ -1264,7 +1291,7 @@
     <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 1.5rem;">
         <h1>Collectez plus d'<span class="highlight">avis Google</span> grâce à une roulette de la fortune par QR code.</h1>
         <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
-            Chaque avis 5 étoiles manquant, c\'est un client qui choisit votre concurrent sur Google Maps. Transformez votre comptoir en machine à avis, à likes et à contacts qualifiés avec un jeu concours à votre image : créez-le ci-dessous, <strong>gratuitement</strong>, en 1 minute.
+            Chaque avis 5 étoiles manquant, c'est un client qui choisit votre concurrent sur Google Maps. Transformez votre comptoir en machine à avis, à likes et à contacts qualifiés avec un jeu concours à votre image : créez-le ci-dessous, <strong>gratuitement</strong>, en 1 minute.
         </p>
         <div class="text-center">
             <a href="#configurateur" class="btn hover-effect">Créer mon jeu personnalisé</a>
