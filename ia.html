@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conseiller IA – Atelier & Kiosque</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--chalk:#f3f4f0;--ink:#14221f;--mute:#5d6b67;--line:#dde1da;--pine:#1f6f5c;--pine-d:#164f42;--brass:#d9a441;--card:#fff}
+*{box-sizing:border-box;margin:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--chalk);color:var(--ink);min-height:100vh}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque','DM Sans',system-ui,sans-serif}
+.hidden{display:none!important}
+/* Atelier */
+#atelier header{padding:22px 32px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);background:var(--card)}
+#atelier header h1{font-size:22px;font-weight:800}
+#atelier header span{color:var(--mute);font-size:14px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;max-width:1180px;margin:0 auto;padding:28px 24px 60px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px}
+.panel h2{font-size:18px;font-weight:700;margin-bottom:14px}
+.row{margin-bottom:16px}
+.row>label,.lbl{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--chalk);padding:7px 13px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--pine);border-color:var(--pine);color:#fff}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw[aria-pressed=true]{box-shadow:0 0 0 2.5px var(--pine)}
+input,textarea,select{width:100%;font:inherit;font-size:15px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input:focus,textarea:focus,select:focus,.chip:focus-visible,.sw:focus-visible,button:focus-visible{outline:2.5px solid var(--brass);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hint{font-size:12px;color:var(--mute);margin-top:6px}
+
+/* Drag & Drop Upload */
+.drop-zone { border: 2px dashed var(--line); border-radius: 10px; padding: 22px; text-align: center; color: var(--mute); position: relative; transition: all 0.2s; background: #fff; font-size: 14px; margin-top: 4px; }
+.drop-zone:hover, .drop-zone.dragover { border-color: var(--pine); background: #eef5f2; color: var(--pine-d); }
+.drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+.preview{position:sticky;top:20px;align-self:start}
+.stage{background:radial-gradient(circle at 50% 30%,#2b8a74,#14221f 80%);border-radius:18px;padding:18px 18px 0;overflow:hidden;text-align:center;color:#fff}
+.stage svg{width:100%;max-width:300px;height:auto;display:block;margin:0 auto}
+.stage .nm{font-size:22px;font-weight:800;padding:6px 0 0}.stage .rl{font-size:14px;opacity:.8;padding-bottom:16px}
+.btn{display:block;width:100%;border:0;border-radius:12px;background:var(--brass);color:#2a1d02;font:700 17px 'Bricolage Grotesque',sans-serif;padding:16px;cursor:pointer;margin-top:14px}
+.btn:hover{filter:brightness(1.06)}
+.btn.sec{background:transparent;border:1px solid var(--line);font-size:14px;padding:10px;color:var(--ink);margin-top:8px}
+.gallery{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.av{border:2px solid var(--line);background:#fff;border-radius:14px;padding:4px;cursor:pointer}.av[aria-pressed=true]{border-color:var(--pine);box-shadow:0 0 0 3px rgba(31,111,92,.25);background:#eef5f2}.av svg{width:100%;height:auto;display:block}
+.sub{font-size:14px;font-weight:700;margin:18px 0 12px;padding-top:16px;border-top:1px solid var(--line)}
+#sugg{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:820px;margin-bottom:14px}.sq{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:9px 16px;font:inherit;font-size:clamp(13px,1.8vw,17px);cursor:pointer}
+/* Kiosque */
+#kiosque{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 35%,#2b8a74 0%,#164f42 40%,#0c1815 100%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px 20px 28px;overflow:hidden;user-select:none;-webkit-user-select:none}
+#kiosque .exit{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.1);border:0;color:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-size:13px;opacity:.5;cursor:pointer}
+#kAvatar{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:flex-end}
+#kAvatar svg{height:100%;max-height:62vh;width:auto;max-width:100%}
+.kid{text-align:center;margin-top:6px}
+.kid h2{font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1}
+.kid p{opacity:.8;font-size:clamp(15px,2.2vw,22px);margin-top:4px}
+#bubble{min-height:62px;max-width:760px;width:100%;margin:12px auto;text-align:center;font-size:clamp(16px,2.3vw,23px);line-height:1.4;padding:10px 18px;background:rgba(255,255,255,.1);border-radius:18px}
+#bubble em{opacity:.7;font-style:normal}
+#mic{width:min(88vw,420px);border:0;border-radius:999px;padding:22px;background:var(--brass);color:#2a1d02;font:800 clamp(20px,3vw,28px) 'Bricolage Grotesque',sans-serif;cursor:pointer;touch-action:none;box-shadow:0 8px 30px rgba(0,0,0,.35);transition:transform .12s}
+#mic.on{background:#ff6b57;color:#fff;transform:scale(1.05);animation:pulse 1s infinite}
+#mic:disabled{opacity:.55}
+@keyframes pulse{50%{box-shadow:0 0 0 18px rgba(255,107,87,.2)}}
+#txtfb{display:flex;gap:8px;max-width:560px;width:100%;margin-top:10px}
+#txtfb input{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
+#txtfb button{border:0;border-radius:10px;background:var(--brass);padding:0 18px;font-weight:700;cursor:pointer}
+/* Animations avatar */
+.blink{animation:blink 4.5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.08)}}
+.breathe{animation:breathe 4s ease-in-out infinite;transform-origin:50% 100%}
+.talking .head{animation:bob .45s ease-in-out infinite alternate;transform-origin:200px 330px}
+@keyframes breathe{50%{transform:scale(1.012)}}
+@keyframes bob{to{transform:rotate(1.2deg) translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.preview{position:static;order:-1}}
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN 1 : ATELIER -->
+<section id="atelier">
+  <header><h1>Atelier du conseiller</h1><span>Créez l'expert virtuel de votre boutique</span></header>
+  <div class="wrap">
+    <div>
+      <div class="panel"><h2>Choisissez son visage</h2><div id="avatarControls"></div><div id="custom"></div></div>
+      <div class="panel"><h2>Sa personnalité & Son catalogue</h2>
+        <div class="grid2">
+          <div class="row"><label for="aiName">Prénom de l'expert</label><input id="aiName" value="Marcel"></div>
+          <div class="row"><label for="aiJob">Métier</label><select id="aiJob"></select></div>
+        </div>
+        <div class="row hidden" id="aiRoleBox"><label for="aiRole">Précisez le métier</label><input id="aiRole" placeholder="Ex. Cordonnier, Toiletteur canin…"></div>
+        <div class="row"><label for="aiSkills">Compétences de l'expert</label><textarea id="aiSkills" rows="4"></textarea><p class="hint">Pré-remplies selon le métier, modifiables : elles guident ses conseils.</p></div>
+        <div class="row"><label for="aiShop">Votre boutique (facultatif)</label><input id="aiShop" placeholder="Ex. Cave des Remparts, Lyon"></div>
+        
+        <!-- NOUVEAU CHAMP : UPLOAD STOCK (CORRIGÉ & DRAG AND DROP) -->
+        <div class="row">
+          <span class="lbl">Catalogue / Stock (Fichier CSV ou Texte)</span>
+          <div class="drop-zone" id="dropZone">
+            <span id="dzText">Glissez-déposez votre fichier ici ou <strong>cliquez</strong> pour parcourir.</span>
+            <input type="file" id="aiStock" accept=".csv,.txt,text/csv,text/plain">
+          </div>
+          <p class="hint">Exportez votre Excel en CSV. L'IA lira ce fichier pour proposer des produits réels avec leurs prix.</p>
+        </div>
+
+        <div class="row"><label for="aiTone">Ton de la voix</label>
+          <select id="aiTone"><option>Chaleureux</option><option>Énergique</option><option>Calme</option><option>Professionnel</option><option>Humoristique</option></select></div>
+        <div class="row"><label for="aiVoice">Voix (Gemini)</label><select id="aiVoice"></select><p class="hint">Voix naturelle générée par Gemini. Si elle est indisponible, la voix du navigateur prend le relais.</p></div>
+        <div class="row"><label for="aiWelcome">Message d'accueil</label>
+          <textarea id="aiWelcome" rows="3">Bonjour et bienvenue ! Je suis Marcel, votre sommelier. Dites-moi ce que vous cherchez, je vous guide.</textarea></div>
+      </div>
+      <div class="panel"><h2>Connexion IA</h2>
+        <div class="row"><label for="apiKey">Clé API Gemini</label><input id="apiKey" type="password" autocomplete="off">
+          <p class="hint">Stockée dans ce navigateur. Visible par quiconque ouvre ce fichier : limitez la clé à votre domaine dans Google AI Studio.</p></div>
+      </div>
+    </div>
+    <aside class="preview">
+      <div class="stage"><div id="pAvatar"></div><div class="nm" id="pName"></div><div class="rl" id="pRole"></div></div>
+      <button class="btn" id="launch">Lancer le mode Kiosque</button>
+      <button class="btn sec" id="randomize">Un avatar au hasard</button>
+    </aside>
+  </div>
+</section>
+
+<!-- ÉCRAN 2 : KIOSQUE -->
+<section id="kiosque" class="hidden">
+  <button class="exit" id="exit">Quitter le kiosque</button>
+  <div id="kAvatar"></div>
+  <div class="kid"><h2 id="kName"></h2><p id="kRole"></p></div>
+  <div id="bubble"></div>
+  <div id="sugg"></div>
+  <button id="mic">🎙️ Maintenez pour parler</button>
+  <form id="txtfb" class="hidden"><input id="txtIn" placeholder="Écrivez votre question…" aria-label="Question"><button>Envoyer</button></form>
+</section>
+
+<script>
+/* ---------- CONFIG ---------- */
+const DEFAULT_KEY = 'AQ.Ab8RN6IcLkG21U8hDpdD72zipCGopRW4E5XhZ3atAQWIgV0pPw';
+const MODELS = ['gemini-3.8-flash','gemini-3.6-flash','gemini-3.5-flash'];
+const $ = s => document.querySelector(s);
+
+/* ---------- LECTURE DU FICHIER DE STOCK (DRAG & DROP) ---------- */
+let stockData = "";
+const stockInput = $('#aiStock');
+const dropZone = $('#dropZone');
+const dzText = $('#dzText');
+
+function handleFile(file) {
+  if(!file) { 
+    stockData = ""; 
+    dzText.innerHTML = "Glissez-déposez votre fichier ici ou <strong>cliquez</strong> pour parcourir."; 
+    dropZone.style.borderColor = ""; 
+    return; 
+  }
+  const reader = new FileReader();
+  reader.onload = ev => { 
+    stockData = ev.target.result; 
+    dzText.innerHTML = `✅ Fichier chargé : <strong>${file.name}</strong>`;
+    dropZone.style.borderColor = "var(--pine)";
+  };
+  reader.readAsText(file);
+}
+
+stockInput.addEventListener('change', e => handleFile(e.target.files[0]));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); 
+  dropZone.classList.remove('dragover');
+  if(e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    stockInput.files = e.dataTransfer.files; // Synchronise l'input caché
+    handleFile(e.dataTransfer.files[0]);
+  }
+});
+
+/* ---------- AVATARS : 20 modèles (inspirés de la planche) ---------- */
+const AV=[
+ {skin:'#f5cfb0',hair:'tousled',hc:'#5b3a29',beard:'full',bc:'#4a2f22',shirt:'#c9473c',ss:'collar',grin:1},
+ {skin:'#f7d4b8',hair:'sweep',hc:'#e0702d',shirt:'#8d8d92',ss:'collar'},
+ {skin:'#8a5a3a',hair:'crop',hc:'#2a1a14',shirt:'#2b2623',ss:'tee',grin:1},
+ {skin:'#f7d9bd',hair:'sweep',hc:'#e8b538',glasses:'round',shirt:'#8a5a3a',ss:'vneck'},
+ {skin:'#f5d3a8',hair:'crop',hc:'#2a1c18',glasses:'rect',eyes:'closed',shirt:'#8fbbe8',ss:'collar',grin:1},
+ {skin:'#e8bd98',hair:'crop',hc:'#a77b55',eyes:'closed',beard:'stub',bc:'#a77b55',shirt:'#7ec24f',ss:'tee',grin:1},
+ {skin:'#8a5a3a',hair:'crop',hc:'#2a1a14',beard:'full',bc:'#2a1a14',shirt:'#c0463d',ss:'tee',grin:1},
+ {skin:'#f2c9a8',hair:'old',hc:'#e8e8e8',beard:'mous',bc:'#e8e8e8',shirt:'#4a97d6',ss:'vneck'},
+ {skin:'#f3cba6',hair:'tousled',hc:'#5b3a29',shirt:'#a67a4a',ss:'tee'},
+ {skin:'#b5774d',hair:'shaggy',hc:'#2a1a14',beard:'goatee',bc:'#2a1a14',shirt:'#444449',ss:'tee'},
+ {skin:'#f6d4bd',hair:'asym',hc:'#cc4f7c',glasses:'round',shirt:'#26262b',ss:'tee'},
+ {skin:'#f6d4bd',hair:'curly',hc:'#e0652a',shirt:'#4aa0d8',ss:'tank',grin:1},
+ {skin:'#8a5a3a',hair:'long',hc:'#2a1814',eyes:'closed',shirt:'#e0a63a',ss:'tee',grin:1,ring:1},
+ {skin:'#f6d4bd',hair:'long',hc:'#eab83a',shirt:'#a9a9ae',ss:'blazer'},
+ {skin:'#f7dcb4',hair:'bobbangs',hc:'#2a1814',eyes:'closed',shirt:'#e87fb0',ss:'tee',grin:1},
+ {skin:'#f3cba6',hair:'ponytail',hc:'#8a5a3a',shirt:'#cf4a3e',ss:'tee'},
+ {skin:'#c58f66',hair:'hijab',hc:'#8e5cb5',shirt:'#2b2623',ss:'tee'},
+ {skin:'#f3cba6',hair:'oldbob',hc:'#dcdcdc',eyes:'closed',shirt:'#a6c9ee',ss:'vneck'},
+ {skin:'#f3cba6',hair:'bun',hc:'#5b3a29',shirt:'#34343a',ss:'tee'},
+ {skin:'#a9704a',hair:'long',hc:'#2a1814',shirt:'#7ec24f',ss:'tee'}
+];
+let sel=0,ov={};
+const cur=()=>{const a={...AV[sel],...ov};if(ov.hc&&AV[sel].bc)a.bc=ov.hc;return a};
+function shade(hex,k){const n=parseInt(hex.slice(1),16),f=v=>Math.max(0,Math.min(255,Math.round(v*k)));return '#'+[n>>16,n>>8&255,n&255].map(v=>f(v).toString(16).padStart(2,'0')).join('')}
+function avatarSVG(a){
+  const sk=a.skin,skD=shade(sk,.88),h=a.hc,hD=shade(h,.78),sh=a.shirt,shD=shade(sh,.78),ink=a.ec||'#2a1c14';
+  const circ=(pts,r)=>pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${h}"/>`).join('');
+  const bob=`<path d="M92 215C80 100 150 70 200 70S320 100 308 215C312 262 302 300 296 322H104C98 300 88 262 92 215Z" fill="${h}"/>`;
+  const crop=`<path d="M98 205C84 104 148 76 200 76S318 104 302 205C288 166 258 140 200 140S112 166 98 205Z" fill="${h}"/>`;
+  const sweep=`<path d="M98 205C84 100 150 70 205 74C262 76 316 110 302 205C292 160 262 126 226 116C200 150 140 150 108 190Z" fill="${h}"/>`;
+  const HB={long:`<path d="M96 210C84 100 150 72 200 72S316 100 304 210C308 300 300 380 332 412H68C100 380 92 300 96 210Z" fill="${h}"/>`,
+    oldbob:bob,bobbangs:bob,
+    asym:`<path d="M90 230C78 100 150 72 202 72S312 100 306 190L300 215H104L100 300C90 296 86 270 90 230Z" fill="${h}"/>`,
+    ponytail:`<path d="M112 140C54 150 44 250 76 316C98 292 104 244 124 206Z" fill="${h}"/>`,
+    bun:`<circle cx="240" cy="66" r="40" fill="${h}"/>`,
+    curly:circ([[98,170],[118,118],[160,90],[204,82],[246,90],[284,118],[304,170],[96,222],[306,222]],38)};
+  const HF={tousled:`<path d="M98 200C84 120 118 88 148 94L158 64L184 90L204 60L226 90L254 68L260 98C292 106 316 142 302 200C290 160 262 134 200 134S112 160 98 200Z" fill="${h}"/>`,
+    sweep,crop,long:sweep,oldbob:sweep,ponytail:crop,bun:crop,
+    shaggy:`<path d="M96 226C80 108 140 78 200 78S322 108 304 226C300 190 290 160 270 144C240 162 180 132 150 152C120 162 104 192 96 226Z" fill="${h}"/>`,
+    asym:`<path d="M96 210C86 110 150 78 204 78S312 104 304 190C290 150 250 120 214 120C176 130 130 150 100 214Z" fill="${h}"/>`,
+    bobbangs:`<path d="M98 200C88 104 150 78 200 78S314 104 302 200L296 158C250 172 150 172 104 158Z" fill="${h}"/>`,
+    curly:circ([[140,128],[180,112],[222,112],[262,128]],30),
+    old:`<path d="M102 205C92 176 94 150 108 138C114 160 116 182 122 200Z M298 205C308 176 306 150 292 138C286 160 284 182 278 200Z" fill="${h}"/>`,
+    hijab:`<path fill-rule="evenodd" fill="${h}" d="M88 232C68 90 140 54 200 54S332 90 312 232C314 300 302 342 292 352H108C98 342 86 300 88 232Z M200 118C254 118 282 160 282 215C282 272 250 312 200 312C150 312 118 272 118 215C118 160 146 118 200 118Z"/><path d="M120 176C130 132 160 118 200 118S270 132 280 176C260 150 235 142 200 142S140 150 120 176Z" fill="#fff"/>`};
+  const ears=['tousled','sweep','crop','old','ponytail','bun'].includes(a.hair)?`<ellipse cx="100" cy="216" rx="15" ry="25" fill="${sk}"/><ellipse cx="300" cy="216" rx="15" ry="25" fill="${sk}"/><ellipse cx="100" cy="218" rx="7" ry="13" fill="${skD}" opacity=".6"/><ellipse cx="300" cy="218" rx="7" ry="13" fill="${skD}" opacity=".6"/>`:'';
+  const eye=x=>a.eyes==='closed'?`<path d="M${x-15} 208Q${x} 192 ${x+15} 208" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round"/>`:`<g class="blink"><circle cx="${x}" cy="206" r="10" fill="${ink}"/><circle cx="${x+3}" cy="203" r="3" fill="#fff"/></g>`;
+  const bc=a.bc,bw=a.hair==='hijab'?'#3a2a22':hD;
+  const mous=`<path d="M158 256C170 240 190 246 200 252C210 246 230 240 242 256C226 264 212 262 200 260C188 262 174 264 158 256Z" fill="${bc}"/>`;
+  const beard={full:`<path d="M101 225C104 320 150 346 200 346S296 320 299 225C284 270 252 286 200 286S116 270 101 225Z" fill="${bc}"/>`,
+    goatee:`<path d="M172 292C176 316 224 316 228 292C216 300 184 300 172 292Z" fill="${bc}"/>`,
+    stub:`<path d="M158 288C170 322 230 322 242 288C226 306 174 306 158 288Z" fill="${bc}" opacity=".7"/>`,mous:''}[a.beard]||'';
+  const hasM=a.beard==='full'||a.beard==='mous'||a.beard==='goatee'&&false;
+  const gl=!a.glasses?'':a.glasses==='round'
+    ?`<g fill="rgba(255,255,255,.15)" stroke="#2a2a33" stroke-width="5"><circle cx="160" cy="206" r="28"/><circle cx="240" cy="206" r="28"/><path d="M188 204Q200 196 212 204M132 200L100 194M268 200L300 194" fill="none"/></g>`
+    :`<g fill="rgba(255,255,255,.15)" stroke="#2a2a33" stroke-width="5"><rect x="128" y="184" width="62" height="44" rx="10"/><rect x="210" y="184" width="62" height="44" rx="10"/><path d="M190 200H210M128 198L100 192M272 198L300 192" fill="none"/></g>`;
+  let body=`<path d="M44 480C54 400 116 366 200 366S346 400 356 480Z" fill="${a.ss==='tank'?sk:sh}"/>`,ns='';
+  if(a.ss==='tank')ns=`<path d="M110 480V440C130 410 158 386 170 368Q200 410 230 368C242 386 270 410 290 440V480Z" fill="${sh}"/>`;
+  if(a.ss==='tee')ns=`<path d="M164 368Q200 416 236 368Z" fill="${skD}"/>`;
+  if(a.ss==='collar')ns=`<path d="M170 368L200 412L230 368Z" fill="${skD}"/><path d="M160 366L200 416L178 434L148 386ZM240 366L200 416L222 434L252 386Z" fill="${shD}"/>`;
+  if(a.ss==='vneck')ns=`<path d="M164 368L200 426L236 368Z" fill="${skD}"/><path d="M156 366L200 414L170 396ZM244 366L200 414L230 396Z" fill="#fff"/>`;
+  if(a.ss==='blazer')ns=`<path d="M170 368L200 470L230 368Z" fill="#f4f1ea"/><path d="M176 368L200 410L224 368Z" fill="${skD}"/><path d="M150 366L200 480H174L128 398ZM250 366L200 480H226L272 398Z" fill="${shD}"/>`;
+  const mouthD=a.grin?`<path d="M168 266H232C228 290 214 300 200 300S172 290 168 266Z" fill="#fff" stroke="#7a2e34" stroke-width="4" stroke-linejoin="round"/>`:`<path d="M176 268Q200 288 224 268" fill="none" stroke="#7a2e34" stroke-width="6" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Avatar du conseiller">
+<defs><clipPath id="mclip"><ellipse id="mclipE" cx="200" cy="270" rx="20" ry="3"/></clipPath></defs>
+<ellipse cx="200" cy="472" rx="150" ry="12" fill="#000" opacity=".15"/>
+<g class="breathe">${body}${ns}
+<g class="head">${HB[a.hair]||''}
+<rect x="170" y="296" width="60" height="84" rx="22" fill="${skD}"/>${a.ss==='tee'||a.ss==='tank'?ns:''}
+${ears}<ellipse cx="200" cy="210" rx="100" ry="108" fill="${sk}"/>
+<ellipse cx="134" cy="248" rx="20" ry="11" fill="#e8806a" opacity=".2"/><ellipse cx="266" cy="248" rx="20" ry="11" fill="#e8806a" opacity=".2"/>
+${beard}${eye(160)}${eye(240)}
+<g fill="none" stroke="${bw}" stroke-width="6" stroke-linecap="round"><path d="M142 178Q160 168 178 178"/><path d="M222 178Q240 168 258 178"/></g>
+<path d="M194 218Q188 240 198 244Q208 246 212 240" fill="none" stroke="${shade(sk,.72)}" stroke-width="4" stroke-linecap="round"/>
+${hasM?mous:''}
+<g id="mouth"><g id="mClosed">${mouthD}</g>
+ <g id="mOpen" opacity="0"><ellipse id="mHole" cx="200" cy="270" rx="20" ry="3" fill="#5a1620"/>
+  <g clip-path="url(#mclip)"><rect id="mTeeth" x="170" y="266" width="60" height="6" fill="#fff"/><ellipse id="mTongue" cx="200" cy="284" rx="12" ry="6" fill="#e5707a"/></g></g></g>
+${gl}${HF[a.hair]||''}
+${a.ring?'<ellipse cx="102" cy="250" rx="4.5" ry="9" fill="#e0a63a"/>':''}
+</g></g></svg>`;
+}
+
+/* ---------- LIP SYNC ---------- */
+function setMouth(v){
+  const closed=$('#mClosed'),open=$('#mOpen');if(!closed)return;
+  if(v<.07){closed.setAttribute('opacity',1);open.setAttribute('opacity',0);return}
+  const ry=3+v*20,rx=24-v*7,cy=270+ry*.55;
+  closed.setAttribute('opacity',0);open.setAttribute('opacity',1);
+  for(const id of['#mHole','#mclipE']){const e=$(id);e.setAttribute('ry',ry);e.setAttribute('rx',rx);e.setAttribute('cy',cy)}
+  const t=$('#mTeeth');t.setAttribute('y',cy-ry);t.setAttribute('height',Math.min(8,ry*.5));
+  $('#mTongue').setAttribute('cy',cy+ry*.55);
+}
+let lipTimer=null,lipTarget=0,lipCur=0;
+function startLips(){stopLips();lipTimer=setInterval(()=>{
+  if(Math.random()<.22)lipTarget=.05; else lipTarget=.35+Math.random()*.65;
+  },110);
+  (function frame(){if(!lipTimer)return;lipCur+=(lipTarget-lipCur)*.45;setMouth(lipCur);requestAnimationFrame(frame)})();
+  $('#kiosque').classList.add('talking');
+}
+function stopLips(){clearInterval(lipTimer);lipTimer=null;lipTarget=lipCur=0;setMouth(0);$('#kiosque').classList.remove('talking')}
+
+/* ---------- ATELIER ---------- */
+const thumb=a=>avatarSVG(a).replace(/ id="[^"]*"/g,'').replace(/ class="[^"]*"/g,'').replace('viewBox="0 0 400 480"','viewBox="46 40 308 340"');
+function buildGallery(){
+  const box=$('#avatarControls');box.className='gallery';box.innerHTML='';
+  AV.forEach((a,i)=>{const b=document.createElement('button');b.className='av';b.innerHTML=thumb(i===sel?cur():a);b.setAttribute('aria-pressed',i===sel);b.setAttribute('aria-label','Avatar '+(i+1));b.onclick=()=>{sel=i;ov={};sync()};box.appendChild(b)});
+}
+function sync(){
+  buildGallery();buildCustom();
+  $('#pAvatar').innerHTML=avatarSVG(cur());
+  $('#pName').textContent=$('#aiName').value||'Votre expert';
+  $('#pRole').textContent=$('#aiRole').value||'';
+}
+['#aiName','#aiRole'].forEach(s=>$(s).addEventListener('input',()=>{$('#pName').textContent=$('#aiName').value;$('#pRole').textContent=$('#aiRole').value}));
+$('#randomize').onclick=()=>{sel=Math.random()*AV.length|0;ov={};sync()};
+$('#apiKey').value=localStorage.getItem('gkey')||DEFAULT_KEY;
+
+/* ---------- MÉTIERS & COMPÉTENCES ---------- */
+const JOBS={
+"Caviste":{s:"conseil en vins, bières et spiritueux; accords mets-boissons; idées cadeaux et coffrets; conservation et service; producteurs et terroirs; choix selon budget et occasion",q:["Quel vin pour un dîner entre amis ?","Une idée cadeau à moins de 30 € ?","Que boire avec du fromage ?"]},
+"Sommelier":{s:"accords mets-vins; régions, cépages et millésimes; vinification; service et température; conservation; whiskies, spiritueux et alternatives sans alcool",q:["Quel vin avec un poisson ?","Rouge, blanc ou rosé pour l'apéro ?","Comment conserver une bouteille ouverte ?"]},
+"Boulanger-pâtissier":{s:"pains, farines et levains; viennoiseries et pâtisseries; gâteaux sur commande et anniversaires; allergènes et régimes (sans gluten, végétarien); conservation et réchauffage; produits du jour",q:["Quel pain avec un plateau de fromages ?","Un gâteau pour 8 personnes ?","Avez-vous du sans gluten ?"]},
+"Garagiste":{s:"entretien et révision; vidange, freins, pneus, batterie; voyants du tableau de bord; contrôle technique; diagnostic de bruits et pannes; devis, délais et priorités de réparation; sécurité avant tout (en cas de doute, ne pas rouler)",q:["Un voyant s'est allumé, que faire ?","Quand changer mes pneus ?","Ma voiture fait un bruit bizarre"]},
+"Fleuriste":{s:"bouquets selon l'occasion; langage des fleurs; saisonnalité; entretien et durée de vie; plantes d'intérieur; mariages et deuil; livraison et budget",q:["Un bouquet pour un anniversaire ?","Quelle plante facile d'entretien ?","Comment garder mes fleurs plus longtemps ?"]},
+"Boucher":{s:"morceaux et cuissons; maturation; quantités par personne; marinades; viandes pour barbecue et repas de fête; conservation et sécurité alimentaire",q:["Quel morceau pour un barbecue ?","Combien de viande par personne ?","Comment cuire un rôti ?"]},
+"Poissonnier":{s:"fraîcheur et saisonnalité; modes de cuisson; préparation des poissons et fruits de mer; alternatives durables; quantités par personne; conservation",q:["Quel poisson pour débuter en cuisine ?","Comment reconnaître un poisson frais ?","Un plateau de fruits de mer ?"]},
+"Fromager":{s:"familles de fromages; accords avec vins et pains; plateaux selon le nombre de convives; affinage et conservation; lait cru et précautions; fromages régionaux",q:["Un plateau pour 6 personnes ?","Quel vin avec un chèvre ?","Comment conserver mon fromage ?"]},
+"Opticien":{s:"lunettes de vue et solaires; verres et traitements (anti-reflet, lumière bleue); montures selon le visage; lentilles; entretien; pas de diagnostic médical, renvoyer vers un ophtalmologiste",q:["Quelle monture pour mon visage ?","À quoi servent les verres anti-lumière bleue ?","Comment entretenir mes lunettes ?"]},
+"Libraire":{s:"conseils de lecture selon les goûts; nouveautés et classiques; livres jeunesse par âge; BD, mangas et sagas; idées cadeaux; lecture à voix haute",q:["Un roman pour l'été ?","Un livre pour un enfant de 8 ans ?","Une idée de cadeau ?"]},
+"Coiffeur":{s:"coupes selon le visage et le type de cheveux; colorations; soins et entretien à la maison; produits adaptés; tendances; coiffures d'événement",q:["Quelle coupe pour mon visage ?","Comment prendre soin de mes cheveux ?","Une coiffure pour un mariage ?"]},
+"Conseiller prêt-à-porter":{s:"tailles et coupes; associations de couleurs et de pièces; tendances de saison; entretien des textiles; tenues pour chaque occasion; idées cadeaux",q:["Une tenue pour un mariage ?","Comment bien choisir ma taille ?","Que porter avec ce pantalon ?"]},
+"Conseiller bricolage":{s:"outillage; peintures et revêtements; plomberie et électricité de base; matériaux; étapes d'un chantier; sécurité (renvoyer vers un professionnel pour le gaz et l'électricité)",q:["Quelle peinture pour une salle de bain ?","Quels outils pour accrocher une étagère ?","Comment déboucher un évier ?"]},
+"Conseiller high-tech":{s:"smartphones, ordinateurs, TV et audio; comparer selon l'usage et le budget; accessoires; installation et réglages; garanties; sécurité numérique de base",q:["Quel ordinateur pour les études ?","Quelle TV pour mon salon ?","Comment protéger mes données ?"]},
+"Jardinier-pépiniériste":{s:"plantes selon l'exposition et le sol; calendrier de plantation; arrosage et entretien; potager; maladies et parasites; plantes d'intérieur",q:["Que planter à l'ombre ?","Quand semer mes tomates ?","Mes feuilles jaunissent, pourquoi ?"]},
+"Vélociste":{s:"choix du vélo selon l'usage (ville, VTT, électrique); taille et réglages; entretien courant; équipements et sécurité; crevaisons; antivols",q:["Quel vélo pour aller au travail ?","Comment régler ma selle ?","Un vélo électrique, ça vaut le coup ?"]}
+};
+const OTHER='Autre…';
+let welcomeEdited=false;
+function autoWelcome(){if(welcomeEdited)return;const n=$('#aiName').value.trim()||'votre conseiller',r=$('#aiRole').value.trim().toLowerCase();
+  $('#aiWelcome').value=`Bonjour et bienvenue ! Je suis ${n}${r?', votre '+r:''}. Dites-moi ce que vous cherchez, je vous guide.`}
+function applyJob(){const j=$('#aiJob').value,o=j===OTHER;
+  $('#aiRoleBox').classList.toggle('hidden',!o);$('#aiRole').value=o?'':j;$('#aiSkills').value=o?'':JOBS[j].s;
+  $('#aiSkills').placeholder=o?'Listez ses compétences (facultatif) : sans liste, l\'IA les déduit du métier.':'';
+  $('#pRole').textContent=$('#aiRole').value;autoWelcome()}
+$('#aiJob').innerHTML=Object.keys(JOBS).map(j=>`<option>${j}</option>`).join('')+`<option>${OTHER}</option>`;
+$('#aiJob').value='Caviste';
+$('#aiJob').onchange=applyJob;
+['#aiName','#aiRole'].forEach(s=>$(s).addEventListener('input',autoWelcome));$('#aiWelcome').addEventListener('input',()=>welcomeEdited=true);
+
+/* ---------- PERSONNALISATION ---------- */
+const PAL={hc:['#2a1814','#5b3a29','#a77b55','#e8b538','#e0702d','#cc4f7c','#dcdcdc','#8e5cb5'],skin:['#f7dcb4','#f5cfb0','#e8bd98','#c58f66','#a9704a','#8a5a3a','#5c3a24'],
+  ec:['#2a1c14','#4a7bd1','#3f8f5a','#7a5230','#6b7280'],shirt:['#c9473c','#4a97d6','#7ec24f','#e0a63a','#444449','#8e5cb5','#e87fb0','#f1ede4']};
+function buildCustom(){
+  const box=$('#custom');box.innerHTML='<h3 class="sub">Personnalisation</h3>';const a=cur();
+  [['hc',AV[sel].hair==='hijab'?'Foulard':'Cheveux'],['skin','Peau'],['ec','Yeux'],['shirt','Vêtement']].forEach(([k,l])=>{
+    const row=document.createElement('div');row.className='row';row.innerHTML=`<span class="lbl">${l}</span><div class="chips"></div>`;
+    [...new Set([AV[sel][k]||'#2a1c14',...PAL[k]])].forEach(col=>{const b=document.createElement('button');b.className='sw';b.style.background=col;
+      b.setAttribute('aria-label',l+' '+col);b.setAttribute('aria-pressed',(a[k]||'#2a1c14')===col);b.onclick=()=>{ov[k]=col;sync()};row.lastChild.appendChild(b)});
+    box.appendChild(row)});
+  const r=document.createElement('button');r.className='chip';r.textContent='Revenir au modèle d\'origine';r.onclick=()=>{ov={};sync()};box.appendChild(r);
+}
+
+/* ---------- VOIX ---------- */
+const TONES={'Chaleureux':{rate:.95,pitch:1.05,desc:'chaleureux, bienveillant et rassurant'},'Énergique':{rate:1.1,pitch:1.15,desc:'énergique, enthousiaste et dynamique'},
+ 'Calme':{rate:.88,pitch:.95,desc:'calme, posé et apaisant'},'Professionnel':{rate:1,pitch:1,desc:'professionnel, précis et courtois'},'Humoristique':{rate:1.05,pitch:1.1,desc:'drôle, avec une touche d\'humour léger mais jamais déplacée'}};
+let E=null; // profil actif
+function speakBrowser(text){
+  return new Promise(res=>{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text),t=TONES[E.tone];u.lang='fr-FR';u.rate=t.rate;u.pitch=t.pitch;
+    const v=speechSynthesis.getVoices().filter(v=>v.lang.startsWith('fr'));
+    if(v.length){const fem=/amelie|audrey|julie|marie|hortense|female|femme/i, mas=/thomas|paul|male|homme|henri/i;
+      u.voice=v.find(x=>(E.voiceMasc?mas:fem).test(x.name))||v[0]}
+    u.onstart=startLips;
+    u.onboundary=()=>{lipTarget=.9};
+    u.onend=u.onerror=()=>{stopLips();res()};
+    speechSynthesis.speak(u);
+  });
+}
+
+/* ---------- VOIX GEMINI (TTS) ---------- */
+const TTS_MODELS=['gemini-3.8-flash-tts','gemini-3.1-flash-tts-preview'];
+const VOICE_AUTO={'Chaleureux':['Achird','Sulafat'],'Énergique':['Fenrir','Zephyr'],'Calme':['Charon','Achernar'],'Professionnel':['Orus','Kore'],'Humoristique':['Puck','Leda']};
+const VOICE_LIST=[['Voix féminines',[['Kore','Kore · assurée'],['Leda','Leda · jeune'],['Aoede','Aoede · légère'],['Sulafat','Sulafat · chaleureuse'],['Zephyr','Zephyr · lumineuse'],['Gacrux','Gacrux · mûre']]],
+ ['Voix masculines',[['Puck','Puck · enjoué'],['Charon','Charon · posé'],['Orus','Orus · ferme'],['Fenrir','Fenrir · énergique'],['Achird','Achird · amical'],['Rasalgethi','Rasalgethi · informatif']]]];
+$('#aiVoice').innerHTML='<option value="auto">Automatique (selon l\'avatar et le ton)</option>'+VOICE_LIST.map(g=>`<optgroup label="${g[0]}">${g[1].map(v=>`<option value="${v[0]}">${v[1]}</option>`).join('')}</optgroup>`).join('');
+let ac=null,curSrc=null;const audioCache=new Map();
+const pickVoice=()=>E.voice!=='auto'?E.voice:VOICE_AUTO[E.tone][E.voiceMasc?0:1];
+async function geminiTTS(text){
+  const voice=pickVoice(),ck=voice+'|'+E.tone+'|'+text;if(audioCache.has(ck))return audioCache.get(ck);
+  const prompt=`Dis d'un ton ${TONES[E.tone].desc}, en français : ${text}`;let last;
+  for(const m of TTS_MODELS){
+    try{
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':E.key},
+        body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}})});
+      if(!r.ok)throw new Error(m+' TTS HTTP '+r.status);
+      const d=await r.json(),p=d.candidates?.[0]?.content?.parts?.find(x=>x.inlineData);
+      if(!p)throw new Error(m+' : pas d\'audio');
+      const bin=atob(p.inlineData.data),n=bin.length>>1,f=new Float32Array(n);
+      for(let i=0;i<n;i++){let v=bin.charCodeAt(2*i)|bin.charCodeAt(2*i+1)<<8;if(v>=32768)v-=65536;f[i]=v/32768}
+      const rate=+(/rate=(\d+)/.exec(p.inlineData.mimeType||'')||[])[1]||24000;
+      const buf=ac.createBuffer(1,n,rate);buf.copyToChannel(f,0);audioCache.set(ck,buf);return buf;
+    }catch(e){last=e;console.warn(e)}
+  }
+  throw last;
+}
+/* Lip sync réel : l'ouverture de la bouche suit le volume de la voix */
+function playBuffer(buf){return new Promise(res=>{
+  const src=ac.createBufferSource(),an=ac.createAnalyser(),data=new Uint8Array(512);an.fftSize=512;
+  src.buffer=buf;src.connect(an);an.connect(ac.destination);curSrc=src;$('#kiosque').classList.add('talking');
+  let on=true,sm=0;
+  (function loop(){if(!on)return;an.getByteTimeDomainData(data);let s=0;for(const b of data){const x=(b-128)/128;s+=x*x}
+    sm+=(Math.min(1,Math.sqrt(s/data.length)*5)-sm)*.5;setMouth(sm);requestAnimationFrame(loop)})();
+  src.onended=()=>{on=false;curSrc=null;stopLips();res()};src.start();
+})}
+function stopSpeech(){speechSynthesis.cancel();try{curSrc&&curSrc.stop()}catch(e){}}
+async function speak(text){
+  stopSpeech();
+  try{return await playBuffer(await geminiTTS(text))}catch(e){console.warn('Voix du navigateur utilisée en secours',e)}
+  return speakBrowser(text);
+}
+
+/* ---------- GEMINI ---------- */
+let history=[];
+async function askGemini(q){
+  const stockInfo = E.stock 
+    ? `\n\nVoici la liste des produits disponibles, avec leurs caractéristiques et prix. Sers-toi EXCLUSIVEMENT de cette liste pour recommander des produits : \n${E.stock}\n`
+    : `Tu ne connais ni le stock ni les prix exacts de la boutique : pour cela, invite le client à voir l'équipe en magasin.`;
+
+  const sys=`Tu es ${E.name}, ${E.role}${E.shop?' de la boutique « '+E.shop+' »':''}. Tu conseilles les clients dans le magasin, sur une tablette. Ton ton est ${TONES[E.tone].desc}. Réponds toujours en français, en 2 phrases courtes maximum (40 mots au plus), sans mise en forme, sans liste, sans emoji, comme à l'oral. ${E.skills?`Tes compétences de professionnel : ${E.skills}.`:`Mobilise l'expertise complète et les usages réels du métier de ${E.role}.`} Raisonne comme un ${E.role} expérimenté : pose les bonnes questions de ce métier et donne des critères concrets. ${stockInfo} Reste dans ton métier ; si la question en sort, ramène poliment la conversation vers ton expertise. Pose au besoin une seule question pour affiner ton conseil.`;
+  
+  history.push({role:'user',parts:[{text:q}]});
+  const body=JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:history.slice(-8),generationConfig:{maxOutputTokens:1024,temperature:.8}});
+  let d,err;
+  for(const m of MODELS){try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':E.key},body});
+    if(!r.ok)throw new Error(m+' HTTP '+r.status);d=await r.json();break}catch(e){err=e;console.warn(e)}}
+  if(!d){history.pop();throw err}
+  const a=(d.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+  if(!a)throw new Error('Réponse vide');
+  history.push({role:'model',parts:[{text:a}]});return a;
+}
+async function handleQuestion(q){
+  $('#bubble').innerHTML=`<em>« ${q} »</em>`;$('#mic').disabled=true;
+  try{const a=await askGemini(q);$('#bubble').textContent=a;await speak(a)}
+  catch(e){const m="Désolé, je n'arrive pas à vous répondre pour le moment. Pouvez-vous réessayer ?";$('#bubble').textContent=m;console.error(e);await speak(m)}
+  $('#mic').disabled=false;
+}
+
+/* ---------- RECONNAISSANCE VOCALE (appui long) ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null,heard='',listening=false;
+function startListen(){
+  if(!SR||listening||$('#mic').disabled)return;
+  stopSpeech();stopLips();
+  rec=new SR();rec.lang='fr-FR';rec.interimResults=true;rec.continuous=true;heard='';
+  rec.onresult=e=>{heard=[...e.results].map(r=>r[0].transcript).join(' ');$('#bubble').innerHTML=`<em>${heard}…</em>`};
+  rec.onend=()=>{listening=false;$('#mic').classList.remove('on');$('#mic').textContent='🎙️ Maintenez pour parler';
+    if(heard.trim())handleQuestion(heard.trim());else $('#bubble').textContent='Je n\'ai rien entendu. Maintenez le bouton et parlez.'};
+  rec.onerror=e=>{console.warn(e.error)};
+  try{rec.start();listening=true;$('#mic').classList.add('on');$('#mic').textContent='🔴 Je vous écoute…';$('#bubble').innerHTML='<em>Je vous écoute…</em>'}catch(e){}
+}
+function stopListen(){if(rec&&listening)rec.stop()}
+const mic=$('#mic');
+mic.addEventListener('pointerdown',e=>{e.preventDefault();mic.setPointerCapture(e.pointerId);startListen()});
+mic.addEventListener('pointerup',stopListen);mic.addEventListener('pointercancel',stopListen);
+mic.addEventListener('contextmenu',e=>e.preventDefault());
+$('#txtfb').onsubmit=e=>{e.preventDefault();const v=$('#txtIn').value.trim();if(v){$('#txtIn').value='';handleQuestion(v)}};
+
+/* ---------- BASCULE ÉCRANS ---------- */
+$('#launch').onclick=async()=>{
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();
+  const key=$('#apiKey').value.trim();localStorage.setItem('gkey',key);
+  
+  E={
+    name:$('#aiName').value.trim()||'Marcel',
+    role:$('#aiRole').value.trim()||'Conseiller',
+    shop:$('#aiShop').value.trim(),
+    skills:$('#aiSkills').value.trim(),
+    voice:$('#aiVoice').value,
+    tone:$('#aiTone').value,
+    welcome:$('#aiWelcome').value.trim()||'Bonjour et bienvenue !',
+    stock: stockData.trim(),
+    key,
+    voiceMasc:sel<10
+  };
+
+  history=[];
+  $('#atelier').classList.add('hidden');$('#kiosque').classList.remove('hidden');
+  $('#pAvatar').innerHTML='';$('#kAvatar').innerHTML=avatarSVG(cur());
+  $('#kName').textContent=E.name;$('#kRole').textContent=E.role;$('#bubble').textContent=E.welcome;
+  $('#sugg').innerHTML='';(JOBS[$('#aiJob').value]?.q||[]).forEach(t=>{const b=document.createElement('button');b.className='sq';b.textContent=t;b.onclick=()=>{if(!mic.disabled)handleQuestion(t)};$('#sugg').appendChild(b)});
+  if(!SR){$('#txtfb').classList.remove('hidden');mic.classList.add('hidden')}
+  if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
+  mic.disabled=true;await speak(E.welcome);mic.disabled=false;
+};
+$('#exit').onclick=()=>{stopSpeech();stopLips();if(document.fullscreenElement)document.exitFullscreen();
+  $('#kAvatar').innerHTML='';$('#kiosque').classList.add('hidden');$('#atelier').classList.remove('hidden');sync()};
+speechSynthesis.onvoiceschanged=()=>{};
+applyJob();sync();
+</script>
+</body>
+</html>
