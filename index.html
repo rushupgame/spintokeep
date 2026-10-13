@@ -272,6 +272,14 @@
     <link rel="canonical" href="https://www.spintokeep.com/">
     <link rel="alternate" hreflang="fr" href="https://www.spintokeep.com/">
     <link rel="alternate" hreflang="en" href="https://www.spintokeep.com/en">
+    <link rel="alternate" hreflang="zh-CN" href="https://www.spintokeep.com/zh">
+    <link rel="alternate" hreflang="hi" href="https://www.spintokeep.com/hi">
+    <link rel="alternate" hreflang="es" href="https://www.spintokeep.com/es">
+    <link rel="alternate" hreflang="pt-BR" href="https://www.spintokeep.com/pt">
+    <link rel="alternate" hreflang="bn" href="https://www.spintokeep.com/bn">
+    <link rel="alternate" hreflang="ru" href="https://www.spintokeep.com/ru">
+    <link rel="alternate" hreflang="ar" href="https://www.spintokeep.com/ar">
+    <link rel="alternate" hreflang="de" href="https://www.spintokeep.com/de">
     <link rel="alternate" hreflang="x-default" href="https://www.spintokeep.com/">
 
     <!-- Google tag (gtag.js) — suivi des conversions Google Ads.
@@ -1249,6 +1257,27 @@
             .nav-more-menu a:hover { background: none; }
             .nav-links a, .nav-more-btn { white-space: normal; font-size: 0.95rem; }
         }
+    
+    
+        /* Sélecteur de langue : menu déroulant avec drapeaux */
+        .nav-lang-dd { position: relative; display: flex; align-items: center; }
+        .lang-flag { display: block; border-radius: 3px; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0,0,0,.12); }
+        .lang-dd-btn { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 980px; background: #fff; color: var(--text-primary); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: border-color .2s ease, box-shadow .2s ease; }
+        .lang-dd-btn::after { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+        .lang-dd-btn:hover, .nav-lang-dd.open .lang-dd-btn { border-color: var(--accent-color); box-shadow: var(--shadow-sm); }
+        .lang-dd-menu { display: none; position: absolute; top: 100%; right: 0; min-width: 190px; margin: 6px 0 0; padding: 8px; list-style: none; flex-direction: column; gap: 2px; background: #fff; border: 1px solid var(--border-color); border-radius: 14px; box-shadow: var(--shadow-md); z-index: 1100; }
+        .nav-lang-dd:hover .lang-dd-menu, .nav-lang-dd.open .lang-dd-menu { display: flex; }
+        .nav-links .lang-dd-menu a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; color: var(--text-primary); }
+        .nav-links .lang-dd-menu a:hover { background: var(--bg-secondary); }
+        .nav-links .lang-dd-menu a[aria-current="true"] { font-weight: 700; background: var(--bg-secondary); }
+        [dir="rtl"] .lang-dd-menu { right: auto; left: 0; }
+        @media (max-width: 1300px) {
+            .nav-links { max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            .nav-lang-dd { flex-direction: column; align-items: flex-start; }
+            .lang-dd-menu { position: static; width: 100%; margin-top: 8px; box-shadow: none; }
+            .nav-lang-dd:hover .lang-dd-menu { display: none; }
+            .nav-lang-dd.open .lang-dd-menu { display: flex; }
+        }
     </style>
 </head>
 <body>
@@ -1279,7 +1308,18 @@
                     <li><a href="#lexique" onclick="closeMenu()">Lexique</a></li>
                 </ul>
             </li>
-            <li class="nav-lang-item"><a href="https://www.spintokeep.com/en" class="lang-switch" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English"><svg class="flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><clipPath id="gbc"><rect width="60" height="40" rx="4"/></clipPath><g clip-path="url(#gbc)"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#C8102E" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="13"/><path d="M30 0V40M0 20H60" stroke="#C8102E" stroke-width="7"/></g></svg>EN</a></li>
+            <li class="nav-lang-item nav-lang-dd"><svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="fl-fr" viewBox="0 0 60 40"><rect width="20" height="40" fill="#0055A4"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#EF4135"/></symbol>
+<symbol id="fl-en" viewBox="0 0 60 40"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#C8102E" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="13"/><path d="M30 0V40M0 20H60" stroke="#C8102E" stroke-width="7"/></symbol>
+<symbol id="fl-zh" viewBox="0 0 60 40"><rect width="60" height="40" fill="#DE2910"/><polygon points="10.00,4.00 11.35,8.15 15.71,8.15 12.18,10.71 13.53,14.85 10.00,12.29 6.47,14.85 7.82,10.71 4.29,8.15 8.65,8.15" fill="#FFDE00"/><polygon points="20.00,2.00 20.45,3.38 21.90,3.38 20.73,4.24 21.18,5.62 20.00,4.76 18.82,5.62 19.27,4.24 18.10,3.38 19.55,3.38" fill="#FFDE00"/><polygon points="24.00,6.00 24.45,7.38 25.90,7.38 24.73,8.24 25.18,9.62 24.00,8.76 22.82,9.62 23.27,8.24 22.10,7.38 23.55,7.38" fill="#FFDE00"/><polygon points="24.00,12.00 24.45,13.38 25.90,13.38 24.73,14.24 25.18,15.62 24.00,14.76 22.82,15.62 23.27,14.24 22.10,13.38 23.55,13.38" fill="#FFDE00"/><polygon points="20.00,16.00 20.45,17.38 21.90,17.38 20.73,18.24 21.18,19.62 20.00,18.76 18.82,19.62 19.27,18.24 18.10,17.38 19.55,17.38" fill="#FFDE00"/></symbol>
+<symbol id="fl-hi" viewBox="0 0 60 40"><rect width="60" height="13.4" fill="#FF9933"/><rect y="13.3" width="60" height="13.4" fill="#fff"/><rect y="26.6" width="60" height="13.4" fill="#138808"/><circle cx="30" cy="20" r="5" fill="none" stroke="#000080" stroke-width="1.2"/><circle cx="30" cy="20" r="1.2" fill="#000080"/></symbol>
+<symbol id="fl-es" viewBox="0 0 60 40"><rect width="60" height="40" fill="#AA151B"/><rect y="10" width="60" height="20" fill="#F1BF00"/></symbol>
+<symbol id="fl-pt" viewBox="0 0 60 40"><rect width="60" height="40" fill="#009C3B"/><polygon points="30,4 55,20 30,36 5,20" fill="#FFDF00"/><circle cx="30" cy="20" r="9" fill="#002776"/><path d="M21.5 18.5Q30 15 38.5 22" stroke="#fff" stroke-width="1.8" fill="none"/></symbol>
+<symbol id="fl-bn" viewBox="0 0 60 40"><rect width="60" height="40" fill="#006A4E"/><circle cx="27" cy="20" r="11" fill="#F42A41"/></symbol>
+<symbol id="fl-ru" viewBox="0 0 60 40"><rect width="60" height="14" fill="#fff"/><rect y="13.3" width="60" height="13.4" fill="#0039A6"/><rect y="26.6" width="60" height="13.4" fill="#D52B1E"/></symbol>
+<symbol id="fl-ar" viewBox="0 0 60 40"><rect width="60" height="40" fill="#006C35"/><rect x="14" y="11" width="32" height="4.5" rx="2.2" fill="#fff"/><rect x="18" y="19" width="24" height="2.4" rx="1.2" fill="#fff" opacity=".85"/><rect x="13" y="27.5" width="34" height="1.8" rx=".9" fill="#fff"/><rect x="13" y="25.8" width="4" height="5.2" rx="1" fill="#fff"/></symbol>
+<symbol id="fl-de" viewBox="0 0 60 40"><rect width="60" height="13.4" fill="#000"/><rect y="13.3" width="60" height="13.4" fill="#DD0000"/><rect y="26.6" width="60" height="13.4" fill="#FFCE00"/></symbol>
+</defs></svg><button type="button" class="lang-dd-btn" aria-haspopup="true" aria-expanded="false" aria-label="Language / Langue"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-fr"/></svg><span>FR</span></button><ul class="lang-dd-menu"><li><a href="https://www.spintokeep.com/" hreflang="fr" lang="fr" aria-current="true"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-fr"/></svg><span>Français</span></a></li><li><a href="https://www.spintokeep.com/en" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-en"/></svg><span>English</span></a></li><li><a href="https://www.spintokeep.com/zh" hreflang="zh-CN" lang="zh-CN"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-zh"/></svg><span>中文</span></a></li><li><a href="https://www.spintokeep.com/hi" hreflang="hi" lang="hi"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-hi"/></svg><span>हिन्दी</span></a></li><li><a href="https://www.spintokeep.com/es" hreflang="es" lang="es"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-es"/></svg><span>Español</span></a></li><li><a href="https://www.spintokeep.com/pt" hreflang="pt-BR" lang="pt-BR"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-pt"/></svg><span>Português</span></a></li><li><a href="https://www.spintokeep.com/bn" hreflang="bn" lang="bn"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-bn"/></svg><span>বাংলা</span></a></li><li><a href="https://www.spintokeep.com/ru" hreflang="ru" lang="ru"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-ru"/></svg><span>Русский</span></a></li><li><a href="https://www.spintokeep.com/ar" hreflang="ar" lang="ar"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-ar"/></svg><span>العربية</span></a></li><li><a href="https://www.spintokeep.com/de" hreflang="de" lang="de"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-de"/></svg><span>Deutsch</span></a></li></ul></li>
             <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
         <div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button></div>
@@ -6170,5 +6210,19 @@ if(slider) {
     })();
 </script>
 
+<script>
+(function () {
+    document.addEventListener('click', function (e) {
+        document.querySelectorAll('.nav-lang-dd').forEach(function (dd) {
+            var btn = dd.querySelector('.lang-dd-btn');
+            if (btn.contains(e.target)) { dd.classList.toggle('open'); btn.setAttribute('aria-expanded', dd.classList.contains('open')); }
+            else if (!dd.contains(e.target)) { dd.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') document.querySelectorAll('.nav-lang-dd').forEach(function (dd) { dd.classList.remove('open'); });
+    });
+})();
+</script>
 </body>
 </html>
