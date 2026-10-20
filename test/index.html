@@ -371,7 +371,7 @@
     end if;
 
     update auth.users
-      set encrypted_password = crypt(p_new_password, gen_salt('bf')),
+      set encrypted_password = extensions.crypt(p_new_password, extensions.gen_salt('bf')),
           updated_at = now()
       where id = v_user_id;
 
@@ -1414,7 +1414,7 @@
 
     /* ---------- ICÔNES EN FOND (texture : trésors, fête) — désactivables ---------- */
     .cd-fx { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
-    .cd-fx.cd-fx-fixed { position: fixed; }
+    .cd-fx.cd-fx-fixed { position: fixed; z-index: 0; }
     .cd-fx span { position: absolute; line-height: 1; opacity: .5; user-select: none; will-change: transform; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); animation: cd-fx-pulse 8s ease-in-out infinite; }
     @keyframes cd-fx-pulse { 0%, 100% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(.88); } 50% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1.12); } }
     @media (prefers-reduced-motion: reduce) { .cd-fx span { animation: none !important; } }
