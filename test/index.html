@@ -1420,11 +1420,19 @@
     @media (prefers-reduced-motion: reduce) { .cd-fx span { animation: none !important; } }
 
     /* ---------- APERÇU DU PARCOURS : grand écran + slider (étapes 1 / 2 / 3 / 4) ---------- */
-    .preview-grid { display: flex !important; grid-template-columns: none !important; gap: 24px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; position: relative; padding: 14px 0 18px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .preview-grid { display: flex !important; grid-template-columns: none !important; gap: 24px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; position: relative; padding: 14px calc(50% - 118px) 18px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .preview-grid::-webkit-scrollbar { display: none; }
-    .preview-grid > .screen-mockup-wrap { flex: 0 0 100% !important; height: auto !important; overflow: visible !important; scroll-snap-align: center; scroll-snap-stop: always; }
-    .preview-grid > .screen-mockup-wrap .screen-mockup { transform: none !important; margin: 0 auto; }
-    @media (min-width: 1100px) { .preview-grid > .screen-mockup-wrap .screen-mockup { zoom: 1.25; } .panel-preview { max-height: calc(100vh - 170px); } }
+    .preview-grid > .screen-mockup-wrap { flex: 0 0 236px !important; transition: filter .3s ease, opacity .3s ease; height: auto !important; overflow: visible !important; scroll-snap-align: center; scroll-snap-stop: always; }
+    .preview-grid > .screen-mockup-wrap .screen-mockup { transform: none !important; margin: 0 auto; zoom: .84; }
+    @media (max-width: 1099px) { .pv-side { width: 42px; height: 42px; font-size: 24px; } }
+    .preview-grid > .screen-mockup-wrap:not(.cd-active) { filter: grayscale(1) brightness(.92); opacity: .5; cursor: pointer; }
+    .preview-grid > .screen-mockup-wrap:not(.cd-active) .screen-mockup { pointer-events: none; }
+    .pv-stage { position: relative; }
+    .pv-side { position: absolute; top: 50%; transform: translateY(-50%); z-index: 6; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #fff; background: var(--black, #111); color: #fff; font-size: 28px; line-height: 1; font-weight: 700; padding: 0 0 3px 0; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.35); font-family: inherit; transition: transform .15s ease, opacity .2s ease; }
+    .pv-side:hover:not(:disabled) { transform: translateY(-50%) scale(1.1); }
+    .pv-side:disabled { opacity: .3; cursor: default; box-shadow: none; }
+    .pv-prev { left: 2px; } .pv-next { right: 2px; }
+    @media (min-width: 1100px) { .preview-grid { padding-left: calc(50% - 140px * var(--pv-zoom, 1.05)); padding-right: calc(50% - 140px * var(--pv-zoom, 1.05)); } .preview-grid > .screen-mockup-wrap { flex-basis: calc(280px * var(--pv-zoom, 1.05)) !important; } .preview-grid > .screen-mockup-wrap .screen-mockup { zoom: var(--pv-zoom, 1.05); } .panel-preview { max-height: calc(100vh - 136px); } }
     .preview-nav { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 0 0; }
     .preview-nav button { border: 1px solid var(--line, #e5e5ea); background: #fff; color: #333; border-radius: 50px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
     .preview-nav button.active { background: var(--black, #111); color: #fff; border-color: var(--black, #111); }
@@ -1731,7 +1739,7 @@
             </div>
         </details>
 
-        <button id="btn-gen" class="btn-black btn-gen-inline" style="width:100%; margin-top:8px;" onclick="saveAndGenerate()">Générer le QR Code</button>
+        <button id="btn-gen" class="btn-black btn-gen-inline" style="width:100%; margin-top:8px;" onclick="saveAndGenerate()">Sauvegarder et générer le QR Code</button>
 
         <div id="qr-display">
             <div id="qrcode-area">
@@ -1861,7 +1869,7 @@
 </div>
 
 <div class="sticky-cta">
-    <button class="btn-black" onclick="saveAndGenerate()">Générer le QR Code</button>
+    <button class="btn-black" onclick="saveAndGenerate()">Sauvegarder et générer le QR Code</button>
 </div>
 
 <!-- ============ DASHBOARD ============ -->
@@ -4052,7 +4060,7 @@ if(slider) {
             lblQrScanner: "Texte affiche QR (Scannez-moi)", lblFormFields: "Champs & boutons du formulaire",
             lblEndMsg: "Boutons & messages de fin", lblCondPart: "Conditions de participation",
             sumActions: "Action avant de jouer", lblGoogleUrl: "Où le client atterrit avant de jouer (votre fiche Google, site, Insta...)",
-            btnGen: "Générer le QR Code", btnDlPng: "Télécharger PNG", btnDlPdf: "Télécharger PDF",
+            btnGen: "Sauvegarder et générer le QR Code", btnDlPng: "Télécharger PNG", btnDlPdf: "Télécharger PDF",
             prevTitle: "Aperçu du parcours client",
             stp1Lbl: "Étape 1 : Avis", stp2Lbl: "Étape 2 : Formulaire", stp3Lbl: "Étape 3 : Jeu", stp4Lbl: "Étape 4 : Résultat",
             qrScanDefault: "Scannez-moi"
@@ -4073,7 +4081,7 @@ if(slider) {
             lblQrScanner: "QR poster text (Scan me)", lblFormFields: "Form fields & buttons",
             lblEndMsg: "End buttons & messages", lblCondPart: "Terms of participation",
             sumActions: "Action before playing", lblGoogleUrl: "Where the customer lands before playing (Google, website, Insta...)",
-            btnGen: "Generate QR Code", btnDlPng: "Download PNG", btnDlPdf: "Download PDF",
+            btnGen: "Save and generate QR Code", btnDlPng: "Download PNG", btnDlPdf: "Download PDF",
             prevTitle: "Customer journey preview",
             stp1Lbl: "Step 1: Review", stp2Lbl: "Step 2: Form", stp3Lbl: "Step 3: Game", stp4Lbl: "Step 4: Result",
             qrScanDefault: "Scan me"
@@ -6556,16 +6564,30 @@ if(slider) {
         slides().forEach(function (w) { var d = Math.abs(w.offsetLeft + w.offsetWidth / 2 - c); if (d < bd) { bd = d; best = w; } });
         return best;
     }
+    function mark() {
+        var ws = slides(), cur = current(), i = ws.indexOf(cur);
+        ws.forEach(function (w) { w.classList.toggle('cd-active', w === cur); });
+        var pv = document.getElementById('pv-prev'), nx = document.getElementById('pv-next');
+        if (pv) pv.disabled = i <= 0;
+        if (nx) nx.disabled = i < 0 || i >= ws.length - 1;
+        return cur;
+    }
+    // Sur PC : la taille des écrans s'adapte à la hauteur disponible (comme sur mobile).
+    function fit() {
+        var g = grid(), pn = document.querySelector('.panel-preview');
+        if (!g || !pn) return;
+        if (window.innerWidth < 1100) { g.style.removeProperty('--pv-zoom'); return; }
+        var above = g.getBoundingClientRect().top - pn.getBoundingClientRect().top;
+        var stickyTop = parseFloat(getComputedStyle(pn).top) || 74;
+        var avail = window.innerHeight - stickyTop - above - 32 - 72 - 14;
+        var z = Math.max(0.6, Math.min(1.5, avail / 520));
+        g.style.setProperty('--pv-zoom', z.toFixed(3));
+    }
+    function step(dir) { var ws = slides(), t = ws[ws.indexOf(current()) + dir]; if (t) goTo(t, true); }
     function build() {
         var nav = document.getElementById('preview-nav'); if (!nav || !grid()) return;
-        var ws = slides(), cur = current();
+        var ws = slides(), cur = mark();
         nav.innerHTML = '';
-        function arrow(txt, dir) {
-            var b = document.createElement('button'); b.type = 'button'; b.className = 'pv-arrow'; b.textContent = txt;
-            b.onclick = function () { var t = ws[ws.indexOf(cur) + dir]; if (t) goTo(t, true); };
-            return b;
-        }
-        nav.appendChild(arrow('\u2039', -1));
         ws.forEach(function (w) {
             var lab = w.querySelector('.screen-label');
             var b = document.createElement('button'); b.type = 'button';
@@ -6574,20 +6596,38 @@ if(slider) {
             b.onclick = function () { goTo(w, true); };
             nav.appendChild(b);
         });
-        nav.appendChild(arrow('\u203A', 1));
     }
-    var t1 = null, t2 = null;
+    var t1 = null, t2 = null, raf = 0;
     window.addEventListener('load', function () {
         cdApplyFxPreview();
         var g = grid(); if (!g) return;
+        // grandes flèches de part et d'autre de l'écran
+        var stage = document.createElement('div'); stage.className = 'pv-stage';
+        g.parentNode.insertBefore(stage, g); stage.appendChild(g);
+        ['prev', 'next'].forEach(function (k) {
+            var b = document.createElement('button'); b.type = 'button'; b.id = 'pv-' + k; b.className = 'pv-side pv-' + k;
+            b.textContent = k === 'prev' ? '‹' : '›';
+            b.onclick = function () { touched = true; step(k === 'prev' ? -1 : 1); };
+            stage.appendChild(b);
+        });
         var w3 = document.getElementById('pre-wrap3');
         var touched = false;
         ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach(function (ev) { g.addEventListener(ev, function () { touched = true; }, { passive: true }); });
         var nv = document.getElementById('preview-nav'); if (nv) nv.addEventListener('click', function () { touched = true; });
+        // clic sur un écran voisin grisé : on le fait glisser au centre
+        g.addEventListener('click', function (e) {
+            var w = e.target.closest ? e.target.closest('.screen-mockup-wrap') : null;
+            if (w && !w.classList.contains('cd-active')) { touched = true; goTo(w, true); }
+        });
         function home() { if (!touched) goTo(w3, false); }
-        build(); home();
-        [400, 1200, 2500].forEach(function (ms) { setTimeout(function () { home(); build(); }, ms); });
-        g.addEventListener('scroll', function () { clearTimeout(t1); t1 = setTimeout(build, 90); }, { passive: true });
+        fit(); build(); home(); mark();
+        [400, 1200, 2500].forEach(function (ms) { setTimeout(function () { fit(); home(); build(); }, ms); });
+        var t3 = null;
+        window.addEventListener('resize', function () { clearTimeout(t3); t3 = setTimeout(function () { fit(); var c = current(); if (c) goTo(c, false); build(); }, 120); });
+        g.addEventListener('scroll', function () {
+            if (!raf) raf = requestAnimationFrame(function () { raf = 0; mark(); });
+            clearTimeout(t1); t1 = setTimeout(build, 90);
+        }, { passive: true });
         new MutationObserver(function () { clearTimeout(t2); t2 = setTimeout(function () { home(); build(); }, 150); })
             .observe(g, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
     });
