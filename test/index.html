@@ -1330,12 +1330,50 @@
     /* ---------- INDICATIONS SOUS LES JEUX (pastille translucide) ---------- */
     .scratch-hint, .mystery-hint, .cups-hint { width: fit-content; max-width: 100%; margin: 10px auto 0; padding: 5px 14px; border-radius: 50px; background: rgba(128,128,128,.16); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-sizing: border-box; }
 
-    /* ---------- BANDIT MANCHOT ---------- */
-    .slot-cabinet { border: 4px solid var(--yellow-border, #ffc21a); border-radius: 28px; background: linear-gradient(160deg, #ff86ab, #ff3d77 55%, #d92a66);
-        box-shadow: 0 0 0 3px rgba(255,255,255,.55), 0 8px 0 rgba(110,0,40,.28), 0 18px 30px rgba(0,0,0,.3), inset 0 3px 0 rgba(255,255,255,.5), inset 0 -8px 14px rgba(0,0,0,.16); }
-    .slot-window { gap: 8px; background: linear-gradient(180deg, #fff6e0, #ffe6a8); border-radius: 18px; box-shadow: inset 0 5px 10px rgba(0,0,0,.28), 0 0 0 3px rgba(255,255,255,.8), 0 0 0 5px var(--yellow-border, #ffc21a); }
-    .slot-reel-track { border-radius: 12px; box-shadow: inset 0 0 0 2px rgba(255,255,255,.65), inset 0 7px 10px rgba(0,0,0,.18), 0 2px 0 rgba(0,0,0,.12); }
-    .slot-lights span { width: 7px; height: 7px; background: radial-gradient(circle at 32% 28%, #fff, #ffe27a 50%, #ffb300); box-shadow: 0 0 0 1px rgba(0,0,0,.2), 0 0 8px rgba(255,214,90,.9); }
+    /* ---------- BANDIT MANCHOT « jackpot doré » : barillet en or, couronne, levier, pièces ---------- */
+    @keyframes cd-coin { 0%, 100% { transform: translateY(var(--cy, 0px)) rotate(var(--cr, 0deg)); } 50% { transform: translateY(calc(var(--cy, 0px) - 2px)) rotate(var(--cr, 0deg)); } }
+    .slot-cabinet { position: relative; width: calc(100% - 52px); margin: 80px auto 30px; padding: 14px 14px 12px; border: none; border-radius: 26px / 34px;
+        background:
+            radial-gradient(circle 4px at 5.2% 24%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 5.2% 50%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 5.2% 76%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 94.8% 24%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 94.8% 50%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 94.8% 76%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            linear-gradient(90deg, rgba(90,50,0,.4) 0, rgba(255,255,255,.2) 3.5%, transparent 9%, transparent 91%, rgba(255,255,255,.2) 96.5%, rgba(90,50,0,.4) 100%),
+            linear-gradient(180deg, #ffeaa0 0%, #f7bf24 16%, #ffd94f 36%, #e8a00c 60%, #c27a05 84%, #f0b82e 100%);
+        box-shadow: 0 0 0 2px rgba(255,255,255,.35), 0 8px 0 #9a6200, 0 16px 22px rgba(0,0,0,.35), inset 0 2px 0 rgba(255,255,255,.75), inset 0 -4px 8px rgba(120,60,0,.45);
+        filter: drop-shadow(0 0 16px rgba(255,205,70,.55)); }
+    /* Couronne sertie de bijoux */
+    .slot-cabinet::before { content: ""; position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); width: min(54%, 130px); aspect-ratio: 120 / 70; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 70%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23fff0a8%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23f6b91d%22/%3E%3Cstop offset=%221%22 stop-color=%22%23b87304%22/%3E%3C/linearGradient%3E%3CradialGradient id=%22o%22 cx=%22.35%22 cy=%22.3%22 r=%22.8%22%3E%3Cstop offset=%220%22 stop-color=%22%23fff6c8%22/%3E%3Cstop offset=%22.5%22 stop-color=%22%23ffd23f%22/%3E%3Cstop offset=%221%22 stop-color=%22%23c98505%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d=%22M12 50 L8 16 L33 34 L47 8 L60 30 L73 8 L87 34 L112 16 L108 50 Z%22 fill=%22url(%23g)%22 stroke=%22%239a5f00%22 stroke-width=%221.6%22 stroke-linejoin=%22round%22/%3E%3Crect x=%2210%22 y=%2244%22 width=%22100%22 height=%2222%22 rx=%226%22 fill=%22url(%23g)%22 stroke=%22%239a5f00%22 stroke-width=%221.6%22/%3E%3Ccircle cx=%228%22 cy=%2214%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%2247%22 cy=%226%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%2273%22 cy=%226%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%22112%22 cy=%2214%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%2260%22 cy=%2255%22 r=%226%22 fill=%22%23e4262b%22 stroke=%22%23fff0a8%22 stroke-width=%221.6%22/%3E%3Ccircle cx=%2230%22 cy=%2255%22 r=%224.6%22 fill=%22%2317a34a%22 stroke=%22%23fff0a8%22 stroke-width=%221.4%22/%3E%3Ccircle cx=%2290%22 cy=%2255%22 r=%224.6%22 fill=%22%2317a34a%22 stroke=%22%23fff0a8%22 stroke-width=%221.4%22/%3E%3C/svg%3E") center / contain no-repeat; pointer-events: none; }
+    /* Levier à boule dorée */
+    .slot-cabinet::after { content: ""; position: absolute; left: calc(100% - 3%); bottom: 26%; width: 14%; aspect-ratio: 40 / 90; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 90%22%3E%3Cdefs%3E%3ClinearGradient id=%22r%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%220%22%3E%3Cstop offset=%220%22 stop-color=%22%23c98505%22/%3E%3Cstop offset=%22.5%22 stop-color=%22%23ffe27a%22/%3E%3Cstop offset=%221%22 stop-color=%22%23b87304%22/%3E%3C/linearGradient%3E%3CradialGradient id=%22b%22 cx=%22.35%22 cy=%22.3%22 r=%22.8%22%3E%3Cstop offset=%220%22 stop-color=%22%23fff6c8%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23ffc928%22/%3E%3Cstop offset=%221%22 stop-color=%22%23b87304%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Cline x1=%229%22 y1=%2280%22 x2=%2228%22 y2=%2224%22 stroke=%22%238a5400%22 stroke-width=%229%22 stroke-linecap=%22round%22/%3E%3Cline x1=%229%22 y1=%2280%22 x2=%2228%22 y2=%2224%22 stroke=%22url(%23r)%22 stroke-width=%226%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%229%22 cy=%2280%22 r=%228%22 fill=%22url(%23b)%22 stroke=%22%238a5400%22 stroke-width=%221.5%22/%3E%3Ccircle cx=%2229%22 cy=%2216%22 r=%2213%22 fill=%22url(%23b)%22 stroke=%22%238a5400%22 stroke-width=%221.5%22/%3E%3Cellipse cx=%2225%22 cy=%2211%22 rx=%224.5%22 ry=%223%22 fill=%22%23fff%22 opacity=%22.55%22/%3E%3C/svg%3E") center / contain no-repeat; pointer-events: none; }
+    /* Fenêtre des rouleaux : cadre or, fond bronze */
+    .slot-window { gap: 5px; padding: 7px; border-radius: 14px; background: linear-gradient(180deg, #7a4b00, #3f2500);
+        box-shadow: inset 0 4px 10px rgba(0,0,0,.7), 0 0 0 3px #ffe58a, 0 0 0 5px #b97a05, 0 3px 0 5px rgba(0,0,0,.22); }
+    /* Rouleaux blancs brillants (légère teinte de la couleur choisie) */
+    .slot-reel-track { border-radius: 6px; background: linear-gradient(180deg, color-mix(in srgb, var(--slot-c1, #cdc7fc) 16%, #ffffff), #ffffff 22%, #f1f2f6 60%, #c9ceda);
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,.9), inset 0 0 10px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.3); }
+    .slot-reel-track { container-type: inline-size; }
+    .slot-reel-track .slot-reel-symbol { font-size: min(28px, 66cqw); line-height: 1; }
+    .slot-reel-track::before { background: linear-gradient(180deg, rgba(0,0,0,.26), transparent); }
+    .slot-reel-track::after { background: linear-gradient(0deg, rgba(0,0,0,.26), transparent); }
+    /* Pièces d'or éparpillées au pied de la machine (remplacent les petites lumières) */
+    .slot-lights { position: relative; height: 22px; margin-top: 10px; margin-bottom: -18px; padding: 0 2px; align-items: flex-end; }
+    .slot-lights::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+        background:
+            radial-gradient(circle 4px at 12% 96%, #ffd84a 0 2.6px, #b97a05 3.4px, transparent 4.2px),
+            radial-gradient(circle 3px at 31% 108%, #ffd84a 0 2px, #b97a05 2.7px, transparent 3.4px),
+            radial-gradient(circle 4px at 67% 104%, #ffd84a 0 2.6px, #b97a05 3.4px, transparent 4.2px),
+            radial-gradient(circle 3px at 88% 100%, #ffd84a 0 2px, #b97a05 2.7px, transparent 3.4px); }
+    .slot-lights span { width: 22px; height: 13px; border-radius: 50%; opacity: 1; background: radial-gradient(ellipse at 38% 30%, #fff6c2 0, #ffd84a 42%, #d89200 100%);
+        box-shadow: inset 0 0 0 2px rgba(255,236,150,.9), inset 0 -2px 2px rgba(130,70,0,.55), 0 3px 3px rgba(0,0,0,.35); animation: cd-coin 2.6s ease-in-out infinite; }
+    .slot-lights span:nth-child(1) { --cr: -16deg; --cy: 5px; width: 24px; height: 14px; animation-delay: -.3s; }
+    .slot-lights span:nth-child(2) { --cr: 9deg; --cy: -1px; width: 18px; height: 11px; animation-delay: -1.1s; }
+    .slot-lights span:nth-child(3) { --cr: -6deg; --cy: 7px; width: 26px; height: 15px; animation-delay: -.7s; }
+    .slot-lights span:nth-child(4) { --cr: 14deg; --cy: 1px; width: 19px; height: 11px; animation-delay: -1.6s; }
+    .slot-lights span:nth-child(5) { --cr: -10deg; --cy: 6px; width: 23px; height: 14px; animation-delay: -.1s; }
+    @media (prefers-reduced-motion: reduce) { .slot-lights span { animation: none; transform: translateY(var(--cy, 0px)) rotate(var(--cr, 0deg)); } }
 
     /* ---------- TICKET À GRATTER ---------- */
     .scratch-card { border: none; border-radius: 22px; background: linear-gradient(160deg, #ffffff, #fff1f6);
@@ -1380,6 +1418,28 @@
     .cd-fx span { position: absolute; line-height: 1; opacity: .5; user-select: none; will-change: transform; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); animation: cd-fx-pulse 8s ease-in-out infinite; }
     @keyframes cd-fx-pulse { 0%, 100% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(.88); } 50% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1.12); } }
     @media (prefers-reduced-motion: reduce) { .cd-fx span { animation: none !important; } }
+
+    /* ---------- APERÇU DU PARCOURS : grand écran + slider (étapes 1 / 2 / 3 / 4) ---------- */
+    .preview-grid { display: flex !important; grid-template-columns: none !important; gap: 24px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; position: relative; padding: 14px 0 18px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .preview-grid::-webkit-scrollbar { display: none; }
+    .preview-grid > .screen-mockup-wrap { flex: 0 0 100% !important; height: auto !important; overflow: visible !important; scroll-snap-align: center; scroll-snap-stop: always; }
+    .preview-grid > .screen-mockup-wrap .screen-mockup { transform: none !important; margin: 0 auto; }
+    @media (min-width: 1100px) { .preview-grid > .screen-mockup-wrap .screen-mockup { zoom: 1.25; } .panel-preview { max-height: calc(100vh - 170px); } }
+    .preview-nav { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 0 0; }
+    .preview-nav button { border: 1px solid var(--line, #e5e5ea); background: #fff; color: #333; border-radius: 50px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .preview-nav button.active { background: var(--black, #111); color: #fff; border-color: var(--black, #111); }
+    .preview-nav .pv-arrow { width: 34px; height: 34px; padding: 0; font-size: 18px; line-height: 1; }
+
+    /* ---------- BOUTON « GÉNÉRER LE QR CODE » : barre fixe sur toute la largeur, y compris sur PC ---------- */
+    .sticky-cta { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 400; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-top: 1px solid var(--line, #e5e5ea); padding: 10px 24px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    .sticky-cta button { width: 100%; padding: 15px; font-size: 15px; }
+    .panel-config .btn-gen-inline { display: none; }
+    @media (min-width: 1100px) { body { padding-bottom: 78px; } }
+
+    /* ---------- QR code affiché : emoji en fond de la carte ---------- */
+    #qrcode-area { position: relative; isolation: isolate; overflow: hidden; }
+    #qrcode { background: #fff; }
+    .cd-fx.cd-fx-static span { animation: none !important; opacity: .35; }
 
     @media (prefers-reduced-motion: reduce) { .wheel-shell::after { animation: none; } }
     </style>
@@ -1699,6 +1759,7 @@
     <div class="panel panel-preview">
         <h2 class="title" id="prev-title">Aperçu du parcours client</h2>
         <p class="subtitle">Ce que verra la personne qui scanne le QR code, en direct.</p>
+        <div class="preview-nav" id="preview-nav"></div>
         <div class="preview-grid">
             <div class="screen-mockup-wrap" id="pre-wrap1"><div class="screen-mockup" id="pre-s1">
                 <span class="screen-label" id="stp1-lbl">Étape 1 : Avis</span>
@@ -3523,7 +3584,7 @@ if(slider) {
     function closeDashboard() {
         document.getElementById('dashboard-view').style.display = 'none';
         document.getElementById('main-content').style.display = 'flex';
-        if (window.innerWidth <= 1099) document.querySelector('.sticky-cta').style.display = 'block';
+        document.querySelector('.sticky-cta').style.display = 'block';
     }
 
     let dashWinLossChart = null;
@@ -4143,6 +4204,17 @@ if(slider) {
         paques: { label: 'Pâques', emoji: '🐰', css: 'none', size: 'auto' },
         ete: { label: 'Été', emoji: '☀️', css: 'none', size: 'auto' },
         hiver: { label: 'Hiver', emoji: '❄️', css: 'none', size: 'auto' },
+        sec_fastfood: { label: 'Restauration rapide', emoji: '🍔', css: 'none', size: 'auto' },
+        sec_restaurant: { label: 'Restaurant', emoji: '🍽️', css: 'none', size: 'auto' },
+        sec_hotel: { label: 'Hôtellerie', emoji: '🏨', css: 'none', size: 'auto' },
+        sec_coiffure: { label: 'Coiffure & Barbier', emoji: '✂️', css: 'none', size: 'auto' },
+        sec_beaute: { label: 'Beauté / Spa', emoji: '💆', css: 'none', size: 'auto' },
+        sec_garage: { label: 'Garage / Auto', emoji: '🔧', css: 'none', size: 'auto' },
+        sec_immobilier: { label: 'Immobilier', emoji: '🏠', css: 'none', size: 'auto' },
+        sec_fitness: { label: 'Sport / Fitness', emoji: '🏋️', css: 'none', size: 'auto' },
+        sec_boulangerie: { label: 'Boulangerie-Pâtisserie', emoji: '🥐', css: 'none', size: 'auto' },
+        sec_medical: { label: 'Médical / Santé', emoji: '🩺', css: 'none', size: 'auto' },
+        sec_grandedistrib: { label: 'Grande distribution', emoji: '🛒', css: 'none', size: 'auto' },
         points: { label: 'Points', css: 'radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.6px)', size: '14px 14px' },
         diagonales: { label: 'Diagonales', css: 'repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 2px, transparent 2px 11px)', size: 'auto' },
         grille: { label: 'Grille', css: 'repeating-linear-gradient(0deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px), repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px)', size: 'auto' },
@@ -4573,15 +4645,26 @@ if(slider) {
         halloween: ['🎃', '👻', '🦇', '🕷️', '💀', '🍬', '🕸️', '🧙', '🌙', '🎃'],
         paques: ['🐰', '🥚', '🐣', '🐇', '🌷', '🐥', '🌸', '🍫', '🥕', '🐣'],
         ete: ['☀️', '🏖️', '🍉', '🌴', '🕶️', '🍦', '🐚', '🌊', '🍹', '⛱️'],
-        hiver: ['❄️', '☃️', '🧣', '🧤', '🏔️', '⛷️', '☕', '🧊', '🌨️', '🧦']
+        hiver: ['❄️', '☃️', '🧣', '🧤', '🏔️', '⛷️', '☕', '🧊', '🌨️', '🧦'],
+        sec_fastfood: ['🍔', '🍟', '🌭', '🥤', '🍕', '🌮', '🍗', '🍦', '🥪', '🍩'],
+        sec_restaurant: ['🍽️', '🍷', '🥂', '🍝', '🥩', '🍰', '🧑‍🍳', '🥗', '🍴', '🍾'],
+        sec_hotel: ['🏨', '🛎️', '🛏️', '🔑', '🧳', '🌅', '🏊', '🍳', '⭐', '🛋️'],
+        sec_coiffure: ['✂️', '💈', '💇', '💇‍♂️', '🧴', '💅', '🪞', '✨', '💄', '🧔'],
+        sec_beaute: ['💆', '🧖', '🕯️', '🌸', '🧴', '🌿', '💅', '🛁', '🧘', '💄'],
+        sec_garage: ['🔧', '🚗', '🛞', '⚙️', '🔩', '🛠️', '🏁', '⛽', '🔋', '🚘'],
+        sec_immobilier: ['🏠', '🏡', '🔑', '🏢', '🛋️', '🪴', '📋', '🏘️', '🚪', '🛏️'],
+        sec_fitness: ['🏋️', '💪', '🏃', '🥇', '🧘', '🚴', '🥤', '🍎', '⏱️', '🏆'],
+        sec_boulangerie: ['🥐', '🥖', '🍞', '🧁', '🥧', '🍪', '🎂', '🥯', '🍩', '🌾'],
+        sec_medical: ['🩺', '💊', '🏥', '🦷', '💉', '❤️', '🩹', '🧬', '🌡️', '🫀'],
+        sec_grandedistrib: ['🛒', '🛍️', '🥕', '🍎', '🥛', '🧺', '🏷️', '🍞', '🧃', '🥫']
     };
     const CD_FX_POS = [[12, 10], [82, 16], [48, 30], [16, 48], [86, 52], [50, 68], [14, 86], [80, 88], [48, 8], [48, 94]];
     const CD_FX_SIZES_PREVIEW = [62, 84, 52, 72, 92, 56, 78, 68, 48, 58];
     const CD_FX_SIZES_CLIENT = [110, 150, 100, 170, 130, 120, 160, 140, 90, 110];
-    function cdBuildFx(container, fixed, icons, key) {
+    function cdBuildFx(container, fixed, icons, key, staticScale) {
         if (!container || !icons) return;
         const layer = document.createElement('div');
-        layer.className = 'cd-fx' + (fixed ? ' cd-fx-fixed' : '');
+        layer.className = 'cd-fx' + (fixed ? ' cd-fx-fixed' : '') + (staticScale ? ' cd-fx-static' : '');
         layer.setAttribute('aria-hidden', 'true');
         layer.dataset.set = key || '';
         const sizes = fixed ? CD_FX_SIZES_CLIENT : CD_FX_SIZES_PREVIEW;
@@ -4591,9 +4674,9 @@ if(slider) {
             el.textContent = icons[i % icons.length];
             el.style.left = CD_FX_POS[i][0] + '%';
             el.style.top = CD_FX_POS[i][1] + '%';
-            el.style.fontSize = sizes[i] + 'px';
+            el.style.fontSize = Math.round(sizes[i] * (staticScale || 1)) + 'px';
             el.style.setProperty('--r', ((i * 17) % 40 - 20) + 'deg');
-            el.style.animationDuration = (6 + (i * 3) % 5) + 's';
+            el.style.animationDuration = ((i === 1 || i === 6) ? 4.2 : 6 + (i * 3) % 5) + 's';
             el.style.animationDelay = '-' + ((i * 5) % 8) + 's';
             layer.appendChild(el);
         }
@@ -4606,6 +4689,30 @@ if(slider) {
             if (layer && (!icons || layer.dataset.set !== selectedTexture)) layer.remove();
             if (icons && !m.querySelector(':scope > .cd-fx')) cdBuildFx(m, false, icons, selectedTexture);
         });
+        // Carte du QR code affichée : mêmes emoji en fond (fixes, pour que le PNG / PDF téléchargé soit net).
+        const qa = document.getElementById('qrcode-area');
+        if (qa) {
+            const ql = qa.querySelector(':scope > .cd-fx');
+            if (ql && (!icons || ql.dataset.set !== selectedTexture)) ql.remove();
+            if (icons && !qa.querySelector(':scope > .cd-fx')) cdBuildFx(qa, false, icons, selectedTexture, 0.7);
+        }
+    }
+    // Affiches (A4 / A5 / A6 / paysage) : emoji en fond, tailles proportionnelles au format.
+    function cdBuildPosterFx(el, f, icons) {
+        if (!icons) return;
+        const w = f.wpx, h = Math.round((w / f.wmm) * f.hmm), base = Math.min(w, h);
+        const layer = document.createElement('div');
+        layer.className = 'cd-fx cd-fx-static';
+        for (let i = 0; i < CD_FX_POS.length; i++) {
+            const sp = document.createElement('span');
+            sp.textContent = icons[i % icons.length];
+            sp.style.left = CD_FX_POS[i][0] + '%';
+            sp.style.top = CD_FX_POS[i][1] + '%';
+            sp.style.fontSize = Math.round(base * CD_FX_SIZES_CLIENT[i] / 390) + 'px';
+            sp.style.setProperty('--r', ((i * 17) % 40 - 20) + 'deg');
+            layer.appendChild(sp);
+        }
+        el.appendChild(layer);
     }
     function splitLotText(text) {
         if (text.length > 10 && text.includes(' ')) {
@@ -5399,6 +5506,7 @@ if(slider) {
             await loadScriptOnce(LIB_URLS.html2canvas);
             for (const f of formats) {
                 const el = buildPosterElement(f, bg, textColor, buttonColor, buttonTextColor, logoUrl, emoji, title, subtitle, qrDataUrl, scanCaption);
+                cdBuildPosterFx(el, f, CD_FX_SETS[live.cust_bg_texture]);
                 document.body.appendChild(el);
                 await new Promise(r => setTimeout(r, 60));
                 fitPosterTopBlock(el);
@@ -6111,6 +6219,7 @@ if(slider) {
 
         document.body.innerHTML = `
         <style>
+            html { background-color: ${clientBg.fallbackColor}; min-height: 100%; }
             body { margin: 0; padding: 0; padding-top: env(safe-area-inset-top); box-sizing: border-box; min-height: 100vh; min-height: 100dvh; color-scheme: light; background-color: ${clientBg.image === 'none' ? clientBg.fallbackColor : 'transparent'}; background-image: ${clientBg.image}; background-size: ${clientBg.size}; background-position: center; background-attachment: scroll; color: ${txCol}; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-family: 'Segoe UI', sans-serif; position: relative; overflow-x: hidden; direction: ${lang === 'ar' ? 'rtl' : 'ltr'}; }
             .client-card { position: relative; z-index: 1; background: transparent; padding: 56px 20px 40px 20px; width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
             .btn-black-c { background: ${btnCol}; color: ${btnTxtCol}; border: none; padding: 18px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px; font-size: 16px; margin: 15px auto 0 auto; position: relative; z-index: 2; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; }
@@ -6409,14 +6518,12 @@ if(slider) {
         if (!section || !cta || !('IntersectionObserver' in window)) return;
         const io = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                if (window.innerWidth > 1099) { cta.style.display = 'none'; return; }
                 if (document.getElementById('dashboard-view').style.display === 'block') return;
                 cta.style.display = entry.isIntersecting ? 'block' : 'none';
             });
         }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
         io.observe(section);
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 1099) { cta.style.display = 'none'; }
         });
     })();
 </script>
@@ -6435,6 +6542,56 @@ if(slider) {
     });
 })();
 </script>
-<script>window.addEventListener('load', function () { cdApplyFxPreview(); });</script>
+<script>
+(function () {
+    function grid() { return document.querySelector('.preview-grid'); }
+    function slides() { return Array.prototype.slice.call(document.querySelectorAll('.preview-grid > .screen-mockup-wrap')).filter(function (w) { return w.style.display !== 'none'; }); }
+    function goTo(w, smooth) {
+        var g = grid(); if (!g || !w) return;
+        g.scrollTo({ left: w.offsetLeft - (g.clientWidth - w.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
+    }
+    function current() {
+        var g = grid(), best = null, bd = 1e9; if (!g) return null;
+        var c = g.scrollLeft + g.clientWidth / 2;
+        slides().forEach(function (w) { var d = Math.abs(w.offsetLeft + w.offsetWidth / 2 - c); if (d < bd) { bd = d; best = w; } });
+        return best;
+    }
+    function build() {
+        var nav = document.getElementById('preview-nav'); if (!nav || !grid()) return;
+        var ws = slides(), cur = current();
+        nav.innerHTML = '';
+        function arrow(txt, dir) {
+            var b = document.createElement('button'); b.type = 'button'; b.className = 'pv-arrow'; b.textContent = txt;
+            b.onclick = function () { var t = ws[ws.indexOf(cur) + dir]; if (t) goTo(t, true); };
+            return b;
+        }
+        nav.appendChild(arrow('\u2039', -1));
+        ws.forEach(function (w) {
+            var lab = w.querySelector('.screen-label');
+            var b = document.createElement('button'); b.type = 'button';
+            b.textContent = lab ? lab.textContent : '';
+            if (w === cur) b.className = 'active';
+            b.onclick = function () { goTo(w, true); };
+            nav.appendChild(b);
+        });
+        nav.appendChild(arrow('\u203A', 1));
+    }
+    var t1 = null, t2 = null;
+    window.addEventListener('load', function () {
+        cdApplyFxPreview();
+        var g = grid(); if (!g) return;
+        var w3 = document.getElementById('pre-wrap3');
+        var touched = false;
+        ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach(function (ev) { g.addEventListener(ev, function () { touched = true; }, { passive: true }); });
+        var nv = document.getElementById('preview-nav'); if (nv) nv.addEventListener('click', function () { touched = true; });
+        function home() { if (!touched) goTo(w3, false); }
+        build(); home();
+        [400, 1200, 2500].forEach(function (ms) { setTimeout(function () { home(); build(); }, ms); });
+        g.addEventListener('scroll', function () { clearTimeout(t1); t1 = setTimeout(build, 90); }, { passive: true });
+        new MutationObserver(function () { clearTimeout(t2); t2 = setTimeout(function () { home(); build(); }, 150); })
+            .observe(g, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
+    });
+})();
+</script>
 </body>
 </html>
