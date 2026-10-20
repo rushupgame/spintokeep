@@ -1448,6 +1448,13 @@
     #qrcode-area { position: relative; isolation: isolate; overflow: hidden; }
     #qrcode { background: #fff; }
     #dashboard-view { scroll-margin-top: 84px; }
+
+    /* ---------- FENÊTRES (aperçu des affiches, etc.) : au-dessus du header, croix de fermeture bien visible ---------- */
+    .modal-overlay { z-index: 2000; }
+    #toast-container { z-index: 2100; }
+    .modal-close { position: sticky; top: 0; right: auto; float: right; z-index: 5; width: 42px; height: 42px; margin: -12px -12px 8px 10px; padding: 0 0 3px 0; display: flex; align-items: center; justify-content: center;
+        border: 3px solid #fff; border-radius: 50%; background: #111; color: #fff; font-size: 24px; line-height: 1; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.35); cursor: pointer; font-family: inherit; transition: transform .15s ease; }
+    .modal-close:hover { transform: scale(1.1); }
     .cd-fx.cd-fx-static span { animation: none !important; opacity: .35; }
 
     @media (prefers-reduced-motion: reduce) { .wheel-shell::after { animation: none; } }
