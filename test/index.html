@@ -1447,6 +1447,7 @@
     /* ---------- QR code affiché : emoji en fond de la carte ---------- */
     #qrcode-area { position: relative; isolation: isolate; overflow: hidden; }
     #qrcode { background: #fff; }
+    #dashboard-view { scroll-margin-top: 84px; }
     .cd-fx.cd-fx-static span { animation: none !important; opacity: .35; }
 
     @media (prefers-reduced-motion: reduce) { .wheel-shell::after { animation: none; } }
@@ -3586,7 +3587,7 @@ if(slider) {
         document.getElementById('main-content').style.display = 'none';
         document.querySelector('.sticky-cta').style.display = 'none';
         document.getElementById('dashboard-view').style.display = 'block';
-        document.getElementById('configurateur').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('dashboard-view').scrollIntoView({ behavior: 'instant', block: 'start' });
         await loadDashboard();
     }
     function closeDashboard() {
@@ -3595,6 +3596,7 @@ if(slider) {
         document.querySelector('.sticky-cta').style.display = 'block';
     }
 
+    let dashLoadToken = 0;
     let dashWinLossChart = null;
     let dashTopLotsChart = null;
     let dashParticipantsCache = {};
@@ -3604,8 +3606,9 @@ if(slider) {
     let dashEvolutionChart = null;
 
     async function loadDashboard(isRetry) {
+        const dashToken = ++dashLoadToken;
         await ensureSupabase();
-        await loadScriptOnce(LIB_URLS.chartjs);
+        try { await loadScriptOnce(LIB_URLS.chartjs); } catch (chartErr) { console.error('Chart.js indisponible :', chartErr); }
         document.getElementById('dash-status-premium').innerText = isPremium() ? 'Premium ⭐' : 'Free';
         document.getElementById('dash-upsell').style.display = isPremium() ? 'none' : 'flex';
 
@@ -3628,6 +3631,7 @@ if(slider) {
         const knownIds = new Set(configs.map(c => c.id));
         justCreatedRoulettes.forEach(rc => { if (!knownIds.has(rc.id)) { configs = [rc, ...configs]; knownIds.add(rc.id); } });
 
+        if (dashToken !== dashLoadToken) return;
         const list = document.getElementById('dash-list');
         list.innerHTML = '';
 
@@ -3643,18 +3647,28 @@ if(slider) {
             return;
         }
 
+        // Affichage immédiat de l'historique (noms des roulettes) pendant que les statistiques se calculent.
+        configs.forEach(cfg => {
+            const nm = (cfg.data && (cfg.data.roulette_name || cfg.data.t1)) || 'Roulette sans nom';
+            const quick = document.createElement('div');
+            quick.className = 'dash-item';
+            quick.innerHTML = `<div class="dash-item-top"><div><div class="dash-item-name">${nm.replace(/</g, '&lt;')}</div><span class="dash-item-id">${cfg.id}</span></div></div><div class="dash-item-mini-stats"><span>Chargement des statistiques…</span></div>`;
+            list.appendChild(quick);
+        });
         document.getElementById('dash-count-configs').innerText = configs.length;
         const configIds = configs.map(c => c.id);
         dashConfigIdsCache = configIds;
+        const scanCounts = {};
+        let participants = [];
+        try {
 
         // Scans (comptage par roulette + total)
-        const scanCounts = {};
         let totalScans = 0;
-        for (const cfg of configs) {
+        await Promise.all(configs.map(async cfg => {
             const { count } = await sb.from('roulette_scans').select('*', { count: 'exact', head: true }).eq('config_id', cfg.id);
             scanCounts[cfg.id] = count || 0;
-            totalScans += count || 0;
-        }
+        }));
+        configs.forEach(cfg => { totalScans += scanCounts[cfg.id] || 0; });
 
         // Clics "Laissez un avis" (= visiteurs envoyés vers la page d'avis)
         const { count: avisClicksCount } = await sb.from('roulette_avis_clicks').select('*', { count: 'exact', head: true }).in('config_id', configIds);
@@ -3665,7 +3679,7 @@ if(slider) {
             .select('id, config_id, nom, email, telephone, lot_gagne, is_win, lot_recupere, "OPTIN", extra_fields, created_at')
             .in('config_id', configIds)
             .order('created_at', { ascending: false });
-        const participants = allParticipants || [];
+        participants = allParticipants || [];
         dashParticipantsCache = {};
         configs.forEach(cfg => { dashParticipantsCache[cfg.id] = participants.filter(p => p.config_id === cfg.id); dashConfigNamesCache[cfg.id] = (cfg.data && (cfg.data.roulette_name || cfg.data.t1)) || cfg.id; dashConfigExtraFieldsCache[cfg.id] = (cfg.data && cfg.data.ef) || []; });
 
@@ -3702,6 +3716,13 @@ if(slider) {
             startInput.value = past.toISOString().slice(0, 10);
         }
         loadDashboardEvolution();
+
+        } catch (statsErr) {
+            // Une erreur de statistiques ne doit jamais empêcher d'afficher l'historique des roulettes.
+            console.error('Erreur chargement statistiques dashboard :', statsErr);
+        }
+        if (dashToken !== dashLoadToken) return;
+        list.innerHTML = '';
 
         // Liste des roulettes, avec mini-stats + tableau participants dépliable
         configs.forEach(cfg => {
@@ -6612,7 +6633,7 @@ if(slider) {
         });
         var w3 = document.getElementById('pre-wrap3');
         var touched = false;
-        ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach(function (ev) { g.addEventListener(ev, function () { touched = true; }, { passive: true }); });
+        ['pointerdown', 'touchstart'].forEach(function (ev) { g.addEventListener(ev, function () { touched = true; }, { passive: true }); });
         var nv = document.getElementById('preview-nav'); if (nv) nv.addEventListener('click', function () { touched = true; });
         // clic sur un écran voisin grisé : on le fait glisser au centre
         g.addEventListener('click', function (e) {
@@ -6628,6 +6649,13 @@ if(slider) {
             if (!raf) raf = requestAnimationFrame(function () { raf = 0; mark(); });
             clearTimeout(t1); t1 = setTimeout(build, 90);
         }, { passive: true });
+        // Retour sur le configurateur (ex. depuis le dashboard) : on revient toujours sur l'étape 3.
+        var lastW = g.clientWidth;
+        if (window.ResizeObserver) new ResizeObserver(function () {
+            var w = g.clientWidth;
+            if (w > 0 && lastW === 0) { touched = false; fit(); home(); build(); setTimeout(function () { fit(); home(); build(); }, 200); }
+            lastW = w;
+        }).observe(g);
         new MutationObserver(function () { clearTimeout(t2); t2 = setTimeout(function () { home(); build(); }, 150); })
             .observe(g, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
     });
