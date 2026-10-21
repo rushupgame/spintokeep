@@ -1448,6 +1448,8 @@
     #qrcode-area { position: relative; isolation: isolate; overflow: hidden; }
     #qrcode { background: #fff; }
     #dashboard-view { scroll-margin-top: 84px; }
+    /* Mobile : l'aperçu du parcours client s'affiche avant le bloc de configuration */
+    @media (max-width: 1099px) { .main-wrapper > .panel-preview { order: -1; } .main-wrapper > .panel-config { order: 1; } }
 
     /* ---------- FENÊTRES (aperçu des affiches, etc.) : au-dessus du header, croix de fermeture bien visible ---------- */
     .modal-overlay { z-index: 2000; }
@@ -1569,7 +1571,7 @@
             </div>
         </details>
 
-        <details class="step" open id="step-gametype">
+        <details class="step" id="step-gametype">
             <summary><span class="num">2</span><span class="label" id="sum-gametype">Format du jeu</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-gametype">Choisissez comment vos clients vont tenter de gagner.</p>
@@ -1596,7 +1598,7 @@
             </div>
         </details>
 
-        <details class="step">
+        <details class="step" open>
             <summary><span class="num">3</span><span class="label" id="sum-logo">Logo & branding</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-logo-file">Ajoutez le logo qui apparaîtra sur les 4 écrans du jeu.</p>
