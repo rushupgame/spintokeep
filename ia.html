@@ -561,6 +561,7 @@
   -- Code de supabase/functions/conseiller-proxy/index.ts :
   --
   --   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  --   const TRIAL_HITS = new Map<string, number[]>();
   --   const CORS = { "Access-Control-Allow-Origin": "*",
   --     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   --     "Access-Control-Allow-Methods": "POST, OPTIONS" };
@@ -571,22 +572,34 @@
   --     try {
   --       const raw = await req.text();
   --       if (raw.length > 400000) return J({ error: "payload trop volumineux" }, 413);
-  --       const { config_id, mode, model, payload } = JSON.parse(raw);
-  --       if (typeof config_id !== "string" || !/^[A-Za-z0-9]{4,16}$/.test(config_id)) return J({ error: "id invalide" }, 400);
+  --       const { config_id, mode, model, payload, trial } = JSON.parse(raw);
+  --       const hasId = typeof config_id === "string" && /^[A-Za-z0-9]{4,16}$/.test(config_id);
+  --       if (!hasId && trial !== true) return J({ error: "id invalide" }, 400);
   --       if (mode !== "stream" && mode !== "generate") return J({ error: "mode invalide" }, 400);
   --       if (typeof model !== "string" || !/^gemini-[a-z0-9.\-]+$/.test(model)) return J({ error: "modèle invalide" }, 400);
   --       if (!payload || typeof payload !== "object") return J({ error: "requête invalide" }, 400);
   --       const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  --       const { data: cfg } = await sb.from("conseiller_configs").select("owner_id").eq("id", config_id).maybeSingle();
-  --       if (!cfg) return J({ error: "conseiller introuvable" }, 404);
-  --       const { data: prof } = await sb.from("profiles").select("is_premium").eq("id", cfg.owner_id).maybeSingle();
-  --       if (!prof?.is_premium) return J({ error: "abonnement inactif" }, 402);
-  --       const since = new Date(Date.now() - 864e5).toISOString();
-  --       const { count } = await sb.from("conseiller_interactions").select("id", { count: "exact", head: true })
-  --         .eq("config_id", config_id).gte("created_at", since);
-  --       if ((count ?? 0) >= Number(Deno.env.get("DAILY_LIMIT") ?? 3000)) return J({ error: "limite quotidienne atteinte" }, 429);
-  --       const { data: sec } = await sb.from("conseiller_secrets").select("gemini_key").eq("config_id", config_id).maybeSingle();
-  --       const key = sec?.gemini_key || Deno.env.get("GEMINI_API_KEY");
+  --       let key: string | undefined;
+  --       if (trial === true) {
+  --         // Essai gratuit (visiteur non connecté ou non Premium) : pas de contrôle Premium, mais quota par IP.
+  --         const ip = (req.headers.get("x-forwarded-for") ?? "inconnue").split(",")[0].trim();
+  --         const now = Date.now();
+  --         const hits = (TRIAL_HITS.get(ip) ?? []).filter((t) => now - t < 36e5);
+  --         if (hits.length >= Number(Deno.env.get("TRIAL_HOURLY_LIMIT") ?? 60)) return J({ error: "limite d'essai atteinte, réessayez plus tard" }, 429);
+  --         hits.push(now); TRIAL_HITS.set(ip, hits);
+  --         key = Deno.env.get("GEMINI_API_KEY");
+  --       } else {
+  --         const { data: cfg } = await sb.from("conseiller_configs").select("owner_id").eq("id", config_id).maybeSingle();
+  --         if (!cfg) return J({ error: "conseiller introuvable" }, 404);
+  --         const { data: prof } = await sb.from("profiles").select("is_premium").eq("id", cfg.owner_id).maybeSingle();
+  --         if (!prof?.is_premium) return J({ error: "abonnement inactif" }, 402);
+  --         const since = new Date(Date.now() - 864e5).toISOString();
+  --         const { count } = await sb.from("conseiller_interactions").select("id", { count: "exact", head: true })
+  --           .eq("config_id", config_id).gte("created_at", since);
+  --         if ((count ?? 0) >= Number(Deno.env.get("DAILY_LIMIT") ?? 3000)) return J({ error: "limite quotidienne atteinte" }, 429);
+  --         const { data: sec } = await sb.from("conseiller_secrets").select("gemini_key").eq("config_id", config_id).maybeSingle();
+  --         key = sec?.gemini_key || Deno.env.get("GEMINI_API_KEY");
+  --       }
   --       if (!key) return J({ error: "clé IA non configurée" }, 500);
   --       delete (payload as any).tools; delete (payload as any).toolConfig;
   --       const gc = (payload as any).generationConfig;
@@ -4483,7 +4496,7 @@ function buildTabs(){
 /* ===== CLOUD : comptes, enregistrement, publication, statistiques ===== */
 const PROXY=SB_URL+'/functions/v1/conseiller-proxy';
 const RPCH={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
-function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;cToast('Le serveur IA a refusé l\'essai (code '+r.status+').',8000)}return r})}
+function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID||undefined,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;r.clone().json().catch(()=>({})).then(j=>cToast('Le serveur IA a refusé l\'essai (code '+r.status+(j&&j.error?' : '+j.error:'')+').',8000))}return r})}
 const uid=()=>Math.random().toString(36).substring(2,9).toUpperCase();
 const pubUrl=(id,x)=>location.origin+location.pathname+'?id='+id+(x||'');
 let hasKey=false,SESSION=uid(),FONTS_ON=false;
@@ -4772,7 +4785,7 @@ async function importSite(url){
   const order=[GOOD,...MODELS.filter(m=>m!==GOOD)].filter(Boolean);let text='';
   for(const m of order){
     try{
-      const r=await fetch(PROXY,{method:'POST',signal:AbortSignal.timeout(50000),headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode:'generate',model:m,trial:true,payload:{contents:[{parts:[{text:prompt}]}],tools:[{url_context:{}}],generationConfig:{temperature:.2,maxOutputTokens:4000}}})});
+      const r=await fetch(PROXY,{method:'POST',signal:AbortSignal.timeout(50000),headers:RPCH,body:JSON.stringify({config_id:CFG_ID||undefined,mode:'generate',model:m,trial:true,payload:{contents:[{parts:[{text:prompt}]}],tools:[{url_context:{}}],generationConfig:{temperature:.2,maxOutputTokens:4000}}})});
       if(!r.ok)continue;const j=await r.json();
       text=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();if(text.length>=80)break;
     }catch(e){console.warn(e)}
