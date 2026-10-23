@@ -76,7 +76,7 @@
           "name": "Puis-je personnaliser l'apparence et la voix de mon conseiller ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Totalement. Vous choisissez son visage parmi une galerie d'avatars, vos couleurs, un fond dégradé ou texturé, une typographie, un halo, votre logo et une offre du moment facultative. Côté voix, vous réglez le ton (chaleureux, énergique, calme, professionnel ou humoristique) et vous écoutez un extrait de chaque voix avant de choisir."
+            "text": "Totalement. Vous choisissez son visage parmi une galerie d'avatars, vos couleurs, un fond dégradé ou texturé, une typographie, votre logo et une offre du moment facultative. Côté voix, vous réglez le ton (chaleureux, énergique, calme, professionnel ou humoristique) et vous écoutez un extrait de chaque voix avant de choisir."
           }
         },
         {
@@ -116,7 +116,7 @@
           "name": "Ai-je besoin de compétences techniques ou informatiques particulières ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Aucune. L'atelier fonctionne par onglets simples (visage, ambiance, expert, boutique, publication). Si vous savez envoyer un document par e-mail, vous savez alimenter votre conseiller. Le code d'intégration à votre site se copie-colle en une seconde."
+            "text": "Aucune. Le configurateur fonctionne par étapes simples (visage, ambiance, expert, boutique, test, publication). Si vous savez envoyer un document par e-mail, vous savez alimenter votre conseiller. Le code d'intégration à votre site se copie-colle en une seconde."
           }
         },
         {
@@ -1384,6 +1384,162 @@ body.cs-public #exit{display:none}
 html:not(.cs-loading) #loader-wrapper{display:none}
 @media(max-width:900px){#cs #atelier .chead{padding:14px 16px}#cs .gate{margin:12px 12px 0}}
 
+/* ===== v2 : boutons bleus, étapes, popin d'essai ===== */
+#cs{--blue:#0071e3;--blue-d:#0060c2;--blue-l:#eaf3fe}
+#cs .cbtn{background:var(--blue);color:#fff}
+#cs .cbtn:hover{background:var(--blue-d);filter:none}
+#cs .cbtn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+#cs .cbtn.sec:hover{background:#fff;border-color:var(--blue);color:var(--blue-d)}
+#cs input:focus,#cs textarea:focus,#cs select:focus,#cs .chip:focus-visible,#cs .sw:focus-visible,#cs .th:focus-visible,#cs button:focus-visible,#cs .sw.custom:focus-within{outline-color:var(--blue)}
+#cs .gate{background:var(--blue-l);border-color:#cfe0f7}
+.btn-premium,.btn-premium-nav{background:var(--accent,#0071e3);color:#fff}
+.btn-premium:hover,.btn-premium-nav:hover{background:var(--accent-dark,#0060c2)}
+.dash-upsell{background:linear-gradient(135deg,#eaf3fe,#dcebfc);border-color:#bcd7f7}
+#cs #techBtn[aria-pressed=true]{border-color:var(--blue);color:var(--blue-d)}
+/* étapes */
+#cs #tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;overflow:visible;align-items:start}
+#cs .step{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 2px;min-height:44px;border:0;background:none;font:600 13px 'DM Sans',system-ui,sans-serif;line-height:1.1;color:var(--mute);cursor:pointer;text-align:center}
+#cs .step::before{content:'';position:absolute;top:15px;right:50%;width:100%;height:2px;background:var(--line)}
+#cs .step:first-child::before{display:none}
+#cs .step.done::before,#cs .step[aria-selected=true]::before{background:var(--blue)}
+#cs .step .sn{position:relative;z-index:1;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid var(--line);color:var(--mute);font:700 14px 'DM Sans',system-ui,sans-serif;transition:background .2s,border-color .2s,color .2s}
+#cs .step.done .sn{background:var(--blue-l);border-color:var(--blue);color:var(--blue-d)}
+#cs .step.done{color:var(--ink)}
+#cs .step[aria-selected=true] .sn{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 4px rgba(0,113,227,.18)}
+#cs .step[aria-selected=true]{color:var(--ink);font-weight:700}
+#cs .step:focus-visible{outline:2.5px solid var(--blue);outline-offset:2px;border-radius:10px}
+@media(max-width:900px){#cs .step{font-size:11px;gap:4px}#cs .step .sn{width:30px;height:30px;font-size:13px}#cs .step::before{top:14px}}
+#cs .stepnav{display:flex;gap:10px;margin-top:18px}
+#cs .stepnav .cbtn{margin-top:0}
+#cs .stepnav .prev{flex:0 0 auto;width:auto;padding:12px 18px;font-size:14px}
+#cs .stepnav .next{flex:1;width:auto;margin-top:0}
+#cs[data-step=test] #launch{display:none}
+/* étape Tester / Publier */
+#cs .trialbox{display:grid;gap:12px;background:var(--blue-l);border:1px solid #cfe0f7;border-radius:14px;padding:16px}
+#cs .trialbox p{font-size:14px}
+#cs .tlist{list-style:none;padding:0;display:grid;gap:6px;font-size:14px}
+#cs .tlist li{display:flex;gap:8px}
+#cs .tlist li::before{content:'✓';color:var(--blue);font-weight:800}
+#cs .trialbox .cbtn{margin-top:4px}
+#cs .pricebox{border:2px solid var(--blue);border-radius:16px;padding:18px;background:#fff;margin:4px 0 14px;display:grid;gap:10px}
+#cs .pricebox .pr{font-size:15px;color:var(--mute)}
+#cs .pricebox .pr b{font:800 32px 'Bricolage Grotesque',sans-serif;color:var(--ink)}
+/* popin d'essai */
+body.trial-on{overflow:hidden}
+body.trial-on #toast-container,body.trial-on #cs #toast{z-index:100002}
+#cs #trialBack{position:fixed;inset:0;z-index:100000;background:rgba(10,16,30,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#cs #kiosque.trial{inset:0;margin:auto;width:min(460px,calc(100vw - 24px));height:min(820px,calc(100vh - 24px));height:min(820px,calc(100dvh - 24px));border-radius:26px;box-shadow:0 30px 90px rgba(0,0,0,.5);z-index:100001;padding-top:50px;animation:trialPop .22s ease-out}
+@keyframes trialPop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@media(max-width:600px){#cs #kiosque.trial{width:auto;height:auto;margin:0;border-radius:0}}
+#cs #kiosque.trial .exit{opacity:1;top:10px;right:10px;font-weight:700}
+#cs #trialBar{position:absolute;top:0;left:0;right:0;z-index:30;pointer-events:none}
+#cs #trialBar i{display:block;height:5px;background:rgba(255,255,255,.25)}
+#cs #trialBar b{display:block;height:100%;width:100%;background:var(--blue);transition:width .25s linear}
+#cs #trialBar span{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(10,16,30,.55);color:#fff;border-radius:999px;padding:6px 14px;font:700 13px 'DM Sans',system-ui,sans-serif;white-space:nowrap;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#cs #trialEnd{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(10,16,30,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#cs #trialEnd .te{background:#fff;color:var(--ink);border-radius:20px;padding:24px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);text-shadow:none}
+#cs #trialEnd h3{font-size:21px;font-weight:800;margin-bottom:8px;color:var(--ink)}
+#cs #trialEnd p{font-size:14px;color:var(--mute);line-height:1.45}
+#cs #trialEnd .cbtn{margin-top:16px}
+#cs #trialEnd .cbtn.sec{margin-top:8px}
+
+/* v3 : démarrage express, import site, bilan d'essai */
+#cs .quick{display:grid;gap:12px;margin:16px 24px 0;padding:18px;border-radius:14px;background:#fff;border:2px solid var(--blue)}
+#cs .quick h3{font-size:17px}#cs .quick p{font-size:14px;color:var(--mute)}
+#cs .qgrid{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px}
+#cs .quick .cbtn{margin-top:0}
+#cs .vrow input{flex:1;min-width:0}
+
+/* v4 : aperçu en contexte */
+#cs .ctx{border-radius:16px;background:linear-gradient(135deg,#eef2f7,#dfe6ee);padding:18px;display:grid;place-items:center;min-height:300px;overflow:hidden}
+#cs .tdev{width:min(100%,400px);aspect-ratio:4/3;background:#0b0f19;border-radius:22px;padding:9px;box-shadow:0 18px 40px rgba(0,0,0,.28)}
+#cs .tscr{height:100%;border-radius:14px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;padding:8px;color:#fff;text-align:center;background-size:cover}
+#cs .tscr .av{height:56%;width:auto;margin-bottom:-2px}
+#cs .tscr .lg{position:absolute;top:8px;left:10px;max-height:24px;max-width:90px;object-fit:contain}
+#cs .tscr b{font-size:15px}
+#cs .tscr .bub{background:rgba(255,255,255,.95);color:#14221f;border-radius:12px;padding:6px 10px;font-size:10.5px;line-height:1.3;max-width:88%}
+#cs .tscr .pill{border-radius:999px;padding:6px 18px;font-weight:800;font-size:11px}
+#cs .qstand{width:210px;background:#fff;border-radius:16px;padding:14px;text-align:center;box-shadow:0 14px 30px rgba(0,0,0,.2);display:grid;gap:8px;justify-items:center}
+#cs .qstand .lg{max-height:30px;max-width:130px;object-fit:contain;font-weight:800}
+#cs .qstand svg{width:130px;height:130px}
+#cs .qstand b{font-size:14px}#cs .qstand span{font-size:12px;color:var(--mute)}
+#cs .qbase{width:260px;height:14px;background:#b9c2cd;border-radius:0 0 10px 10px;margin-top:-2px}
+#cs .web{width:min(100%,420px);height:290px;background:#fff;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.2);position:relative;overflow:hidden}
+#cs .web .bar{height:26px;background:#e9edf2;display:flex;align-items:center;gap:5px;padding:0 10px;font-size:11px;color:#5d6b67}
+#cs .web .bar i{width:8px;height:8px;border-radius:50%;background:#c3cbd4}
+#cs .web .sk{height:10px;border-radius:5px;background:#e9edf2;margin:12px 16px 0}
+#cs .web .hero{height:80px;border-radius:10px;background:#f0f3f7;margin:14px 16px 0}
+#cs .wchat{position:absolute;right:12px;bottom:56px;width:190px;border-radius:14px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,.28);overflow:hidden}
+#cs .wchat .hd{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:12px}
+#cs .wchat .hd img{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.4);object-fit:cover;object-position:top}
+#cs .wchat p{font-size:11px;padding:10px;line-height:1.35;color:#14221f}
+#cs .wfab{position:absolute;right:12px;bottom:10px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#cs #trialEnd .te{max-height:100%;overflow:auto}
+#cs #teDebrief{margin-top:12px;text-align:left;font-size:13px;color:var(--ink);display:grid;gap:8px}
+#cs #teDebrief .dq{background:var(--blue-l);border-radius:12px;padding:10px;display:grid;gap:8px}
+#cs #teDebrief .dq.ok{background:#eafaf1}
+#cs #teDebrief input{min-height:40px;font-size:14px;padding:8px 10px}
+@media(max-width:900px){#cs .quick{margin:12px 12px 0}#cs .qgrid{grid-template-columns:1fr}}
+
+/* v5 : halo contenu dans la zone de l'avatar (plus de coupure nette derrière la tête) */
+#cs :is(#kAvatar,#pAvatar)::before{width:auto;height:min(52vh,94%);max-width:80%;aspect-ratio:1;bottom:3%}
+#cs [data-halo=star] :is(#kAvatar,#pAvatar)::before{width:auto;height:min(46vh,94%);max-width:76%;aspect-ratio:1}
+#cs [data-halo=square] :is(#kAvatar,#pAvatar)::before{width:auto;height:min(48vh,94%);max-width:72%;aspect-ratio:1}
+
+/* v6 : topbar masquée, aperçu à gauche, aperçu tablette, pastilles mobiles */
+#topbar{display:none!important}
+#cs .tscr .av,#cs .wchat .hd img{background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0}
+#cs .wchat .hd img{border-radius:50%;background:rgba(255,255,255,.4)}
+#cs .tscr .av{flex:1 1 0;min-height:0;width:auto;max-width:100%;height:auto;object-fit:contain;object-position:center bottom}
+#cs #ctxChips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#cs #ctxChips .chip{display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;line-height:1.15;min-height:44px;padding:8px 6px;font-size:13px}
+@media(max-width:600px){#cs #ctxChips .chip{font-size:12px;padding:8px 4px}}
+
+/* v7 : bandeau compte masqué, réglages avancés, aperçu à gauche sur mobile */
+#cs-gate{display:none!important}
+#cs details.adv summary{cursor:pointer;font-weight:700;font-size:15px;color:var(--ink);padding:2px 0;list-style:none}
+#cs details.adv summary::before{content:'▸ ';color:var(--blue)}
+#cs details.adv[open] summary::before{content:'▾ '}
+#cs details.adv[open] summary{margin-bottom:12px}
+
+/* v8 : conseiller centré en haut, étapes de configuration en dessous */
+@media(min-width:901px){
+#cs .wrap{display:flex;flex-direction:column;align-items:center;max-width:760px;margin-inline:auto;gap:16px}
+#cs .preview{display:contents}
+#cs .stage{order:1;width:min(380px,100%);position:relative;top:auto}
+#cs #tabs{order:3;align-self:stretch;width:100%;position:sticky;top:70px;z-index:35;margin:0}
+#cs .main{order:4;align-self:stretch;width:100%}
+#cs .side{order:5;width:min(380px,100%)}
+}
+@media(max-width:900px){#cs .stage{justify-content:center}#cs .stage .info{flex:0 1 auto}#cs #tabs{width:calc(100% + 24px);box-sizing:border-box}}
+
+/* v10 : conseiller au-dessus du démarrage express */
+#cs .wrap>.quick{margin:0;align-self:stretch}
+@media(min-width:901px){#cs .quick{order:2}}
+@media(max-width:900px){#cs .stage{order:-1}#cs .quick{order:0}}
+
+/* v11 : boutons Suivant + Tester fixes en bas */
+#cs #launch{display:none!important}
+#cs .stepnav .next{display:none}
+#cs .wrap{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+#cs #dock{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;gap:8px;max-width:760px;margin:0 auto;padding:22px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(243,243,239,.97) 65%,rgba(243,243,239,0));pointer-events:none}
+#cs #dock .cbtn{pointer-events:auto;margin:0;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+#cs #dock #dockNext{background:#1d1d1f;color:#fff}
+#cs #dock #dockNext:hover{background:#3a3a3c}
+#cs #dock .hidden{display:none}
+#cs:not(.inview) #dock{display:none}
+body.trial-on #cs #dock{display:none}
+
+/* v12 : CTA vers le démarrage express + démo hero */
+.btn.btn-demo{background:transparent;color:var(--accent,#0071e3);border:2px solid var(--accent,#0071e3);box-shadow:none;font:inherit;font-weight:600;cursor:pointer;margin:0 0 .6rem 10px}
+.btn.btn-demo:hover{background:var(--accent,#0071e3);color:#fff}
+@media(max-width:600px){.btn.btn-demo{margin:.8rem 0 0}}
+#cs #quick{scroll-margin-top:90px}
+@media(max-width:900px){#cs #quick{scroll-margin-top:200px}}
+
+/* v13 : plus de halo derrière l'avatar */
+#cs :is(#kAvatar,#pAvatar)::before{display:none!important}
+
     </style>
 </head>
 <body>
@@ -1437,10 +1593,11 @@ html:not(.cs-loading) #loader-wrapper{display:none}
     <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 1.5rem;">
         <h1>Offrez à votre boutique un <span class="highlight">conseiller IA</span> qui parle à vos clients, jour et nuit.</h1>
         <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
-            Chaque question restée sans réponse, c'est un client qui hésite, puis qui achète ailleurs. Donnez un visage, une voix et votre catalogue à un expert virtuel : il accueille, conseille et rassure sur tablette, par QR code ou sur votre site, pendant que votre équipe se consacre aux clients qui ont besoin d'un contact humain. Concevez-le gratuitement dès maintenant, en quelques minutes.
+            Dynamisez votre magasin avec un expert virtuel gratuit, accessible sur tablette ou par QR code pour conseiller chaque visiteur. Vos vendeurs sont ainsi libérés pour le véritable contact humain.
         </p>
         <div class="text-center">
-            <a href="#configurateur" class="btn hover-effect">Créer mon conseiller IA</a>
+            <a href="#configurateur" class="btn hover-effect">Créer mon conseiller IA en 5 min</a>
+            <button type="button" class="btn btn-demo" id="heroDemo">▶ Essayer la démo (caviste)</button>
             <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">Concevez gratuitement • Publication dès 9,90 € TTC / mois</p>
         </div>
     </section>
@@ -1460,9 +1617,6 @@ html:not(.cs-loading) #loader-wrapper{display:none}
     <div class="topbar-menu-mobile" id="topbar-menu-mobile"></div>
 </div>
 
-<h2>Créez votre conseiller IA en 10 minutes</h2>
-        <p class="text-center" style="max-width: 800px; margin: -1rem auto 2rem;">Choisissez son visage, sa voix et son ton, donnez-lui votre catalogue, puis publiez-le par QR code, sur tablette ou sur votre site. L'aperçu se met à jour en direct.</p>
-
 <!-- ============ ATELIER DU CONSEILLER IA ============ -->
 <div id="main-content">
 <div id="cs">
@@ -1470,9 +1624,13 @@ html:not(.cs-loading) #loader-wrapper{display:none}
 
 
 <div id="atelier">
-  <div class="chead"><h2>Atelier du conseiller</h2><span id="saved">Brouillon enregistré sur cet appareil</span></div>
+  <div class="chead"><h2>Configurateur du conseiller</h2><span id="saved">Brouillon enregistré sur cet appareil</span></div>
   <div id="cs-gate" class="gate" role="status"></div>
+  
   <div class="wrap">
+    <div id="quick" class="quick"><div><h3>Démarrage express</h3><p>Indiquez votre métier : un conseiller prêt à l'emploi (visage, prénom, accueil, questions) est généré en une seconde.</p></div>
+    <div class="qgrid"><select id="qkJob" aria-label="Votre métier"></select><input id="qkShop" placeholder="Nom de la boutique" aria-label="Nom de la boutique" maxlength="60"><input id="qkUrl" type="url" inputmode="url" placeholder="Site web (facultatif) : produits et infos importés" aria-label="Site web"></div>
+    <button type="button" class="cbtn" id="qkGo">Générer mon conseiller</button></div>
     <aside class="preview">
       <div class="stage themed" id="pStage">
         <img id="pLogo" class="clogo hidden" alt="">
@@ -1482,12 +1640,12 @@ html:not(.cs-loading) #loader-wrapper{display:none}
       <div class="side">
         <div class="bar"><b id="barFill"></b></div>
         <ul id="ready"></ul>
-        <button class="cbtn sec" id="saveCloud" type="button">💾 Enregistrer et publier</button>
+        <button class="cbtn sec" id="saveCloud" type="button">🚀 Publier mon conseiller</button>
         <button class="cbtn" id="launch" type="button">Tester mon conseiller</button>
       </div>
     </aside>
 
-    <nav id="tabs" role="tablist" aria-label="Sections du paramétrage"></nav>
+    <nav id="tabs" role="tablist" aria-label="Étapes de création du conseiller"></nav>
 
     <main class="main">
       <div class="cpanel" data-tab="face"><h2>Choisissez son visage</h2>
@@ -1502,7 +1660,6 @@ html:not(.cs-loading) #loader-wrapper{display:none}
         <div class="row"><span class="lbl">Texture</span><div class="chips" id="texChips"></div></div>
         <div class="row"><label for="texInt">Intensité de la texture</label><input type="range" id="texInt" min="0" max="60" value="25"></div>
         <div class="row"><span class="lbl">Typographie</span><div class="chips" id="fontChips"></div></div>
-        <div class="row"><span class="lbl">Halo derrière l'avatar</span><div class="chips" id="haloChips"></div></div>
         <p class="hint">Chaque couleur propose 8 teintes et un sélecteur libre (le rond multicolore). Le texte s'adapte automatiquement pour rester lisible.</p>
       </div>
 
@@ -1522,6 +1679,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
               <li><b>un document « valeurs &amp; communication »</b> : valeurs de l'entreprise, ton, vocabulaire, ce qu'il faut dire ou éviter, pour que l'IA s'adapte à votre image ;</li>
               <li><b>un document d'infos pratiques</b> : horaires, adresse, email, téléphone, livraison, retours, moyens de paiement…</li>
             </ul></div>
+          <div class="row"><label for="siteUrl">Importer depuis votre site web <span class="opt">— facultatif</span></label><div class="vrow"><input id="siteUrl" type="url" inputmode="url" placeholder="www.mon-site.fr" aria-label="Adresse du site"><button type="button" class="cbtn sm" id="siteImport">Importer</button></div><p class="hint">L'IA lit les pages publiques de votre site et en tire catalogue, infos pratiques et ton. Relisez le document créé dans la liste ci-dessous.</p></div>
           <div class="drop-zone" id="dropZone">
             <span id="dzText"></span>
             <input type="file" id="aiStock" multiple accept=".pdf,.docx,.xlsx,.xls,.pptx,.csv,.tsv,.txt,.md" aria-label="Ajouter des documents">
@@ -1559,24 +1717,37 @@ html:not(.cs-loading) #loader-wrapper{display:none}
         </div>
       </div>
 
-      <div class="cpanel" data-tab="tech"><h2>Connexion IA</h2>
+      <div class="cpanel" data-tab="test"><h2>Testez votre conseiller</h2>
+        <div class="trialbox">
+          <p><b>Une minute pour l'essayer comme un client.</b> Parlez-lui ou écrivez-lui : il répond avec la voix, le ton et les documents que vous avez choisis.</p>
+          <ul class="tlist"><li>Sa voix et son ton vous conviennent-ils ?</li><li>Répond-il juste sur vos produits et vos prix ?</li><li>Ses 3 questions de départ donnent-elles envie de cliquer ?</li></ul>
+          <p class="hint hidden" id="testWarn">Aucun document ajouté à l'étape Expert : il répondra de façon générale, sans vos produits ni vos prix.</p>
+          <button type="button" class="cbtn" id="launch2">Tester mon conseiller (1 min)</button>
+        </div>
+        <p class="hint">L'essai est gratuit et ne publie rien. Relancez-le après chaque modification.</p>
+      </div>
+
+      <div class="cpanel" data-tab="test"><details class="adv"><summary>Connexion IA (avancé)</summary>
         <p class="hint" style="margin:0 0 12px">Aucune configuration nécessaire : l'intelligence artificielle et la voix sont fournies avec votre abonnement Premium.</p>
         <div class="row"><label for="apiKey">Clé API Gemini personnelle <span class="opt">— facultatif</span></label><input id="apiKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Laisser vide pour utiliser la clé du service">
           <p class="hint">Si vous renseignez votre propre clé Google AI Studio, elle est enregistrée chiffrée côté serveur, jamais visible par vos clients. <button type="button" class="cbtn sm sec" id="keyDel" style="margin-left:6px">Retirer ma clé</button></p></div>
-      </div>
-
-      <div class="cpanel" data-tab="tech"><h2>Sauvegarde du profil</h2>
+      </details></div>
+      <div class="cpanel" data-tab="test"><details class="adv"><summary>Sauvegarde du profil (avancé)</summary>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="cbtn sm" type="button" id="profExp">💾 Exporter le profil</button>
           <button class="cbtn sm sec" type="button" id="profImp">📂 Importer</button>
           <input type="file" id="importFile" class="hidden" accept=".json">
         </div>
         <p class="hint">Clonez vos réglages (thème, clogo, documents…) sur une autre tablette.</p>
-      </div>
+      </details></div>
 
       <div class="cpanel" data-tab="publish"><h2>Publier votre conseiller</h2>
-        <div id="pubEmpty"><p class="hint" style="margin:0 0 12px">Une fois enregistré, votre conseiller reçoit un lien, un QR code à imprimer et un code d'intégration pour votre site.</p>
-          <button type="button" class="cbtn" id="pubSave">💾 Enregistrer et publier</button></div>
+        <div id="pubEmpty">
+          <div class="row"><span class="lbl">Votre conseiller chez vos clients</span><div class="chips" id="ctxChips"></div><div class="ctx" id="ctxStage" style="margin-top:10px"></div><p class="hint" id="ctxCap"></p></div>
+          <div class="pricebox"><div class="pr"><b>9,90 €</b> TTC / mois, sans engagement</div>
+            <ul class="tlist"><li>Lien et QR code à imprimer</li><li>Bulle ou bloc à intégrer à votre site</li><li>Voix, IA et hébergement inclus</li><li>Statistiques : questions, heures d'affluence, réponses non trouvées</li></ul></div>
+          <button type="button" class="cbtn" id="pubSave">Publier mon conseiller</button>
+          <p class="hint" id="pubHint"></p></div>
         <div id="pubLive" class="hidden">
           <div class="row"><label for="pubLink">Lien de votre conseiller</label><input id="pubLink" readonly>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="cbtn sm" id="pubCopy">📋 Copier le lien</button><button type="button" class="cbtn sm sec" id="pubOpen">Ouvrir</button></div></div>
@@ -1595,8 +1766,11 @@ html:not(.cs-loading) #loader-wrapper{display:none}
 </div>
 
 
+<div id="dock"><button type="button" class="cbtn" id="dockNext">Suivant →</button><button type="button" class="cbtn" id="dockTest">Tester mon conseiller</button></div>
+<div id="trialBack" class="hidden"></div>
 <div id="kiosque" class="themed hidden">
   <button class="exit" id="exit" type="button">Fermer</button>
+  <div id="trialBar" class="hidden"><i><b id="trialFill"></b></i><span id="trialTime" role="timer" aria-label="Temps d'essai restant">⏱ 1:00</span></div>
   <img id="kLogo" class="clogo hidden" alt="">
   <div id="attract"><div class="h1" id="attractTxt"></div><p id="attractSub"></p></div>
 
@@ -1617,6 +1791,14 @@ html:not(.cs-loading) #loader-wrapper{display:none}
     </div>
     <form id="txtfb" class="hidden"><input id="txtIn" placeholder="Votre question…" autocomplete="off" enterkeyhint="send" aria-label="Question"><button>Envoyer</button><button type="button" class="x" id="writeClose" aria-label="Fermer le clavier">✕</button></form>
   </div>
+  <div id="trialEnd" class="hidden" role="dialog" aria-modal="true" aria-labelledby="trialEndT"><div class="te">
+    <h3 id="trialEndT">Votre minute d'essai est terminée</h3>
+    <p id="teText"></p>
+    <div id="teDebrief"></div>
+    <button type="button" class="cbtn hidden" id="teDocs">Compléter ses documents</button>
+    <button type="button" class="cbtn" id="teGo">Publier mon conseiller</button>
+    <button type="button" class="cbtn sec" id="teBack">Fermer et modifier</button>
+  </div></div>
 </div>
 
 
@@ -1626,12 +1808,12 @@ html:not(.cs-loading) #loader-wrapper{display:none}
     <div class="dash-header">
         <h2 style="text-align:left;margin:0;font-size:1.9rem;">Mon Dashboard</h2>
         <div class="dash-header-actions">
-            <button class="btn-ghost" onclick="closeDashboard()">← Retour à l'atelier</button>
+            <button class="btn-ghost" onclick="closeDashboard()">← Retour au configurateur</button>
         </div>
     </div>
 
     <div class="dash-upsell" id="dash-upsell" style="display:none;">
-        <div class="txt"><strong>🔒 Publiez votre conseiller</strong><span>Passez Premium (9,90 €/mois) pour essayer l'expert à voix haute, obtenir votre QR code, votre lien et l'intégration web.</span></div>
+        <div class="txt"><strong>🔒 Publiez votre conseiller</strong><span>Passez Premium (9,90 €/mois) pour publier l'expert, obtenir votre QR code, votre lien et l'intégration web.</span></div>
         <button class="btn-premium" onclick="openPremiumFlow()">Voir Premium</button>
     </div>
 
@@ -1769,7 +1951,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
             <div class="card hover-effect">
                 <span class="card-icon">🎨</span>
                 <h3>1. Créez son visage en 10 min</h3>
-                <p>Choisissez un avatar, des couleurs, un ton de voix, votre logo et une offre du moment : l'atelier vous guide onglet par onglet, avec un aperçu en direct.</p>
+                <p>Choisissez un avatar, des couleurs, un ton de voix, votre logo et une offre du moment : le configurateur vous guide étape par étape, avec un aperçu en direct.</p>
             </div>
             <div class="card hover-effect">
                 <span class="card-icon">📚</span>
@@ -1980,7 +2162,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
 <h4>Avatar, texte ou bulle sur le site : lequel choisir ?</h4>
 <p>En magasin, privilégiez l'avatar vocal en mode kiosque. Sur votre site, la bulle flottante est discrète et s'ouvre à la demande. Vous pouvez proposer les deux avec le même conseiller.</p>
 <h4>Aller plus loin : soigner les détails sonores et visuels</h4>
-<p>Choisissez un avatar cohérent avec votre clientèle : un visage souriant et sobre rassure davantage qu'un personnage trop caricatural. Réglez le halo et le fond pour que le visage reste net, et vérifiez le contraste du texte, afin que la conversation soit lisible de loin sur une tablette.</p>
+<p>Choisissez un avatar cohérent avec votre clientèle : un visage souriant et sobre rassure davantage qu'un personnage trop caricatural. Réglez le fond pour que le visage reste net, et vérifiez le contraste du texte, afin que la conversation soit lisible de loin sur une tablette.</p>
 <p>Côté voix, écoutez l'extrait de chaque option et faites relire votre message d'accueil. Une voix un peu plus lente convient aux conseils techniques, une voix plus vive aux commerces d'ambiance. Dans le doute, demandez l'avis de trois clients fidèles.</p>
 <div class="cta-row"><a href="#configurateur" class="btn hover-effect">Tester l'avatar sur mon commerce ➡️</a></div>
 </article>
@@ -2140,7 +2322,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
         <div class="grid-3">
             <div class="card hover-effect">
                 <h3>🎨 Avatar et ambiance sur mesure</h3>
-                <p>Visage, couleurs principale et secondaire, textures, typographie, halo derrière l'avatar et logo : tout se règle avec un aperçu en direct, pour un conseiller parfaitement aligné sur l'identité de votre marque (branding). Huit thèmes prêts à l'emploi vous font gagner du temps.</p>
+                <p>Visage, couleurs principale et secondaire, textures, typographie et logo : tout se règle avec un aperçu en direct, pour un conseiller parfaitement aligné sur l'identité de votre marque (branding). Huit thèmes prêts à l'emploi vous font gagner du temps.</p>
             </div>
             <div class="card hover-effect">
                 <h3>📚 Documents illimités</h3>
@@ -2248,7 +2430,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
 <h4>Le contexte</h4>
 <p>Un institut reçoit des demandes répétitives sur les soins, les durées, les prix et les cartes cadeaux. Les praticiennes, les mains occupées, ne peuvent ni répondre ni rassurer les nouvelles clientes en ligne.</p>
 <h4>La mécanique</h4>
-<p>Le conseiller est affiché sur une tablette à l'accueil et intégré au site. Il décrit les soins, rappelle les contre-indications générales, indique les tarifs et oriente vers la réservation, avec un ton apaisant choisi dans l'atelier.</p>
+<p>Le conseiller est affiché sur une tablette à l'accueil et intégré au site. Il décrit les soins, rappelle les contre-indications générales, indique les tarifs et oriente vers la réservation, avec un ton apaisant choisi dans le configurateur.</p>
 <div class="case-meta">
 <div><b>~600</b><span>visiteurs du site / mois (hypothèse)</span></div>
 <div><b>15 %</b><span>ouvrent le conseiller (hypothèse)</span></div>
@@ -2493,7 +2675,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
             </details>
             <details>
                 <summary>Puis-je personnaliser l'apparence et la voix de mon conseiller ?</summary>
-                <p>Totalement. Vous choisissez son visage parmi une galerie d'avatars, vos couleurs, un fond dégradé ou texturé, une typographie, un halo, votre logo et une offre du moment facultative. Côté voix, vous réglez le ton (chaleureux, énergique, calme, professionnel ou humoristique) et vous écoutez un extrait de chaque voix avant de choisir.</p>
+                <p>Totalement. Vous choisissez son visage parmi une galerie d'avatars, vos couleurs, un fond dégradé ou texturé, une typographie, votre logo et une offre du moment facultative. Côté voix, vous réglez le ton (chaleureux, énergique, calme, professionnel ou humoristique) et vous écoutez un extrait de chaque voix avant de choisir.</p>
             </details>
             <details>
                 <summary>Combien de temps faut-il pour mettre en ligne mon conseiller ?</summary>
@@ -2513,7 +2695,7 @@ html:not(.cs-loading) #loader-wrapper{display:none}
             </details>
             <details>
                 <summary>Ai-je besoin de compétences techniques ou informatiques particulières ?</summary>
-                <p>Aucune. L'atelier fonctionne par onglets simples (visage, ambiance, expert, boutique, publication). Si vous savez envoyer un document par e-mail, vous savez alimenter votre conseiller. Le code d'intégration à votre site se copie-colle en une seconde.</p>
+                <p>Aucune. Le configurateur fonctionne par étapes simples (visage, ambiance, expert, boutique, test, publication). Si vous savez envoyer un document par e-mail, vous savez alimenter votre conseiller. Le code d'intégration à votre site se copie-colle en une seconde.</p>
             </details>
             <details>
                 <summary>Comment un conseiller virtuel peut-il augmenter mes ventes en magasin ?</summary>
@@ -3202,7 +3384,7 @@ if(slider) {
         container.innerHTML = '';
         if (!window.paypal) { toast("PayPal indisponible pour le moment.", "error"); return; }
         window.paypal.Buttons({
-            style: { shape: 'pill', color: 'gold', layout: 'vertical', label: 'subscribe' },
+            style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
             createSubscription: (data, actions) => actions.subscription.create({
                 plan_id: PREMIUM_PLAN_ID
             }),
@@ -3255,6 +3437,7 @@ if(slider) {
             await refreshSession();
             closePremiumModal();
             toast("🎉 Abonnement Premium activé ! Votre conseiller IA est débloqué.", "success");
+            if (window.CS && window.CS.afterPremium) window.CS.afterPremium();
             if (document.getElementById('dashboard-view').style.display === 'block') loadDashboard();
         } catch (e) {
             console.error('Activation Premium échouée :', e);
@@ -3333,7 +3516,7 @@ if(slider) {
 'use strict';
 
 /* ---------- CONFIG & UTILES ---------- */
-let EMB=false,TESTMODE=false,CFG_ID=null,editingId=null;
+let EMB=false,TESTMODE=false,TRIAL=false,TLOG=[],CFG_ID=null,editingId=null;
 const MODELS = ['gemini-3.8-flash','gemini-3.6-flash','gemini-3.5-flash'];
 const $ = s => document.querySelector(s);
 const MIC_IDLE = '🎙️ Parler';
@@ -3403,7 +3586,7 @@ function refreshAmbiance(){
     b.innerHTML=`<i style="background:${bg};--a:${p.ac}"></i><span></span>`;b.querySelector('span').textContent=p.n;
     b.onclick=()=>{const {n,...rest}=p;setTheme(rest)};g.appendChild(b);
   });
-  chipRow('#texChips',TEXN,'tex');chipRow('#fontChips',FONTN,'font');chipRow('#haloChips',HALON,'halo');
+  chipRow('#texChips',TEXN,'tex');chipRow('#fontChips',FONTN,'font');
   $('#bgType').value=TH.t;$('#texInt').value=TH.ti;buildThemeColors();
 }
 
@@ -3496,13 +3679,14 @@ function importProfile(e){
 /* ---------- PRÊT À LANCER ---------- */
 function updateReady(){
   const it=[
-    ['Compte Premium actif',isPremium()],
+    ['Abonnement actif (pour publier)',isPremium()],
     ['Prénom et métier',!!$('#aiName').value.trim()&&!!$('#aiRole').value.trim()],
     ['Documents / catalogue (recommandé)',DOCS.length>0],
     ['Logo de la boutique',!!LOGO],
     ['Offre du moment',!!$('#aiPromo').value.trim()]];
   $('#ready').innerHTML=it.map(([t,ok])=>`<li class="${ok?'ok':''}"><span>${ok?'✓':'○'}</span>${t}</li>`).join('');
   $('#barFill').style.width=(it.filter(x=>x[1]).length/it.length*100)+'%';
+  const tw=$('#testWarn');if(tw)tw.classList.toggle('hidden',DOCS.length>0);
 }
 
 /* ---------- DOCUMENTS : base de connaissances (PDF, Word, Excel, PowerPoint, CSV, TXT) ---------- */
@@ -3833,7 +4017,7 @@ const PAL={
  shirt:['#c9473c','#4a97d6','#7ec24f','#e0a63a','#444449','#8e5cb5','#e87fb0','#f1ede4']};
 function buildCustom(){
   const box=$('#custom');box.innerHTML='<h3 class="sub">Couleurs</h3>';const a=cur();
-  [['hc',AV[sel].hair==='hijab'?'Foulard':'Cheveux'],['skin','Peau'],['ec','Yeux'],['shirt','Vêtement']].forEach(([k,l])=>
+  [['hc',AV[sel].hair==='hijab'?'Foulard':'Cheveux'],['skin','Bronzage'],['ec','Yeux'],['shirt','Vêtement']].forEach(([k,l])=>
     colorField(box,{label:l,presets:PAL[k],value:a[k]||'#2a1c14',onPick:(c,live)=>{ov[k]=c;if(live){$('#pAvatar').innerHTML=avatarSVG(cur());saveDraft()}else sync()}}));
   const r=document.createElement('button');r.type='button';r.className='chip';r.textContent='↺ Revenir au modèle d\'origine';r.onclick=()=>{ov={};sync()};box.appendChild(r);
 }
@@ -3914,7 +4098,7 @@ function showWrite(on){if(on)stopSpeech();$('#actions').classList.toggle('hidden
 let idleTimer=null;
 function resetIdle(){
   clearTimeout(idleTimer);
-  if(!E)return;
+  if(!E||TRIAL)return;
   const att=$('#attract');
   if(att.classList.contains('show')){
     att.classList.remove('show');
@@ -4122,7 +4306,7 @@ async function launchKiosk(fromPublic){
     promo:$('#aiPromo').value.trim(),idle:+$('#aiIdle').value||60,q:[1,2,3].map(i=>$('#aiQ'+i).value.trim()).filter(Boolean),attract:$('#aiAttract').value.trim()||"Touchez l'écran pour commencer"
   };
   chatHistory=[];applyTheme();applyLogo();
-  $('#atelier').classList.add('hidden');$('#kiosque').classList.remove('hidden');
+  if(!TRIAL)$('#atelier').classList.add('hidden');$('#kiosque').classList.remove('hidden');
   $('#pAvatar').innerHTML='';$('#kAvatar').innerHTML=avatarSVG(cur());
   $('#kName').textContent=E.name;$('#kRole').textContent=E.role;
   $('#kPromo').textContent=E.promo;$('#kPromo').classList.toggle('hidden',!E.promo);
@@ -4132,18 +4316,90 @@ async function launchKiosk(fromPublic){
   mic.disabled=false;mic.classList.add('hint');
   if(fromPublic){$('#attract').classList.add('show');if(new URLSearchParams(location.search).get('kiosk')==='1')warmUp();return} // préchargement : bornes uniquement (économise l'IA sur le web) // un premier toucher active le son
   keepAwake();
-  if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
+  if(!TRIAL&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
   resetIdle();
   const w=speak(E.welcome);
   warmUp();
   await w;
 }
-$('#launch').onclick=async()=>{
-  if(!await ensureSaved(true))return;
-  TESTMODE=true;CFG_ID=editingId;
-  await launchKiosk(false);
-};
+/* ---------- ESSAI GRATUIT EN POPIN (1 minute) ---------- */
+const TRIAL_SECONDS=60;let trialTimer=null,trialEndAt=0;
+const fmtClock=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function tickTrial(){
+  const left=Math.max(0,trialEndAt-Date.now());
+  $('#trialFill').style.width=(left/(TRIAL_SECONDS*1000)*100)+'%';
+  $('#trialTime').textContent='⏱ '+fmtClock(Math.ceil(left/1000));
+  if(left<=0)finishTrial();
+}
+function startTrialClock(){if(!TRIAL||trialTimer)return;trialEndAt=Date.now()+TRIAL_SECONDS*1000;tickTrial();trialTimer=setInterval(tickTrial,250)}
+function haltTrialActivity(){
+  clearInterval(trialTimer);trialTimer=null;clearTimeout(idleTimer);
+  if(curCtl){try{curCtl.abort()}catch(e){}curCtl=null}
+  qSeq++;stopSpeech();stopLips();stopListen();
+}
+function addLearned(q,a){
+  const nm='Réponses ajoutées après test.txt';let d=DOCS.find(x=>x.name===nm);const line='Question : '+q+'\nRéponse : '+a;
+  if(d){d.text+='\n\n'+line;d.n=d.text.split(/\s+/).length}
+  else DOCS.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:nm,ext:'txt',kind:'text',text:line,n:line.split(/\s+/).length,hidden:[],warn:''});
+  refreshDocsUI();updateReady();saveDraft();
+}
+function renderDebrief(){
+  const box=$('#teDebrief');box.innerHTML='';const tot=TLOG.length;
+  if(!tot){box.appendChild(el('p','','Vous n\'avez posé aucune question : relancez l\'essai et posez-lui une vraie question de client.'));$('#teDocs').classList.add('hidden');return}
+  const bad=[...new Map(TLOG.filter(x=>x.no).map(x=>[x.q,x])).values()].slice(0,3),okn=tot-TLOG.filter(x=>x.no).length;
+  box.appendChild(el('p','','Bilan : '+tot+' question'+(tot>1?'s':'')+', '+okn+' réponse'+(okn>1?'s':'')+' trouvée'+(okn>1?'s':'')+(bad.length?', '+TLOG.filter(x=>x.no).length+' sans réponse.':'. Il sait répondre à tout : essayez des questions plus pointues avant de publier.')));
+  bad.forEach(x=>{
+    const row=el('div','dq'),inp=el('input'),b=el('button','cbtn sm','Ajouter'),vr=el('div','vrow');
+    inp.placeholder='Votre réponse (ex. : livraison sous 48 h)';inp.setAttribute('aria-label','Réponse à : '+x.q);b.type='button';
+    b.onclick=()=>{const v=inp.value.trim();if(!v)return inp.focus();addLearned(x.q,v);row.className='dq ok';row.innerHTML='';row.appendChild(el('span','','✓ Ajouté. Il saura répondre dès le prochain essai.'))};
+    vr.append(inp,b);row.append(el('b','','« '+x.q+' »'),vr);box.appendChild(row);
+  });
+  $('#teDocs').classList.toggle('hidden',!bad.length);
+}
+function finishTrial(){
+  haltTrialActivity();
+  $('#trialFill').style.width='0%';$('#trialTime').textContent='⏱ 0:00';
+  $('#teText').textContent=(E&&E.name?E.name:'Votre conseiller')+' vous convient ? Publiez-le pour l\'offrir à vos clients.';
+  renderDebrief();$('#trialEnd').classList.remove('hidden');
+}
+function closeTrial(){
+  if(!TRIAL)return;
+  haltTrialActivity();
+  try{wakeLock&&wakeLock.release()}catch(e){}
+  TRIAL=false;TESTMODE=false;
+  const k=$('#kiosque');k.classList.remove('trial');k.classList.add('hidden');k.style.height=k.style.top=k.style.bottom='';
+  ['#trialBack','#trialBar','#trialEnd'].forEach(s=>$(s).classList.add('hidden'));
+  $('#attract').classList.remove('show');$('#kAvatar').innerHTML='';
+  document.body.classList.remove('trial-on');
+  sync();paintSteps();
+}
+async function openTrial(){
+  if(TRIAL)return;
+  TRIAL=true;TESTMODE=true;TLOG=[];CFG_ID=editingId;trialRan=true;paintSteps();
+  $('#kiosque').classList.add('trial');
+  ['#trialBack','#trialBar'].forEach(s=>$(s).classList.remove('hidden'));$('#trialEnd').classList.add('hidden');
+  $('#trialFill').style.width='100%';$('#trialTime').textContent='⏱ '+fmtClock(TRIAL_SECONDS);
+  document.body.classList.add('trial-on');
+  const p=launchKiosk(false).catch(e=>console.warn(e));
+  await Promise.race([p,new Promise(r=>setTimeout(r,10000))]); // le chrono démarre une fois l'accueil prononcé
+  startTrialClock();
+}
+$('#launch').onclick=openTrial;
+function goQuick(){
+  const q=$('#quick'),vis=q&&!q.classList.contains('hidden'),t=vis?q:$('#tabs');
+  t.scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>{const f=vis?$('#qkJob'):document.querySelector('#tabs .step[aria-selected=true]');if(f)f.focus({preventScroll:true})},600);
+}
+document.querySelectorAll('a.btn[href="#configurateur"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goQuick()}));
+const hd=document.getElementById('heroDemo');if(hd)hd.onclick=openTrial;
+$('#dockTest').onclick=openTrial;$('#dockNext').onclick=()=>{const n=TABS[TABS.findIndex(t=>t[0]===curStep)+1];if(n)showTab(n[0],true)};$('#launch2').onclick=openTrial;
+$('#trialBack').onclick=closeTrial;
+$('#teGo').onclick=()=>{closeTrial();showTab('publish',true)};
+$('#teBack').onclick=closeTrial;
+$('#teDocs').onclick=()=>{closeTrial();showTab('expert',true)};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&TRIAL)closeTrial()});
 $('#exit').onclick=()=>{
+  if(TRIAL){closeTrial();return}
   if(!confirm('Quitter le mode test ?'))return;
   clearTimeout(idleTimer);stopSpeech();stopLips();stopListen();
   try{wakeLock&&wakeLock.release()}catch(e){}
@@ -4178,27 +4434,45 @@ function hbars(title,rows,sub){
 }
 /*CLOUD*/
 /* ---------- ONGLETS DE PARAMÉTRAGE ---------- */
-const TABS=[['face','🙂','Visage'],['look','🎨','Ambiance'],['expert','💬','Expert'],['brand','🏷️','Boutique'],['publish','🚀','Publier'],['tech','⚙️','Réglages']];
+const TABS=[['face','Visage'],['look','Ambiance'],['expert','Expert'],['brand','Boutique'],['test','Tester'],['publish','Publier']];
+let curStep='face',lastStep='face',trialRan=false;const SEEN=new Set();
+function stepDone(id){if(id==='test')return trialRan;if(id==='publish')return !!editingId;return SEEN.has(id)}
+function paintSteps(){
+  document.querySelectorAll('#tabs .step').forEach(b=>{
+    const id=b.dataset.t,n=TABS.findIndex(t=>t[0]===id)+1,on=id===curStep,dn=!on&&stepDone(id);
+    b.setAttribute('aria-selected',on);b.classList.toggle('done',dn);b.tabIndex=id===lastStep?0:-1;
+    if(on)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+    b.querySelector('.sn').textContent=dn?'✓':String(n);
+    b.setAttribute('aria-label','Étape '+n+' : '+TABS[n-1][1]+(dn?' (terminée)':''));
+  });
+}
+function paintDock(){const dn=$('#dockNext');if(!dn)return;const nx=TABS[TABS.findIndex(t=>t[0]===curStep)+1];dn.classList.toggle('hidden',!nx);if(nx)dn.textContent='Suivant : '+nx[1]+' →'}
 function showTab(id,user){
-  if(!TABS.some(t=>t[0]===id))id='face';
-  try{localStorage.setItem('ktab',id)}catch(e){}
+  if(id!=='tech'&&!TABS.some(t=>t[0]===id))id='face';
+  curStep=id;
+  if(id!=='tech'){lastStep=id;SEEN.add(id);try{localStorage.setItem('ktab',id)}catch(e){}}
+  document.getElementById('cs').dataset.step=id;
   document.querySelectorAll('.cpanel[data-tab]').forEach(p=>{p.hidden=p.dataset.tab!==id});
-  document.querySelectorAll('#tabs .tab').forEach(b=>{const on=b.dataset.t===id;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;if(on&&user)b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})});
-  if(user){const m=$('.main');window.scrollTo({top:Math.max(0,m.getBoundingClientRect().top+scrollY-(innerWidth<=900?280:150)),behavior:'smooth'})}
+  paintSteps();paintDock();if(id==='publish')renderContext();
+  const tb=$('#techBtn');if(tb)tb.setAttribute('aria-pressed',id==='tech');
+  if(user){const on=document.querySelector('#tabs .step[aria-selected=true]');if(on)on.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});const m=$('.main');window.scrollTo({top:Math.max(0,m.getBoundingClientRect().top+scrollY-(innerWidth<=900?270:150)),behavior:'smooth'})}
 }
 function buildTabs(){
   const nav=$('#tabs');nav.innerHTML='';
-  TABS.forEach(([id,ic,lb],i)=>{
-    const b=document.createElement('button');b.type='button';b.className='tab';b.dataset.t=id;b.setAttribute('role','tab');b.innerHTML=`<span class="ti">${ic}</span><span class="tl">${lb}</span>`;
+  TABS.forEach(([id,lb],i)=>{
+    const b=document.createElement('button');b.type='button';b.className='step';b.dataset.t=id;b.setAttribute('role','tab');
+    b.innerHTML=`<span class="sn">${i+1}</span><span class="sl">${lb}</span>`;
     b.onclick=()=>showTab(id,true);
     b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const t=TABS[(i+(e.key==='ArrowRight'?1:TABS.length-1))%TABS.length][0];showTab(t,true);nav.querySelector(`[data-t=${t}]`).focus()}};
     nav.appendChild(b);
-    if(i<TABS.length-1){
-      const ps=document.querySelectorAll(`.cpanel[data-tab=${id}]`),last=ps[ps.length-1],nx=document.createElement('button');
-      nx.type='button';nx.className='cbtn next';nx.textContent='Suivant : '+TABS[i+1][2]+' →';nx.onclick=()=>showTab(TABS[i+1][0],true);last.appendChild(nx);
-    }
+    const ps=document.querySelectorAll(`.cpanel[data-tab=${id}]`),last=ps[ps.length-1],row=document.createElement('div');row.className='stepnav';
+    if(i>0){const pv=document.createElement('button');pv.type='button';pv.className='cbtn sec prev';pv.textContent='← Retour';pv.onclick=()=>showTab(TABS[i-1][0],true);row.appendChild(pv)}
+    if(i<TABS.length-1){const nx=document.createElement('button');nx.type='button';nx.className='cbtn next';nx.textContent='Suivant : '+TABS[i+1][1]+' →';nx.onclick=()=>showTab(TABS[i+1][0],true);row.appendChild(nx)}
+    if(row.children.length)last.appendChild(row);
   });
   let t='face';try{t=localStorage.getItem('ktab')||'face'}catch(e){}
+  const ti=TABS.findIndex(x=>x[0]===t);if(ti<0)t='face';
+  TABS.slice(0,Math.max(ti,0)).forEach(x=>SEEN.add(x[0]));
   showTab(t,false);updateReady();
 }
 
@@ -4206,7 +4480,7 @@ function buildTabs(){
 /* ===== CLOUD : comptes, enregistrement, publication, statistiques ===== */
 const PROXY=SB_URL+'/functions/v1/conseiller-proxy';
 const RPCH={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
-function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode,model,payload})})}
+function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode,model,payload,trial:TRIAL||undefined})})}
 const uid=()=>Math.random().toString(36).substring(2,9).toUpperCase();
 const pubUrl=(id,x)=>location.origin+location.pathname+'?id='+id+(x||'');
 let hasKey=false,SESSION=uid(),FONTS_ON=false;
@@ -4216,13 +4490,16 @@ function loadFonts(){if(FONTS_ON)return;FONTS_ON=true;const l=document.createEle
 function refreshGate(){
   const g=$('#cs-gate');if(!g)return;
   let h='';
-  if(!currentUser)h='<div><strong>Concevez gratuitement, publiez avec Premium.</strong><span>Créez un compte pour enregistrer votre conseiller, l\'écouter parler et le mettre en ligne.</span></div><button type="button" class="cbtn sm" data-g="signup">Créer mon compte</button>';
-  else if(!isPremium())h='<div><strong>Votre conseiller est prêt à être publié.</strong><span>Plan Premium Access : 9,90 € TTC / mois, sans engagement. Voix, IA, QR code, intégration et statistiques inclus.</span></div><button type="button" class="cbtn sm" data-g="premium">⭐ Passer Premium</button>';
+  if(!currentUser)h='<div><strong>Concevez et testez gratuitement, publiez avec Premium.</strong><span>Créez un compte pour enregistrer votre conseiller et le mettre en ligne.</span></div><button type="button" class="cbtn sm" data-g="signup">Créer mon compte</button>';
+  else if(!isPremium())h='<div><strong>Testez-le gratuitement, publiez-le avec Premium.</strong><span>9,90 € TTC / mois, sans engagement. Voix, IA, QR code, intégration et statistiques inclus.</span></div><button type="button" class="cbtn sm" data-g="premium">⭐ Passer Premium</button>';
   else h='<div><strong>⭐ Premium actif</strong><span>'+(editingId?'Vous modifiez un conseiller publié (ID '+editingId+').':'Nouveau conseiller : enregistrez-le pour obtenir son lien et son QR code.')+'</span></div>'+(editingId?'<button type="button" class="cbtn sm sec" data-g="new">Enregistrer comme nouveau conseiller</button>':'');
   g.innerHTML=h;g.classList.toggle('ok',!!currentUser&&isPremium());
   const b=g.querySelector('button');
   if(b)b.onclick=()=>{const a=b.dataset.g;if(a==='signup')openAuthModal('signup');else if(a==='premium')openPremiumFlow();else if(a==='new'){editingId=null;CFG_ID=null;updatePublish();refreshGate();cToast('Les prochains enregistrements créeront un nouveau conseiller.')}};
-  updateReady();
+  const ps=$('#pubSave');if(ps&&!saving)ps.textContent=!currentUser?'Créer mon compte pour publier':!isPremium()?'Payer 9,90 € et publier':'Publier mon conseiller';
+  const sc=$('#saveCloud');if(sc&&!saving)sc.textContent=editingId?'💾 Enregistrer les modifications':'🚀 Publier mon conseiller';
+  const ph=$('#pubHint');if(ph)ph.textContent=!currentUser?'Un compte gratuit est nécessaire pour enregistrer votre conseiller et gérer votre abonnement.':!isPremium()?'Paiement sécurisé par PayPal. Sans engagement : vous pouvez résilier à tout moment.':'Votre abonnement Premium est actif : la publication est immédiate.';
+  paintSteps();updateReady();
 }
 
 /* ---------- Enregistrement ---------- */
@@ -4247,7 +4524,7 @@ async function saveToCloud(silent){
     if(!silent)cToast('Conseiller enregistré ✓');
     return id;
   }catch(e){console.error(e);cToast("Erreur d'enregistrement. Vérifiez votre connexion et réessayez.");return null}
-  finally{saving=false;btns.forEach((b,i)=>{b.disabled=false;b.textContent=old[i]})}
+  finally{saving=false;btns.forEach(b=>{b.disabled=false});refreshGate()}
 }
 const ensureSaved=()=>saveToCloud(true);
 let justCreated=[];
@@ -4291,6 +4568,7 @@ async function loadConfigForEditing(id){
 
 /* ---------- Journal des conversations (clients réels uniquement) ---------- */
 function logAnalytics(q,a){
+  if(TRIAL)TLOG.push({q:String(q),a:String(a),no:NOANS.test(a)});
   if(!EMB||TESTMODE||!CFG_ID)return;
   fetch(SB_URL+'/rest/v1/rpc/conseiller_log_interaction',{method:'POST',headers:RPCH,keepalive:true,body:JSON.stringify({p_config:CFG_ID,p_session:SESSION,p_question:String(q).slice(0,500),p_answer:String(a).slice(0,1500),p_noans:NOANS.test(a)})}).catch(()=>{});
 }
@@ -4357,7 +4635,7 @@ async function loadDashboard(retry){
   const ids=cfgs.map(c=>c.id);
   if(!ids.length){
     ['dash-count-configs','dash-count-visits','dash-count-questions','dash-count-clients'].forEach(i=>$('#'+i).textContent='0');$('#dash-count-found').textContent='—';
-    list.appendChild(el('div','dash-empty',error?'Impossible de charger vos conseillers pour le moment.':'Aucun conseiller publié pour le moment. Créez-le dans l\'atelier ci-dessus.'));
+    list.appendChild(el('div','dash-empty',error?'Impossible de charger vos conseillers pour le moment.':'Aucun conseiller publié pour le moment. Créez-le dans le configurateur ci-dessus.'));
     $('#dash').innerHTML='';return;
   }
   for(const id of ids){const{count}=await sb.from('conseiller_visits').select('*',{count:'exact',head:true}).eq('config_id',id);DASH.visits[id]=count||0}
@@ -4445,7 +4723,7 @@ $('#logoDel').onclick=()=>setLogo('');
 $('#profExp').onclick=exportProfile;
 $('#profImp').onclick=()=>$('#importFile').click();
 $('#importFile').onchange=importProfile;
-$('#saveCloud').onclick=()=>saveToCloud(false);
+$('#saveCloud').onclick=()=>{const wasNew=!editingId;if(wasNew&&!isPremium()){showTab('publish',true);return}saveToCloud(false).then(id=>{if(id&&wasNew)showTab('publish',true)})};
 $('#pubSave').onclick=()=>saveToCloud(false);
 $('#pubCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#pubLink').value);cToast('Lien copié ✓')}catch(e){$('#pubLink').select()}};
 $('#pubOpen').onclick=()=>window.open($('#pubLink').value,'_blank');
@@ -4456,6 +4734,68 @@ $('#keyDel').onclick=async()=>{
   if(!editingId||!currentUser)return cToast("Aucune clé enregistrée.");
   await ensureSupabase();await sb.from('conseiller_secrets').delete().eq('config_id',editingId);hasKey=false;$('#apiKey').value='';$('#apiKey').placeholder='Laisser vide pour utiliser la clé du service';cToast('Clé personnelle retirée.');
 };
+/* ---------- APERÇU EN CONTEXTE (tablette, QR, site web) ---------- */
+var CTX='tablet';
+function escH(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function svgImg(svg){if(!/xmlns=/.test(svg.slice(0,200)))svg=svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+function pseudoQr(seed){
+  let h=0;for(const c of seed)h=(h*31+c.charCodeAt(0))|0;const rnd=()=>{h=(h*1103515245+12345)&0x7fffffff;return h/0x7fffffff};
+  const N=21,f=(x,y)=>[[0,0],[N-7,0],[0,N-7]].some(([a,b])=>x>=a&&x<a+7&&y>=b&&y<b+7);let r='';
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    let on;if(f(x,y)){const[a,b]=[[0,0],[N-7,0],[0,N-7]].find(([a,b])=>x>=a&&x<a+7&&y>=b&&y<b+7),dx=x-a,dy=y-b;on=dx==0||dx==6||dy==0||dy==6||(dx>=2&&dx<=4&&dy>=2&&dy<=4)}else on=rnd()>.5;
+    if(on)r+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}
+  return `<svg viewBox="0 0 ${N} ${N}" fill="#111" shape-rendering="crispEdges">${r}</svg>`;
+}
+function renderContext(){
+  const box=$('#ctxStage');if(!box)return;const mode=CTX||'tablet';
+  const chips=$('#ctxChips'),M=[['tablet','Tablette en boutique'],['qr','QR sur le comptoir'],['web','Bulle sur votre site']];
+  if(!chips.children.length)M.forEach(([k,l])=>{const b=el('button','chip',l);b.type='button';b.dataset.k=k;b.onclick=()=>{CTX=k;renderContext()};chips.appendChild(b)});
+  [...chips.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===mode));
+  const name=escH($('#aiName').value.trim()||'Votre expert'),role=escH($('#aiRole').value.trim()||'Conseiller'),shop=escH($('#aiShop').value.trim()||'Votre boutique'),wel=escH($('#aiWelcome').value.trim()),av=svgImg(avatarSVG(cur()));
+  const lg=LOGO?`<img class="lg" src="${LOGO}" alt="">`:`<span class="lg">${shop}</span>`,fg=lum(TH.ac)>.35?'#1d1503':'#fff';
+  const cs=getComputedStyle($('#pStage'));
+  const cap={tablet:'Sur une tablette ou une borne en magasin, avec écran de veille.',qr:'Sur le comptoir, la vitrine ou les emballages : le client scanne et discute sur son téléphone.',web:'Une bulle sur votre site, sans rien installer.'}[mode];
+  if(mode==='tablet')box.innerHTML=`<div class="tdev"><div class="tscr" style="background-image:${cs.backgroundImage};background-color:${cs.backgroundColor}">${LOGO?lg:''}<img class="av" src="${av}" alt=""><b>${name}</b><div class="bub">${wel}</div><div class="pill" style="background:${TH.ac};color:${fg}">🎙️ Parler</div></div></div>`;
+  else if(mode==='qr')box.innerHTML=`<div style="display:grid;justify-items:center"><div class="qstand">${lg}${pseudoQr(name+shop)}<b>Scannez et parlez à ${name}</b><span>${role}${shop?', '+shop:''}</span></div><div class="qbase"></div></div>`;
+  else box.innerHTML=`<div class="web"><div class="bar"><i></i><i></i><i></i><span>${shop.toLowerCase().replace(/\s+/g,'')}.fr</span></div><div class="hero"></div><div class="sk" style="width:60%"></div><div class="sk" style="width:85%"></div><div class="sk" style="width:45%"></div><div class="wchat"><div class="hd" style="background:${TH.ac};color:${fg}"><img src="${av}" alt=""><div><b>${name}</b><br>${role}</div></div><p>${wel}</p></div><div class="wfab" style="background:${TH.ac};color:${fg}">💬</div></div>`;
+  $('#ctxCap').textContent=cap;
+}
+/* ---------- IMPORT DEPUIS UN SITE WEB (Gemini + lecture d'URL) ---------- */
+async function importSite(url){
+  if(!/^https?:\/\//i.test(url))url='https://'+url;
+  let host;try{host=new URL(url).hostname.replace(/^www\./,'')}catch(e){cToast('Adresse de site invalide.');return false}
+  cToast('Lecture de '+host+'…',60000);
+  const prompt='Lis le site '+url+' (page d\'accueil et pages utiles : produits, tarifs, contact, à propos). Extrais en français uniquement ce qui y figure réellement, sans rien inventer, sous forme de texte structuré avec ces sections quand l\'information existe : "CATALOGUE" (une ligne par produit ou service : nom ; courte description ; prix TTC), "INFOS PRATIQUES" (adresse, horaires, téléphone, email, livraison, retours, paiement), "VALEURS ET TON" (3 à 5 phrases sur l\'esprit de la marque). N\'indique aucun prix d\'achat ni marge.';
+  const order=[GOOD,...MODELS.filter(m=>m!==GOOD)].filter(Boolean);let text='';
+  for(const m of order){
+    try{
+      const r=await fetch(PROXY,{method:'POST',signal:AbortSignal.timeout(50000),headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode:'generate',model:m,trial:true,payload:{contents:[{parts:[{text:prompt}]}],tools:[{url_context:{}}],generationConfig:{temperature:.2,maxOutputTokens:4000}}})});
+      if(!r.ok)continue;const j=await r.json();
+      text=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();if(text.length>=80)break;
+    }catch(e){console.warn(e)}
+  }
+  if(text.length<80){cToast('Import impossible : le site n\'a pas pu être lu. Ajoutez vos documents à la main.',6000);return false}
+  const nm='Site '+host+'.txt';DOCS=DOCS.filter(x=>x.name!==nm);
+  DOCS.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:nm,ext:'txt',kind:'text',text,n:text.split(/\s+/).length,hidden:[],warn:''});
+  refreshDocsUI();updateReady();saveDraft();cToast('Site importé ✓ Relisez le document créé.',5000);return true;
+}
+$('#siteImport').onclick=async()=>{const u=$('#siteUrl').value.trim();if(!u)return $('#siteUrl').focus();const b=$('#siteImport');b.disabled=true;await importSite(u);b.disabled=false};
+
+/* ---------- DÉMARRAGE EXPRESS ---------- */
+const NAMES_M=['Marcel','Antoine','Hugo','Lucas','Théo','Paul','Julien','Victor'],NAMES_F=['Léa','Camille','Chloé','Inès','Louise','Manon','Clara','Emma'];
+$('#qkJob').innerHTML=Object.keys(JOBS).map(j=>`<option>${j}</option>`).join('');$('#qkJob').value=$('#aiJob').value in JOBS?$('#aiJob').value:Object.keys(JOBS)[0];
+async function quickStart(){
+  const shop=$('#qkShop').value.trim(),url=$('#qkUrl').value.trim(),b=$('#qkGo');
+  sel=0;ov={};const L=sel<10?NAMES_M:NAMES_F;$('#aiName').value=L[Math.random()*L.length|0];
+  $('#aiJob').value=$('#qkJob').value;welcomeEdited=false;qEdited=false;applyJob();$('#aiShop').value=shop;
+  if(shop){$('#aiWelcome').value='Bonjour et bienvenue chez '+shop+' ! Je suis '+$('#aiName').value+', votre '+$('#aiRole').value.toLowerCase()+'. Dites-moi ce que vous cherchez, je vous guide.';welcomeEdited=true}
+  sync();showTab('face',true);cToast('Conseiller généré : ajustez-le étape par étape.');
+  if(url){b.disabled=true;b.textContent='Import du site…';await importSite(url);b.disabled=false;b.textContent='Générer mon conseiller'}
+  $('#quick').classList.add('hidden');
+}
+$('#qkGo').onclick=quickStart;
+try{if(localStorage.getItem('stk_cs_draft'))$('#quick').classList.add('hidden')}catch(e){}
+
 (function(){ // police + bouton flottant mobile : seulement quand l'atelier est à l'écran
   const root=document.getElementById('cs'),sec=document.getElementById('configurateur');
   if(!('IntersectionObserver' in window)){loadFonts();return}
@@ -4464,7 +4804,7 @@ $('#keyDel').onclick=async()=>{
 })();
 window.openDashboard=openDashboard;window.closeDashboard=closeDashboard;window.loadDashboard=loadDashboard;
 window.loadConfigForEditing=loadConfigForEditing;
-window.CS={runPublic,refreshGate,reset(){editingId=null;CFG_ID=null;hasKey=false;updatePublish();refreshGate()}};
+window.CS={runPublic,refreshGate,afterPremium(){refreshGate();if(curStep==='publish'&&!editingId&&isPremium())saveToCloud(false)},reset(){editingId=null;CFG_ID=null;hasKey=false;updatePublish();refreshGate()}};
 
 })();
 </script>
