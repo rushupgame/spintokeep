@@ -1503,19 +1503,10 @@ body.trial-on #toast-container,body.trial-on #cs #toast{z-index:100002}
 #cs details.adv[open] summary{margin-bottom:12px}
 
 /* v8 : conseiller centré en haut, étapes de configuration en dessous */
-@media(min-width:901px){
-#cs .wrap{display:flex;flex-direction:column;align-items:center;max-width:760px;margin-inline:auto;gap:16px}
-#cs .preview{display:contents}
-#cs .stage{order:1;width:min(380px,100%);position:relative;top:auto}
-#cs #tabs{order:3;align-self:stretch;width:100%;position:sticky;top:70px;z-index:35;margin:0}
-#cs .main{order:4;align-self:stretch;width:100%}
-#cs .side{order:5;width:min(380px,100%)}
-}
 @media(max-width:900px){#cs .stage{justify-content:center}#cs .stage .info{flex:0 1 auto}#cs #tabs{width:calc(100% + 24px);box-sizing:border-box}}
 
 /* v10 : conseiller au-dessus du démarrage express */
-#cs .wrap>.quick{margin:0;align-self:stretch}
-@media(min-width:901px){#cs .quick{order:2}}
+#cs .colR>.quick{margin:0 0 16px}
 @media(max-width:900px){#cs .stage{order:-1}#cs .quick{order:0}}
 
 /* v11 : boutons Suivant + Tester fixes en bas */
@@ -1539,6 +1530,15 @@ body.trial-on #cs #dock{display:none}
 
 /* v13 : plus de halo derrière l'avatar */
 #cs :is(#kAvatar,#pAvatar)::before{display:none!important}
+
+/* v14 : PC = conseiller à gauche, configurateur à droite */
+#cs .colR{display:contents}
+@media(min-width:901px){
+#cs .wrap{display:flex;flex-direction:row;align-items:flex-start;gap:24px;max-width:1180px;margin-inline:auto}
+#cs .preview{display:block;position:sticky;top:90px;flex:0 0 380px;width:380px;order:0}
+#cs .stage{width:100%;order:0}
+#cs .colR{display:block;flex:1;min-width:0;order:1}
+}
 
     </style>
 </head>
@@ -4375,6 +4375,8 @@ function closeTrial(){
 }
 async function openTrial(){
   if(TRIAL)return;
+  gfetch.w=0;
+  if(currentUser&&isPremium()){try{await ensureSaved()}catch(e){console.warn(e)}}
   TRIAL=true;TESTMODE=true;TLOG=[];CFG_ID=editingId;trialRan=true;paintSteps();
   $('#kiosque').classList.add('trial');
   ['#trialBack','#trialBar'].forEach(s=>$(s).classList.remove('hidden'));$('#trialEnd').classList.add('hidden');
@@ -4385,6 +4387,7 @@ async function openTrial(){
   startTrialClock();
 }
 $('#launch').onclick=openTrial;
+(function(){const w=document.querySelector('#cs .wrap'),r=document.createElement('div');r.className='colR';['#quick','#tabs','.main'].forEach(q=>{const e=w.querySelector(q);if(e)r.appendChild(e)});w.appendChild(r)})();
 function goQuick(){
   const q=$('#quick'),vis=q&&!q.classList.contains('hidden'),t=vis?q:$('#tabs');
   t.scrollIntoView({behavior:'smooth',block:'start'});
@@ -4480,7 +4483,7 @@ function buildTabs(){
 /* ===== CLOUD : comptes, enregistrement, publication, statistiques ===== */
 const PROXY=SB_URL+'/functions/v1/conseiller-proxy';
 const RPCH={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
-function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode,model,payload,trial:TRIAL||undefined})})}
+function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;cToast('Le serveur IA a refusé l\'essai (code '+r.status+').',8000)}return r})}
 const uid=()=>Math.random().toString(36).substring(2,9).toUpperCase();
 const pubUrl=(id,x)=>location.origin+location.pathname+'?id='+id+(x||'');
 let hasKey=false,SESSION=uid(),FONTS_ON=false;
