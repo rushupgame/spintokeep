@@ -4496,7 +4496,7 @@ function buildTabs(){
 /* ===== CLOUD : comptes, enregistrement, publication, statistiques ===== */
 const PROXY=SB_URL+'/functions/v1/conseiller-proxy';
 const RPCH={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
-function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID||undefined,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;r.clone().json().catch(()=>({})).then(j=>cToast('Le serveur IA a refusé l\'essai (code '+r.status+(j&&j.error?' : '+j.error:'')+').',8000))}return r})}
+function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID||undefined,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;r.clone().json().catch(()=>({})).then(j=>{if(j&&typeof j.error==='string')cToast('Le serveur IA a refusé l\'essai (code '+r.status+' : '+j.error+').',8000);else gfetch.w=0})}return r})}
 const uid=()=>Math.random().toString(36).substring(2,9).toUpperCase();
 const pubUrl=(id,x)=>location.origin+location.pathname+'?id='+id+(x||'');
 let hasKey=false,SESSION=uid(),FONTS_ON=false;
