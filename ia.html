@@ -1551,6 +1551,11 @@ body.trial-on #cs #dock{display:none}
 #cs .preview{display:block;position:sticky;top:90px;flex:0 0 380px;width:380px;order:0}
 #cs .stage{width:100%;order:0}
 #cs .colR{display:block;flex:1;min-width:0;order:1}
+/* PC : boutons Suivant / Tester en bas du bloc de configuration (plus de barre flottante) */
+#cs .wrap{padding-bottom:60px}
+#cs #dock,#cs:not(.inview) #dock{position:static;display:flex;gap:10px;max-width:none;margin:0 0 20px;padding:0;background:none;pointer-events:auto}
+#cs #dock .cbtn{flex:1;box-shadow:none}
+#cs #dock .hidden{display:none}
 }
 
     </style>
@@ -4408,6 +4413,10 @@ function goQuick(){
 }
 document.querySelectorAll('a.btn[href="#configurateur"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goQuick()}));
 const hd=document.getElementById('heroDemo');if(hd)hd.onclick=openTrial;
+(function(){const dk=document.getElementById('dock'),cs=document.getElementById('cs'),mq=window.matchMedia('(min-width:901px)');
+function placeDock(){const m=cs&&cs.querySelector('.main');if(!dk||!m)return;
+if(mq.matches){if(m.nextElementSibling!==dk)m.after(dk)}else if(dk.parentNode!==cs)cs.appendChild(dk)}
+if(mq.addEventListener)mq.addEventListener('change',placeDock);else mq.addListener(placeDock);placeDock()})();
 $('#dockTest').onclick=openTrial;$('#dockNext').onclick=()=>{const n=TABS[TABS.findIndex(t=>t[0]===curStep)+1];if(n)showTab(n[0],true)};$('#launch2').onclick=openTrial;
 $('#trialBack').onclick=closeTrial;
 $('#teGo').onclick=()=>{closeTrial();showTab('publish',true)};
