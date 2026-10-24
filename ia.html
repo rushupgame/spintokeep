@@ -1584,14 +1584,15 @@ html:not(.cs-loading) #loader-wrapper{display:none}
 body.trial-on{overflow:hidden}
 body.trial-on #toast-container,body.trial-on #cs #toast{z-index:100002}
 #cs #trialBack{position:fixed;inset:0;z-index:100000;background:rgba(10,16,30,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
-#cs #kiosque.trial{inset:0;margin:auto;width:min(460px,calc(100vw - 24px));height:min(820px,calc(100vh - 24px));height:min(820px,calc(100dvh - 24px));border-radius:26px;box-shadow:0 30px 90px rgba(0,0,0,.5);z-index:100001;padding-top:50px;animation:trialPop .22s ease-out}
+#cs #kiosque.trial{inset:0;margin:0;width:100%;height:100%;height:100dvh;border-radius:0;box-shadow:none;z-index:100001;padding-top:58px;animation:trialPop .22s ease-out} /* démo = plein écran, comme en mode kiosque */
 @keyframes trialPop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
-@media(max-width:600px){#cs #kiosque.trial{width:auto;height:auto;margin:0;border-radius:0}}
-#cs #kiosque.trial .exit{opacity:1;top:10px;right:10px;font-weight:700}
+#cs #kiosque.trial .exit{opacity:1;top:max(10px,env(safe-area-inset-top));right:14px;font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;background:rgba(10,16,30,.8);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+#cs #kiosque.trial .exit:hover{background:#000}
 #cs #trialBar{position:absolute;top:0;left:0;right:0;z-index:30;pointer-events:none}
 #cs #trialBar i{display:block;height:5px;background:rgba(255,255,255,.25)}
 #cs #trialBar b{display:block;height:100%;width:100%;background:var(--blue);transition:width .25s linear}
 #cs #trialBar span{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(10,16,30,.55);color:#fff;border-radius:999px;padding:6px 14px;font:700 13px 'DM Sans',system-ui,sans-serif;white-space:nowrap;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@media(max-width:600px){#cs #trialBar span{left:14px;transform:none}#cs #kiosque.trial .exit{font-size:13px;padding:9px 13px}}
 #cs #trialEnd{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(10,16,30,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 #cs #trialEnd .te{background:#fff;color:var(--ink);border-radius:20px;padding:24px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);text-shadow:none}
 #cs #trialEnd h3{font-size:21px;font-weight:800;margin-bottom:8px;color:var(--ink)}
@@ -3803,6 +3804,15 @@ $('#logoFile').addEventListener('change',e=>{
 });
 
 /* ---------- PROFIL : COLLECTE / APPLICATION / SAUVEGARDE AUTO ---------- */
+/* ---------- PRÉNOM : un changement se répercute partout dans les textes ---------- */
+const effName=()=>($('#aiName').value||'').trim()||'votre conseiller';
+let nameBase=effName();
+const NAME_TEXTS=['aiWelcome','aiAttract','aiPromo','aiSkills','aiQ1','aiQ2','aiQ3'];
+function renameInTexts(o,n){
+  if(!o||o===n)return;
+  const re=new RegExp('(^|[^\\p{L}\\p{N}])'+o.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\p{N}])','gu');
+  NAME_TEXTS.forEach(f=>{const el=$('#'+f);if(el)el.value=el.value.replace(re,(m,a)=>a+n)});
+}
 const FIELDS=['aiName','aiRole','aiSkills','aiShop','aiTone','aiVoice','aiWelcome','aiPromo','aiAttract','aiIdle','aiQ1','aiQ2','aiQ3'];
 function collectConf(withDocs){
   const c={aiJob:$('#aiJob').value,theme:{...TH},sel,ov,clogo:LOGO};
@@ -3811,6 +3821,7 @@ function collectConf(withDocs){
 function applyConf(c){
   if(c.aiJob&&[...$('#aiJob').options].some(o=>o.value===c.aiJob)){$('#aiJob').value=c.aiJob;applyJob()}
   FIELDS.forEach(f=>{if(c[f]!==undefined&&c[f]!==null)$('#'+f).value=c[f]});
+  nameBase=effName();
   if(c.aiQ1!==undefined)qEdited=true;
   if(c.aiWelcome)welcomeEdited=true;
   $('#aiRoleBox').classList.toggle('hidden',$('#aiJob').value!==OTHER);
@@ -4117,7 +4128,7 @@ function stopLips(){clearInterval(lipTimer);lipTimer=null;lipTarget=lipCur=0;set
 const thumb=a=>avatarSVG(a).replace(/ id="[^"]*"/g,'').replace(/ class="[^"]*"/g,'').replace('viewBox="0 0 400 480"','viewBox="46 40 308 340"');
 function buildGallery(){
   const box=$('#avatarControls');box.className='gallery';box.innerHTML='';
-  AV.forEach((a,i)=>{const b=document.createElement('button');b.type='button';b.className='av';b.innerHTML=thumb(i===sel?cur():a);b.setAttribute('aria-pressed',i===sel);b.setAttribute('aria-label','Avatar '+(i+1));b.onclick=()=>{sel=i;ov={};sync()};box.appendChild(b)});
+  AV.forEach((a,i)=>{const b=document.createElement('button');b.type='button';b.className='av';b.innerHTML=thumb(i===sel?cur():a);b.setAttribute('aria-pressed',i===sel);b.setAttribute('aria-label','Avatar '+(i+1));b.onclick=()=>{sel=i;ov={};fitNameToFace();sync()};box.appendChild(b)});
 }
 function sync(){
   buildGallery();buildCustom();
@@ -4134,7 +4145,7 @@ function sync(){
 $('#atelier').addEventListener('input',saveDraft);
 $('#atelier').addEventListener('change',saveDraft);
 $('#apiKey').addEventListener('input',updateReady);$('#apiProv').addEventListener('change',paintKey);
-$('#randomize').onclick=()=>{sel=Math.random()*AV.length|0;ov={};sync()};
+$('#randomize').onclick=()=>{sel=Math.random()*AV.length|0;ov={};fitNameToFace();sync()};
 $('#apiKey').value='';
 
 /* ---------- MÉTIERS & COMPÉTENCES ---------- */
@@ -4169,6 +4180,13 @@ $('#aiJob').innerHTML=Object.keys(JOBS).map(j=>`<option>${j}</option>`).join('')
 $('#aiJob').value='Caviste';
 $('#aiJob').onchange=applyJob;
 ['#aiName','#aiRole'].forEach(s=>$(s).addEventListener('input',autoWelcome));
+$('#aiName').addEventListener('input',()=>{const n=effName();renameInTexts(nameBase,n);nameBase=n;saveDraft()});
+function fitNameToFace(){ // visage, prénom et voix restent cohérents : un prénom proposé du mauvais genre est remplacé
+  const masc=sel<10,cu=$('#aiName').value.trim();
+  if(!((masc&&NAMES_F.includes(cu))||(!masc&&NAMES_M.includes(cu))))return;
+  const L=masc?NAMES_M:NAMES_F,n=L[Math.random()*L.length|0];
+  renameInTexts(nameBase,n);$('#aiName').value=n;nameBase=n;autoWelcome();
+}
 $('#aiWelcome').addEventListener('input',()=>welcomeEdited=true);
 ['#aiQ1','#aiQ2','#aiQ3'].forEach(x=>$(x).addEventListener('input',()=>{qEdited=true}));
 
@@ -4193,8 +4211,8 @@ function speakBrowser(text){
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(text),t=TONES[E.tone];u.lang='fr-FR';u.rate=t.rate;u.pitch=t.pitch;
     const v=speechSynthesis.getVoices().filter(v=>v.lang.startsWith('fr'));
-    if(v.length){const fem=/amelie|audrey|julie|marie|hortense|female|femme/i,mas=/thomas|paul|male|homme|henri/i;
-      u.voice=v.find(x=>(E.voiceMasc?mas:fem).test(x.name))||v[0]}
+    if(v.length){const fem=/amelie|amélie|audrey|julie|marie|hortense|denise|eloise|céline|celine|female|femme/i,mas=/thomas|paul|henri|claude|antoine|male|homme/i;
+      const f=v.find(x=>(E.voiceMasc?mas:fem).test(x.name));u.voice=f||v[0];if(!f&&E.voiceMasc)u.pitch=Math.max(.1,u.pitch-.35)}
     u.onstart=startLips;u.onboundary=()=>{lipTarget=.9};u.onend=u.onerror=()=>{stopLips();res()};speechSynthesis.speak(u);
   });
 }
@@ -4202,17 +4220,19 @@ const TTS_MODELS=['gemini-3.8-flash-tts','gemini-3.1-flash-tts-preview'];
 const VOICE_AUTO={'Chaleureux':['Achird','Sulafat'],'Énergique':['Fenrir','Zephyr'],'Calme':['Charon','Achernar'],'Professionnel':['Orus','Kore'],'Humoristique':['Puck','Leda']};
 const VOICE_LIST=[['Voix féminines',[['Kore','Kore · assurée'],['Leda','Leda · jeune'],['Aoede','Aoede · légère'],['Sulafat','Sulafat · chaleureuse'],['Zephyr','Zephyr · lumineuse'],['Gacrux','Gacrux · mûre']]],
  ['Voix masculines',[['Puck','Puck · enjoué'],['Charon','Charon · posé'],['Orus','Orus · ferme'],['Fenrir','Fenrir · énergique'],['Achird','Achird · amical'],['Rasalgethi','Rasalgethi · informatif']]]];
-$('#aiVoice').innerHTML='<option value="auto">Automatique (selon l\'avatar et le ton)</option>'+VOICE_LIST.map(g=>`<optgroup label="${g[0]}">${g[1].map(v=>`<option value="${v[0]}">${v[1]}</option>`).join('')}</optgroup>`).join('');
+$('#aiVoice').innerHTML='<option value="auto">Automatique (la plus fluide, selon le visage)</option>'+VOICE_LIST.map(g=>`<optgroup label="${g[0]}">${g[1].map(v=>`<option value="${v[0]}">${v[1]}</option>`).join('')}</optgroup>`).join('');
 let ttsDeadUntil=0,GOOD_TTS=localStorage.getItem('gtts')||'';
 let ac=null,curSrc=null,curGain=null;const audioCache=new Map();
-const pickVoice=()=>E.voice!=='auto'?E.voice:VOICE_AUTO[E.tone][E.voiceMasc?0:1];
+const autoVoice=masc=>masc?'Achird':'Sulafat'; // voix par défaut, les plus naturelles en français : masculine = Achird, féminine = Sulafat (suit le visage, ne change jamais en cours de route)
+const pickVoice=()=>E.voice!=='auto'?E.voice:autoVoice(E.voiceMasc);
 async function geminiTTS(text,opts){
   const voice=opts?opts.voice:pickVoice(),ck=voice+'|'+(opts?'preview':E.tone)+'|'+text;if(audioCache.has(ck))return audioCache.get(ck);
   if(!opts&&Date.now()<ttsDeadUntil)throw new Error('TTS indisponible');
   const prompt=text;let last;
-  for(const m of [GOOD_TTS,...TTS_MODELS.filter(x=>x!==GOOD_TTS)].filter(Boolean)){
+  const ML=[GOOD_TTS,...TTS_MODELS.filter(x=>x!==GOOD_TTS)].filter(Boolean);
+  for(const m of [...ML,...ML]){
     try{
-      const r=await gfetch('generate',m,{contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}},AbortSignal.timeout(10000));
+      const r=await gfetch('generate',m,{contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}},AbortSignal.timeout(8000));
       if(!r.ok)throw new Error(m+' TTS HTTP '+r.status);
       const d=await r.json(),p=d.candidates?.[0]?.content?.parts?.find(x=>x.inlineData);
       if(!p)throw new Error(m+' : pas d\'audio');
@@ -4226,7 +4246,7 @@ async function geminiTTS(text,opts){
       return buf;
     }catch(e){last=e;console.warn(e)}
   }
-  ttsDeadUntil=Date.now()+60000;
+  ttsDeadUntil=Date.now()+20000; // le repli navigateur ne dure que 20 s, puis la voix Gemini revient
   throw last;
 }
 function playBuffer(buf){return new Promise(res=>{
@@ -4440,7 +4460,7 @@ async function previewVoice(){
   if(!currentUser){openAuthModal('signup');cToast("Créez un compte pour écouter les voix.");return}
   if(!isPremium()){openPremiumFlow();return}
   ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();
-  const v=$('#aiVoice').value,voice=v==='auto'?VOICE_AUTO[$('#aiTone').value][sel<10?0:1]:v;
+  const v=$('#aiVoice').value,voice=v==='auto'?autoVoice(sel<10):v;
   btn.textContent='⏳';btn.disabled=true;
   try{
     if(!await ensureSaved(true)){btn.textContent='▶ Écouter';btn.disabled=false;return}
@@ -4468,7 +4488,7 @@ if(window.visualViewport){ // le clavier tactile ne cache jamais le champ de sai
 async function launchKiosk(fromPublic){
   ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();
   E={
-    name:$('#aiName').value.trim()||'Marcel',role:$('#aiRole').value.trim()||'Conseiller',shop:$('#aiShop').value.trim(),skills:$('#aiSkills').value.trim(),
+    name:$('#aiName').value.trim()||'Votre conseiller',role:$('#aiRole').value.trim()||'Conseiller',shop:$('#aiShop').value.trim(),skills:$('#aiSkills').value.trim(),
     voice:$('#aiVoice').value,tone:$('#aiTone').value,welcome:$('#aiWelcome').value.trim()||'Bonjour !',docs:DOCS.map(d=>({id:d.id,name:d.name,kind:d.kind,text:d.text})),voiceMasc:sel<10,
     promo:$('#aiPromo').value.trim(),idle:+$('#aiIdle').value||60,q:[1,2,3].map(i=>$('#aiQ'+i).value.trim()).filter(Boolean),attract:$('#aiAttract').value.trim()||"Touchez l'écran pour commencer"
   };
@@ -4533,7 +4553,7 @@ function closeTrial(){
   if(!TRIAL)return;
   haltTrialActivity();
   try{wakeLock&&wakeLock.release()}catch(e){}
-  TRIAL=false;TESTMODE=false;
+  TRIAL=false;TESTMODE=false;$('#exit').textContent='Fermer';
   const k=$('#kiosque');k.classList.remove('trial');k.classList.add('hidden');k.style.height=k.style.top=k.style.bottom='';
   ['#trialBack','#trialBar','#trialEnd'].forEach(s=>$(s).classList.add('hidden'));
   $('#attract').classList.remove('show');$('#kAvatar').innerHTML='';
@@ -4544,7 +4564,7 @@ async function openTrial(){
   if(TRIAL)return;
   gfetch.w=0;
   if(currentUser&&isPremium()){try{await ensureSaved()}catch(e){console.warn(e)}}
-  TRIAL=true;TESTMODE=true;TLOG=[];CFG_ID=editingId;trialRan=true;paintSteps();
+  TRIAL=true;TESTMODE=true;TLOG=[];CFG_ID=editingId;trialRan=true;paintSteps();$('#exit').textContent='✕ Fermer la démo';
   $('#kiosque').classList.add('trial');
   ['#trialBack','#trialBar'].forEach(s=>$(s).classList.remove('hidden'));$('#trialEnd').classList.add('hidden');
   $('#trialFill').style.width='100%';$('#trialTime').textContent='⏱ '+fmtClock(TRIAL_SECONDS);
@@ -4967,6 +4987,7 @@ async function quickStart(){
   sel=0;ov={};const L=sel<10?NAMES_M:NAMES_F;$('#aiName').value=L[Math.random()*L.length|0];
   $('#aiJob').value=$('#qkJob').value;welcomeEdited=false;qEdited=false;applyJob();$('#aiShop').value=shop;
   if(shop){$('#aiWelcome').value='Bonjour et bienvenue chez '+shop+' ! Je suis '+$('#aiName').value+', votre '+$('#aiRole').value.toLowerCase()+'. Dites-moi ce que vous cherchez, je vous guide.';welcomeEdited=true}
+  nameBase=effName();
   sync();showTab('face',true);cToast('Conseiller généré : ajustez-le étape par étape.');
   if(url){b.disabled=true;b.textContent='Import du site…';await importSite(url);b.disabled=false;b.textContent='Générer mon conseiller'}
   $('#quick').classList.add('hidden');
