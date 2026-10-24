@@ -1702,6 +1702,103 @@ body.trial-on #cs #dock{display:none}
 #cs #dock .hidden{display:none}
 }
 
+
+/* ---------- DASHBOARD v2 : aéré, ergonomique, bleu comme les boutons CTA ---------- */
+#cs #dashboard-view{--pine:#0071e3;--pine-d:#0060c2;--brass:#0071e3;--b:#0071e3;--b-d:#0060c2;--b-l:#eaf3fe;--b-ll:#f5f9ff;--b-line:#cfe0f7;max-width:1240px;margin:0 auto;padding:56px 28px 100px;color:var(--ink)}
+#cs #dashboard-view .dash-header{align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:32px}
+#cs #dashboard-view .dash-eyebrow{display:inline-block;font:700 12px/1 'DM Sans',system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--b-d);background:var(--b-l);padding:8px 13px;border-radius:999px;margin-bottom:14px}
+#cs #dashboard-view .dash-title h2{margin:0;text-align:left;font-size:clamp(1.8rem,3.2vw,2.3rem);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+#cs #dashboard-view .dash-title p{margin:10px 0 0;color:var(--mute);font-size:15.5px;line-height:1.5}
+#cs #dashboard-view .btn-ghost{background:#fff;border:1.5px solid var(--b-line);color:var(--b-d);padding:11px 20px;font-size:14px;font-weight:700;border-radius:999px;transition:background .15s,border-color .15s,color .15s}
+#cs #dashboard-view .btn-ghost:hover{background:var(--b-l);border-color:var(--b)}
+#cs #dashboard-view .dash-upsell{border-radius:20px;padding:22px 26px;margin-bottom:28px;background:linear-gradient(135deg,#eaf3fe,#dcebfc);border:1px solid var(--b-line)}
+#cs #dashboard-view .dash-upsell .txt strong{color:#0a3d78;font-size:15.5px;margin-bottom:5px}
+#cs #dashboard-view .dash-upsell .txt span{color:#2c5a8f;font-size:13.5px;line-height:1.5}
+#cs #dashboard-view .btn-premium{padding:12px 22px;border-radius:999px;font-weight:700}
+
+#cs #dashboard-view .dash-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:18px;margin-bottom:44px}
+#cs #dashboard-view .dash-card{position:relative;background:#fff;border:1px solid #e8eef7;border-radius:20px;padding:22px 22px 20px;box-shadow:0 1px 2px rgba(16,40,80,.04),0 10px 28px rgba(16,40,80,.06);transition:transform .15s,box-shadow .15s}
+#cs #dashboard-view .dash-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(16,40,80,.05),0 16px 36px rgba(0,113,227,.12)}
+#cs #dashboard-view .dash-card .ico{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:var(--b-l);font-size:20px;margin-bottom:16px}
+#cs #dashboard-view .dash-card .num{font:800 32px/1.05 'Bricolage Grotesque','DM Sans',system-ui,sans-serif;letter-spacing:-.02em;color:var(--ink)}
+#cs #dashboard-view .dash-card .lbl{margin-top:7px;font-size:13px;line-height:1.35;color:var(--mute);font-weight:600}
+#cs #dashboard-view .dash-card.win{background:linear-gradient(145deg,#2b8cf0,#0071e3 55%,#0060c2);border-color:transparent;box-shadow:0 14px 34px rgba(0,113,227,.32)}
+#cs #dashboard-view .dash-card.win .ico{background:rgba(255,255,255,.2)}
+#cs #dashboard-view .dash-card.win .num,#cs #dashboard-view .dash-card.win .lbl{color:#fff}
+#cs #dashboard-view .dash-card.win .lbl{opacity:.9}
+#cs #dashboard-view .dash-card.status .num{font-size:20px;padding-top:8px;color:var(--b-d);white-space:nowrap}
+
+#cs #dashboard-view .dash-body{display:flex;flex-direction:column;gap:44px;align-items:stretch}
+@media(min-width:1100px){
+  #cs #dashboard-view .dash-body{flex-direction:row;gap:40px;align-items:flex-start}
+  #cs #dashboard-view .dash-col-list{flex:0 0 400px;min-width:0;position:sticky;top:84px;max-height:calc(100vh - 110px);overflow-y:auto;padding:4px 8px 24px 4px;margin:-4px -8px 0 -4px;scrollbar-width:thin}
+  #cs #dashboard-view .dash-col-stats{flex:1;min-width:0}
+}
+#cs #dashboard-view .dash-section-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font:800 20px/1.2 'Bricolage Grotesque','DM Sans',system-ui,sans-serif;letter-spacing:-.01em;margin:0 0 20px}
+#cs #dashboard-view .dash-pill{display:inline-block;font:700 13px/1 'DM Sans',system-ui,sans-serif;color:var(--b-d);background:var(--b-l);border-radius:999px;padding:7px 13px;letter-spacing:0}
+#cs #dashboard-view .dash-pill:empty{display:none}
+#cs #dashboard-view .dash-stats-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 18px;margin-bottom:6px}
+#cs #dashboard-view .dash-stats-head .dash-section-title{margin-bottom:14px}
+
+/* liste des conseillers */
+#cs #dashboard-view .dash-list{display:flex;flex-direction:column;gap:16px}
+#cs #dashboard-view .dash-item{position:relative;background:#fff;border:2px solid transparent;border-radius:20px;padding:20px 22px;box-shadow:0 1px 2px rgba(16,40,80,.04),0 8px 22px rgba(16,40,80,.06);cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s}
+#cs #dashboard-view .dash-item:hover{border-color:var(--b-line)}
+#cs #dashboard-view .dash-item.active{border-color:var(--b);background:var(--b-ll);box-shadow:0 0 0 4px rgba(0,113,227,.1),0 12px 28px rgba(0,113,227,.12)}
+#cs #dashboard-view .dash-item-top{align-items:flex-start;gap:12px;flex-wrap:nowrap}
+#cs #dashboard-view .dash-item-top>div{min-width:0}
+#cs #dashboard-view .dash-item-name{font:800 17px/1.25 'Bricolage Grotesque','DM Sans',system-ui,sans-serif;margin-bottom:8px;color:var(--ink)}
+#cs #dashboard-view .dash-item-id{display:inline-block;font:600 11.5px/1 ui-monospace,Menlo,monospace;background:var(--b-l);color:var(--b-d);padding:5px 9px;border-radius:7px}
+#cs #dashboard-view .dash-item-count{font-size:12px;font-weight:700;color:var(--b-d);background:var(--b-l);padding:6px 11px;border-radius:999px;white-space:nowrap}
+#cs #dashboard-view .dash-item-mini-stats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;padding-top:16px;border-top:1px solid #e8eef7;font-size:13px;color:var(--mute)}
+#cs #dashboard-view .dash-item-mini-stats b{color:var(--ink);font-weight:800}
+#cs #dashboard-view .dash-item-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+#cs #dashboard-view .dash-item-actions .btn-ghost{padding:9px 14px;font-size:13px}
+#cs #dashboard-view .dash-item-actions .btn-ghost[data-a=stats]{background:var(--b);border-color:var(--b);color:#fff;box-shadow:0 6px 16px rgba(0,113,227,.28)}
+#cs #dashboard-view .dash-item-actions .btn-ghost[data-a=stats]:hover{background:var(--b-d);border-color:var(--b-d)}
+#cs #dashboard-view .dash-item-actions .btn-ghost[data-a=del]{margin-left:auto;border-color:transparent;background:transparent;color:#d93025;padding:9px 12px}
+#cs #dashboard-view .dash-item-actions .btn-ghost[data-a=del]:hover{background:#fdecea;border-color:#f5c6c2}
+#cs #dashboard-view .dash-empty{background:#fff;border:2px dashed var(--b-line);border-radius:20px;padding:44px 24px;color:var(--mute);font-size:15px;line-height:1.55}
+
+/* sélecteur de période = contrôle segmenté bleu */
+#cs #dashboard-view #dash-range{display:inline-flex;gap:4px;padding:5px;margin:0 0 14px;background:#fff;border:1px solid #e1e9f5;border-radius:999px;box-shadow:0 1px 2px rgba(16,40,80,.04)}
+#cs #dashboard-view #dash-range .chip{border:0;background:transparent;color:var(--mute);padding:9px 18px;font-size:13.5px;font-weight:700;border-radius:999px;transition:background .15s,color .15s}
+#cs #dashboard-view #dash-range .chip:hover{color:var(--b-d);background:var(--b-l)}
+#cs #dashboard-view #dash-range .chip[aria-pressed=true]{background:var(--b);color:#fff;box-shadow:0 4px 12px rgba(0,113,227,.3)}
+
+/* contenu des statistiques */
+#cs #dashboard-view .kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:10px}
+#cs #dashboard-view .kpi{border:1px solid #e8eef7;border-radius:18px;padding:20px;box-shadow:0 1px 2px rgba(16,40,80,.04),0 8px 22px rgba(16,40,80,.05)}
+#cs #dashboard-view .kpi b{font-size:28px;letter-spacing:-.02em;color:var(--b-d)}
+#cs #dashboard-view .kpi span{display:block;margin-top:6px;font-size:13px;font-weight:600;color:var(--mute)}
+#cs #dashboard-view .ccard{border:1px solid #e8eef7;border-radius:20px;padding:24px;margin-top:22px;box-shadow:0 1px 2px rgba(16,40,80,.04),0 8px 22px rgba(16,40,80,.05)}
+#cs #dashboard-view .ccard h3{font:800 16px/1.3 'Bricolage Grotesque','DM Sans',system-ui,sans-serif;margin:0 0 18px}
+#cs #dashboard-view .hb{grid-template-columns:minmax(90px,38%) 1fr 34px;gap:14px;margin:13px 0;font-size:14px}
+#cs #dashboard-view .hbt{height:12px;background:var(--b-l);border-radius:999px}
+#cs #dashboard-view .hbt i{border-radius:999px;background:linear-gradient(90deg,#5aaeff,#0071e3)}
+#cs #dashboard-view .hv{color:var(--b-d);font-weight:800}
+#cs #dashboard-view .ccard .hint{margin:16px 0 0;padding:12px 14px;border-radius:12px;background:var(--b-ll);border:1px solid var(--b-line);color:#2c5a8f;font-size:13px;line-height:1.5}
+#cs #dashboard-view .ccard input[type=search]{border-radius:999px;border:1.5px solid #dbe6f5;padding:12px 18px;font-size:14px;margin-bottom:6px}
+#cs #dashboard-view .ccard input[type=search]:focus{border-color:var(--b);outline:3px solid rgba(0,113,227,.18);outline-offset:0}
+#cs #dashboard-view .cvs{margin-top:14px}
+#cs #dashboard-view .cv{padding:16px 0;border-top:1px solid #eaf0f8}
+#cs #dashboard-view .cv .q{font-size:14.5px;line-height:1.4;color:var(--ink)}
+#cs #dashboard-view .cv .a{margin-top:6px;font-size:13.5px;line-height:1.5}
+#cs #dashboard-view .cv .mt{margin-bottom:6px;font-weight:600;color:var(--b)}
+#cs #dashboard-view .ccard .cbtn{margin-top:14px;border-radius:999px}
+#cs #dashboard-view .empty{background:#fff;border:2px dashed var(--b-line);border-radius:20px;padding:44px 24px;font-size:15px;line-height:1.55;margin-top:10px}
+@media(max-width:700px){
+  #cs #dashboard-view{padding:24px 16px 80px}
+  #cs #dashboard-view .dash-header{margin-bottom:24px}
+  #cs #dashboard-view .dash-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:34px}
+  #cs #dashboard-view .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  #cs #dashboard-view .dash-card{padding:16px}
+  #cs #dashboard-view .dash-card .num{font-size:26px}
+  #cs #dashboard-view .dash-body{gap:34px}
+  #cs #dashboard-view .dash-item{padding:18px}
+  #cs #dashboard-view .ccard{padding:18px}
+  #cs #dashboard-view .hb{grid-template-columns:minmax(70px,42%) 1fr 30px;gap:10px}
+}
     </style>
 </head>
 <body>
@@ -1970,7 +2067,11 @@ body.trial-on #cs #dock{display:none}
 <!-- ============ DASHBOARD ============ -->
 <div id="dashboard-view">
     <div class="dash-header">
-        <h2 style="text-align:left;margin:0;font-size:1.9rem;">Mon Dashboard</h2>
+        <div class="dash-title">
+            <span class="dash-eyebrow">Tableau de bord</span>
+            <h2>Mon Dashboard</h2>
+            <p>Suivez l'activité de vos conseillers et ce que demandent vos clients.</p>
+        </div>
         <div class="dash-header-actions">
             <button class="btn-ghost" onclick="closeDashboard()">← Retour au configurateur</button>
         </div>
@@ -1982,22 +2083,24 @@ body.trial-on #cs #dock{display:none}
     </div>
 
     <div class="dash-cards">
-        <div class="dash-card"><div class="num" id="dash-count-configs">0</div><div class="lbl">Conseillers publiés</div></div>
-        <div class="dash-card"><div class="num" id="dash-count-visits">0</div><div class="lbl">Ouvertures (lien, QR, site)</div></div>
-        <div class="dash-card"><div class="num" id="dash-count-clients">0</div><div class="lbl">Clients (sessions)</div></div>
-        <div class="dash-card"><div class="num" id="dash-count-questions">0</div><div class="lbl">Questions posées</div></div>
-        <div class="dash-card win"><div class="num" id="dash-count-found">—</div><div class="lbl">Réponses trouvées</div></div>
-        <div class="dash-card"><div class="num" id="dash-status-premium">Free</div><div class="lbl">Statut du compte</div></div>
+        <div class="dash-card"><div class="ico" aria-hidden="true">🧑‍💼</div><div class="num" id="dash-count-configs">0</div><div class="lbl">Conseillers publiés</div></div>
+        <div class="dash-card"><div class="ico" aria-hidden="true">👁️</div><div class="num" id="dash-count-visits">0</div><div class="lbl">Ouvertures (lien, QR, site)</div></div>
+        <div class="dash-card"><div class="ico" aria-hidden="true">👥</div><div class="num" id="dash-count-clients">0</div><div class="lbl">Clients (sessions)</div></div>
+        <div class="dash-card"><div class="ico" aria-hidden="true">💬</div><div class="num" id="dash-count-questions">0</div><div class="lbl">Questions posées</div></div>
+        <div class="dash-card win"><div class="ico" aria-hidden="true">✅</div><div class="num" id="dash-count-found">—</div><div class="lbl">Réponses trouvées</div></div>
+        <div class="dash-card status"><div class="ico" aria-hidden="true">⭐</div><div class="num" id="dash-status-premium">Free</div><div class="lbl">Statut du compte</div></div>
     </div>
 
     <div class="dash-body">
-        <div class="dash-col-list">
+        <div class="dash-col-list" role="region" aria-label="Mes conseillers">
             <h3 class="dash-section-title">Mes conseillers</h3>
             <div id="dash-list" class="dash-list"></div>
         </div>
-        <div class="dash-col-stats" id="dash-stats-wrap">
-            <h3 class="dash-section-title">Statistiques : <span id="dash-sel-name"></span></h3>
-            <div id="dash-range" class="chips" style="margin-bottom:12px"></div>
+        <div class="dash-col-stats" id="dash-stats-wrap" role="region" aria-label="Statistiques">
+            <div class="dash-stats-head">
+                <h3 class="dash-section-title">Statistiques <span id="dash-sel-name" class="dash-pill"></span></h3>
+                <div id="dash-range" class="chips"></div>
+            </div>
             <div id="dash"></div>
         </div>
     </div>
@@ -4222,7 +4325,21 @@ const VOICE_LIST=[['Voix féminines',[['Kore','Kore · assurée'],['Leda','Leda 
  ['Voix masculines',[['Puck','Puck · enjoué'],['Charon','Charon · posé'],['Orus','Orus · ferme'],['Fenrir','Fenrir · énergique'],['Achird','Achird · amical'],['Rasalgethi','Rasalgethi · informatif']]]];
 $('#aiVoice').innerHTML='<option value="auto">Automatique (la plus fluide, selon le visage)</option>'+VOICE_LIST.map(g=>`<optgroup label="${g[0]}">${g[1].map(v=>`<option value="${v[0]}">${v[1]}</option>`).join('')}</optgroup>`).join('');
 let ttsDeadUntil=0,GOOD_TTS=localStorage.getItem('gtts')||'';
-let ac=null,curSrc=null,curGain=null;const audioCache=new Map();
+let ac=null,curSrc=null,curGain=null,keepAudio=null;
+const SILENT_WAV='data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+/* iPhone/iPad : le son n'est audible que si le contexte audio est débloqué par un geste ET si la session audio est « lecture »
+   (sinon l'interrupteur silencieux coupe tout). À appeler dans chaque geste de l'utilisateur. */
+function unlockAudio(){
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(navigator.audioSession)navigator.audioSession.type='playback';
+    if(ac.state!=='running')ac.resume();
+    const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);
+    if(!keepAudio){keepAudio=new Audio(SILENT_WAV);keepAudio.loop=true;keepAudio.setAttribute('playsinline','');keepAudio.setAttribute('webkit-playsinline','')}
+    if(keepAudio.paused){const p=keepAudio.play();if(p&&p.catch)p.catch(()=>{})}
+  }catch(e){console.warn('audio',e)}
+}
+function stopKeepAudio(){try{keepAudio&&keepAudio.pause()}catch(e){}}const audioCache=new Map();
 const autoVoice=masc=>masc?'Achird':'Sulafat'; // voix par défaut, les plus naturelles en français : masculine = Achird, féminine = Sulafat (suit le visage, ne change jamais en cours de route)
 const pickVoice=()=>E.voice!=='auto'?E.voice:autoVoice(E.voiceMasc);
 async function geminiTTS(text,opts){
@@ -4250,6 +4367,7 @@ async function geminiTTS(text,opts){
   throw last;
 }
 function playBuffer(buf){return new Promise(res=>{
+  if(ac.state!=='running'){try{ac.resume()}catch(e){}}
   const src=ac.createBufferSource(),an=ac.createAnalyser(),data=new Uint8Array(512);an.fftSize=512;
   const gn=ac.createGain();src.buffer=buf;src.connect(an);an.connect(gn);gn.connect(ac.destination);curSrc=src;curGain=gn;$('#kiosque').classList.add('talking');
   let on=true,sm=0;
@@ -4286,7 +4404,7 @@ function resetIdle(){
   if(att.classList.contains('show')){
     att.classList.remove('show');
     chatHistory=[]; // nouveau client : on oublie la conversation précédente
-    ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();
+    unlockAudio();
     showHome();speak(E.welcome);
   }
   if(!$('#kiosque').classList.contains('hidden')){
@@ -4382,6 +4500,7 @@ async function warmUp(){
 }
 let qSeq=0,curCtl=null;
 async function handleQuestion(q){
+  unlockAudio();
   const my=++qSeq; // une nouvelle question remplace aussitôt la précédente (voix ou texte)
   if(curCtl){try{curCtl.abort()}catch(e){}curCtl=null}
   stopSpeech();$('#txtIn').value='';mic.classList.remove('hint');
@@ -4424,6 +4543,7 @@ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null,heard='',listening=false,listenEl=null,latched=false,downAt=0,ignoreUp=false,autoStop=null,micErr=false;
 const mic=$('#mic');
 function startListen(){
+  unlockAudio();
   if(!SR||listening||mic.disabled)return;
   stopSpeech();stopLips();mic.classList.remove('hint');micErr=false;
   rec=new SR();rec.lang='fr-FR';rec.interimResults=true;rec.continuous=true;heard='';
@@ -4459,7 +4579,7 @@ async function previewVoice(){
   if(prevSrc){try{prevSrc.stop()}catch(e){}prevSrc=null;btn.textContent='▶ Écouter';return}
   if(!currentUser){openAuthModal('signup');cToast("Créez un compte pour écouter les voix.");return}
   if(!isPremium()){openPremiumFlow();return}
-  ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();
+  unlockAudio();
   const v=$('#aiVoice').value,voice=v==='auto'?autoVoice(sel<10):v;
   btn.textContent='⏳';btn.disabled=true;
   try{
@@ -4486,7 +4606,7 @@ if(window.visualViewport){ // le clavier tactile ne cache jamais le champ de sai
 
 /* ---------- BASCULE ÉCRANS ---------- */
 async function launchKiosk(fromPublic){
-  ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume();
+  unlockAudio();
   E={
     name:$('#aiName').value.trim()||'Votre conseiller',role:$('#aiRole').value.trim()||'Conseiller',shop:$('#aiShop').value.trim(),skills:$('#aiSkills').value.trim(),
     voice:$('#aiVoice').value,tone:$('#aiTone').value,welcome:$('#aiWelcome').value.trim()||'Bonjour !',docs:DOCS.map(d=>({id:d.id,name:d.name,kind:d.kind,text:d.text})),voiceMasc:sel<10,
@@ -4553,7 +4673,7 @@ function closeTrial(){
   if(!TRIAL)return;
   haltTrialActivity();
   try{wakeLock&&wakeLock.release()}catch(e){}
-  TRIAL=false;TESTMODE=false;$('#exit').textContent='Fermer';
+  TRIAL=false;TESTMODE=false;stopKeepAudio();$('#exit').textContent='Fermer';
   const k=$('#kiosque');k.classList.remove('trial');k.classList.add('hidden');k.style.height=k.style.top=k.style.bottom='';
   ['#trialBack','#trialBar','#trialEnd'].forEach(s=>$(s).classList.add('hidden'));
   $('#attract').classList.remove('show');$('#kAvatar').innerHTML='';
@@ -4561,6 +4681,7 @@ function closeTrial(){
   sync();paintSteps();
 }
 async function openTrial(){
+  unlockAudio(); // dans le geste de l'utilisateur, avant tout await
   if(TRIAL)return;
   gfetch.w=0;
   if(currentUser&&isPremium()){try{await ensureSaved()}catch(e){console.warn(e)}}
@@ -4595,7 +4716,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&TRIAL)closeTrial()}
 $('#exit').onclick=()=>{
   if(TRIAL){closeTrial();return}
   if(!confirm('Quitter le mode test ?'))return;
-  clearTimeout(idleTimer);stopSpeech();stopLips();stopListen();
+  clearTimeout(idleTimer);stopSpeech();stopLips();stopListen();stopKeepAudio();
   try{wakeLock&&wakeLock.release()}catch(e){}
   if(document.fullscreenElement)document.exitFullscreen();
   $('#attract').classList.remove('show');TESTMODE=false;
@@ -4849,8 +4970,9 @@ async function loadDashboard(retry){
     const it=document.createElement('div');it.className='dash-item';it.dataset.id=c.id;
     it.innerHTML=`<div class="dash-item-top"><div><div class="dash-item-name">${name}</div><span class="dash-item-id">ID · ${c.id}</span></div><span class="dash-item-count">${r.length} question${r.length>1?'s':''}</span></div>
       <div class="dash-item-mini-stats"><span>👁️ <b>${DASH.visits[c.id]}</b> ouvertures</span><span>👥 <b>${s}</b> clients</span><span>💬 <b>${r.length}</b> questions</span></div>
-      <div class="dash-item-actions"><button class="btn-ghost" data-a="stats">📊 Statistiques</button><button class="btn-ghost" data-a="edit">✏️ Éditer</button><button class="btn-ghost" data-a="open">🔗 Ouvrir</button><button class="btn-ghost" data-a="copy">📋 Copier le lien</button><button class="btn-ghost" data-a="csv">⬇️ CSV</button><button class="btn-ghost" data-a="del" style="color:#d93025">🗑️</button></div>`;
+      <div class="dash-item-actions"><button class="btn-ghost" data-a="stats">📊 Statistiques</button><button class="btn-ghost" data-a="edit">✏️ Éditer</button><button class="btn-ghost" data-a="open">🔗 Ouvrir</button><button class="btn-ghost" data-a="copy">📋 Copier le lien</button><button class="btn-ghost" data-a="csv">⬇️ CSV</button><button class="btn-ghost" data-a="del" title="Supprimer ce conseiller" aria-label="Supprimer ce conseiller">🗑️</button></div>`;
     it.querySelectorAll('button').forEach(b=>b.onclick=()=>dashAction(c.id,b.dataset.a));
+    it.onclick=e=>{if(e.target.closest('button'))return;DASH.sel=c.id;drawDashStats()};
     list.appendChild(it);
   });
   drawDashStats();
@@ -4859,6 +4981,7 @@ function drawDashStats(){
   const id=DASH.sel;if(!id)return;
   const c=DASH.cfgs.find(x=>x.id===id);
   $('#dash-sel-name').textContent=c?(c.name||'Conseiller'):'';
+  document.querySelectorAll('#dash-list .dash-item').forEach(x=>x.classList.toggle('active',x.dataset.id===id));
   const h=$('#dash-range');h.innerHTML='';
   [[7,'7 jours'],[30,'30 jours'],[0,'Tout']].forEach(([v,l])=>{const b=el('button','chip',l);b.type='button';b.setAttribute('aria-pressed',dashRange===v);b.onclick=()=>{dashRange=v;drawDashStats()};h.appendChild(b)});
   renderStats($('#dash'),DASH.rows[id]||[],DASH.visits[id]||0,dashRange);
