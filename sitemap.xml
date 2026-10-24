@@ -9,6 +9,12 @@
   </url>
 
   <url>
+    <loc>https://spintokeep.com/blog/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://spintokeep.com/blog/acheter-avis-google-danger.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -107,7 +113,61 @@
   </url>
 
   <url>
+    <loc>https://spintokeep.com/bijouterie/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/boucherie-charcuterie/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/boulangerie/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/boutique-de-bubble-tea/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/cave-a-bieres/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/chocolatier/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/cordonnier-et-cle-minute/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/epicerie-fine/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://spintokeep.com/fleuriste/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://spintokeep.com/fromagerie/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -119,7 +179,19 @@
   </url>
 
   <url>
+    <loc>https://spintokeep.com/hotel-et-chambre-d-hotes/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://spintokeep.com/institut-de-beaute/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/kebab-et-restauration-rapide/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -131,13 +203,43 @@
   </url>
 
   <url>
+    <loc>https://spintokeep.com/paysagiste/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://spintokeep.com/pharmacie/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/pizzeria-a-emporter/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/reparation-de-smartphone/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/restaurant/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
     <loc>https://spintokeep.com/salle-de-sport/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://spintokeep.com/station-de-lavage-auto/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
