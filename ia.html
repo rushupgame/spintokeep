@@ -654,14 +654,18 @@
   --
   --       if (trial === true) {
   --         // Essai gratuit : pas de contrôle Premium, mais quota par IP
+  --         // Deux compteurs séparés : les phrases de voix (nombreuses) ne doivent pas épuiser le quota des réponses texte.
   --         const ip = (req.headers.get("x-forwarded-for") ?? "inconnue").split(",")[0].trim();
+  --         const bucket = (wantsAudio ? "voix:" : "texte:") + ip;
+  --         const max = Number(Deno.env.get(wantsAudio ? "TRIAL_AUDIO_LIMIT" : "TRIAL_HOURLY_LIMIT") ?? (wantsAudio ? 600 : 200));
   --         const now = Date.now();
-  --         const hits = (TRIAL_HITS.get(ip) ?? []).filter((t) => now - t < 36e5);
-  --         if (hits.length >= Number(Deno.env.get("TRIAL_HOURLY_LIMIT") ?? 60)) {
+  --         const hits = (TRIAL_HITS.get(bucket) ?? []).filter((t) => now - t < 36e5);
+  --         if (hits.length >= max) {
   --           return J({ error: "limite d'essai atteinte, réessayez plus tard" }, 429);
   --         }
   --         hits.push(now);
-  --         TRIAL_HITS.set(ip, hits);
+  --         TRIAL_HITS.set(bucket, hits);
+  --         if (TRIAL_HITS.size > 5000) TRIAL_HITS.clear();
   --       } else {
   --         let c = CFG_CACHE.get(config_id);
   --         if (!c || Date.now() - c.t > 60000) {
@@ -4446,7 +4450,11 @@ async function streamGemini(contents,q,cb={}){
         const gc={temperature:.7,maxOutputTokens:think?300:1024};
         if(think)gc.thinkingConfig={thinkingBudget:0};
         const r=await gfetch('stream',m,{systemInstruction:{parts:[{text:sys}]},contents,generationConfig:gc},ctl.signal);
-        if(!r.ok){if(r.status===400&&think){tried400=true;continue}const bt=(await r.text().catch(()=>'')).slice(0,200);throw new Error(m+' HTTP '+r.status+' '+bt)}
+        if(!r.ok){if(r.status===400&&think){tried400=true;continue}const bt=(await r.text().catch(()=>'')).slice(0,300);
+          let pj=null;try{pj=JSON.parse(bt)}catch(x){}
+          const er=new Error(m+' HTTP '+r.status+' '+bt);
+          if(pj&&typeof pj.error==='string'&&[402,413,429,500].includes(r.status)){er.fatal=true;er.code=r.status;er.detail=pj.error} // erreur de NOTRE serveur : inutile d'essayer les autres modèles
+          throw er}
         const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
         try{
           for(;;){
@@ -4470,7 +4478,7 @@ async function streamGemini(contents,q,cb={}){
         if(!think&&tried400)NO_THINK=true;
         GOOD=m;try{localStorage.setItem('gmodel',m)}catch(e){}
         return acc.trim();
-      }catch(e){if(cb.stale&&cb.stale())throw e;lastErr=e;console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}}
+      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}}
       finally{clearTimeout(to)}
     }
   }
@@ -4530,9 +4538,9 @@ async function handleQuestion(q){
     stopSt();typing.remove();
     if(my!==qSeq)return;
     stopWait();console.error(e);
-    const m="Désolé, je n'arrive pas à vous répondre pour le moment. Réessayez ?";
+    const m=e&&e.code===429?"Beaucoup de monde en ce moment, je reviens vers vous dans quelques instants. Réessayez ?":"Désolé, je n'arrive pas à vous répondre pour le moment. Réessayez ?";
     appendMsg(m,'ai');
-    if(/[?&]debug/.test(location.search))appendMsg('⚠ '+(e&&e.message||e),'ai');
+    if(TRIAL||/[?&]debug/.test(location.search))appendMsg('⚠ '+((e&&(e.detail?'serveur : '+e.detail+' (code '+e.code+')':e.message))||e),'ai'); // détail technique visible pendant la démo
     setSugg([],true);
     await speak(m);
   }
