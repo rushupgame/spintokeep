@@ -4452,7 +4452,7 @@ async function streamGemini(contents,q,cb={}){
         const r=await gfetch('stream',m,{systemInstruction:{parts:[{text:sys}]},contents,generationConfig:gc},ctl.signal);
         if(!r.ok){if(r.status===400&&think){tried400=true;continue}const bt=(await r.text().catch(()=>'')).slice(0,300);
           let pj=null;try{pj=JSON.parse(bt)}catch(x){}
-          const er=new Error(m+' HTTP '+r.status+' '+bt);
+          const er=new Error(m+' HTTP '+r.status+' '+bt);er.http=r.status;
           if(pj&&typeof pj.error==='string'&&[402,413,429,500].includes(r.status)){er.fatal=true;er.code=r.status;er.detail=pj.error} // erreur de NOTRE serveur : inutile d'essayer les autres modèles
           throw er}
         const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
@@ -4478,7 +4478,7 @@ async function streamGemini(contents,q,cb={}){
         if(!think&&tried400)NO_THINK=true;
         GOOD=m;try{localStorage.setItem('gmodel',m)}catch(e){}
         return acc.trim();
-      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}}
+      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}if(e&&e.http===429)break} // quota dépassé : inutile de réessayer le même modèle
       finally{clearTimeout(to)}
     }
   }
@@ -4501,7 +4501,7 @@ async function prefetchAnswer(q){
 function pingProxy(){try{fetch(PROXY,{method:'OPTIONS'}).catch(()=>{})}catch(e){}} // réveille la fonction Edge (évite le démarrage à froid)
 async function warmUp(){
   pingProxy();const mine=E;PRE={};
-  for(const q of mine.q){
+  for(const q of (TRIAL?mine.q.slice(0,1):mine.q)){ // démo : on ne précharge que la 1re question (économise le quota IA)
     if(E!==mine||$('#kiosque').classList.contains('hidden'))return;
     try{const r=await prefetchAnswer(q);if(E===mine)PRE[q]=r}catch(e){console.warn('préchargement',e)}
   }
@@ -4538,9 +4538,9 @@ async function handleQuestion(q){
     stopSt();typing.remove();
     if(my!==qSeq)return;
     stopWait();console.error(e);
-    const m=e&&e.code===429?"Beaucoup de monde en ce moment, je reviens vers vous dans quelques instants. Réessayez ?":"Désolé, je n'arrive pas à vous répondre pour le moment. Réessayez ?";
+    const m=e&&(e.code===429||e.http===429)?"Beaucoup de monde en ce moment, je reviens vers vous dans quelques instants. Réessayez ?":"Désolé, je n'arrive pas à vous répondre pour le moment. Réessayez ?";
     appendMsg(m,'ai');
-    if(TRIAL||/[?&]debug/.test(location.search))appendMsg('⚠ '+((e&&(e.detail?'serveur : '+e.detail+' (code '+e.code+')':e.message))||e),'ai'); // détail technique visible pendant la démo
+    if(TRIAL||/[?&]debug/.test(location.search))appendMsg('⚠ '+((e&&(e.detail?'serveur : '+e.detail+' (code '+e.code+')':(e.http===429?'Quota Gemini dépassé (code 429) : la clé IA du service a atteint sa limite. Activez la facturation de ce projet dans Google AI Studio, ou renseignez votre propre clé.':e.message)))||e),'ai'); // détail technique visible pendant la démo
     setSugg([],true);
     await speak(m);
   }
