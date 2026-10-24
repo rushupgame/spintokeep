@@ -4439,9 +4439,13 @@ function buildSys(q){
   const promo=E.promo?` Offre du moment à mentionner brièvement si elle colle à la demande du client : ${E.promo}.`:'';
   return `Tu es ${E.name}, ${E.role}${E.shop?' de la boutique « '+E.shop+' »':''}. Tu conseilles les clients dans le magasin sur un kiosque. Ton ton est ${TONES[E.tone].desc}. Réponds toujours en français, en 2 phrases très courtes maximum, sans liste, sans emoji, comme à l'oral ; ta première phrase fait 8 mots maximum pour que la voix démarre tout de suite. ${E.skills?`Compétences : ${E.skills}.`:''} ${stockInfo}${promo} Va droit au but, fais une recommandation précise si possible. Ne pose une question QUE si c'est strictement indispensable, et limite-toi à une seule question courte.`;
 }
+function errBrief(m,e){ // résumé d'une erreur par modèle, pour le diagnostic
+  const t=(e&&e.message)||'',h=e&&e.http,st=/"status":\s*"([A-Z_]+)"/.exec(t),lim=/limit:\s*(\d+)/.exec(t),mt=/metric:\s*([^\s,\\]+)/.exec(t);
+  return m+' → '+(h||t.slice(0,50))+(st?' '+st[1]:'')+(lim?' (limite '+lim[1]+')':'')+(mt?' ['+mt[1].split('/').pop()+']':'');
+}
 async function streamGemini(contents,q,cb={}){
   const sys=buildSys(q),order=[GOOD,...MODELS.filter(m=>m!==GOOD)].filter(Boolean);
-  let lastErr;
+  let lastErr;const all=[];
   for(const m of order){
     let tried400=false;
     for(const think of(NO_THINK?[false]:[true,false])){
@@ -4450,7 +4454,7 @@ async function streamGemini(contents,q,cb={}){
         const gc={temperature:.7,maxOutputTokens:think?300:1024};
         if(think)gc.thinkingConfig={thinkingBudget:0};
         const r=await gfetch('stream',m,{systemInstruction:{parts:[{text:sys}]},contents,generationConfig:gc},ctl.signal);
-        if(!r.ok){if(r.status===400&&think){tried400=true;continue}const bt=(await r.text().catch(()=>'')).slice(0,300);
+        if(!r.ok){if(r.status===400&&think){tried400=true;continue}const bt=(await r.text().catch(()=>'')).slice(0,1500);
           let pj=null;try{pj=JSON.parse(bt)}catch(x){}
           const er=new Error(m+' HTTP '+r.status+' '+bt);er.http=r.status;
           if(pj&&typeof pj.error==='string'&&[402,413,429,500].includes(r.status)){er.fatal=true;er.code=r.status;er.detail=pj.error} // erreur de NOTRE serveur : inutile d'essayer les autres modèles
@@ -4478,11 +4482,11 @@ async function streamGemini(contents,q,cb={}){
         if(!think&&tried400)NO_THINK=true;
         GOOD=m;try{localStorage.setItem('gmodel',m)}catch(e){}
         return acc.trim();
-      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}if(e&&e.http===429)break} // quota dépassé : inutile de réessayer le même modèle
+      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;all.push(errBrief(m,e));console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}if(e&&e.http===429)break} // quota dépassé : inutile de réessayer le même modèle
       finally{clearTimeout(to)}
     }
   }
-  throw lastErr||new Error('Gemini indisponible');
+  const fe=lastErr||new Error('Gemini indisponible');fe.all=all;throw fe;
 }
 function makeSpeaker(){
   const gen=speechGen;let chain=Promise.resolve();
@@ -4540,7 +4544,7 @@ async function handleQuestion(q){
     stopWait();console.error(e);
     const m=e&&(e.code===429||e.http===429)?"Beaucoup de monde en ce moment, je reviens vers vous dans quelques instants. Réessayez ?":"Désolé, je n'arrive pas à vous répondre pour le moment. Réessayez ?";
     appendMsg(m,'ai');
-    if(TRIAL||/[?&]debug/.test(location.search))appendMsg('⚠ '+((e&&(e.detail?'serveur : '+e.detail+' (code '+e.code+')':(e.http===429?'Quota Gemini dépassé (code 429) : la clé IA du service a atteint sa limite. Activez la facturation de ce projet dans Google AI Studio, ou renseignez votre propre clé.':e.message)))||e),'ai'); // détail technique visible pendant la démo
+    if(TRIAL||/[?&]debug/.test(location.search))appendMsg('⚠ '+((e&&(e.detail?'serveur : '+e.detail+' (code '+e.code+')':(e.all&&e.all.length?e.all.join(' · ')+(e.http===429?' — si votre quota Google semble libre, vérifiez que la clé GEMINI_API_KEY de Supabase appartient bien à ce projet.':''):e.message)))||e),'ai'); // détail technique visible pendant la démo
     setSugg([],true);
     await speak(m);
   }
