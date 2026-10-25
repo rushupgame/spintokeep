@@ -563,6 +563,7 @@
   --   supabase functions deploy conseiller-proxy
   --   supabase secrets set GEMINI_API_KEY=... DAILY_LIMIT=3000
   --   (facultatif) ANTHROPIC_MODEL=claude-haiku-5-5  OPENAI_MODEL=gpt-4o-mini
+  --   GROQ_API_KEY=...  (texte en premier sur Groq, Gemini en secours)  GROQ_MODEL=openai/gpt-oss-120b  GROQ_TIMEOUT_MS=4000
   -- Code de supabase/functions/conseiller-proxy/index.ts :
   --
   --   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -575,6 +576,7 @@
   --     "Access-Control-Allow-Origin": "*",
   --     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   --     "Access-Control-Allow-Methods": "POST, OPTIONS",
+  --     "Access-Control-Expose-Headers": "x-engine",
   --   };
   --   const J = (o: unknown, s = 200) =>
   --     new Response(JSON.stringify(o), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
@@ -603,7 +605,7 @@
   --   // ---- Réponses (Claude / OpenAI -> format Gemini attendu par le navigateur) ----
   --   const geminiFrame = (t: string) => `data: ${JSON.stringify({ candidates: [{ content: { parts: [{ text: t }] } }] })}\n\n`;
   --
-  --   function streamAsGemini(up: Response, extract: (j: any) => string): Response {
+  --   function streamAsGemini(up: Response, extract: (j: any) => string, engine = ""): Response {
   --     const dec = new TextDecoder(), enc = new TextEncoder();
   --     let buf = "";
   --     const ts = new TransformStream<Uint8Array, Uint8Array>({
@@ -619,10 +621,61 @@
   --         }
   --       },
   --     });
-  --     return new Response(up.body!.pipeThrough(ts), { status: 200, headers: { ...CORS, "Content-Type": "text/event-stream" } });
+  --     return new Response(up.body!.pipeThrough(ts), { status: 200, headers: { ...CORS, "Content-Type": "text/event-stream", ...(engine ? { "x-engine": engine } : {}) } });
   --   }
   --
-  --   const asGeminiJson = (t: string) => J({ candidates: [{ content: { parts: [{ text: t }] } }] });
+  --   const asGeminiJson = (t: string, engine = "") =>
+  --     new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: t }] } }] }), {
+  --       status: 200, headers: { ...CORS, "Content-Type": "application/json", ...(engine ? { "x-engine": engine } : {}) },
+  --     });
+  --
+  --   // ---- Groq en premier (rapide et économique), Gemini en secours ----
+  --   let GROQ_OFF_UNTIL = 0; // pause automatique de Groq après un refus (quota, crédit, panne)
+  --   const groqKey = () => Deno.env.get("GROQ_API_KEY") ?? Deno.env.get("GROQ_KEY");
+  --
+  --   function groqBackoff(up: Response) {
+  --     const s = up.status;
+  --     let ms = 20000; // panne ou lenteur : on réessaiera dans 20 s
+  --     if (s === 429) { const ra = Number(up.headers.get("retry-after")); ms = (ra > 0 ? Math.min(ra, 3600) : 60) * 1000; } // limite par minute ou par jour
+  --     else if (s === 401 || s === 402 || s === 403) ms = 600000; // clé refusée / plus de crédit : 10 min
+  --     else if (s === 400 || s === 404) ms = 300000; // modèle ou paramètre refusé : 5 min
+  --     GROQ_OFF_UNTIL = Date.now() + ms;
+  --     console.warn("groq", s, "en pause", Math.round(ms / 1000), "s");
+  --   }
+  --
+  --   async function tryGroq(payload: any, stream: boolean): Promise<Response | null> {
+  --     const key = groqKey();
+  --     if (!key || Date.now() < GROQ_OFF_UNTIL) return null;
+  --     const { system, msgs, max, temp } = toChat(payload);
+  --     const model = Deno.env.get("GROQ_MODEL") ?? "openai/gpt-oss-120b";
+  --     const oss = model.includes("gpt-oss");
+  --     const body: any = {
+  --       model, stream,
+  --       messages: [...(system ? [{ role: "system", content: system }] : []), ...msgs],
+  --       max_completion_tokens: oss ? Math.max(max, 700) : max, // la réflexion de gpt-oss compte dans la limite
+  --     };
+  --     if (typeof temp === "number") body.temperature = temp;
+  --     if (oss) { body.reasoning_effort = "low"; body.include_reasoning = false; } // réflexion minimale = réponse quasi instantanée
+  --     const ctl = new AbortController();
+  --     const to = setTimeout(() => ctl.abort(), Number(Deno.env.get("GROQ_TIMEOUT_MS") ?? 4000));
+  --     try {
+  --       const up = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  --         method: "POST", signal: ctl.signal,
+  --         headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+  --         body: JSON.stringify(body),
+  --       });
+  --       if (!up.ok) { clearTimeout(to); groqBackoff(up); try { await up.body?.cancel(); } catch { /* ok */ } return null; }
+  --       if (stream) { clearTimeout(to); return streamAsGemini(up, (j) => j.choices?.[0]?.delta?.content ?? "", "groq"); }
+  --       const j = await up.json();
+  --       clearTimeout(to);
+  --       const txt = j.choices?.[0]?.message?.content ?? "";
+  --       return txt.trim() ? asGeminiJson(txt, "groq") : null;
+  --     } catch {
+  --       clearTimeout(to);
+  --       GROQ_OFF_UNTIL = Date.now() + 20000;
+  --       return null;
+  --     }
+  --   }
   --
   --   async function providerError(up: Response, name: string) {
   --     let msg = "";
@@ -650,6 +703,7 @@
   --       const wantsAudio = (payload as any).generationConfig?.responseModalities?.includes?.("AUDIO") === true;
   --
   --       let provider: Provider = "gemini";
+  --       let useService = true; // clé du service (Groq puis Gemini) ; false si le commerçant a sa propre clé
   --       let key: string | undefined = Deno.env.get("GEMINI_API_KEY"); // Gemini par défaut, clé du service
   --
   --       if (trial === true) {
@@ -689,6 +743,7 @@
   --
   --         // Clé personnelle du commerçant : Gemini, Claude (Anthropic) ou OpenAI
   --         if (c.userKey) {
+  --           useService = false;
   --           const p = c.provider as Provider;
   --           if (p === "gemini") key = c.userKey;
   --           else if (!wantsAudio && (p === "anthropic" || p === "openai")) { provider = p; key = c.userKey; }
@@ -702,7 +757,13 @@
   --       const gc = (payload as any).generationConfig;
   --       if (gc && gc.maxOutputTokens > 2048) gc.maxOutputTokens = 2048;
   --
-  --       // ---------- Gemini (par défaut) ----------
+  --       // ---------- Groq d'abord (clé du service, texte uniquement), puis Gemini ----------
+  --       if (useService && provider === "gemini" && !wantsAudio) {
+  --         const g = await tryGroq(payload, mode === "stream");
+  --         if (g) return g;
+  --       }
+  --
+  --       // ---------- Gemini (par défaut ou secours) ----------
   --       if (provider === "gemini") {
   --         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:` +
   --           (mode === "stream" ? "streamGenerateContent?alt=sse" : "generateContent");
@@ -713,7 +774,7 @@
   --         });
   --         return new Response(up.body, {
   --           status: up.status,
-  --           headers: { ...CORS, "Content-Type": up.headers.get("Content-Type") ?? "application/json" },
+  --           headers: { ...CORS, "Content-Type": up.headers.get("Content-Type") ?? "application/json", "x-engine": "gemini" },
   --         });
   --       }
   --
@@ -3788,7 +3849,7 @@ if(slider) {
 
 /* ---------- CONFIG & UTILES ---------- */
 let EMB=false,TESTMODE=false,TRIAL=false,TLOG=[],CFG_ID=null,editingId=null;
-const MODELS = ['gemini-3.8-flash','gemini-3.6-flash','gemini-3.5-flash'];
+const MODELS = ['gemini-3.5-flash-lite','gemini-3.6-flash','gemini-3.8-flash']; // du plus rapide au plus costaud
 const $ = s => document.querySelector(s);
 const MIC_IDLE = '🎙️ Parler';
 let E=null, LOGO="", wakeLock=null, chatHistory=[];
@@ -4330,7 +4391,7 @@ const VOICE_LIST=[['Voix féminines',[['Kore','Kore · assurée'],['Leda','Leda 
 $('#aiVoice').innerHTML='<option value="auto">Automatique (la plus fluide, selon le visage)</option>'+VOICE_LIST.map(g=>`<optgroup label="${g[0]}">${g[1].map(v=>`<option value="${v[0]}">${v[1]}</option>`).join('')}</optgroup>`).join('');
 let ttsDeadUntil=0,GOOD_TTS=localStorage.getItem('gtts')||'';
 let ac=null,curSrc=null,curGain=null,keepAudio=null;
-const SILENT_WAV='data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+const SILENT_WAV='data:audio/wav;base64,UklGRqQ+AABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YYA+AACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
 /* iPhone/iPad : le son n'est audible que si le contexte audio est débloqué par un geste ET si la session audio est « lecture »
    (sinon l'interrupteur silencieux coupe tout). À appeler dans chaque geste de l'utilisateur. */
 function unlockAudio(){
@@ -4346,6 +4407,20 @@ function unlockAudio(){
 function stopKeepAudio(){try{keepAudio&&keepAudio.pause()}catch(e){}}const audioCache=new Map();
 const autoVoice=masc=>masc?'Achird':'Sulafat'; // voix par défaut, les plus naturelles en français : masculine = Achird, féminine = Sulafat (suit le visage, ne change jamais en cours de route)
 const pickVoice=()=>E.voice!=='auto'?E.voice:autoVoice(E.voiceMasc);
+/* Recadre l'audio : retire le silence de début/fin et le petit bruit isolé (souffle, clic de micro) qui suit parfois la voix */
+function trimPcm(f,rate){
+  const n=f.length,W=Math.max(1,Math.round(rate*.01)),nw=Math.floor(n/W);if(nw<6)return f.slice();
+  const rm=new Float32Array(nw);let pk=0;
+  for(let w=0;w<nw;w++){let s=0;for(let i=w*W,e=i+W;i<e;i++)s+=f[i]*f[i];rm[w]=Math.sqrt(s/W);if(rm[w]>pk)pk=rm[w]}
+  if(pk<.003)return f.slice();
+  const th=Math.max(.006,pk*.06);let a=0,z=nw-1;
+  while(a<nw&&rm[a]<th)a++;while(z>a&&rm[z]<th)z--;
+  if(a>=z)return f.slice();
+  let b=z;while(b>a&&rm[b]>=th)b--;
+  const len=z-b;let gap=0,q=b;while(q>a&&rm[q]<th){gap++;q--}
+  if(len<=15&&gap>=8&&q-a>30){let mx=0;for(let w=b+1;w<=z;w++)if(rm[w]>mx)mx=rm[w];if(mx<pk*.25)z=q}
+  return f.slice(Math.max(0,(a-2)*W),Math.min(n,(z+4)*W));
+}
 async function geminiTTS(text,opts){
   const voice=opts?opts.voice:pickVoice(),ck=voice+'|'+(opts?'preview':E.tone)+'|'+text;if(audioCache.has(ck))return audioCache.get(ck);
   if(!opts&&Date.now()<ttsDeadUntil)throw new Error('TTS indisponible');
@@ -4360,9 +4435,9 @@ async function geminiTTS(text,opts){
       const bin=atob(p.inlineData.data),n=bin.length>>1,f=new Float32Array(n);
       for(let i=0;i<n;i++){let v=bin.charCodeAt(2*i)|bin.charCodeAt(2*i+1)<<8;if(v>=32768)v-=65536;f[i]=v/32768}
       const rate=+(/rate=(\d+)/.exec(p.inlineData.mimeType||'')||[])[1]||24000;
-      const fi=Math.min(n,Math.round(rate*.008)),fo=Math.min(n,Math.round(rate*.035));
-      for(let i=0;i<fi;i++)f[i]*=i/fi;for(let i=0;i<fo;i++)f[n-1-i]*=i/fo; // fondus : plus de claquement
-      const pad=Math.round(rate*.04),buf=ac.createBuffer(1,n+pad,rate);buf.copyToChannel(f,0);
+      const g=trimPcm(f,rate),n2=g.length,fi=Math.min(n2,Math.round(rate*.008)),fo=Math.min(n2,Math.round(rate*.06));
+      for(let i=0;i<fi;i++)g[i]*=i/fi;for(let i=0;i<fo;i++)g[n2-1-i]*=i/fo; // fondus : plus de claquement
+      const pad=Math.round(rate*.12),buf=ac.createBuffer(1,n2+pad,rate);buf.copyToChannel(g,0); // 120 ms de respiration entre deux phrases
       audioCache.set(ck,buf);GOOD_TTS=m;try{localStorage.setItem('gtts',m)}catch(e){}if(audioCache.size>40)audioCache.delete(audioCache.keys().next().value);
       return buf;
     }catch(e){last=e;console.warn(e)}
@@ -4428,7 +4503,10 @@ function appendMsg(text,type,isTyping=false){
 }
 
 /* ---------- GEMINI : streaming, voix phrase par phrase, préchargement ---------- */
-let GOOD=localStorage.getItem('gmodel')||'',NO_THINK=false,PRE={};
+let GOOD=localStorage.getItem('gmodel2')||'',NO_THINK=false,PRE={};
+const okCfg={}; // réglage de réflexion qui fonctionne, par modèle (évite de réessayer à chaque question)
+/* Gemini 3.8 / 3.7 : réflexion « low » (« minimal » refusé) ; 3.6 / 3.5 : « minimal » ; Lite : déjà minimal par défaut */
+const thinkCfgs=m=>/lite/.test(m)?[null]:/3\.[78]/.test(m)?[{thinkingLevel:'low'},{thinkingBudget:0},null]:[{thinkingLevel:'minimal'},{thinkingBudget:0},null];
 const FILLERS=['Voyons ça…','Alors, un instant…'];
 const ttsKey=t=>pickVoice()+'|'+E.tone+'|'+t;
 function buildSys(q){
@@ -4447,14 +4525,14 @@ async function streamGemini(contents,q,cb={}){
   const sys=buildSys(q),order=[GOOD,...MODELS.filter(m=>m!==GOOD)].filter(Boolean);
   let lastErr;const all=[];
   for(const m of order){
-    let tried400=false;
-    for(const think of(NO_THINK?[false]:[true,false])){
-      let acc='',pend='',nSent=0;const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);if(cb.reg)cb.reg(ctl);
+    const cl=(m in okCfg)?[okCfg[m]]:thinkCfgs(m);
+    for(const tc of cl){
+      let acc='',pend='',nSent=0,first=true;const ctl=new AbortController();let to=setTimeout(()=>ctl.abort(),m===order[order.length-1]?12000:6000);if(cb.reg)cb.reg(ctl); // 6 s max pour le 1er mot (12 s pour le dernier modèle), sinon on passe au suivant
       try{
-        const gc={temperature:.7,maxOutputTokens:think?300:1024};
-        if(think)gc.thinkingConfig={thinkingBudget:0};
+        const gc={temperature:.7,maxOutputTokens:(tc||/lite/.test(m))?220:1024};
+        if(tc)gc.thinkingConfig=tc;
         const r=await gfetch('stream',m,{systemInstruction:{parts:[{text:sys}]},contents,generationConfig:gc},ctl.signal);
-        if(!r.ok){if(r.status===400&&think){tried400=true;continue}const bt=(await r.text().catch(()=>'')).slice(0,1500);
+        if(!r.ok){if(r.status===400&&tc){continue}const bt=(await r.text().catch(()=>'')).slice(0,1500);
           let pj=null;try{pj=JSON.parse(bt)}catch(x){}
           const er=new Error(m+' HTTP '+r.status+' '+bt);er.http=r.status;
           if(pj&&typeof pj.error==='string'&&[402,413,429,500].includes(r.status)){er.fatal=true;er.code=r.status;er.detail=pj.error} // erreur de NOTRE serveur : inutile d'essayer les autres modèles
@@ -4463,6 +4541,7 @@ async function streamGemini(contents,q,cb={}){
         try{
           for(;;){
             const{done,value}=await rd.read();if(done)break;
+            if(first){first=false;clearTimeout(to);to=setTimeout(()=>ctl.abort(),20000)}
             buf+=dec.decode(value,{stream:true});let i;
             while((i=buf.indexOf('\n'))>=0){
               const line=buf.slice(0,i).trim();buf=buf.slice(i+1);
@@ -4479,10 +4558,10 @@ async function streamGemini(contents,q,cb={}){
         }catch(e){if(!acc)throw e}
         if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());
         if(!acc.trim())throw new Error('Réponse vide');
-        if(!think&&tried400)NO_THINK=true;
-        GOOD=m;try{localStorage.setItem('gmodel',m)}catch(e){}
+        okCfg[m]=tc;
+        GOOD=m;try{localStorage.setItem('gmodel2',m)}catch(e){}
         return acc.trim();
-      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;all.push(errBrief(m,e));console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}if(e&&e.http===429)break} // quota dépassé : inutile de réessayer le même modèle
+      }catch(e){if(e&&e.fatal)throw e;if(cb.stale&&cb.stale())throw e;lastErr=e;all.push(errBrief(m,e));console.warn(e);if(acc.trim()){if(pend.trim())cb.onSentence&&cb.onSentence(pend.trim());return acc.trim()}if(e&&(e.http===429||e.name==='AbortError'))break} // quota dépassé ou trop lent : on passe au modèle suivant : inutile de réessayer le même modèle
       finally{clearTimeout(to)}
     }
   }
@@ -4524,7 +4603,7 @@ async function handleQuestion(q){
     pre.sents.forEach(t=>sp.add(t));return;
   }
   const typing=appendMsg(`${E.name} réfléchit`,'ai',true);
-  const st=[[900,`${E.name} vérifie la réponse`],[1900,`${E.name} formule la réponse`]].map(([d,t])=>setTimeout(()=>{if(typing.isConnected)typing.textContent=t},d));
+  const st=[[2800,`${E.name} vérifie la réponse`],[5600,`${E.name} formule la réponse`],[8800,`${E.name} peaufine les derniers détails`],[12000,`${E.name} arrive, merci de patienter`]].map(([d,t])=>setTimeout(()=>{if(typing.isConnected)typing.textContent=t},d));
   const stopSt=()=>st.forEach(clearTimeout);
   k.classList.add('thinking');
   let bubble=null;
@@ -4538,6 +4617,7 @@ async function handleQuestion(q){
     if(my!==qSeq)return;
     chatHistory.push({role:'user',parts:[{text:q}]},{role:'model',parts:[{text:text}]});
     logAnalytics(q,text);setSugg(FOLLOW,true);
+    if(/[?&]debug/.test(location.search))appendMsg('⚙ moteur : '+(window.__engine||'?'),'ai');
   }catch(e){
     stopSt();typing.remove();
     if(my!==qSeq)return;
@@ -4807,7 +4887,7 @@ function buildTabs(){
 /* ===== CLOUD : comptes, enregistrement, publication, statistiques ===== */
 const PROXY=SB_URL+'/functions/v1/conseiller-proxy';
 const RPCH={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
-function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID||undefined,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;r.clone().json().catch(()=>({})).then(j=>{if(j&&typeof j.error==='string')cToast('Le serveur IA a refusé l\'essai (code '+r.status+' : '+j.error+').',8000);else gfetch.w=0})}return r})}
+function gfetch(mode,model,payload,signal){return fetch(PROXY,{method:'POST',signal,headers:RPCH,body:JSON.stringify({config_id:CFG_ID||undefined,mode,model,payload,trial:TRIAL||undefined})}).then(r=>{try{const en=r.headers.get('x-engine');if(en&&mode==='stream')window.__engine=en}catch(e){}if(TRIAL&&!r.ok&&!gfetch.w){gfetch.w=1;r.clone().json().catch(()=>({})).then(j=>{if(j&&typeof j.error==='string')cToast('Le serveur IA a refusé l\'essai (code '+r.status+' : '+j.error+').',8000);else gfetch.w=0})}return r})}
 const uid=()=>Math.random().toString(36).substring(2,9).toUpperCase();
 const pubUrl=(id,x)=>location.origin+location.pathname+'?id='+id+(x||'');
 let hasKey=false,keyProv='gemini',SESSION=uid(),FONTS_ON=false;
