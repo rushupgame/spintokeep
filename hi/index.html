@@ -894,7 +894,7 @@
     .step summary .num { width: 26px; height: 26px; border-radius: 50%; background: #f1f1f3; color: var(--muted); font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .step[open] summary .num { background: var(--black); color: #fff; }
     .step summary .label { font-weight: 700; font-size: 14.5px; flex: 1; }
-    .step summary .label::after { content: "— touchez pour ouvrir"; font-weight: 500; font-size: 11.5px; color: var(--muted); margin-left: 8px; }
+    .step summary .label::after { content: "— खोलने के लिए टैप करें"; font-weight: 500; font-size: 11.5px; color: var(--muted); margin-left: 8px; }
     .step[open] summary .label::after { content: ""; margin: 0; }
     .step summary .chev { font-size: 12px; color: #fff; background: var(--muted); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .25s ease, background .2s ease; }
     .step[open] summary .chev { background: var(--ink); transform: rotate(180deg); }
@@ -1460,6 +1460,11 @@
     .cd-fx.cd-fx-static span { animation: none !important; opacity: .35; }
 
     @media (prefers-reduced-motion: reduce) { .wheel-shell::after { animation: none; } }
+.file-pick-btn { display: inline-block; padding: 9px 18px; border-radius: 50px; background: var(--black, #111); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; line-height: 1.2; }
+.file-pick-name { display: block; margin-top: 8px; font-size: 12px; color: var(--muted, #6e6e73); word-break: break-all; }
+[dir="rtl"] .step summary .label::after { margin-left: 0; margin-right: 8px; }
+[dir="rtl"] .preview-grid { direction: ltr; }
+[dir="rtl"] .preview-grid > .screen-mockup-wrap { direction: rtl; }
     </style>
 </head>
 <body>
@@ -1603,7 +1608,9 @@
             <div class="step-body">
                 <p class="step-help" id="lbl-logo-file">वह लोगो जोड़ें जो गेम की 4 स्क्रीन पर दिखाई देगा।</p>
                 <div class="upload-wrapper">
-                    <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')">
+                    <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')" style="display:none">
+                    <label for="logo_file_input" class="file-pick-btn">फ़ाइल चुनें</label>
+                    <span class="file-pick-name" id="logo_file_input-name" data-empty="कोई फ़ाइल नहीं चुनी गई">कोई फ़ाइल नहीं चुनी गई</span>
                     <div id="upload-status">स्वीकृत फ़ॉर्मेट: PNG, JPG, WEBP</div>
                 </div>
                 <label class="field-label" id="lbl-logo-url" style="display:none;">या लोगो का URL, अगर वह पहले से ऑनलाइन होस्ट है</label>
@@ -1617,7 +1624,9 @@
                 <p class="step-help" id="lbl-screen-cust">ग्राहक को दिखने वाली 4 स्क्रीन की बैकग्राउंड इमेज और रंग।</p>
                 <div class="upload-wrapper">
                     <button class="delete-bg" onclick="document.getElementById('bg_url').value=''; update();" title="इमेज हटाएँ">×</button>
-                    <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')">
+                    <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')" style="display:none">
+                    <label for="bg_file_input" class="file-pick-btn">फ़ाइल चुनें</label>
+                    <span class="file-pick-name" id="bg_file_input-name" data-empty="कोई फ़ाइल नहीं चुनी गई">कोई फ़ाइल नहीं चुनी गई</span>
                     <div id="bg-upload-status">आदर्श आकार: 1080 × 1920 px (9:16 फ़ॉर्मेट)</div>
                 </div>
                 <input type="hidden" id="bg_url" oninput="update()" value="">
@@ -5771,11 +5780,11 @@ if(slider) {
         div.className = 'lot-row-wrapper';
         div.innerHTML = `<div class="lot-row">
             <div class="input-wrapper">
-                <span class="mobile-label">LOT (2 lignes auto)</span>
+                <span class="mobile-label">इनाम (ऑटो 2 पंक्तियाँ)</span>
                 <input type="text" class="ln" value="${n}" oninput="update()">
             </div>
             <div class="input-wrapper small">
-                <span class="mobile-label">PROB. %</span>
+                <span class="mobile-label">संभावना %</span>
                 <input type="number" class="lp" value="${p}" step="0.1" oninput="handleProbChange(this)">
             </div>
             <div class="input-wrapper small">
@@ -6691,6 +6700,12 @@ if(slider) {
             .observe(g, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
     });
 })();
+</script>
+<script>
+document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(function (i) {
+    var n = document.getElementById(i.id + '-name');
+    if (n) i.addEventListener('change', function () { n.textContent = (i.files && i.files[0]) ? i.files[0].name : n.dataset.empty; });
+});
 </script>
 </body>
 </html>
