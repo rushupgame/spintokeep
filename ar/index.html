@@ -539,6 +539,10 @@
   ============================================================================
 -->
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+    <script>try { document.fonts && document.fonts.load("20px 'Lilita One'"); } catch (e) {}</script>
     <style>
         /* Variables Apple-like Design */
         :root {
@@ -890,7 +894,7 @@
     .step summary .num { width: 26px; height: 26px; border-radius: 50%; background: #f1f1f3; color: var(--muted); font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .step[open] summary .num { background: var(--black); color: #fff; }
     .step summary .label { font-weight: 700; font-size: 14.5px; flex: 1; }
-    .step summary .label::after { content: "— touchez pour ouvrir"; font-weight: 500; font-size: 11.5px; color: var(--muted); margin-left: 8px; }
+    .step summary .label::after { content: "— المس للفتح"; font-weight: 500; font-size: 11.5px; color: var(--muted); margin-left: 8px; }
     .step[open] summary .label::after { content: ""; margin: 0; }
     .step summary .chev { font-size: 12px; color: #fff; background: var(--muted); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .25s ease, background .2s ease; }
     .step[open] summary .chev { background: var(--ink); transform: rotate(180deg); }
@@ -1278,6 +1282,189 @@
             .nav-lang-dd:hover .lang-dd-menu { display: none; }
             .nav-lang-dd.open .lang-dd-menu { display: flex; }
         }
+
+    /* =====================================================================
+       REDESIGN VISUEL DES JEUX — style « candy / spin-wheel » (rose, or, bleu)
+       CSS uniquement : aucun ID, texte ou logique n'est modifié.
+       ===================================================================== */
+    @keyframes cd-twinkle { 0%, 100% { opacity: .35; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.03); } }
+    @keyframes cd-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+    /* ---------- ROUE ---------- */
+    .wheel-shell { filter: drop-shadow(0 16px 20px rgba(0,0,0,.24)); }
+    /* Médaillon translucide « verre » derrière la roue */
+    .wheel-shell::before { content: ""; position: absolute; inset: -9px -10px; border-radius: 44% 56% 48% 52% / 48% 42% 58% 52%; background: linear-gradient(145deg, rgba(255,255,255,.55), rgba(255,255,255,.14)); border: 1px solid rgba(255,255,255,.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: -1; pointer-events: none; }
+    /* Étoiles scintillantes autour de la roue */
+    .wheel-shell::after { content: ""; position: absolute; inset: -14px -14px; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22 preserveAspectRatio=%22none%22%3E%3Cpath fill=%22%23fff%22 transform=%22translate(22 70) scale(13)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3Cpath fill=%22%23fff%22 transform=%22translate(276 34) scale(10)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3Cpath fill=%22%23fff%22 transform=%22translate(284 214) scale(15)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3Cpath fill=%22%23fff%22 transform=%22translate(14 246) scale(9)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3Cpath fill=%22%23fff%22 transform=%22translate(150 8) scale(8)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3Cpath fill=%22%23fff%22 transform=%22translate(252 288) scale(10)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3Cpath fill=%22%23fff%22 transform=%22translate(60 150) scale(6)%22 d=%22M0 -1 C0.05 -0.32 0.32 -0.05 1 0 C0.32 0.05 0.05 0.32 0 1 C-0.05 0.32 -0.32 0.05 -1 0 C-0.32 -0.05 -0.05 -0.32 0 -1Z%22/%3E%3C/svg%3E") center / 100% 100% no-repeat; pointer-events: none; z-index: 30; animation: cd-twinkle 3.4s ease-in-out infinite; }
+
+    .wheel-ring { --rbw: 10px; box-shadow: 0 0 0 2px rgba(255,255,255,.6), 0 5px 0 rgba(0,0,0,.14); }
+    #pre-wheel-ring { --rbw: 9px; }
+    #client-wheel-ring { --rbw: 14px; }
+    /* Reflets métalliques sur le cadre (la couleur du cadre reste celle choisie) */
+    .wheel-ring::before { content: ""; position: absolute; inset: calc(-1 * var(--rbw)); border-radius: 50%; pointer-events: none; z-index: 12;
+        background: conic-gradient(from 210deg, rgba(255,255,255,.7), rgba(255,255,255,0) 16%, rgba(0,0,0,.26) 36%, rgba(255,255,255,0) 54%, rgba(255,255,255,.5) 74%, rgba(255,255,255,.7));
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--rbw)), #000 calc(100% - var(--rbw) + 1px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - var(--rbw)), #000 calc(100% - var(--rbw) + 1px)); }
+    /* Ombre intérieure + reflet brillant sur la roue (ne tourne pas) */
+    .wheel-ring::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; z-index: 13;
+        box-shadow: inset 0 5px 14px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.45);
+        background: radial-gradient(ellipse at 28% 16%, rgba(255,255,255,.34), rgba(255,255,255,0) 46%); }
+    /* Rivets dorés du cadre */
+    .wheel-dot { width: 7px; height: 7px; background: radial-gradient(circle at 32% 28%, #fff 0, var(--bulb-color) 48%, rgba(0,0,0,.45) 135%); box-shadow: 0 0 0 1px rgba(0,0,0,.22), 0 0 7px var(--bulb-color); }
+    /* Aiguille en goutte avec bijou central */
+    .wheel-pointer-clean { width: 26px; height: 32px; top: -16px; border-radius: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 45%), var(--pointer-color, #ff3b30);
+        clip-path: polygon(50% 100%, 30% 76%, 14% 56%, 6% 38%, 8% 22%, 18% 10%, 32% 3%, 50% 0, 68% 3%, 82% 10%, 92% 22%, 94% 38%, 86% 56%, 70% 76%);
+        filter: drop-shadow(0 4px 5px rgba(0,0,0,.5)); }
+    .wheel-pointer-clean::after { content: ""; position: absolute; left: 50%; top: 34%; width: 36%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle at 35% 30%, #fff, #ffe27a 55%, #ffb300); box-shadow: 0 0 0 2px rgba(255,255,255,.75); }
+    /* Moyeu : anneau doré + liseré blanc */
+    .wheel-hub { box-shadow: 0 0 0 4px var(--yellow-border, #ffc21a), 0 0 0 7px #fff, 0 0 0 9px rgba(0,0,0,.08), 0 7px 14px rgba(0,0,0,.35), inset 0 -4px 8px rgba(0,0,0,.12); }
+    .wheel-hub::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: linear-gradient(155deg, rgba(255,255,255,.5), rgba(255,255,255,0) 48%); }
+
+    /* ---------- BOUTONS DE JEU (relief « bonbon ») ---------- */
+    #pre-btn-spin, #spin-btn.btn-black-c { border: 3px solid rgba(255,255,255,.8) !important; border-radius: 50px; letter-spacing: .03em; text-shadow: 0 1px 2px rgba(0,0,0,.28);
+        background-image: linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0) 52%) !important;
+        box-shadow: 0 5px 0 rgba(0,0,0,.3), 0 12px 20px rgba(0,0,0,.22), inset 0 -3px 0 rgba(0,0,0,.14) !important; }
+    #spin-btn.btn-black-c:active { transform: translateY(3px) !important; box-shadow: 0 2px 0 rgba(0,0,0,.3), 0 6px 12px rgba(0,0,0,.2), inset 0 -2px 0 rgba(0,0,0,.14) !important; }
+
+    /* ---------- INDICATIONS SOUS LES JEUX (pastille translucide) ---------- */
+    .scratch-hint, .mystery-hint, .cups-hint { width: fit-content; max-width: 100%; margin: 10px auto 0; padding: 5px 14px; border-radius: 50px; background: rgba(128,128,128,.16); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); box-sizing: border-box; }
+
+    /* ---------- BANDIT MANCHOT « jackpot doré » : barillet en or, couronne, levier, pièces ---------- */
+    @keyframes cd-coin { 0%, 100% { transform: translateY(var(--cy, 0px)) rotate(var(--cr, 0deg)); } 50% { transform: translateY(calc(var(--cy, 0px) - 2px)) rotate(var(--cr, 0deg)); } }
+    .slot-cabinet { position: relative; width: calc(100% - 52px); margin: 80px auto 30px; padding: 14px 14px 12px; border: none; border-radius: 26px / 34px;
+        background:
+            radial-gradient(circle 4px at 5.2% 24%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 5.2% 50%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 5.2% 76%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 94.8% 24%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 94.8% 50%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            radial-gradient(circle 4px at 94.8% 76%, #fff3b5 0 1.4px, #a96a00 2.4px, transparent 3.4px),
+            linear-gradient(90deg, rgba(90,50,0,.4) 0, rgba(255,255,255,.2) 3.5%, transparent 9%, transparent 91%, rgba(255,255,255,.2) 96.5%, rgba(90,50,0,.4) 100%),
+            linear-gradient(180deg, #ffeaa0 0%, #f7bf24 16%, #ffd94f 36%, #e8a00c 60%, #c27a05 84%, #f0b82e 100%);
+        box-shadow: 0 0 0 2px rgba(255,255,255,.35), 0 8px 0 #9a6200, 0 16px 22px rgba(0,0,0,.35), inset 0 2px 0 rgba(255,255,255,.75), inset 0 -4px 8px rgba(120,60,0,.45);
+        filter: drop-shadow(0 0 16px rgba(255,205,70,.55)); }
+    /* Couronne sertie de bijoux */
+    .slot-cabinet::before { content: ""; position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); width: min(54%, 130px); aspect-ratio: 120 / 70; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 70%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23fff0a8%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23f6b91d%22/%3E%3Cstop offset=%221%22 stop-color=%22%23b87304%22/%3E%3C/linearGradient%3E%3CradialGradient id=%22o%22 cx=%22.35%22 cy=%22.3%22 r=%22.8%22%3E%3Cstop offset=%220%22 stop-color=%22%23fff6c8%22/%3E%3Cstop offset=%22.5%22 stop-color=%22%23ffd23f%22/%3E%3Cstop offset=%221%22 stop-color=%22%23c98505%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d=%22M12 50 L8 16 L33 34 L47 8 L60 30 L73 8 L87 34 L112 16 L108 50 Z%22 fill=%22url(%23g)%22 stroke=%22%239a5f00%22 stroke-width=%221.6%22 stroke-linejoin=%22round%22/%3E%3Crect x=%2210%22 y=%2244%22 width=%22100%22 height=%2222%22 rx=%226%22 fill=%22url(%23g)%22 stroke=%22%239a5f00%22 stroke-width=%221.6%22/%3E%3Ccircle cx=%228%22 cy=%2214%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%2247%22 cy=%226%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%2273%22 cy=%226%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%22112%22 cy=%2214%22 r=%225%22 fill=%22url(%23o)%22/%3E%3Ccircle cx=%2260%22 cy=%2255%22 r=%226%22 fill=%22%23e4262b%22 stroke=%22%23fff0a8%22 stroke-width=%221.6%22/%3E%3Ccircle cx=%2230%22 cy=%2255%22 r=%224.6%22 fill=%22%2317a34a%22 stroke=%22%23fff0a8%22 stroke-width=%221.4%22/%3E%3Ccircle cx=%2290%22 cy=%2255%22 r=%224.6%22 fill=%22%2317a34a%22 stroke=%22%23fff0a8%22 stroke-width=%221.4%22/%3E%3C/svg%3E") center / contain no-repeat; pointer-events: none; }
+    /* Levier à boule dorée */
+    .slot-cabinet::after { content: ""; position: absolute; left: calc(100% - 3%); bottom: 26%; width: 14%; aspect-ratio: 40 / 90; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 90%22%3E%3Cdefs%3E%3ClinearGradient id=%22r%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%220%22%3E%3Cstop offset=%220%22 stop-color=%22%23c98505%22/%3E%3Cstop offset=%22.5%22 stop-color=%22%23ffe27a%22/%3E%3Cstop offset=%221%22 stop-color=%22%23b87304%22/%3E%3C/linearGradient%3E%3CradialGradient id=%22b%22 cx=%22.35%22 cy=%22.3%22 r=%22.8%22%3E%3Cstop offset=%220%22 stop-color=%22%23fff6c8%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23ffc928%22/%3E%3Cstop offset=%221%22 stop-color=%22%23b87304%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Cline x1=%229%22 y1=%2280%22 x2=%2228%22 y2=%2224%22 stroke=%22%238a5400%22 stroke-width=%229%22 stroke-linecap=%22round%22/%3E%3Cline x1=%229%22 y1=%2280%22 x2=%2228%22 y2=%2224%22 stroke=%22url(%23r)%22 stroke-width=%226%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%229%22 cy=%2280%22 r=%228%22 fill=%22url(%23b)%22 stroke=%22%238a5400%22 stroke-width=%221.5%22/%3E%3Ccircle cx=%2229%22 cy=%2216%22 r=%2213%22 fill=%22url(%23b)%22 stroke=%22%238a5400%22 stroke-width=%221.5%22/%3E%3Cellipse cx=%2225%22 cy=%2211%22 rx=%224.5%22 ry=%223%22 fill=%22%23fff%22 opacity=%22.55%22/%3E%3C/svg%3E") center / contain no-repeat; pointer-events: none; }
+    /* Fenêtre des rouleaux : cadre or, fond bronze */
+    .slot-window { gap: 5px; padding: 7px; border-radius: 14px; background: linear-gradient(180deg, #7a4b00, #3f2500);
+        box-shadow: inset 0 4px 10px rgba(0,0,0,.7), 0 0 0 3px #ffe58a, 0 0 0 5px #b97a05, 0 3px 0 5px rgba(0,0,0,.22); }
+    /* Rouleaux blancs brillants (légère teinte de la couleur choisie) */
+    .slot-reel-track { border-radius: 6px; background: linear-gradient(180deg, color-mix(in srgb, var(--slot-c1, #cdc7fc) 16%, #ffffff), #ffffff 22%, #f1f2f6 60%, #c9ceda);
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,.9), inset 0 0 10px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.3); }
+    .slot-reel-track { container-type: inline-size; }
+    .slot-reel-track .slot-reel-symbol { font-size: min(28px, 66cqw); line-height: 1; }
+    .slot-reel-track::before { background: linear-gradient(180deg, rgba(0,0,0,.26), transparent); }
+    .slot-reel-track::after { background: linear-gradient(0deg, rgba(0,0,0,.26), transparent); }
+    /* Pièces d'or éparpillées au pied de la machine (remplacent les petites lumières) */
+    .slot-lights { position: relative; height: 22px; margin-top: 10px; margin-bottom: -18px; padding: 0 2px; align-items: flex-end; }
+    .slot-lights::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+        background:
+            radial-gradient(circle 4px at 12% 96%, #ffd84a 0 2.6px, #b97a05 3.4px, transparent 4.2px),
+            radial-gradient(circle 3px at 31% 108%, #ffd84a 0 2px, #b97a05 2.7px, transparent 3.4px),
+            radial-gradient(circle 4px at 67% 104%, #ffd84a 0 2.6px, #b97a05 3.4px, transparent 4.2px),
+            radial-gradient(circle 3px at 88% 100%, #ffd84a 0 2px, #b97a05 2.7px, transparent 3.4px); }
+    .slot-lights span { width: 22px; height: 13px; border-radius: 50%; opacity: 1; background: radial-gradient(ellipse at 38% 30%, #fff6c2 0, #ffd84a 42%, #d89200 100%);
+        box-shadow: inset 0 0 0 2px rgba(255,236,150,.9), inset 0 -2px 2px rgba(130,70,0,.55), 0 3px 3px rgba(0,0,0,.35); animation: cd-coin 2.6s ease-in-out infinite; }
+    .slot-lights span:nth-child(1) { --cr: -16deg; --cy: 5px; width: 24px; height: 14px; animation-delay: -.3s; }
+    .slot-lights span:nth-child(2) { --cr: 9deg; --cy: -1px; width: 18px; height: 11px; animation-delay: -1.1s; }
+    .slot-lights span:nth-child(3) { --cr: -6deg; --cy: 7px; width: 26px; height: 15px; animation-delay: -.7s; }
+    .slot-lights span:nth-child(4) { --cr: 14deg; --cy: 1px; width: 19px; height: 11px; animation-delay: -1.6s; }
+    .slot-lights span:nth-child(5) { --cr: -10deg; --cy: 6px; width: 23px; height: 14px; animation-delay: -.1s; }
+    @media (prefers-reduced-motion: reduce) { .slot-lights span { animation: none; transform: translateY(var(--cy, 0px)) rotate(var(--cr, 0deg)); } }
+
+    /* ---------- TICKET À GRATTER ---------- */
+    .scratch-card { border: none; border-radius: 22px; background: linear-gradient(160deg, #ffffff, #fff1f6);
+        box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--yellow-border, #ffc21a), 0 0 0 9px rgba(255,255,255,.5), 0 16px 26px rgba(0,0,0,.24); }
+    .scratch-card::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: 22px; background: linear-gradient(125deg, rgba(255,255,255,.28) 0, rgba(255,255,255,0) 30%); }
+
+    /* ---------- COFFRES MYSTÈRES ---------- */
+    .mystery-box { border-radius: 20px; box-shadow: inset 0 0 0 3px rgba(255,255,255,.78), inset 0 -7px 0 rgba(0,0,0,.16), 0 6px 0 rgba(0,0,0,.15), 0 13px 18px rgba(0,0,0,.18); }
+    .mystery-box::before { content: ""; position: absolute; left: 9%; right: 9%; top: 5%; height: 40%; border-radius: 16px 16px 40px 40px / 16px 16px 24px 24px; background: linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,0)); pointer-events: none; z-index: 0; }
+    .mystery-box .mb-icon { position: relative; z-index: 1; filter: drop-shadow(0 3px 2px rgba(0,0,0,.28)); }
+    .mystery-box .mb-label { z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,.35); }
+
+    /* ---------- PLINKO ---------- */
+    .plinko-frame { border: 3px solid var(--yellow-border, #ffc21a); border-radius: 26px; background: linear-gradient(160deg, #ff86ab, #ff3d77 55%, #d92a66);
+        box-shadow: 0 0 0 3px rgba(255,255,255,.55), 0 8px 0 rgba(110,0,40,.28), 0 18px 30px rgba(0,0,0,.3), inset 0 3px 0 rgba(255,255,255,.5); }
+    .plinko-board { background: radial-gradient(circle at 50% 0%, #92306a, #2b0b22 82%); }
+    .plinko-pin { width: 6px; height: 6px; background: radial-gradient(circle at 32% 28%, #fff, #ffe27a 55%, #ffb300); box-shadow: 0 0 6px rgba(255,214,90,.85); }
+    .plinko-drop { background: linear-gradient(180deg, #fff, var(--yellow-border, #ffc21a)); box-shadow: 0 0 12px var(--yellow-border, #ffc21a); }
+    .plinko-ball { background: radial-gradient(circle at 32% 28%, #fff 0, #ffe27a 34%, #ffb300 68%, #d98200); box-shadow: 0 3px 6px rgba(0,0,0,.45), 0 0 13px rgba(255,214,90,.85); }
+    .plinko-bin { border-radius: 0 0 12px 12px; box-shadow: inset 0 3px 6px rgba(0,0,0,.22), inset 0 -3px 0 rgba(0,0,0,.16), 0 0 0 1.5px rgba(255,255,255,.65); }
+    .plinko-bin::before { height: 46%; background: linear-gradient(rgba(255,255,255,.42), rgba(255,255,255,0)); }
+    .plinko-bin .pb-label { position: relative; z-index: 1; }
+
+    /* ---------- GOBELETS ---------- */
+    .cup { filter: drop-shadow(0 9px 6px rgba(0,0,0,.28)); }
+    .cup .cup-body { box-shadow: none; border-radius: 6px 6px 14px 14px;
+        background: linear-gradient(100deg, rgba(255,255,255,.55) 0, rgba(255,255,255,0) 30%), linear-gradient(180deg, rgba(255,255,255,.4) 0, rgba(255,255,255,.4) 13%, rgba(255,255,255,0) 13%), linear-gradient(160deg, var(--slot-c1, #cdc7fc), var(--slot-c2, #fa879a)); }
+
+
+    /* ---------- TYPOGRAPHIE « SPIN THE WHEEL » : lettres rondes, épaisses, contour + relief ---------- */
+    :root { --cd-font: 'Lilita One', 'Baloo 2', 'Arial Rounded MT Bold', 'Arial Black', sans-serif; --cd-outline: #a3124a; }
+    .client-card h2, .client-card h3, #pre-twheel, #pre-s3 h4 {
+        font-family: var(--cd-font); font-weight: 400; letter-spacing: .02em; line-height: 1.12;
+        -webkit-text-stroke: .17em var(--cd-outline); paint-order: stroke fill;
+        text-shadow: 0 .1em 0 var(--cd-outline), 0 .2em .28em rgba(0,0,0,.28); }
+    #win-txt { font-family: var(--cd-font); font-weight: 400; -webkit-text-stroke: .14em var(--cd-outline); paint-order: stroke fill; text-shadow: 0 .08em 0 var(--cd-outline); }
+    #pre-btn-spin, .btn-black-c { font-family: var(--cd-font); font-weight: 400; letter-spacing: .05em; text-shadow: 0 2px 0 rgba(0,0,0,.28); }
+
+    /* ---------- ICÔNES EN FOND (texture : trésors, fête) — désactivables ---------- */
+    .cd-fx { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+    .cd-fx.cd-fx-fixed { position: fixed; z-index: 0; }
+    .cd-fx span { position: absolute; line-height: 1; opacity: .5; user-select: none; will-change: transform; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); animation: cd-fx-pulse 8s ease-in-out infinite; }
+    @keyframes cd-fx-pulse { 0%, 100% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(.88); } 50% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1.12); } }
+    @media (prefers-reduced-motion: reduce) { .cd-fx span { animation: none !important; } }
+
+    /* ---------- APERÇU DU PARCOURS : grand écran + slider (étapes 1 / 2 / 3 / 4) ---------- */
+    .preview-grid { display: flex !important; grid-template-columns: none !important; gap: 24px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; position: relative; padding: 14px calc(50% - 118px) 18px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .preview-grid::-webkit-scrollbar { display: none; }
+    .preview-grid > .screen-mockup-wrap { flex: 0 0 236px !important; transition: filter .3s ease, opacity .3s ease; height: auto !important; overflow: visible !important; scroll-snap-align: center; scroll-snap-stop: always; }
+    .preview-grid > .screen-mockup-wrap .screen-mockup { transform: none !important; margin: 0 auto; zoom: .84; }
+    @media (max-width: 1099px) { .pv-side { width: 42px; height: 42px; font-size: 24px; } }
+    .preview-grid > .screen-mockup-wrap:not(.cd-active) { filter: grayscale(1) brightness(.92); opacity: .5; cursor: pointer; }
+    .preview-grid > .screen-mockup-wrap:not(.cd-active) .screen-mockup { pointer-events: none; }
+    .pv-stage { position: relative; }
+    .pv-side { position: absolute; top: 50%; transform: translateY(-50%); z-index: 6; width: 50px; height: 50px; border-radius: 50%; border: 3px solid #fff; background: var(--black, #111); color: #fff; font-size: 28px; line-height: 1; font-weight: 700; padding: 0 0 3px 0; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.35); font-family: inherit; transition: transform .15s ease, opacity .2s ease; }
+    .pv-side:hover:not(:disabled) { transform: translateY(-50%) scale(1.1); }
+    .pv-side:disabled { opacity: .3; cursor: default; box-shadow: none; }
+    .pv-prev { left: 2px; } .pv-next { right: 2px; }
+    @media (min-width: 1100px) { .preview-grid { padding-left: calc(50% - 140px * var(--pv-zoom, 1.05)); padding-right: calc(50% - 140px * var(--pv-zoom, 1.05)); } .preview-grid > .screen-mockup-wrap { flex-basis: calc(280px * var(--pv-zoom, 1.05)) !important; } .preview-grid > .screen-mockup-wrap .screen-mockup { zoom: var(--pv-zoom, 1.05); } .panel-preview { max-height: calc(100vh - 136px); } }
+    .preview-nav { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 0 0; }
+    .preview-nav button { border: 1px solid var(--line, #e5e5ea); background: #fff; color: #333; border-radius: 50px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .preview-nav button.active { background: var(--black, #111); color: #fff; border-color: var(--black, #111); }
+    .preview-nav .pv-arrow { width: 34px; height: 34px; padding: 0; font-size: 18px; line-height: 1; }
+
+    /* ---------- BOUTON « GÉNÉRER LE QR CODE » : barre fixe sur toute la largeur, y compris sur PC ---------- */
+    .sticky-cta { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 400; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-top: 1px solid var(--line, #e5e5ea); padding: 10px 24px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    .sticky-cta button { width: 100%; padding: 15px; font-size: 15px; }
+    .panel-config .btn-gen-inline { display: none; }
+    @media (min-width: 1100px) { body { padding-bottom: 78px; } }
+
+    /* ---------- QR code affiché : emoji en fond de la carte ---------- */
+    #qrcode-area { position: relative; isolation: isolate; overflow: hidden; }
+    #qrcode { background: #fff; }
+    #dashboard-view { scroll-margin-top: 84px; }
+    /* Mobile : l'aperçu du parcours client s'affiche avant le bloc de configuration */
+    @media (max-width: 1099px) { .main-wrapper > .panel-preview { order: -1; } .main-wrapper > .panel-config { order: 1; } }
+
+    /* ---------- FENÊTRES (aperçu des affiches, etc.) : au-dessus du header, croix de fermeture bien visible ---------- */
+    .modal-overlay { z-index: 2000; }
+    #toast-container { z-index: 2100; }
+    .modal-close { position: sticky; top: 0; right: auto; float: right; z-index: 5; width: 42px; height: 42px; margin: -12px -12px 8px 10px; padding: 0 0 3px 0; display: flex; align-items: center; justify-content: center;
+        border: 3px solid #fff; border-radius: 50%; background: #111; color: #fff; font-size: 24px; line-height: 1; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.35); cursor: pointer; font-family: inherit; transition: transform .15s ease; }
+    .modal-close:hover { transform: scale(1.1); }
+    .cd-fx.cd-fx-static span { animation: none !important; opacity: .35; }
+
+    @media (prefers-reduced-motion: reduce) { .wheel-shell::after { animation: none; } }
+.file-pick-btn { display: inline-block; padding: 9px 18px; border-radius: 50px; background: var(--black, #111); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; line-height: 1.2; }
+.file-pick-name { display: block; margin-top: 8px; font-size: 12px; color: var(--muted, #6e6e73); word-break: break-all; }
+[dir="rtl"] .step summary .label::after { margin-left: 0; margin-right: 8px; }
+[dir="rtl"] .preview-grid { direction: ltr; }
+[dir="rtl"] .preview-grid > .screen-mockup-wrap { direction: rtl; }
     </style>
 </head>
 <body>
@@ -1389,7 +1576,7 @@
             </div>
         </details>
 
-        <details class="step" open id="step-gametype">
+        <details class="step" id="step-gametype">
             <summary><span class="num">2</span><span class="label" id="sum-gametype">نوع اللعبة</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-gametype">اختر الطريقة التي سيحاول بها عملاؤك الفوز.</p>
@@ -1416,12 +1603,14 @@
             </div>
         </details>
 
-        <details class="step">
+        <details class="step" open>
             <summary><span class="num">3</span><span class="label" id="sum-logo">الشعار والهوية</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-logo-file">أضف الشعار الذي سيظهر على شاشات اللعبة الأربع.</p>
                 <div class="upload-wrapper">
-                    <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')">
+                    <input type="file" id="logo_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'logo_url', 'upload-status')" style="display:none">
+                    <label for="logo_file_input" class="file-pick-btn">اختيار ملف</label>
+                    <span class="file-pick-name" id="logo_file_input-name" data-empty="لم يتم اختيار أي ملف">لم يتم اختيار أي ملف</span>
                     <div id="upload-status">الصيغ المقبولة: PNG وJPG وWEBP</div>
                 </div>
                 <label class="field-label" id="lbl-logo-url" style="display:none;">أو رابط الشعار إذا كان مستضافًا على الإنترنت</label>
@@ -1435,7 +1624,9 @@
                 <p class="step-help" id="lbl-screen-cust">صورة الخلفية وألوان الشاشات الأربع التي يراها العميل.</p>
                 <div class="upload-wrapper">
                     <button class="delete-bg" onclick="document.getElementById('bg_url').value=''; update();" title="حذف الصورة">×</button>
-                    <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')">
+                    <input type="file" id="bg_file_input" accept="image/*" onchange="uploadLogoDirect(this, 'bg_url', 'bg-upload-status')" style="display:none">
+                    <label for="bg_file_input" class="file-pick-btn">اختيار ملف</label>
+                    <span class="file-pick-name" id="bg_file_input-name" data-empty="لم يتم اختيار أي ملف">لم يتم اختيار أي ملف</span>
                     <div id="bg-upload-status">المقاس المثالي: 1080 × 1920 بكسل (نسبة 9:16)</div>
                 </div>
                 <input type="hidden" id="bg_url" oninput="update()" value="">
@@ -1456,7 +1647,7 @@
                     </div>
                     <div class="color-input-group"><input type="range" id="bg_opacity" min="0" max="1" step="0.1" value="0.4" oninput="update()" style="width:56px;vertical-align:middle;" disabled><div id="lbl-col-op">شفافية الخلفية</div></div>
                     <div class="color-input-group"><input type="color" id="text_color" value="#ffffff" oninput="update()"><div id="lbl-col-txt">النص</div></div>
-                    <div class="color-input-group"><input type="color" id="button_color" value="#046A38" oninput="update()"><div id="lbl-col-btn">الأزرار</div></div>
+                    <div class="color-input-group"><input type="color" id="button_color" value="#FF3D77" oninput="update()"><div id="lbl-col-btn">الأزرار</div></div>
                     <div class="color-input-group"><input type="color" id="button_text_color" value="#ffffff" oninput="update()"><div id="lbl-col-btn-txt">نص الأزرار</div></div>
                 </div>
             </div>
@@ -1467,16 +1658,16 @@
             <div class="step-body">
                 <p class="step-help" id="lbl-wheel-design">إطار لعبتك وألوانها.</p>
                 <div class="brand-colors">
-                    <div class="color-input-group"><input type="color" id="wheel_border_color" value="#046A38" oninput="update()"><div id="lbl-col-bord">الإطار</div></div>
-                    <div class="color-input-group" id="bulb-color-group"><input type="color" id="wheel_bulb_color" value="#C4D600" oninput="update()"><div id="lbl-col-bulb">الأضواء</div></div>
+                    <div class="color-input-group"><input type="color" id="wheel_border_color" value="#FFC21A" oninput="update()"><div id="lbl-col-bord">الإطار</div></div>
+                    <div class="color-input-group" id="bulb-color-group"><input type="color" id="wheel_bulb_color" value="#FFE27A" oninput="update()"><div id="lbl-col-bulb">الأضواء</div></div>
                     <div class="color-input-group" id="bulb-size-group"><input type="number" id="wheel_bulb_size" value="16" min="2" max="20" oninput="update()" style="width:52px;padding:6px;"><div id="lbl-size-bulb">الحجم (بكسل)</div></div>
                 </div>
                 <label class="field-label" id="lbl-brand-quick">ألوان العلامة التجارية السريعة</label>
                 <p class="step-help" id="lbl-brand-quick-help" style="margin-top:-6px;">تُطبَّق على الجوائز، وعلى ديكور ماكينة الحظ / بطاقة الكشط أيضًا.</p>
                 <div class="brand-colors">
-                    <div class="color-input-group"><input type="color" id="color1" value="#046A38" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def1">اللون 1</div></div>
+                    <div class="color-input-group"><input type="color" id="color1" value="#F0275F" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def1">اللون 1</div></div>
                     <div style="font-size:18px;">🔄</div>
-                    <div class="color-input-group"><input type="color" id="color2" value="#C4D600" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def2">اللون 2</div></div>
+                    <div class="color-input-group"><input type="color" id="color2" value="#5B8DFF" oninput="updateAllLotsColors(this.value,'bg')"><div id="lbl-col-def2">اللون 2</div></div>
                 </div>
             </div>
         </details>
@@ -1594,6 +1785,7 @@
     <div class="panel panel-preview">
         <h2 class="title" id="prev-title">معاينة رحلة العميل</h2>
         <p class="subtitle">ما سيراه الشخص الذي يمسح رمز QR مباشرة.</p>
+        <div class="preview-nav" id="preview-nav"></div>
         <div class="preview-grid">
             <div class="screen-mockup-wrap" id="pre-wrap1"><div class="screen-mockup" id="pre-s1">
                 <span class="screen-label" id="stp1-lbl">الخطوة 1: التقييم</span>
@@ -3412,7 +3604,7 @@ if(slider) {
     function closeDashboard() {
         document.getElementById('dashboard-view').style.display = 'none';
         document.getElementById('main-content').style.display = 'flex';
-        if (window.innerWidth <= 1099) document.querySelector('.sticky-cta').style.display = 'block';
+        document.querySelector('.sticky-cta').style.display = 'block';
     }
 
     let dashWinLossChart = null;
@@ -4074,14 +4266,31 @@ if(slider) {
         brand: { label: 'أحمر وأصفر', css: 'linear-gradient(135deg, #DA291C, #FFC72C)' }
     };
     const TEXTURE_PRESETS = {
+        tresor: { label: 'كنوز', emoji: '💰', css: 'none', size: 'auto' },
+        noel: { label: 'عيد الميلاد', emoji: '🎄', css: 'none', size: 'auto' },
+        halloween: { label: 'هالوين', emoji: '🎃', css: 'none', size: 'auto' },
+        paques: { label: 'عيد الفصح', emoji: '🐰', css: 'none', size: 'auto' },
+        ete: { label: 'الصيف', emoji: '☀️', css: 'none', size: 'auto' },
+        hiver: { label: 'الشتاء', emoji: '❄️', css: 'none', size: 'auto' },
+        sec_fastfood: { label: 'وجبات سريعة', emoji: '🍔', css: 'none', size: 'auto' },
+        sec_restaurant: { label: 'مطعم', emoji: '🍽️', css: 'none', size: 'auto' },
+        sec_hotel: { label: 'فنادق', emoji: '🏨', css: 'none', size: 'auto' },
+        sec_coiffure: { label: 'حلاقة وتصفيف الشعر', emoji: '✂️', css: 'none', size: 'auto' },
+        sec_beaute: { label: 'تجميل / سبا', emoji: '💆', css: 'none', size: 'auto' },
+        sec_garage: { label: 'ورشة / سيارات', emoji: '🔧', css: 'none', size: 'auto' },
+        sec_immobilier: { label: 'عقارات', emoji: '🏠', css: 'none', size: 'auto' },
+        sec_fitness: { label: 'رياضة / لياقة', emoji: '🏋️', css: 'none', size: 'auto' },
+        sec_boulangerie: { label: 'مخبز وحلويات', emoji: '🥐', css: 'none', size: 'auto' },
+        sec_medical: { label: 'طبي / صحة', emoji: '🩺', css: 'none', size: 'auto' },
+        sec_grandedistrib: { label: 'تجزئة / سوبرماركت', emoji: '🛒', css: 'none', size: 'auto' },
         points: { label: 'نقاط', css: 'radial-gradient(rgba(255,255,255,.4) 1px, transparent 1.6px)', size: '14px 14px' },
         diagonales: { label: 'خطوط قطرية', css: 'repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 2px, transparent 2px 11px)', size: 'auto' },
         grille: { label: 'شبكة', css: 'repeating-linear-gradient(0deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px), repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 1px, transparent 1px 16px)', size: 'auto' },
         vagues: { label: 'أمواج', css: 'repeating-radial-gradient(circle at 0 0, transparent 0, transparent 9px, rgba(255,255,255,.14) 9px, rgba(255,255,255,.14) 11px)', size: '22px 22px' },
         toile: { label: 'قماش', css: 'repeating-linear-gradient(45deg, rgba(255,255,255,.14) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(255,255,255,.14) 0 2px, transparent 2px 9px)', size: 'auto' }
     };
-    let selectedGradient = 'emerald';
-    let selectedTexture = 'none';
+    let selectedGradient = 'candy';
+    let selectedTexture = 'tresor';
 
     function buildSwatchPickers() {
         const gradWrap = document.getElementById('gradient-swatches');
@@ -4116,12 +4325,12 @@ if(slider) {
         const texWrap = document.getElementById('texture-swatches');
         if (texWrap && !texWrap.children.length) {
             const noneSw = document.createElement('div');
-            noneSw.className = 'swatch swatch-none active';
+            noneSw.className = 'swatch swatch-none' + (selectedTexture === 'none' ? ' active' : '');
             noneSw.title = 'بدون ملمس';
             noneSw.dataset.key = 'none';
             noneSw.innerText = '✕';
             noneSw.onclick = () => {
-                selectedTexture = 'none';
+                selectedTexture = 'none'; cdApplyFxPreview();
                 Array.from(texWrap.children).forEach(c => c.classList.remove('active'));
                 noneSw.classList.add('active');
                 update();
@@ -4129,14 +4338,15 @@ if(slider) {
             texWrap.appendChild(noneSw);
             Object.keys(TEXTURE_PRESETS).forEach(key => {
                 const sw = document.createElement('div');
-                sw.className = 'swatch swatch-texture';
+                sw.className = 'swatch swatch-texture' + (key === selectedTexture ? ' active' : '');
                 sw.title = TEXTURE_PRESETS[key].label;
                 sw.dataset.key = key;
                 sw.style.backgroundColor = '#8a8a92';
                 sw.style.backgroundImage = TEXTURE_PRESETS[key].css;
                 sw.style.backgroundSize = TEXTURE_PRESETS[key].size;
+                if (TEXTURE_PRESETS[key].emoji) { sw.textContent = TEXTURE_PRESETS[key].emoji; sw.style.display = 'flex'; sw.style.alignItems = 'center'; sw.style.justifyContent = 'center'; sw.style.fontSize = '20px'; sw.style.backgroundColor = '#f4f4f5'; }
                 sw.onclick = () => {
-                    selectedTexture = key;
+                    selectedTexture = key; cdApplyFxPreview();
                     Array.from(texWrap.children).forEach(c => c.classList.remove('active'));
                     sw.classList.add('active');
                     update();
@@ -4180,7 +4390,7 @@ if(slider) {
         } else if (gradientKey !== 'none') {
             const grad = GRADIENT_PRESETS[gradientKey] ? GRADIENT_PRESETS[gradientKey].css : 'linear-gradient(135deg,#eee,#ddd)';
             const tex = TEXTURE_PRESETS[textureKey];
-            if (tex) { images.push(tex.css); sizes.push(tex.size); }
+            if (tex && !tex.emoji) { images.push(tex.css); sizes.push(tex.size); }
             images.push(grad);
             sizes.push('cover');
         }
@@ -4460,6 +4670,118 @@ if(slider) {
         return `<div style="width:${boxSize};height:${boxSize};border-radius:14px;background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:${fontSize};margin:0 auto ${marginBottom} auto;">${emoji}</div>`;
     }
 
+    // Habillage visuel de la roue (canvas) : reflet doux sur chaque part, liseré, centre.
+    function cdWedgeSheen(ctx, size) {
+        const c = size / 2, r = size / 2 * 0.96;
+        const g = ctx.createRadialGradient(c, c, r * 0.1, c, c, r);
+        g.addColorStop(0, 'rgba(0,0,0,.20)');
+        g.addColorStop(0.32, 'rgba(0,0,0,0)');
+        g.addColorStop(0.78, 'rgba(255,255,255,.07)');
+        g.addColorStop(1, 'rgba(255,255,255,.26)');
+        return g;
+    }
+    function cdWheelFinish(ctx, size, holeRatio) {
+        const c = size / 2, r = size / 2 * 0.96;
+        ctx.save();
+        ctx.beginPath(); ctx.arc(c, c, r, 0, Math.PI * 2);
+        ctx.lineWidth = Math.max(1.5, size * 0.012); ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.stroke();
+        ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = size * 0.035; ctx.shadowOffsetY = size * 0.008;
+        ctx.beginPath(); ctx.fillStyle = 'white'; ctx.arc(c, c, size * holeRatio, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    }
+
+    // Texte de lot « sticker » : contour arrondi (clair sur fond sombre, sombre sur fond clair).
+    function cdFillText(ctx, text, x, y) {
+        const col = String(ctx.fillStyle);
+        let lum = 0;
+        const m = col.match(/^#([0-9a-f]{6})$/i);
+        if (m) { const n = parseInt(m[1], 16); lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
+        const px = parseFloat((ctx.font.match(/([\d.]+)px/) || [0, 12])[1]);
+        ctx.save();
+        ctx.lineJoin = 'round'; ctx.miterLimit = 2;
+        ctx.lineWidth = Math.max(2, px * 0.22);
+        ctx.strokeStyle = lum > 0.6 ? 'rgba(130,10,55,.9)' : 'rgba(255,255,255,.9)';
+        ctx.strokeText(text, x, y);
+        ctx.restore();
+        ctx.fillText(text, x, y);
+    }
+    // Textures d'emoji (effet « texture » en arrière-plan) : les icônes grossissent / rétrécissent doucement.
+    const CD_FX_SETS = {
+        tresor: ['💰', '🎉', '💎', '🎊', '💶', '🎈', '👑', '🎁', '✨', '🎉'],
+        noel: ['🎄', '🎅', '⛄', '🎁', '⭐', '🦌', '🔔', '❄️', '🍪', '🎄'],
+        halloween: ['🎃', '👻', '🦇', '🕷️', '💀', '🍬', '🕸️', '🧙', '🌙', '🎃'],
+        paques: ['🐰', '🥚', '🐣', '🐇', '🌷', '🐥', '🌸', '🍫', '🥕', '🐣'],
+        ete: ['☀️', '🏖️', '🍉', '🌴', '🕶️', '🍦', '🐚', '🌊', '🍹', '⛱️'],
+        hiver: ['❄️', '☃️', '🧣', '🧤', '🏔️', '⛷️', '☕', '🧊', '🌨️', '🧦'],
+        sec_fastfood: ['🍔', '🍟', '🌭', '🥤', '🍕', '🌮', '🍗', '🍦', '🥪', '🍩'],
+        sec_restaurant: ['🍽️', '🍷', '🥂', '🍝', '🥩', '🍰', '🧑‍🍳', '🥗', '🍴', '🍾'],
+        sec_hotel: ['🏨', '🛎️', '🛏️', '🔑', '🧳', '🌅', '🏊', '🍳', '⭐', '🛋️'],
+        sec_coiffure: ['✂️', '💈', '💇', '💇‍♂️', '🧴', '💅', '🪞', '✨', '💄', '🧔'],
+        sec_beaute: ['💆', '🧖', '🕯️', '🌸', '🧴', '🌿', '💅', '🛁', '🧘', '💄'],
+        sec_garage: ['🔧', '🚗', '🛞', '⚙️', '🔩', '🛠️', '🏁', '⛽', '🔋', '🚘'],
+        sec_immobilier: ['🏠', '🏡', '🔑', '🏢', '🛋️', '🪴', '📋', '🏘️', '🚪', '🛏️'],
+        sec_fitness: ['🏋️', '💪', '🏃', '🥇', '🧘', '🚴', '🥤', '🍎', '⏱️', '🏆'],
+        sec_boulangerie: ['🥐', '🥖', '🍞', '🧁', '🥧', '🍪', '🎂', '🥯', '🍩', '🌾'],
+        sec_medical: ['🩺', '💊', '🏥', '🦷', '💉', '❤️', '🩹', '🧬', '🌡️', '🫀'],
+        sec_grandedistrib: ['🛒', '🛍️', '🥕', '🍎', '🥛', '🧺', '🏷️', '🍞', '🧃', '🥫']
+    };
+    const CD_FX_POS = [[12, 10], [82, 16], [48, 30], [16, 48], [86, 52], [50, 68], [14, 86], [80, 88], [48, 8], [48, 94]];
+    const CD_FX_SIZES_PREVIEW = [62, 84, 52, 72, 92, 56, 78, 68, 48, 58];
+    const CD_FX_SIZES_CLIENT = [110, 150, 100, 170, 130, 120, 160, 140, 90, 110];
+    function cdBuildFx(container, fixed, icons, key, staticScale) {
+        if (!container || !icons) return;
+        const layer = document.createElement('div');
+        layer.className = 'cd-fx' + (fixed ? ' cd-fx-fixed' : '') + (staticScale ? ' cd-fx-static' : '');
+        layer.setAttribute('aria-hidden', 'true');
+        layer.dataset.set = key || '';
+        const sizes = fixed ? CD_FX_SIZES_CLIENT : CD_FX_SIZES_PREVIEW;
+        const count = fixed ? 10 : 8;
+        for (let i = 0; i < count && i < CD_FX_POS.length; i++) {
+            const el = document.createElement('span');
+            el.textContent = icons[i % icons.length];
+            el.style.left = CD_FX_POS[i][0] + '%';
+            el.style.top = CD_FX_POS[i][1] + '%';
+            el.style.fontSize = Math.round(sizes[i] * (staticScale || 1)) + 'px';
+            el.style.setProperty('--r', ((i * 17) % 40 - 20) + 'deg');
+            el.style.animationDuration = ((i === 1 || i === 6) ? 4.2 : 6 + (i * 3) % 5) + 's';
+            el.style.animationDelay = '-' + ((i * 5) % 8) + 's';
+            layer.appendChild(el);
+        }
+        container.insertBefore(layer, container.firstChild);
+    }
+    function cdApplyFxPreview() {
+        const icons = CD_FX_SETS[selectedTexture];
+        document.querySelectorAll('.screen-mockup').forEach(m => {
+            const layer = m.querySelector(':scope > .cd-fx');
+            if (layer && (!icons || layer.dataset.set !== selectedTexture)) layer.remove();
+            if (icons && !m.querySelector(':scope > .cd-fx')) cdBuildFx(m, false, icons, selectedTexture);
+        });
+        // Carte du QR code affichée : mêmes emoji en fond (fixes, pour que le PNG / PDF téléchargé soit net).
+        const qa = document.getElementById('qrcode-area');
+        if (qa) {
+            const ql = qa.querySelector(':scope > .cd-fx');
+            if (ql && (!icons || ql.dataset.set !== selectedTexture)) ql.remove();
+            if (icons && !qa.querySelector(':scope > .cd-fx')) cdBuildFx(qa, false, icons, selectedTexture, 0.7);
+        }
+    }
+    // Affiches (A4 / A5 / A6 / paysage) : emoji en fond, tailles proportionnelles au format.
+    function cdBuildPosterFx(el, f, icons) {
+        if (!icons) return;
+        const w = f.wpx, h = Math.round((w / f.wmm) * f.hmm), base = Math.min(w, h);
+        const layer = document.createElement('div');
+        layer.className = 'cd-fx cd-fx-static';
+        for (let i = 0; i < CD_FX_POS.length; i++) {
+            const sp = document.createElement('span');
+            sp.textContent = icons[i % icons.length];
+            sp.style.left = CD_FX_POS[i][0] + '%';
+            sp.style.top = CD_FX_POS[i][1] + '%';
+            sp.style.fontSize = Math.round(base * CD_FX_SIZES_CLIENT[i] / 390) + 'px';
+            sp.style.setProperty('--r', ((i * 17) % 40 - 20) + 'deg');
+            layer.appendChild(sp);
+        }
+        el.appendChild(layer);
+    }
+
     // Découpe un nom de lot trop long en 2 lignes (sur un espace proche du milieu).
     function splitLotText(text) {
         if (text.length > 10 && text.includes(' ')) {
@@ -4479,11 +4801,11 @@ if(slider) {
         let size = Math.max(minSize, Math.min(requestedSize, wedgeLimit));
         const maxWidth = Math.max(10, radius - startX - 6);
         const longest = lines.reduce((a, b) => (b.length > a.length ? b : a), '');
-        ctx.font = `bold ${size}px Arial`;
+        ctx.font = `${size}px 'Lilita One', 'Arial Black', Arial`;
         let guard = 0;
         while (size > minSize && ctx.measureText(longest).width > maxWidth && guard < 30) {
             size -= 1;
-            ctx.font = `bold ${size}px Arial`;
+            ctx.font = `${size}px 'Lilita One', 'Arial Black', Arial`;
             guard++;
         }
         return size;
@@ -4783,6 +5105,25 @@ if(slider) {
             ctx.lineTo(x + h, h);
             ctx.stroke();
         }
+        ctx.save();
+        const sheen = ctx.createLinearGradient(0, 0, 0, h);
+        sheen.addColorStop(0, 'rgba(255,255,255,.38)');
+        sheen.addColorStop(0.5, 'rgba(255,255,255,.04)');
+        sheen.addColorStop(1, 'rgba(0,0,0,.14)');
+        ctx.fillStyle = sheen;
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(255,255,255,.85)';
+        [[0.12, 0.2, 0.05], [0.88, 0.26, 0.04], [0.2, 0.84, 0.04], [0.82, 0.8, 0.055]].forEach(([px, py, pr]) => {
+            const sx = w * px, sy = h * py, sr = Math.min(w, h) * pr;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy - sr);
+            ctx.quadraticCurveTo(sx, sy, sx + sr, sy);
+            ctx.quadraticCurveTo(sx, sy, sx, sy + sr);
+            ctx.quadraticCurveTo(sx, sy, sx - sr, sy);
+            ctx.quadraticCurveTo(sx, sy, sx, sy - sr);
+            ctx.fill();
+        });
+        ctx.restore();
         ctx.fillStyle = 'rgba(255,255,255,.92)';
         ctx.font = `bold ${Math.round(h * 0.14)}px 'Segoe UI', sans-serif`;
         ctx.textAlign = 'center';
@@ -5234,6 +5575,7 @@ if(slider) {
             await loadScriptOnce(LIB_URLS.html2canvas);
             for (const f of formats) {
                 const el = buildPosterElement(f, bg, textColor, buttonColor, buttonTextColor, logoUrl, emoji, title, subtitle, qrDataUrl, scanCaption);
+                cdBuildPosterFx(el, f, CD_FX_SETS[live.cust_bg_texture]);
                 document.body.appendChild(el);
                 await new Promise(r => setTimeout(r, 60));
                 fitPosterTopBlock(el);
@@ -5351,7 +5693,7 @@ if(slider) {
             document.getElementById('wheel_bulb_color').value = c.wl_c || '#C4D600';
             document.getElementById('wheel_bulb_size').value = c.wl_s || 10;
             document.getElementById('bg_url').value = c.cust_bg || '';
-            selectedGradient = c.cust_bg_gradient || 'emerald';
+            selectedGradient = c.cust_bg_gradient || 'candy';
             selectedTexture = c.cust_bg_texture || 'none';
             document.getElementById('bg_color').value = c.cust_bg_c || '#ffffff';
             document.getElementById('bg_opacity').value = c.cust_bg_o || 0.5;
@@ -5372,6 +5714,7 @@ if(slider) {
             document.getElementById('extra-fields-inputs').innerHTML = '';
             (c.ef || []).forEach(label => addExtraFieldRow(label));
             if (document.getElementById('opt_skip_avis')) document.getElementById('opt_skip_avis').checked = !!c.skip_avis;
+            cdApplyFxPreview();
             if (document.getElementById('opt_avis_end')) document.getElementById('opt_avis_end').checked = !!c.avis_end && isPremium();
 
             document.getElementById('lots-inputs').innerHTML = '';
@@ -5398,10 +5741,10 @@ if(slider) {
     }
 
     const defaultLots = [
-        { n: "🥹 خسرت", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "🎁 خصم 20%", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true },
-        { n: "🥹 خسرت", p: 40, s: 16, bg: "#046A38", tx: "#ffffff", w: false },
-        { n: "🎁 خصم 10%", p: 10, s: 16, bg: "#C4D600", tx: "#1d1d1f", w: true }
+        { n: "🥹 خسرت", p: 40, s: 16, bg: "#F0275F", tx: "#ffffff", w: false },
+        { n: "🎁 خصم 20%", p: 10, s: 16, bg: "#5B8DFF", tx: "#ffffff", w: true },
+        { n: "🥹 خسرت", p: 40, s: 16, bg: "#F0275F", tx: "#ffffff", w: false },
+        { n: "🎁 خصم 10%", p: 10, s: 16, bg: "#5B8DFF", tx: "#ffffff", w: true }
     ];
 
     // ---------------------------------------------------------------
@@ -5437,11 +5780,11 @@ if(slider) {
         div.className = 'lot-row-wrapper';
         div.innerHTML = `<div class="lot-row">
             <div class="input-wrapper">
-                <span class="mobile-label">LOT (2 lignes auto)</span>
+                <span class="mobile-label">الجائزة (سطران تلقائيًا)</span>
                 <input type="text" class="ln" value="${n}" oninput="update()">
             </div>
             <div class="input-wrapper small">
-                <span class="mobile-label">PROB. %</span>
+                <span class="mobile-label">الاحتمال %</span>
                 <input type="number" class="lp" value="${p}" step="0.1" oninput="handleProbChange(this)">
             </div>
             <div class="input-wrapper small">
@@ -5716,20 +6059,21 @@ if(slider) {
         filtered.forEach((idx, i) => {
             ctx.beginPath(); ctx.fillStyle = bgs[idx];
             ctx.moveTo(centerX, centerY); ctx.arc(centerX, centerY, radius, i * arc, (i + 1) * arc); ctx.fill();
-            ctx.lineWidth = Math.max(1, size * 0.008);
-            ctx.strokeStyle = 'rgba(255,255,255,.4)';
+            ctx.fillStyle = cdWedgeSheen(ctx, size); ctx.fill();
+            ctx.lineWidth = Math.max(1.5, size * 0.011);
+            ctx.strokeStyle = 'rgba(255,255,255,.55)';
             ctx.stroke();
             ctx.save(); ctx.translate(centerX, centerY); ctx.rotate(i * arc + arc / 2);
-            ctx.fillStyle = txs[idx]; ctx.textAlign = "left";
+            ctx.fillStyle = txs[idx]; ctx.textAlign = "left"; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 2; ctx.shadowOffsetY = 1;
             const startX = size * 0.2;
             const lines = splitLotText(ns[idx]);
             const fitSize = computeFitFontSize(ctx, lines, ss[idx] * 0.7, radius, startX, arc, 6);
-            ctx.font = `bold ${fitSize}px Arial`;
-            if (lines.length === 2) { ctx.fillText(lines[0], startX, -4); ctx.fillText(lines[1], startX, 8); }
-            else { ctx.fillText(lines[0], startX, 4); }
+            ctx.font = `${fitSize}px 'Lilita One', 'Arial Black', Arial`;
+            if (lines.length === 2) { cdFillText(ctx, lines[0], startX, -4); cdFillText(ctx, lines[1], startX, 8); }
+            else { cdFillText(ctx, lines[0], startX, 4); }
             ctx.restore();
         });
-        ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(centerX, centerY, size * 0.125, 0, Math.PI * 2); ctx.fill();
+        cdWheelFinish(ctx, size, 0.125);
     }
 
     function spinPreview() {
@@ -5944,6 +6288,7 @@ if(slider) {
 
         document.body.innerHTML = `
         <style>
+            html { background-color: ${clientBg.fallbackColor}; min-height: 100%; }
             body { margin: 0; padding: 0; padding-top: env(safe-area-inset-top); box-sizing: border-box; min-height: 100vh; min-height: 100dvh; color-scheme: light; background-color: ${clientBg.image === 'none' ? clientBg.fallbackColor : 'transparent'}; background-image: ${clientBg.image}; background-size: ${clientBg.size}; background-position: center; background-attachment: scroll; color: ${txCol}; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-family: 'Segoe UI', sans-serif; position: relative; overflow-x: hidden; direction: ${lang === 'ar' ? 'rtl' : 'ltr'}; }
             .client-card { position: relative; z-index: 1; background: transparent; padding: 56px 20px 40px 20px; width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
             .btn-black-c { background: ${btnCol}; color: ${btnTxtCol}; border: none; padding: 18px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px; font-size: 16px; margin: 15px auto 0 auto; position: relative; z-index: 2; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; }
@@ -5996,6 +6341,8 @@ if(slider) {
                  </div>
             </div>
         </div>`;
+
+        if (CD_FX_SETS[config.cust_bg_texture]) cdBuildFx(document.body, true, CD_FX_SETS[config.cust_bg_texture], config.cust_bg_texture);
 
         // Repositionne toujours la page tout en haut à l'ouverture du jeu — sans ça, le
         // scroll hérité de la page précédente (ex: barre d'adresse Safari qui se réduit)
@@ -6158,20 +6505,21 @@ if(slider) {
         config.n.forEach((n, i) => {
             ctx.beginPath(); ctx.fillStyle = config.bg[i];
             ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, i * arc, (i + 1) * arc); ctx.fill();
-            ctx.lineWidth = Math.max(1, size * 0.008);
-            ctx.strokeStyle = 'rgba(255,255,255,.4)';
+            ctx.fillStyle = cdWedgeSheen(ctx, size); ctx.fill();
+            ctx.lineWidth = Math.max(1.5, size * 0.011);
+            ctx.strokeStyle = 'rgba(255,255,255,.55)';
             ctx.stroke();
             ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * arc + arc / 2);
-            ctx.fillStyle = config.tx[i]; ctx.textAlign = "left";
+            ctx.fillStyle = config.tx[i]; ctx.textAlign = "left"; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 2; ctx.shadowOffsetY = 1;
             const startX = size * 0.2;
             const lines = splitLotText(n);
             const fitSize = computeFitFontSize(ctx, lines, config.s[i], r, startX, arc, 7);
-            ctx.font = `bold ${fitSize}px Arial`;
-            if (lines.length === 2) { ctx.fillText(lines[0], startX, -6); ctx.fillText(lines[1], startX, 12); }
-            else { ctx.fillText(lines[0], startX, 6); }
+            ctx.font = `${fitSize}px 'Lilita One', 'Arial Black', Arial`;
+            if (lines.length === 2) { cdFillText(ctx, lines[0], startX, -6); cdFillText(ctx, lines[1], startX, 12); }
+            else { cdFillText(ctx, lines[0], startX, 6); }
             ctx.restore();
         });
-        ctx.beginPath(); ctx.fillStyle = "white"; ctx.arc(cx, cy, size * 0.12, 0, Math.PI * 2); ctx.fill();
+        cdWheelFinish(ctx, size, 0.12);
     }
 
     window.onload = async () => {
@@ -6239,14 +6587,12 @@ if(slider) {
         if (!section || !cta || !('IntersectionObserver' in window)) return;
         const io = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                if (window.innerWidth > 1099) { cta.style.display = 'none'; return; }
                 if (document.getElementById('dashboard-view').style.display === 'block') return;
                 cta.style.display = entry.isIntersecting ? 'block' : 'none';
             });
         }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
         io.observe(section);
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 1099) { cta.style.display = 'none'; }
         });
     })();
 </script>
@@ -6264,6 +6610,102 @@ if(slider) {
         if (e.key === 'Escape') document.querySelectorAll('.nav-lang-dd').forEach(function (dd) { dd.classList.remove('open'); });
     });
 })();
+</script>
+<script>
+(function () {
+    function grid() { return document.querySelector('.preview-grid'); }
+    function slides() { return Array.prototype.slice.call(document.querySelectorAll('.preview-grid > .screen-mockup-wrap')).filter(function (w) { return w.style.display !== 'none'; }); }
+    function goTo(w, smooth) {
+        var g = grid(); if (!g || !w) return;
+        g.scrollTo({ left: w.offsetLeft - (g.clientWidth - w.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
+    }
+    function current() {
+        var g = grid(), best = null, bd = 1e9; if (!g) return null;
+        var c = g.scrollLeft + g.clientWidth / 2;
+        slides().forEach(function (w) { var d = Math.abs(w.offsetLeft + w.offsetWidth / 2 - c); if (d < bd) { bd = d; best = w; } });
+        return best;
+    }
+    function mark() {
+        var ws = slides(), cur = current(), i = ws.indexOf(cur);
+        ws.forEach(function (w) { w.classList.toggle('cd-active', w === cur); });
+        var pv = document.getElementById('pv-prev'), nx = document.getElementById('pv-next');
+        if (pv) pv.disabled = i <= 0;
+        if (nx) nx.disabled = i < 0 || i >= ws.length - 1;
+        return cur;
+    }
+    // Sur PC : la taille des écrans s'adapte à la hauteur disponible (comme sur mobile).
+    function fit() {
+        var g = grid(), pn = document.querySelector('.panel-preview');
+        if (!g || !pn) return;
+        if (window.innerWidth < 1100) { g.style.removeProperty('--pv-zoom'); return; }
+        var above = g.getBoundingClientRect().top - pn.getBoundingClientRect().top;
+        var stickyTop = parseFloat(getComputedStyle(pn).top) || 74;
+        var avail = window.innerHeight - stickyTop - above - 32 - 72 - 14;
+        var z = Math.max(0.6, Math.min(1.5, avail / 520));
+        g.style.setProperty('--pv-zoom', z.toFixed(3));
+    }
+    function step(dir) { var ws = slides(), t = ws[ws.indexOf(current()) + dir]; if (t) goTo(t, true); }
+    function build() {
+        var nav = document.getElementById('preview-nav'); if (!nav || !grid()) return;
+        var ws = slides(), cur = mark();
+        nav.innerHTML = '';
+        ws.forEach(function (w) {
+            var lab = w.querySelector('.screen-label');
+            var b = document.createElement('button'); b.type = 'button';
+            b.textContent = lab ? lab.textContent : '';
+            if (w === cur) b.className = 'active';
+            b.onclick = function () { goTo(w, true); };
+            nav.appendChild(b);
+        });
+    }
+    var t1 = null, t2 = null, raf = 0;
+    window.addEventListener('load', function () {
+        cdApplyFxPreview();
+        var g = grid(); if (!g) return;
+        // grandes flèches de part et d'autre de l'écran
+        var stage = document.createElement('div'); stage.className = 'pv-stage';
+        g.parentNode.insertBefore(stage, g); stage.appendChild(g);
+        ['prev', 'next'].forEach(function (k) {
+            var b = document.createElement('button'); b.type = 'button'; b.id = 'pv-' + k; b.className = 'pv-side pv-' + k;
+            b.textContent = k === 'prev' ? '‹' : '›';
+            b.onclick = function () { touched = true; step(k === 'prev' ? -1 : 1); };
+            stage.appendChild(b);
+        });
+        var w3 = document.getElementById('pre-wrap3');
+        var touched = false;
+        ['pointerdown', 'touchstart'].forEach(function (ev) { g.addEventListener(ev, function () { touched = true; }, { passive: true }); });
+        var nv = document.getElementById('preview-nav'); if (nv) nv.addEventListener('click', function () { touched = true; });
+        // clic sur un écran voisin grisé : on le fait glisser au centre
+        g.addEventListener('click', function (e) {
+            var w = e.target.closest ? e.target.closest('.screen-mockup-wrap') : null;
+            if (w && !w.classList.contains('cd-active')) { touched = true; goTo(w, true); }
+        });
+        function home() { if (!touched) goTo(w3, false); }
+        fit(); build(); home(); mark();
+        [400, 1200, 2500].forEach(function (ms) { setTimeout(function () { fit(); home(); build(); }, ms); });
+        var t3 = null;
+        window.addEventListener('resize', function () { clearTimeout(t3); t3 = setTimeout(function () { fit(); var c = current(); if (c) goTo(c, false); build(); }, 120); });
+        g.addEventListener('scroll', function () {
+            if (!raf) raf = requestAnimationFrame(function () { raf = 0; mark(); });
+            clearTimeout(t1); t1 = setTimeout(build, 90);
+        }, { passive: true });
+        // Retour sur le configurateur (ex. depuis le dashboard) : on revient toujours sur l'étape 3.
+        var lastW = g.clientWidth;
+        if (window.ResizeObserver) new ResizeObserver(function () {
+            var w = g.clientWidth;
+            if (w > 0 && lastW === 0) { touched = false; fit(); home(); build(); setTimeout(function () { fit(); home(); build(); }, 200); }
+            lastW = w;
+        }).observe(g);
+        new MutationObserver(function () { clearTimeout(t2); t2 = setTimeout(function () { home(); build(); }, 150); })
+            .observe(g, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
+    });
+})();
+</script>
+<script>
+document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(function (i) {
+    var n = document.getElementById(i.id + '-name');
+    if (n) i.addEventListener('change', function () { n.textContent = (i.files && i.files[0]) ? i.files[0].name : n.dataset.empty; });
+});
 </script>
 </body>
 </html>
