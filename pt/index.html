@@ -1465,6 +1465,24 @@
 [dir="rtl"] .step summary .label::after { margin-left: 0; margin-right: 8px; }
 [dir="rtl"] .preview-grid { direction: ltr; }
 [dir="rtl"] .preview-grid > .screen-mockup-wrap { direction: rtl; }
+/* Rotation verticale du mot-clé du titre (de bas en haut, 2 s) */
+.rotator { display: inline-block; overflow: hidden; vertical-align: bottom; height: 1.2em; line-height: 1.2; white-space: nowrap; transition: width .45s ease; background: var(--accent-color); color: #fff; box-sizing: content-box; padding: 0 .4em 0 .3em; border-radius: .3em; }
+.rot-track { display: block; transition: transform .45s cubic-bezier(.65, 0, .35, 1); will-change: transform; }
+.rot-track.no-anim { transition: none; }
+.rot-item { display: block; width: max-content; height: 1.2em; line-height: 1.2; white-space: nowrap; }
+.hero-emoji { display: block; text-align: center; font-size: 3rem; line-height: 1; height: 1em; margin: 0 0 .9rem; }
+.hero-emoji.pop { animation: heroEmojiPop .5s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes heroEmojiPop { 0% { transform: translateY(18px) scale(.5); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.trade-marquee { width: 100%; overflow: hidden; padding: 1rem 0; margin: 2rem 0 0 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.trade-marquee-track { display: flex; width: max-content; animation: trade-marquee-scroll 90s linear infinite; }
+.trade-marquee:hover .trade-marquee-track { animation-play-state: paused; }
+.trade-marquee-group { display: flex; white-space: pre; padding-right: 0; font-size: 1rem; font-weight: 600; color: #48484a; }
+@keyframes trade-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .trade-marquee-track { animation: none; } }
+.trade-marquee { direction: ltr; }
+.trade-marquee-group span::after { content: "•"; margin: 0 .7em; }
+[dir="rtl"] .rotator { padding: 0 .3em 0 .4em; }
+.btn-download.btn-blue { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
     </style>
 </head>
 <body>
@@ -1516,13 +1534,20 @@
 <main>
     <!-- HERO SECTION -->
     <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 1.5rem;">
-        <h1>Receba mais <span class="highlight">avaliações no Google</span> com uma roleta da sorte por QR code.</h1>
+        <div class="hero-emoji" id="hero-emoji" aria-hidden="true">⭐</div>
+        <h1>Receba mais <span class="rotator highlight" id="hero-rotator"><span class="rot-track"><span class="rot-item">avaliações no Google</span></span></span> com uma roleta da sorte por QR code.</h1>
         <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
             Cada avaliação de 5 estrelas que falta é um cliente que escolhe a concorrência no Google Maps. Transforme o seu balcão numa máquina de avaliações, curtidas e contatos qualificados com um jogo-concurso à sua imagem: crie-o abaixo, <strong>gratuitamente</strong>, em 1 minuto.
         </p>
         <div class="text-center">
             <a href="#configurateur" class="btn hover-effect">Criar o meu jogo personalizado</a>
             <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">Experimente grátis • Configuração em 1 minuto</p>
+        </div>
+        <div class="trade-marquee" aria-hidden="true">
+            <div class="trade-marquee-track">
+                <div class="trade-marquee-group"><span>🥖 Padaria</span><span>💇 Cabeleireiro</span><span>🔧 Oficina mecânica</span><span>🍽️ Restaurante</span><span>🦷 Dentista</span><span>👗 Loja de moda</span><span>🏨 Hotel</span><span>🌸 Floricultura</span><span>🏋️ Academia</span><span>🍷 Adega</span><span>🐾 Veterinário</span><span>🏠 Imobiliária</span><span>🎮 Games</span><span>💅 Esmalteria</span><span>🛒 Supermercado</span><span>📚 Livraria</span><span>⛽ Posto de gasolina</span><span>☕ Cafeteria</span><span>💊 Farmácia</span><span>🚲 Loja de bicicletas</span><span>🍕 Pizzaria</span><span>💍 Joalheria</span><span>🔨 Obras e reformas</span><span>🎳 Boliche</span><span>🥩 Açougue</span><span>👓 Ótica</span><span>🛋️ Móveis e decoração</span><span>🧖 Spa e salão de beleza</span><span>🏪 Mercearia</span><span>📱 Telefonia</span><span>⛺ Camping</span><span>🍰 Confeitaria</span><span>🚗 Concessionária</span><span>🧸 Loja de brinquedos</span><span>🩺 Consultório médico</span><span>🌱 Garden center</span><span>🍔 Fast food</span><span>🧺 Lavanderia</span><span>🎬 Cinema</span><span>🐟 Peixaria</span><span>💈 Barbearia</span><span>🛠️ Casa e construção</span><span>🧘 Estúdio de yoga</span><span>🍣 Sushi</span><span>📷 Fotógrafo</span><span>🛞 Loja de pneus</span><span>👟 Loja de calçados</span><span>🎁 Loja de presentes</span><span>🧀 Queijaria</span><span>💻 Informática</span><span>🚕 Táxi e transporte por app</span><span>🍦 Sorveteria</span><span>🏖️ Aluguel de temporada</span><span>🐶 Banho e tosa</span><span>🎢 Parque de diversões</span><span>🥦 Hortifrúti</span><span>🚿 Lava-rápido</span><span>💆 Massagem</span><span>🥞 Creperia</span><span>🛏️ Pousada</span><span>🎓 Autoescola</span><span>🍫 Chocolateria</span><span>🍺 Bar e cervejaria</span></div>
+                <div class="trade-marquee-group"><span>🥖 Padaria</span><span>💇 Cabeleireiro</span><span>🔧 Oficina mecânica</span><span>🍽️ Restaurante</span><span>🦷 Dentista</span><span>👗 Loja de moda</span><span>🏨 Hotel</span><span>🌸 Floricultura</span><span>🏋️ Academia</span><span>🍷 Adega</span><span>🐾 Veterinário</span><span>🏠 Imobiliária</span><span>🎮 Games</span><span>💅 Esmalteria</span><span>🛒 Supermercado</span><span>📚 Livraria</span><span>⛽ Posto de gasolina</span><span>☕ Cafeteria</span><span>💊 Farmácia</span><span>🚲 Loja de bicicletas</span><span>🍕 Pizzaria</span><span>💍 Joalheria</span><span>🔨 Obras e reformas</span><span>🎳 Boliche</span><span>🥩 Açougue</span><span>👓 Ótica</span><span>🛋️ Móveis e decoração</span><span>🧖 Spa e salão de beleza</span><span>🏪 Mercearia</span><span>📱 Telefonia</span><span>⛺ Camping</span><span>🍰 Confeitaria</span><span>🚗 Concessionária</span><span>🧸 Loja de brinquedos</span><span>🩺 Consultório médico</span><span>🌱 Garden center</span><span>🍔 Fast food</span><span>🧺 Lavanderia</span><span>🎬 Cinema</span><span>🐟 Peixaria</span><span>💈 Barbearia</span><span>🛠️ Casa e construção</span><span>🧘 Estúdio de yoga</span><span>🍣 Sushi</span><span>📷 Fotógrafo</span><span>🛞 Loja de pneus</span><span>👟 Loja de calçados</span><span>🎁 Loja de presentes</span><span>🧀 Queijaria</span><span>💻 Informática</span><span>🚕 Táxi e transporte por app</span><span>🍦 Sorveteria</span><span>🏖️ Aluguel de temporada</span><span>🐶 Banho e tosa</span><span>🎢 Parque de diversões</span><span>🥦 Hortifrúti</span><span>🚿 Lava-rápido</span><span>💆 Massagem</span><span>🥞 Creperia</span><span>🛏️ Pousada</span><span>🎓 Autoescola</span><span>🍫 Chocolateria</span><span>🍺 Bar e cervejaria</span></div>
+            </div>
         </div>
     </section>
 
@@ -1767,16 +1792,12 @@
                 <div id="qrcode"></div>
                 <p id="qr-id-display" style="font-family:monospace; font-weight:bold; margin-top:5px; color:#555;"></p>
             </div>
-            <div class="qr-actions">
-                <button class="btn-download" id="btn-dl-png" onclick="downloadQR('png')">Baixar PNG</button>
-                <button class="btn-download" id="btn-dl-pdf" onclick="downloadQR('pdf')">Baixar PDF</button>
-            </div>
             <div id="poster-area" style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
                 <p id="poster-status" style="font-size:12.5px; color:var(--muted); margin:0 0 10px 0;">🖼️ Preparando os seus 3 pôsteres A4 / A5 / A6...</p>
-                <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Pré-visualização dos meus pôsteres (PDF, A4+A5+A6+Horizontal)</button>
+                <button class="btn-download btn-blue" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 Pré-visualização dos meus pôsteres (PDF, A4+A5+A6+Horizontal)</button>
             </div>
             <div style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
-                <button class="btn-download" style="width:100%;" onclick="downloadReglementJeu()">⚖️ Baixar o regulamento do jogo (PDF)</button>
+                <button class="btn-download btn-blue" style="width:100%;" onclick="downloadReglementJeu()">⚖️ Baixar o regulamento do jogo (PDF)</button>
                 <p style="font-size:11.5px; color:var(--muted); margin:8px 0 0 0;">Documento legal pronto a completar: basta indicar a sua denominação social, SIREN, morada da sede, etc.</p>
             </div>
         </div>
@@ -2053,8 +2074,8 @@
     </div>
 
     <!-- STATS BANNER -->
-    <div class="container animate-up hover-effect" style="margin-bottom: 4rem;">
-        <div style="background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
+    <div class="container animate-up" style="margin-bottom: 4rem;">
+        <div class="hover-effect" style="background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">🚀 + 200 avaliações ⭐ e seguidores de «curtir» 👍 em 1 mês*</h2>
             <p style="margin:0; font-size: 1.2rem; color: var(--text-primary);">Cada nova avaliação reforça o seu SEO local e tranquiliza os próximos clientes: impulsione a sua visibilidade no Google, Instagram ou TripAdvisor.</p>
         </div>
@@ -4221,8 +4242,8 @@ if(slider) {
             document.getElementById('sum-actions').innerText = ui.sumActions;
             document.getElementById('lbl-google-url').innerText = ui.lblGoogleUrl;
             document.getElementById('btn-gen').innerText = ui.btnGen;
-            document.getElementById('btn-dl-png').innerText = ui.btnDlPng;
-            document.getElementById('btn-dl-pdf').innerText = ui.btnDlPdf;
+            { const _b = document.getElementById('btn-dl-png'); if (_b) _b.innerText = ui.btnDlPng; }
+            { const _b = document.getElementById('btn-dl-pdf'); if (_b) _b.innerText = ui.btnDlPdf; }
             document.getElementById('prev-title').innerText = ui.prevTitle;
             document.getElementById('stp1-lbl').innerText = ui.stp1Lbl;
             document.getElementById('stp2-lbl').innerText = ui.stp2Lbl;
@@ -5361,6 +5382,7 @@ if(slider) {
             qrContainer.innerHTML = "";
             await loadScriptOnce(LIB_URLS.qrcode);
             new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark: "#000000" });
+            applyQrAreaBackground();
             document.getElementById('qr-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             btn.innerText = "✅ QR code pronto, clique aqui novamente para qualquer alteração";
             btn.disabled = false;
@@ -5388,6 +5410,25 @@ if(slider) {
 
     function escapeHtml(s) {
         return (s || '').toString().replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // Applique à la zone du QR code (logo, titre, « Scannez-moi », code) le même fond que
+    // l'écran client choisi (couleur, dégradé, texture), avec un texte contrasté.
+    // Le QR code lui-même reste noir sur blanc pour rester scannable.
+    function applyQrAreaBackground() {
+        const area = document.getElementById('qrcode-area');
+        if (!area) return;
+        const live = getLiveStyleConfig();
+        const bg = computeScreenBackground(live.cust_bg, live.cust_bg_gradient, live.cust_bg_texture, live.cust_bg_c, live.cust_bg_o, live.cust_bg_none);
+        area.style.backgroundColor = bg.fallbackColor;
+        area.style.backgroundImage = bg.image;
+        area.style.backgroundSize = bg.size;
+        area.style.borderRadius = '14px';
+        const tc = live.cust_tx_c || getContrastColor(live.cust_bg_c || '#ffffff');
+        ['qr-title', 'qr-scan-text', 'qr-id-display'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.style.color = tc;
+        });
     }
 
     function buildQrDataUrl(text, size) {
@@ -6706,6 +6747,60 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
     var n = document.getElementById(i.id + '-name');
     if (n) i.addEventListener('change', function () { n.textContent = (i.files && i.files[0]) ? i.files[0].name : n.dataset.empty; });
 });
+</script>
+<script>
+(function () {
+    var r = document.getElementById('hero-rotator');
+    if (!r) return;
+    var track = r.querySelector('.rot-track');
+    var words = ["avaliações no Google", "visitantes", "clientes", "seguidores", "tráfego"];
+    track.innerHTML = '';
+    words.concat([words[0]]).forEach(function (w) {
+        var el = document.createElement('span');
+        el.className = 'rot-item';
+        el.textContent = w;
+        track.appendChild(el);
+    });
+    var emojis = ['⭐', '👋', '🛍️', '❤️', '🚀'];
+    var emojiEl = document.getElementById('hero-emoji');
+    function setEmoji(k) {
+        if (!emojiEl) return;
+        emojiEl.textContent = emojis[k % emojis.length];
+        emojiEl.classList.remove('pop');
+        void emojiEl.offsetWidth;
+        emojiEl.classList.add('pop');
+    }
+    var items = track.children, i = 0;
+    // Ajuste la taille du mot pour que la pastille ne dépasse jamais de l'écran
+    function fit() {
+        r.style.fontSize = '';
+        var cs = getComputedStyle(r), ps = getComputedStyle(r.parentNode);
+        var avail = r.parentNode.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
+        var max = 0;
+        for (var k = 0; k < items.length; k++) max = Math.max(max, items[k].offsetWidth);
+        var total = max + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        if (avail > 0 && total > avail) r.style.fontSize = (Math.floor((avail / total) * 97)) + '%';
+        r.style.width = items[i].offsetWidth + 'px';
+    }
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    window.addEventListener('resize', fit);
+    setInterval(function () {
+        i++;
+        setEmoji(i);
+        track.style.transform = 'translateY(-' + (i * 1.2) + 'em)';
+        fit();
+        if (i === words.length) {
+            setTimeout(function () {
+                track.classList.add('no-anim');
+                track.style.transform = 'translateY(0)';
+                i = 0;
+                void track.offsetHeight;
+                track.classList.remove('no-anim');
+            }, 480);
+        }
+    }, 2000);
+})();
 </script>
 </body>
 </html>
