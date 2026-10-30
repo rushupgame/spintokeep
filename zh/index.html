@@ -1465,6 +1465,24 @@
 [dir="rtl"] .step summary .label::after { margin-left: 0; margin-right: 8px; }
 [dir="rtl"] .preview-grid { direction: ltr; }
 [dir="rtl"] .preview-grid > .screen-mockup-wrap { direction: rtl; }
+/* Rotation verticale du mot-clé du titre (de bas en haut, 2 s) */
+.rotator { display: inline-block; overflow: hidden; vertical-align: bottom; height: 1.2em; line-height: 1.2; white-space: nowrap; transition: width .45s ease; background: var(--accent-color); color: #fff; box-sizing: content-box; padding: 0 .4em 0 .3em; border-radius: .3em; }
+.rot-track { display: block; transition: transform .45s cubic-bezier(.65, 0, .35, 1); will-change: transform; }
+.rot-track.no-anim { transition: none; }
+.rot-item { display: block; width: max-content; height: 1.2em; line-height: 1.2; white-space: nowrap; }
+.hero-emoji { display: block; text-align: center; font-size: 3rem; line-height: 1; height: 1em; margin: 0 0 .9rem; }
+.hero-emoji.pop { animation: heroEmojiPop .5s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes heroEmojiPop { 0% { transform: translateY(18px) scale(.5); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.trade-marquee { width: 100%; overflow: hidden; padding: 1rem 0; margin: 2rem 0 0 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.trade-marquee-track { display: flex; width: max-content; animation: trade-marquee-scroll 90s linear infinite; }
+.trade-marquee:hover .trade-marquee-track { animation-play-state: paused; }
+.trade-marquee-group { display: flex; white-space: pre; padding-right: 0; font-size: 1rem; font-weight: 600; color: #48484a; }
+@keyframes trade-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .trade-marquee-track { animation: none; } }
+.trade-marquee { direction: ltr; }
+.trade-marquee-group span::after { content: "•"; margin: 0 .7em; }
+[dir="rtl"] .rotator { padding: 0 .3em 0 .4em; }
+.btn-download.btn-blue { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
     </style>
 </head>
 <body>
@@ -1516,13 +1534,20 @@
 <main>
     <!-- HERO SECTION -->
     <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 1.5rem;">
-        <h1>通过二维码转盘游戏，收集更多<span class="highlight">谷歌好评</span>。</h1>
+        <div class="hero-emoji" id="hero-emoji" aria-hidden="true">⭐</div>
+        <h1>通过二维码转盘游戏，收集更多<span class="rotator highlight" id="hero-rotator"><span class="rot-track"><span class="rot-item">谷歌好评</span></span></span>。</h1>
         <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
             每少一条 5 星好评，就意味着有一位顾客在谷歌地图上选择了您的竞争对手。用一个贴合您品牌形象的抽奖游戏，把您的收银台变成收集好评、点赞和优质联系人的利器：请在下方<strong>免费</strong>创建，只需 1 分钟。
         </p>
         <div class="text-center">
             <a href="#configurateur" class="btn hover-effect">创建我的专属游戏</a>
             <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">免费试用 • 1 分钟完成配置</p>
+        </div>
+        <div class="trade-marquee" aria-hidden="true">
+            <div class="trade-marquee-track">
+                <div class="trade-marquee-group"><span>🥖 面包店</span><span>💇 理发店</span><span>🔧 汽修店</span><span>🍽️ 餐厅</span><span>🦷 牙科诊所</span><span>👗 服装店</span><span>🏨 酒店</span><span>🌸 花店</span><span>🏋️ 健身房</span><span>🍷 酒类专卖店</span><span>🐾 宠物医院</span><span>🏠 房产中介</span><span>🎮 电子游戏店</span><span>💅 美甲店</span><span>🛒 超市</span><span>📚 书店</span><span>⛽ 加油站</span><span>☕ 咖啡馆</span><span>💊 药店</span><span>🚲 自行车店</span><span>🍕 披萨店</span><span>💍 珠宝店</span><span>🔨 装修工程</span><span>🎳 保龄球馆</span><span>🥩 肉铺</span><span>👓 眼镜店</span><span>🛋️ 家具与装饰</span><span>🧖 水疗与美容院</span><span>🏪 杂货店</span><span>📱 手机店</span><span>⛺ 露营地</span><span>🍰 糕点店</span><span>🚗 汽车经销商</span><span>🧸 玩具店</span><span>🩺 医疗诊所</span><span>🌱 园艺中心</span><span>🍔 快餐店</span><span>🧺 干洗店</span><span>🎬 电影院</span><span>🐟 鱼铺</span><span>💈 男士理发店</span><span>🛠️ 五金建材</span><span>🧘 瑜伽馆</span><span>🍣 寿司店</span><span>📷 摄影工作室</span><span>🛞 轮胎店</span><span>👟 鞋店</span><span>🎁 礼品店</span><span>🧀 奶酪店</span><span>💻 电脑店</span><span>🚕 出租车与网约车</span><span>🍦 冰淇淋店</span><span>🏖️ 度假租赁</span><span>🐶 宠物美容</span><span>🎢 游乐园</span><span>🥦 果蔬店</span><span>🚿 洗车店</span><span>💆 按摩</span><span>🥞 可丽饼店</span><span>🛏️ 民宿</span><span>🎓 驾校</span><span>🍫 巧克力店</span><span>🍺 酒吧与啤酒屋</span></div>
+                <div class="trade-marquee-group"><span>🥖 面包店</span><span>💇 理发店</span><span>🔧 汽修店</span><span>🍽️ 餐厅</span><span>🦷 牙科诊所</span><span>👗 服装店</span><span>🏨 酒店</span><span>🌸 花店</span><span>🏋️ 健身房</span><span>🍷 酒类专卖店</span><span>🐾 宠物医院</span><span>🏠 房产中介</span><span>🎮 电子游戏店</span><span>💅 美甲店</span><span>🛒 超市</span><span>📚 书店</span><span>⛽ 加油站</span><span>☕ 咖啡馆</span><span>💊 药店</span><span>🚲 自行车店</span><span>🍕 披萨店</span><span>💍 珠宝店</span><span>🔨 装修工程</span><span>🎳 保龄球馆</span><span>🥩 肉铺</span><span>👓 眼镜店</span><span>🛋️ 家具与装饰</span><span>🧖 水疗与美容院</span><span>🏪 杂货店</span><span>📱 手机店</span><span>⛺ 露营地</span><span>🍰 糕点店</span><span>🚗 汽车经销商</span><span>🧸 玩具店</span><span>🩺 医疗诊所</span><span>🌱 园艺中心</span><span>🍔 快餐店</span><span>🧺 干洗店</span><span>🎬 电影院</span><span>🐟 鱼铺</span><span>💈 男士理发店</span><span>🛠️ 五金建材</span><span>🧘 瑜伽馆</span><span>🍣 寿司店</span><span>📷 摄影工作室</span><span>🛞 轮胎店</span><span>👟 鞋店</span><span>🎁 礼品店</span><span>🧀 奶酪店</span><span>💻 电脑店</span><span>🚕 出租车与网约车</span><span>🍦 冰淇淋店</span><span>🏖️ 度假租赁</span><span>🐶 宠物美容</span><span>🎢 游乐园</span><span>🥦 果蔬店</span><span>🚿 洗车店</span><span>💆 按摩</span><span>🥞 可丽饼店</span><span>🛏️ 民宿</span><span>🎓 驾校</span><span>🍫 巧克力店</span><span>🍺 酒吧与啤酒屋</span></div>
+            </div>
         </div>
     </section>
 
@@ -1767,16 +1792,12 @@
                 <div id="qrcode"></div>
                 <p id="qr-id-display" style="font-family:monospace; font-weight:bold; margin-top:5px; color:#555;"></p>
             </div>
-            <div class="qr-actions">
-                <button class="btn-download" id="btn-dl-png" onclick="downloadQR('png')">下载 PNG</button>
-                <button class="btn-download" id="btn-dl-pdf" onclick="downloadQR('pdf')">下载 PDF</button>
-            </div>
             <div id="poster-area" style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
                 <p id="poster-status" style="font-size:12.5px; color:var(--muted); margin:0 0 10px 0;">🖼️ 正在准备您的 3 张 A4 / A5 / A6 海报……</p>
-                <button class="btn-download" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 预览我的海报（PDF，A4+A5+A6+横版）</button>
+                <button class="btn-download btn-blue" id="btn-posters" onclick="generatePosters()" style="display:none; width:100%;">📄 预览我的海报（PDF，A4+A5+A6+横版）</button>
             </div>
             <div style="margin-top:16px; padding-top:16px; border-top:1px dashed #ccc;">
-                <button class="btn-download" style="width:100%;" onclick="downloadReglementJeu()">⚖️ 下载游戏规则（PDF）</button>
+                <button class="btn-download btn-blue" style="width:100%;" onclick="downloadReglementJeu()">⚖️ 下载游戏规则（PDF）</button>
                 <p style="font-size:11.5px; color:var(--muted); margin:8px 0 0 0;">可直接补充使用的法律文件：您只需填写公司名称、SIREN 号码、总部地址等信息。</p>
             </div>
         </div>
@@ -2053,8 +2074,8 @@
     </div>
 
     <!-- STATS BANNER -->
-    <div class="container animate-up hover-effect" style="margin-bottom: 4rem;">
-        <div style="background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
+    <div class="container animate-up" style="margin-bottom: 4rem;">
+        <div class="hover-effect" style="background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">🚀 1 个月内新增 200+ 条评价 ⭐ 和“点赞”粉丝 👍*</h2>
             <p style="margin:0; font-size: 1.2rem; color: var(--text-primary);">每条新评价都会提升您的本地 SEO，并让后来的顾客更放心：在谷歌、Instagram 或 TripAdvisor 上大幅提升您的曝光度。</p>
         </div>
@@ -4221,8 +4242,8 @@ if(slider) {
             document.getElementById('sum-actions').innerText = ui.sumActions;
             document.getElementById('lbl-google-url').innerText = ui.lblGoogleUrl;
             document.getElementById('btn-gen').innerText = ui.btnGen;
-            document.getElementById('btn-dl-png').innerText = ui.btnDlPng;
-            document.getElementById('btn-dl-pdf').innerText = ui.btnDlPdf;
+            { const _b = document.getElementById('btn-dl-png'); if (_b) _b.innerText = ui.btnDlPng; }
+            { const _b = document.getElementById('btn-dl-pdf'); if (_b) _b.innerText = ui.btnDlPdf; }
             document.getElementById('prev-title').innerText = ui.prevTitle;
             document.getElementById('stp1-lbl').innerText = ui.stp1Lbl;
             document.getElementById('stp2-lbl').innerText = ui.stp2Lbl;
@@ -5361,6 +5382,7 @@ if(slider) {
             qrContainer.innerHTML = "";
             await loadScriptOnce(LIB_URLS.qrcode);
             new QRCode(qrContainer, { text: url, width: 220, height: 220, colorDark: "#000000" });
+            applyQrAreaBackground();
             document.getElementById('qr-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             btn.innerText = "✅ 二维码已就绪，如需修改请再次点击此处";
             btn.disabled = false;
@@ -5388,6 +5410,25 @@ if(slider) {
 
     function escapeHtml(s) {
         return (s || '').toString().replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // Applique à la zone du QR code (logo, titre, « Scannez-moi », code) le même fond que
+    // l'écran client choisi (couleur, dégradé, texture), avec un texte contrasté.
+    // Le QR code lui-même reste noir sur blanc pour rester scannable.
+    function applyQrAreaBackground() {
+        const area = document.getElementById('qrcode-area');
+        if (!area) return;
+        const live = getLiveStyleConfig();
+        const bg = computeScreenBackground(live.cust_bg, live.cust_bg_gradient, live.cust_bg_texture, live.cust_bg_c, live.cust_bg_o, live.cust_bg_none);
+        area.style.backgroundColor = bg.fallbackColor;
+        area.style.backgroundImage = bg.image;
+        area.style.backgroundSize = bg.size;
+        area.style.borderRadius = '14px';
+        const tc = live.cust_tx_c || getContrastColor(live.cust_bg_c || '#ffffff');
+        ['qr-title', 'qr-scan-text', 'qr-id-display'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.style.color = tc;
+        });
     }
 
     function buildQrDataUrl(text, size) {
@@ -6706,6 +6747,60 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
     var n = document.getElementById(i.id + '-name');
     if (n) i.addEventListener('change', function () { n.textContent = (i.files && i.files[0]) ? i.files[0].name : n.dataset.empty; });
 });
+</script>
+<script>
+(function () {
+    var r = document.getElementById('hero-rotator');
+    if (!r) return;
+    var track = r.querySelector('.rot-track');
+    var words = ["谷歌好评", "访客", "客户", "粉丝", "流量"];
+    track.innerHTML = '';
+    words.concat([words[0]]).forEach(function (w) {
+        var el = document.createElement('span');
+        el.className = 'rot-item';
+        el.textContent = w;
+        track.appendChild(el);
+    });
+    var emojis = ['⭐', '👋', '🛍️', '❤️', '🚀'];
+    var emojiEl = document.getElementById('hero-emoji');
+    function setEmoji(k) {
+        if (!emojiEl) return;
+        emojiEl.textContent = emojis[k % emojis.length];
+        emojiEl.classList.remove('pop');
+        void emojiEl.offsetWidth;
+        emojiEl.classList.add('pop');
+    }
+    var items = track.children, i = 0;
+    // Ajuste la taille du mot pour que la pastille ne dépasse jamais de l'écran
+    function fit() {
+        r.style.fontSize = '';
+        var cs = getComputedStyle(r), ps = getComputedStyle(r.parentNode);
+        var avail = r.parentNode.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
+        var max = 0;
+        for (var k = 0; k < items.length; k++) max = Math.max(max, items[k].offsetWidth);
+        var total = max + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        if (avail > 0 && total > avail) r.style.fontSize = (Math.floor((avail / total) * 97)) + '%';
+        r.style.width = items[i].offsetWidth + 'px';
+    }
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    window.addEventListener('resize', fit);
+    setInterval(function () {
+        i++;
+        setEmoji(i);
+        track.style.transform = 'translateY(-' + (i * 1.2) + 'em)';
+        fit();
+        if (i === words.length) {
+            setTimeout(function () {
+                track.classList.add('no-anim');
+                track.style.transform = 'translateY(0)';
+                i = 0;
+                void track.offsetHeight;
+                track.classList.remove('no-anim');
+            }, 480);
+        }
+    }, 2000);
+})();
 </script>
 </body>
 </html>
