@@ -1483,6 +1483,32 @@
 .trade-marquee { direction: ltr; }
 .trade-marquee-group span::after { content: "•"; margin: 0 .7em; }
 [dir="rtl"] .rotator { padding: 0 .3em 0 .4em; }
+/* Bandeau « événement commercial à venir » */
+.event-banner { display: flex; align-items: center; gap: 1.1rem; width: calc(100% - 2.5rem); max-width: 780px; margin: 1.6rem auto 0; padding: 1.1rem 1.4rem; text-align: start; border-radius: 22px; background: linear-gradient(135deg, #f4f9ff 0%, #e6f0ff 100%); border: 1px solid rgba(0, 113, 227, .2); box-shadow: 0 8px 28px rgba(0, 113, 227, .10); box-sizing: border-box; animation: eventBannerIn .6s ease both; }
+.event-banner[hidden] { display: none; }
+.event-banner-emoji { font-size: 2.8rem; line-height: 1; flex-shrink: 0; }
+.event-banner-body { flex: 1; min-width: 0; }
+.event-banner-kicker { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-color); margin-bottom: .2rem; }
+.event-banner-title { font-size: 1.3rem; font-weight: 800; color: #1d1d1f; line-height: 1.2; }
+.event-banner-text { margin: .35rem 0 0; font-size: .92rem; line-height: 1.45; color: #48484a; }
+.event-banner-cta { flex-shrink: 0; padding: 12px 22px !important; font-size: .9rem !important; white-space: nowrap; }
+@keyframes eventBannerIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .event-banner { flex-direction: column; text-align: center; gap: .6rem; padding: 1.1rem 1rem 1.2rem; } .event-banner-cta { white-space: normal; } }
+.event-banner { position: relative; padding-left: 2.2rem; padding-right: 2.2rem; }
+.event-banner-emoji, .event-banner-body, .event-banner-cta { transition: opacity .25s ease, transform .25s ease; }
+.event-banner.swap .event-banner-emoji, .event-banner.swap .event-banner-body, .event-banner.swap .event-banner-cta { opacity: 0; transform: translateY(6px); }
+.event-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 36px; padding: 0; border: 0; background: transparent; color: var(--accent-color); font-size: 1.6rem; line-height: 1; cursor: pointer; opacity: .28; transition: opacity .2s ease; }
+.event-nav:hover, .event-nav:focus-visible { opacity: .85; }
+.event-prev { left: 4px; }
+.event-next { right: 4px; }
+@media (max-width: 640px) { .event-banner { padding-left: 1.6rem; padding-right: 1.6rem; } .event-nav { top: 2.2rem; } }
+.step-bullets { list-style: none; margin: 0 0 12px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.step-bullets li { display: flex; gap: 10px; align-items: flex-start; background: #f5f5f7; border-radius: 12px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5; color: #1d1d1f; }
+.step-bullets .sb-ico { font-size: 1.15rem; line-height: 1.3; flex-shrink: 0; }
+.step-tip { margin: 0 0 14px 0; font-size: 12px; line-height: 1.5; color: var(--accent-color); font-weight: 600; }
+html[lang="ar"] .event-banner { text-align: right; }
+html[lang="ar"] .event-prev { left: auto; right: 4px; }
+html[lang="ar"] .event-next { right: auto; left: 4px; }
     </style>
 </head>
 <body>
@@ -1548,6 +1574,18 @@
                 <div class="trade-marquee-group"><span>🥖 বেকারি</span><span>💇 হেয়ার সেলুন</span><span>🔧 গ্যারেজ</span><span>🍽️ রেস্তোরাঁ</span><span>🦷 দাঁতের ডাক্তার</span><span>👗 ফ্যাশন বুটিক</span><span>🏨 হোটেল</span><span>🌸 ফুলের দোকান</span><span>🏋️ জিম</span><span>🍷 ওয়াইন শপ</span><span>🐾 পশুচিকিৎসক</span><span>🏠 রিয়েল এস্টেট এজেন্সি</span><span>🎮 ভিডিও গেম</span><span>💅 নেইল সেলুন</span><span>🛒 সুপারমার্কেট</span><span>📚 বইয়ের দোকান</span><span>⛽ পেট্রোল পাম্প</span><span>☕ ক্যাফে</span><span>💊 ফার্মেসি</span><span>🚲 সাইকেলের দোকান</span><span>🍕 পিৎজারিয়া</span><span>💍 গয়নার দোকান</span><span>🔨 নির্মাণ ঠিকাদার</span><span>🎳 বোলিং অ্যালি</span><span>🥩 মাংসের দোকান</span><span>👓 চশমার দোকান</span><span>🛋️ আসবাব ও সাজসজ্জা</span><span>🧖 স্পা ও বিউটি সেন্টার</span><span>🏪 মুদির দোকান</span><span>📱 মোবাইলের দোকান</span><span>⛺ ক্যাম্পিং</span><span>🍰 পেস্ট্রি শপ</span><span>🚗 কার ডিলারশিপ</span><span>🧸 খেলনার দোকান</span><span>🩺 মেডিকেল ক্লিনিক</span><span>🌱 গাছের নার্সারি</span><span>🍔 ফাস্ট ফুড</span><span>🧺 ড্রাই ক্লিনিং</span><span>🎬 সিনেমা</span><span>🐟 মাছের দোকান</span><span>💈 নাপিতের দোকান</span><span>🛠️ হার্ডওয়্যার স্টোর</span><span>🧘 যোগ স্টুডিও</span><span>🍣 সুশি</span><span>📷 ফটোগ্রাফার</span><span>🛞 টায়ারের দোকান</span><span>👟 জুতার দোকান</span><span>🎁 গিফট শপ</span><span>🧀 চিজের দোকান</span><span>💻 কম্পিউটারের দোকান</span><span>🚕 ট্যাক্সি ও রাইড শেয়ার</span><span>🍦 আইসক্রিম পার্লার</span><span>🏖️ হলিডে রেন্টাল</span><span>🐶 পোষা প্রাণীর গ্রুমিং</span><span>🎢 অ্যামিউজমেন্ট পার্ক</span><span>🥦 সবজির দোকান</span><span>🚿 কার ওয়াশ</span><span>💆 ম্যাসাজ</span><span>🥞 ক্রেপ ক্যাফে</span><span>🛏️ গেস্ট হাউস</span><span>🎓 ড্রাইভিং স্কুল</span><span>🍫 চকলেটের দোকান</span><span>🍺 বার ও ব্রুয়ারি</span></div>
                 <div class="trade-marquee-group"><span>🥖 বেকারি</span><span>💇 হেয়ার সেলুন</span><span>🔧 গ্যারেজ</span><span>🍽️ রেস্তোরাঁ</span><span>🦷 দাঁতের ডাক্তার</span><span>👗 ফ্যাশন বুটিক</span><span>🏨 হোটেল</span><span>🌸 ফুলের দোকান</span><span>🏋️ জিম</span><span>🍷 ওয়াইন শপ</span><span>🐾 পশুচিকিৎসক</span><span>🏠 রিয়েল এস্টেট এজেন্সি</span><span>🎮 ভিডিও গেম</span><span>💅 নেইল সেলুন</span><span>🛒 সুপারমার্কেট</span><span>📚 বইয়ের দোকান</span><span>⛽ পেট্রোল পাম্প</span><span>☕ ক্যাফে</span><span>💊 ফার্মেসি</span><span>🚲 সাইকেলের দোকান</span><span>🍕 পিৎজারিয়া</span><span>💍 গয়নার দোকান</span><span>🔨 নির্মাণ ঠিকাদার</span><span>🎳 বোলিং অ্যালি</span><span>🥩 মাংসের দোকান</span><span>👓 চশমার দোকান</span><span>🛋️ আসবাব ও সাজসজ্জা</span><span>🧖 স্পা ও বিউটি সেন্টার</span><span>🏪 মুদির দোকান</span><span>📱 মোবাইলের দোকান</span><span>⛺ ক্যাম্পিং</span><span>🍰 পেস্ট্রি শপ</span><span>🚗 কার ডিলারশিপ</span><span>🧸 খেলনার দোকান</span><span>🩺 মেডিকেল ক্লিনিক</span><span>🌱 গাছের নার্সারি</span><span>🍔 ফাস্ট ফুড</span><span>🧺 ড্রাই ক্লিনিং</span><span>🎬 সিনেমা</span><span>🐟 মাছের দোকান</span><span>💈 নাপিতের দোকান</span><span>🛠️ হার্ডওয়্যার স্টোর</span><span>🧘 যোগ স্টুডিও</span><span>🍣 সুশি</span><span>📷 ফটোগ্রাফার</span><span>🛞 টায়ারের দোকান</span><span>👟 জুতার দোকান</span><span>🎁 গিফট শপ</span><span>🧀 চিজের দোকান</span><span>💻 কম্পিউটারের দোকান</span><span>🚕 ট্যাক্সি ও রাইড শেয়ার</span><span>🍦 আইসক্রিম পার্লার</span><span>🏖️ হলিডে রেন্টাল</span><span>🐶 পোষা প্রাণীর গ্রুমিং</span><span>🎢 অ্যামিউজমেন্ট পার্ক</span><span>🥦 সবজির দোকান</span><span>🚿 কার ওয়াশ</span><span>💆 ম্যাসাজ</span><span>🥞 ক্রেপ ক্যাফে</span><span>🛏️ গেস্ট হাউস</span><span>🎓 ড্রাইভিং স্কুল</span><span>🍫 চকলেটের দোকান</span><span>🍺 বার ও ব্রুয়ারি</span></div>
             </div>
+        </div>
+
+        <div class="event-banner" id="event-banner" hidden>
+            <button type="button" class="event-nav event-prev" id="event-prev" aria-label="আগের ইভেন্ট">‹</button>
+            <button type="button" class="event-nav event-next" id="event-next" aria-label="পরের ইভেন্ট">›</button>
+            <div class="event-banner-emoji" id="event-emoji" aria-hidden="true"></div>
+            <div class="event-banner-body">
+                <div class="event-banner-kicker" id="event-kicker"></div>
+                <div class="event-banner-title" id="event-title"></div>
+                <p class="event-banner-text" id="event-text"></p>
+            </div>
+            <a href="#configurateur" class="btn event-banner-cta" id="event-cta"></a>
         </div>
     </section>
 
@@ -1754,10 +1792,17 @@
             </div>
         </details>
 
-        <details class="step">
+        <details class="step" open>
             <summary><span class="num">৮</span><span class="label" id="sum-actions">খেলার আগের পদক্ষেপ</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-google-url">খেলার আগে গ্রাহক কোথায় পৌঁছাবেন (আপনার Google প্রোফাইল, ওয়েবসাইট, ইনস্টা...)</p>
+                <ul class="step-bullets">
+                    <li><span class="sb-ico">🌐</span><span><strong>আপনার ওয়েবসাইট</strong> আপনার অফার দেখাতে: প্রতিটি খেলোয়াড় হয়ে ওঠে মানসম্মত ভিজিটর, কেনার বা বুক করার জন্য প্রস্তুত।</span></li>
+                    <li><span class="sb-ico">⭐</span><span><strong>আপনার Google বিজনেস প্রোফাইল</strong> রিভিউ ও সুনামের জন্য: আরও ৫★ রিভিউ, Google Maps-এ ভালো র‍্যাঙ্কিং, আরও কল, দিকনির্দেশ ও দোকানে ভিজিট।</span></li>
+                    <li><span class="sb-ico">📱</span><span><strong>আপনার সোশ্যাল মিডিয়া</strong> (Facebook, Instagram, TikTok, WhatsApp…) ফলোয়ার বাড়াতে: এমন অডিয়েন্স, যাদের প্রতিটি অফারে আপনি বিনামূল্যে আবার পেতে পারেন।</span></li>
+                    <li><span class="sb-ico">🔗</span><span><strong>অথবা আপনার পছন্দের যেকোনো URL</strong>: বুকিং পেজ, মেনু, ক্যাটালগ, চলমান অফার… শুধু নিচে লিংকটি পেস্ট করুন।</span></li>
+                </ul>
+                <p class="step-tip">🎯 প্রতিটি গেমের জন্য একটি লিংক: এই মাসের সবচেয়ে গুরুত্বপূর্ণ লক্ষ্য বেছে নিন (রিভিউ, ফলোয়ার বা ওয়েব ট্রাফিক) এবং ফলাফল নিয়ন্ত্রণে রাখতে যেকোনো সময় বদলান।</p>
                 <div class="field-lockable">
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </div>
@@ -2906,11 +2951,24 @@
     
     <div id="legal" class="legal-text">
         <p><strong style="color: #fff; font-size: 1rem;">আইনি বিজ্ঞপ্তি ও হোস্টিং</strong></p>
-        <p>Spin To Keep<br> S.A.S, মূলধন Ariary 2 100 000 Ar<br> NIF 3004082242 &nbsp;|&nbsp; RCS 2020B00582 &nbsp;|&nbsp; STAT N° 70202 11 2020 0 10628</p>
-        <p>নিবন্ধিত কার্যালয়: LOT IVF 45 Behoririka, Antsiranana 201, Madagascar।<br> কর্মক্ষেত্র: ফ্রান্স, বেলজিয়াম, সুইজারল্যান্ড, মাদাগাস্কার।<br> ডেটাবেসের হোস্টিং: ওয়েবসাইটের সার্ভার মাদাগাস্কারে হোস্ট করা।</p>
-        <p style="margin-top: 1.5rem; font-style: italic; color: #777;">
-            GDPR বিধি অনুযায়ী, সংগৃহীত সব ডেটা (নাম, ফোন, ইমেইল ঠিকানা) স্পষ্ট সম্মতির (Opt-In) প্রক্রিয়ায় পাওয়া। contact@spintokeep.com-এ লিখে আপনার ব্যক্তিগত ডেটা দেখা, সংশোধন ও মুছে ফেলার অধিকার আপনার আছে।
-        </p>
+        <p style="color: #fff; font-weight: 700; letter-spacing: .04em;">ডিজাইন প্যারিসে 🇫🇷 &nbsp;|&nbsp; ডেটা সংরক্ষিত ইউরোপে 🇪🇺</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">প্রযুক্তিগত অবকাঠামো ও ডেটা:</strong><br>
+        কোড হোস্টিং ও ডিপ্লয়মেন্ট: GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, যুক্তরাষ্ট্র – ফোন: +1 (877) 448-4820<br>
+        ডেটাবেস ও ব্যাকএন্ড: Supabase, Inc. (ডেলাওয়্যার, যুক্তরাষ্ট্র) – ডেটা সার্ভার ইউরোপীয় ইউনিয়নে অবস্থিত। – যোগাযোগ: support@supabase.io</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">ওয়েবসাইটের প্রকাশক:</strong><br>
+        Spin To Keep – ফ্রান্স 🇫🇷, যুক্তরাজ্য 🇬🇧, চীন 🇨🇳, ভারত 🇮🇳, স্পেন 🇪🇸, ব্রাজিল 🇧🇷, বাংলাদেশ 🇧🇩, রাশিয়া 🇷🇺, সৌদি আরব 🇸🇦 ও জার্মানিতে পরিচালিত একটি বৈশ্বিক সেবা<br>
+        S.A.S, মূলধন 2,100,000 MGA - NIF: 3004082242 &nbsp;|&nbsp; RCS: 2020B00582 &nbsp;|&nbsp; STAT: 70202 11 2020 0 10628 - নিবন্ধিত কার্যালয়: LOT IVF 45 - Behoririka, Antsiranana 201 (MG)<br>
+        প্রকাশনা পরিচালক: José Armand Andriantsalama Rakotovololona<br>
+        যোগাযোগ: contact@spintokeep.com &nbsp;|&nbsp; +261 34 12 345 678 (সহায়তার অনুরোধ ও আইনি আবেদন কেবল ইলেকট্রনিক মাধ্যমে নিষ্পত্তি করা হয়)</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">হোস্টিং ও নিরাপত্তা:</strong><br>
+        ওয়েবসাইটের সার্ভার ও ডেটা অবকাঠামো অত্যন্ত সুরক্ষিত এবং আন্তর্জাতিক মানদণ্ডের ভিত্তিতে তৈরি 🛡️।</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">ডেটা সুরক্ষা (GDPR):</strong><br>
+        ইউরোপীয় বিধি (GDPR) অনুযায়ী, সব ডেটা স্পষ্ট সম্মতি (Opt-In) প্রক্রিয়ায় সংগ্রহ করা হয়। আপনার ব্যক্তিগত ডেটা দেখা, সংশোধন, স্থানান্তর ও মুছে ফেলার অধিকার আপনার আছে; এজন্য contact@spintokeep.com ✉️ ঠিকানায় লিখুন।</p>
+
         <p style="margin-top: 3rem; font-size: 0.75rem; color: #555;">&copy; ২০২৬ Spin To Keep। সর্বস্বত্ব সংরক্ষিত।</p>
     </div>
 </footer>
@@ -6800,6 +6858,121 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
             }, 480);
         }
     }, 2000);
+})();
+</script>
+<script>
+// Event banner (slider): picks the nearest commercial event from the visitor's date, then the next ones.
+// Test: add ?date=YYYY-MM-DD to the page address (simulates a day) or ?evenement=<id> (forces an event).
+(function () {
+    var box = document.getElementById('event-banner');
+    if (!box) return;
+    function day(y, m, d) { return new Date(y, m, d); }
+    function addDays(dt, n) { return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n); }
+    function nth(y, m, wd, n) { var f = day(y, m, 1); return day(y, m, 1 + ((wd - f.getDay() + 7) % 7) + (n - 1) * 7); }
+    function last(y, m, wd) { var e = day(y, m + 1, 0); return day(y, m, e.getDate() - ((e.getDay() - wd + 7) % 7)); }
+    function easter(y) {
+        var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+            g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+            l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+            mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+        return day(y, mo - 1, da);
+    }
+    function ortho(y) {
+        var a = y % 4, b = y % 7, c = y % 19, d = (19 * c + 15) % 30, e = (2 * a + 4 * b - d + 34) % 7,
+            m = Math.floor((d + e + 114) / 31), dd = ((d + e + 114) % 31) + 1;
+        return addDays(day(y, m - 1, dd), 13);
+    }
+    function F(m, d) { return function (y) { return day(y, m - 1, d); }; }
+    function NTH(m, wd, n) { return function (y) { return nth(y, m - 1, wd, n); }; }
+    function LAST(m, wd) { return function (y) { return last(y, m - 1, wd); }; }
+    function EASTER(k) { return function (y) { return addDays(easter(y), k); }; }
+    function ORTHO(k) { return function (y) { return addDays(ortho(y), k); }; }
+    function TBL(t, k) { return function (y) { var v = t[y]; if (!v) return null; var p = v.split('-'); return addDays(day(y, +p[0] - 1, +p[1]), k || 0); }; }
+    var BLACKFRIDAY = function (y) { return addDays(nth(y, 10, 4, 4), 1); };
+    var SMALLBIZ = function (y) { return addDays(nth(y, 10, 4, 4), 2); };
+    var OKTOBERFEST = function (y) { var d = day(y, 8, 16); return addDays(d, (6 - d.getDay() + 7) % 7); };
+    var ADVENT1 = function (y) { var c = day(y, 11, 25), w = c.getDay() || 7; return addDays(c, -(w + 21)); };
+    function bd(s) { return String(s).replace(/\d/g, function (d) { return '০১২৩৪৫৬৭৮৯'.charAt(d); }); }
+    var UI = {
+        title: function (n) { return n + '-এর জন্য প্রস্তুত হোন!'; }, cta: function (n) { return n + '-এর জন্য আমার গেম তৈরি করুন ➡️'; }, today: "আজ", tomorrow: "আগামীকাল", inDays: function (d) { return bd(d) + ' দিন পরে'; }, fmt: function (dt) { var J=['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'], M=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর']; return J[dt.getDay()] + ', ' + bd(dt.getDate()) + ' ' + M[dt.getMonth()]; }
+    };
+    // [id, emoji, name, lead time in days (banner appears this many days before), date rule, marketing argument]
+    var EVENTS = [
+        ["falgun", "🌼", "পহেলা ফাল্গুন ও ভ্যালেন্টাইন্স ডে", 21, F(2,13), "বসন্ত ও ভালোবাসার দিনে ফুল, উপহার আর রেস্তোরাঁর ভিড়: পুরস্কারের QR গেম আপনার দোকানে ক্রেতা আনে এবং ৫★ রিভিউ বাড়ায়।"],
+        ["independence", "🇧🇩", "স্বাধীনতা দিবস", 14, F(3,26), "স্বাধীনতা দিবসের অফার: পুরস্কারের গেম ক্রেতাদের আকর্ষণ করে এবং Google রিভিউ বাড়ায়।"],
+        ["ramadan", "🌙", "রমজান", 42, TBL({2026:'02-18',2027:'02-08',2028:'01-28',2029:'01-16'}), "বছরের সবচেয়ে বড় বিক্রির মাস: ইফতার ও ছাড়ের পুরস্কারসহ QR গেম পরিবারকে আপনার দোকানে আনে এবং রিভিউ বাড়ায়।"],
+        ["eid_fitr", "🎁", "ঈদুল ফিতর", 28, TBL({2026:'03-20',2027:'03-09',2028:'02-26',2029:'02-14'}), "ঈদের কেনাকাটার ভিড়ে সবার আগে নজর কাড়ুন: পুরস্কারের গেম ক্রেতা ও Google রিভিউ দুটোই বাড়ায়।"],
+        ["boishakh", "🎊", "পহেলা বৈশাখ", 28, F(4,14), "নববর্ষে নতুন খাতা, মিষ্টি আর শাড়ি: পুরস্কারের QR গেম ক্রেতাদের ভিড় ও ৫★ রিভিউ এনে দেয়।"],
+        ["mothers", "💐", "মা দিবস", 28, NTH(5,0,2), "ফুল, উপহার ও পরিবারের সঙ্গে খাওয়া: মায়েদের জন্য পুরস্কারের গেম বেশি ভিজিট ও ৫★ রিভিউ আনে।"],
+        ["eid_adha", "🐐", "ঈদুল আযহা", 28, TBL({2026:'05-27',2027:'05-16',2028:'05-05',2029:'04-24'}), "কোরবানির ঈদে কেনাকাটা ও আত্মীয়ের আপ্যায়ন: পুরস্কারের গেম ক্রেতাদের আপনার দোকানে টানে।"],
+        ["durga", "🪔", "দুর্গাপূজা", 35, TBL({2026:'10-18',2027:'10-06'}), "পূজার কেনাকাটা, পোশাক ও ভোজের মৌসুম: পুরস্কারের QR গেম ক্রেতা ও Google রিভিউ বাড়ায়।"],
+        ["kali", "🕯️", "কালীপূজা ও দীপাবলি", 21, TBL({2026:'11-08',2027:'10-29',2028:'10-17'}), "দীপাবলির আলোয় মিষ্টি, উপহার ও সাজসজ্জা: পুরস্কারের গেম ক্রেতাদের দোকানমুখী করে।"],
+        ["victory", "🏅", "বিজয় দিবস", 14, F(12,16), "বিজয় দিবসের ছুটিতে ঘোরাফেরা ও খাওয়া: পুরস্কারের QR গেম ক্রেতা ও রিভিউ বাড়ায়।"],
+        ["xmas", "🎄", "বড়দিন", 21, F(12,25), "কেক, উপহার ও পার্টি: পুরস্কারের গেম বড়দিনের ভিড়কে Google রিভিউতে বদলে দেয়।"],
+        ["thirty", "🥂", "থার্টি ফার্স্ট নাইট", 21, F(12,31), "থার্টি ফার্স্ট নাইটের পার্টি ও ডিনার: পুরস্কারের গেম বুকিং বাড়ায় এবং রিভিউ এনে দেয়।"],
+    ];
+    var q = new URLSearchParams(location.search), today = new Date(), forced = null;
+    today = day(today.getFullYear(), today.getMonth(), today.getDate());
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q.get('date') || '')) { var p = q.get('date').split('-'); today = day(+p[0], +p[1] - 1, +p[2]); }
+    if (q.get('evenement')) forced = q.get('evenement');
+    var list = [];
+    EVENTS.forEach(function (ev) {
+        [today.getFullYear(), today.getFullYear() + 1].forEach(function (y) {
+            var dt = ev[4](y);
+            if (!dt) return;
+            var diff = Math.round((dt - today) / 86400000);
+            if (diff >= 0) list.push({ ev: ev, date: dt, diff: diff });
+        });
+    });
+    list.sort(function (a, b) { return a.diff - b.diff; });
+    var pick = null;
+    if (forced) pick = list.filter(function (x) { return x.ev[0] === forced; })[0] || null;
+    if (!pick) pick = list.filter(function (x) { return x.diff <= x.ev[3]; })[0] || list[0];
+    if (!pick) return;
+    var seen = {}, slides = [];
+    list.slice(list.indexOf(pick)).forEach(function (x) {
+        if (!seen[x.ev[0]] && slides.length < 6) { seen[x.ev[0]] = 1; slides.push(x); }
+    });
+    var cur = 0, timer = null, paused = false;
+    function fill(k) {
+        var x = slides[k], ev = x.ev;
+        var when = x.diff === 0 ? UI.today : (x.diff === 1 ? UI.tomorrow : UI.inDays(x.diff));
+        document.getElementById('event-emoji').textContent = ev[1];
+        document.getElementById('event-kicker').textContent = when + ' · ' + UI.fmt(x.date);
+        document.getElementById('event-title').textContent = UI.title(ev[2]);
+        document.getElementById('event-text').textContent = ev[5];
+        document.getElementById('event-cta').textContent = UI.cta(ev[2]);
+    }
+    function show(k) {
+        cur = (k + slides.length) % slides.length;
+        box.classList.add('swap');
+        setTimeout(function () { fill(cur); box.classList.remove('swap'); }, 230);
+    }
+    function lockHeight() {
+        box.style.minHeight = '';
+        var mh = 0;
+        for (var k = 0; k < slides.length; k++) { fill(k); mh = Math.max(mh, box.offsetHeight); }
+        fill(cur);
+        box.style.minHeight = mh + 'px';
+    }
+    function start() {
+        stop();
+        if (slides.length < 2 || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+        timer = setInterval(function () { if (!paused) show(cur + 1); }, 3500);
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    // As soon as the visitor uses the arrows, automatic scrolling stops for good (time to read)
+    document.getElementById('event-prev').addEventListener('click', function () { stop(); show(cur - 1); });
+    document.getElementById('event-next').addEventListener('click', function () { stop(); show(cur + 1); });
+    box.addEventListener('mouseenter', function () { paused = true; });
+    box.addEventListener('mouseleave', function () { paused = false; });
+    box.addEventListener('touchstart', function () { paused = true; setTimeout(function () { paused = false; }, 6000); }, { passive: true });
+    if (slides.length < 2) { document.getElementById('event-prev').style.display = 'none'; document.getElementById('event-next').style.display = 'none'; }
+    fill(0);
+    box.hidden = false;
+    lockHeight();
+    window.addEventListener('resize', function () { lockHeight(); });
+    start();
 })();
 </script>
 </body>
