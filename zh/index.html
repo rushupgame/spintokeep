@@ -1483,6 +1483,32 @@
 .trade-marquee-group span::after { content: "•"; margin: 0 .7em; }
 [dir="rtl"] .rotator { padding: 0 .3em 0 .4em; }
 .btn-download.btn-blue { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+/* Bandeau « événement commercial à venir » */
+.event-banner { display: flex; align-items: center; gap: 1.1rem; width: calc(100% - 2.5rem); max-width: 780px; margin: 1.6rem auto 0; padding: 1.1rem 1.4rem; text-align: start; border-radius: 22px; background: linear-gradient(135deg, #f4f9ff 0%, #e6f0ff 100%); border: 1px solid rgba(0, 113, 227, .2); box-shadow: 0 8px 28px rgba(0, 113, 227, .10); box-sizing: border-box; animation: eventBannerIn .6s ease both; }
+.event-banner[hidden] { display: none; }
+.event-banner-emoji { font-size: 2.8rem; line-height: 1; flex-shrink: 0; }
+.event-banner-body { flex: 1; min-width: 0; }
+.event-banner-kicker { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-color); margin-bottom: .2rem; }
+.event-banner-title { font-size: 1.3rem; font-weight: 800; color: #1d1d1f; line-height: 1.2; }
+.event-banner-text { margin: .35rem 0 0; font-size: .92rem; line-height: 1.45; color: #48484a; }
+.event-banner-cta { flex-shrink: 0; padding: 12px 22px !important; font-size: .9rem !important; white-space: nowrap; }
+@keyframes eventBannerIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .event-banner { flex-direction: column; text-align: center; gap: .6rem; padding: 1.1rem 1rem 1.2rem; } .event-banner-cta { white-space: normal; } }
+.event-banner { position: relative; padding-left: 2.2rem; padding-right: 2.2rem; }
+.event-banner-emoji, .event-banner-body, .event-banner-cta { transition: opacity .25s ease, transform .25s ease; }
+.event-banner.swap .event-banner-emoji, .event-banner.swap .event-banner-body, .event-banner.swap .event-banner-cta { opacity: 0; transform: translateY(6px); }
+.event-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 36px; padding: 0; border: 0; background: transparent; color: var(--accent-color); font-size: 1.6rem; line-height: 1; cursor: pointer; opacity: .28; transition: opacity .2s ease; }
+.event-nav:hover, .event-nav:focus-visible { opacity: .85; }
+.event-prev { left: 4px; }
+.event-next { right: 4px; }
+@media (max-width: 640px) { .event-banner { padding-left: 1.6rem; padding-right: 1.6rem; } .event-nav { top: 2.2rem; } }
+.step-bullets { list-style: none; margin: 0 0 12px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.step-bullets li { display: flex; gap: 10px; align-items: flex-start; background: #f5f5f7; border-radius: 12px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5; color: #1d1d1f; }
+.step-bullets .sb-ico { font-size: 1.15rem; line-height: 1.3; flex-shrink: 0; }
+.step-tip { margin: 0 0 14px 0; font-size: 12px; line-height: 1.5; color: var(--accent-color); font-weight: 600; }
+html[lang="ar"] .event-banner { text-align: right; }
+html[lang="ar"] .event-prev { left: auto; right: 4px; }
+html[lang="ar"] .event-next { right: auto; left: 4px; }
     </style>
 </head>
 <body>
@@ -1548,6 +1574,18 @@
                 <div class="trade-marquee-group"><span>🥖 面包店</span><span>💇 理发店</span><span>🔧 汽修店</span><span>🍽️ 餐厅</span><span>🦷 牙科诊所</span><span>👗 服装店</span><span>🏨 酒店</span><span>🌸 花店</span><span>🏋️ 健身房</span><span>🍷 酒类专卖店</span><span>🐾 宠物医院</span><span>🏠 房产中介</span><span>🎮 电子游戏店</span><span>💅 美甲店</span><span>🛒 超市</span><span>📚 书店</span><span>⛽ 加油站</span><span>☕ 咖啡馆</span><span>💊 药店</span><span>🚲 自行车店</span><span>🍕 披萨店</span><span>💍 珠宝店</span><span>🔨 装修工程</span><span>🎳 保龄球馆</span><span>🥩 肉铺</span><span>👓 眼镜店</span><span>🛋️ 家具与装饰</span><span>🧖 水疗与美容院</span><span>🏪 杂货店</span><span>📱 手机店</span><span>⛺ 露营地</span><span>🍰 糕点店</span><span>🚗 汽车经销商</span><span>🧸 玩具店</span><span>🩺 医疗诊所</span><span>🌱 园艺中心</span><span>🍔 快餐店</span><span>🧺 干洗店</span><span>🎬 电影院</span><span>🐟 鱼铺</span><span>💈 男士理发店</span><span>🛠️ 五金建材</span><span>🧘 瑜伽馆</span><span>🍣 寿司店</span><span>📷 摄影工作室</span><span>🛞 轮胎店</span><span>👟 鞋店</span><span>🎁 礼品店</span><span>🧀 奶酪店</span><span>💻 电脑店</span><span>🚕 出租车与网约车</span><span>🍦 冰淇淋店</span><span>🏖️ 度假租赁</span><span>🐶 宠物美容</span><span>🎢 游乐园</span><span>🥦 果蔬店</span><span>🚿 洗车店</span><span>💆 按摩</span><span>🥞 可丽饼店</span><span>🛏️ 民宿</span><span>🎓 驾校</span><span>🍫 巧克力店</span><span>🍺 酒吧与啤酒屋</span></div>
                 <div class="trade-marquee-group"><span>🥖 面包店</span><span>💇 理发店</span><span>🔧 汽修店</span><span>🍽️ 餐厅</span><span>🦷 牙科诊所</span><span>👗 服装店</span><span>🏨 酒店</span><span>🌸 花店</span><span>🏋️ 健身房</span><span>🍷 酒类专卖店</span><span>🐾 宠物医院</span><span>🏠 房产中介</span><span>🎮 电子游戏店</span><span>💅 美甲店</span><span>🛒 超市</span><span>📚 书店</span><span>⛽ 加油站</span><span>☕ 咖啡馆</span><span>💊 药店</span><span>🚲 自行车店</span><span>🍕 披萨店</span><span>💍 珠宝店</span><span>🔨 装修工程</span><span>🎳 保龄球馆</span><span>🥩 肉铺</span><span>👓 眼镜店</span><span>🛋️ 家具与装饰</span><span>🧖 水疗与美容院</span><span>🏪 杂货店</span><span>📱 手机店</span><span>⛺ 露营地</span><span>🍰 糕点店</span><span>🚗 汽车经销商</span><span>🧸 玩具店</span><span>🩺 医疗诊所</span><span>🌱 园艺中心</span><span>🍔 快餐店</span><span>🧺 干洗店</span><span>🎬 电影院</span><span>🐟 鱼铺</span><span>💈 男士理发店</span><span>🛠️ 五金建材</span><span>🧘 瑜伽馆</span><span>🍣 寿司店</span><span>📷 摄影工作室</span><span>🛞 轮胎店</span><span>👟 鞋店</span><span>🎁 礼品店</span><span>🧀 奶酪店</span><span>💻 电脑店</span><span>🚕 出租车与网约车</span><span>🍦 冰淇淋店</span><span>🏖️ 度假租赁</span><span>🐶 宠物美容</span><span>🎢 游乐园</span><span>🥦 果蔬店</span><span>🚿 洗车店</span><span>💆 按摩</span><span>🥞 可丽饼店</span><span>🛏️ 民宿</span><span>🎓 驾校</span><span>🍫 巧克力店</span><span>🍺 酒吧与啤酒屋</span></div>
             </div>
+        </div>
+
+        <div class="event-banner" id="event-banner" hidden>
+            <button type="button" class="event-nav event-prev" id="event-prev" aria-label="上一个活动">‹</button>
+            <button type="button" class="event-nav event-next" id="event-next" aria-label="下一个活动">›</button>
+            <div class="event-banner-emoji" id="event-emoji" aria-hidden="true"></div>
+            <div class="event-banner-body">
+                <div class="event-banner-kicker" id="event-kicker"></div>
+                <div class="event-banner-title" id="event-title"></div>
+                <p class="event-banner-text" id="event-text"></p>
+            </div>
+            <a href="#configurateur" class="btn event-banner-cta" id="event-cta"></a>
         </div>
     </section>
 
@@ -1754,10 +1792,17 @@
             </div>
         </details>
 
-        <details class="step">
+        <details class="step" open>
             <summary><span class="num">8</span><span class="label" id="sum-actions">游戏前的操作</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-google-url">顾客在游戏前跳转到的页面（您的谷歌商家页面、网站、Instagram 等）</p>
+                <ul class="step-bullets">
+                    <li><span class="sb-ico">🌐</span><span><strong>您的官网或小程序</strong>，展示您的优惠：每位玩家都成为精准访客，随时准备购买或预约。</span></li>
+                    <li><span class="sb-ico">⭐</span><span><strong>您的 Google 商家资料（或大众点评、美团）</strong>，积累好评与口碑：更多 5★ 好评、更靠前的地图排名，带来更多电话、导航和到店。</span></li>
+                    <li><span class="sb-ico">📱</span><span><strong>您的社交账号</strong>（抖音、小红书、微信、Instagram…），涨粉：每次促销都能免费再次触达的私域受众。</span></li>
+                    <li><span class="sb-ico">🔗</span><span><strong>或任意您指定的链接</strong>：预约页面、菜单、商品目录、当前优惠……把链接粘贴到下方即可。</span></li>
+                </ul>
+                <p class="step-tip">🎯 每个游戏一个链接：选择本月最重要的目标（好评、粉丝或网站流量），随时切换，掌控您的成果。</p>
                 <div class="field-lockable">
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </div>
@@ -2905,12 +2950,25 @@
     </div>
     
     <div id="legal" class="legal-text">
-        <p><strong style="color: #fff; font-size: 1rem;">法律声明与托管</strong></p>
-        <p>Spin To Keep<br> S.A.S，注册资本 Ariary 2 100 000 Ar<br> NIF 3004082242 &nbsp;|&nbsp; RCS 2020B00582 &nbsp;|&nbsp; STAT N° 70202 11 2020 0 10628</p>
-        <p>注册地址：LOT IVF 45 Behoririka, Antsiranana 201, Madagascar。<br> 服务区域：法国、比利时、瑞士、马达加斯加。<br> 数据库托管：本网站服务器托管于马达加斯加。</p>
-        <p style="margin-top: 1.5rem; font-style: italic; color: #777;">
-            根据 GDPR 法规，所有收集的数据（姓名、电话、电子邮箱）均通过明确同意（Opt-In）流程获取。您有权通过写信至 contact@spintokeep.com 访问、更正和删除您的个人数据。
-        </p>
+        <p><strong style="color: #fff; font-size: 1rem;">法律声明与托管信息</strong></p>
+        <p style="color: #fff; font-weight: 700; letter-spacing: .04em;">设计于巴黎 🇫🇷 &nbsp;|&nbsp; 数据存储于欧洲 🇪🇺</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">技术基础设施与数据：</strong><br>
+        代码托管与部署：GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, 美国 – 电话：+1 (877) 448-4820<br>
+        数据库与后端：Supabase, Inc.（美国特拉华州）– 数据服务器位于欧盟境内。– 联系方式：support@supabase.io</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">网站运营方：</strong><br>
+        Spin To Keep – 面向全球的服务，业务覆盖法国 🇫🇷、英国 🇬🇧、中国 🇨🇳、印度 🇮🇳、西班牙 🇪🇸、巴西 🇧🇷、孟加拉国 🇧🇩、俄罗斯 🇷🇺、沙特阿拉伯 🇸🇦 和德国 🇩🇪<br>
+        S.A.S（简易股份公司），注册资本 2,100,000 MGA - NIF：3004082242 &nbsp;|&nbsp; RCS：2020B00582 &nbsp;|&nbsp; STAT：70202 11 2020 0 10628 - 注册地址：LOT IVF 45 - Behoririka, Antsiranana 201 (MG)<br>
+        出版负责人：José Armand Andriantsalama Rakotovololona<br>
+        联系方式：contact@spintokeep.com &nbsp;|&nbsp; +261 34 12 345 678（支持请求与法律事务仅通过电子方式处理）</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">托管与安全：</strong><br>
+        网站服务器与数据基础设施具备高度安全保障，并遵循国际标准 🛡️。</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">数据保护（GDPR）：</strong><br>
+        根据欧盟法规（GDPR），所有数据均通过明确同意（Opt-In）流程收集。您有权访问、更正、携带和删除您的个人数据，请发送邮件至 contact@spintokeep.com ✉️。</p>
+
         <p style="margin-top: 3rem; font-size: 0.75rem; color: #555;">&copy; 2026 Spin To Keep。保留所有权利。</p>
     </div>
 </footer>
@@ -6800,6 +6858,126 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
             }, 480);
         }
     }, 2000);
+})();
+</script>
+<script>
+// Event banner (slider): picks the nearest commercial event from the visitor's date, then the next ones.
+// Test: add ?date=YYYY-MM-DD to the page address (simulates a day) or ?evenement=<id> (forces an event).
+(function () {
+    var box = document.getElementById('event-banner');
+    if (!box) return;
+    function day(y, m, d) { return new Date(y, m, d); }
+    function addDays(dt, n) { return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n); }
+    function nth(y, m, wd, n) { var f = day(y, m, 1); return day(y, m, 1 + ((wd - f.getDay() + 7) % 7) + (n - 1) * 7); }
+    function last(y, m, wd) { var e = day(y, m + 1, 0); return day(y, m, e.getDate() - ((e.getDay() - wd + 7) % 7)); }
+    function easter(y) {
+        var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+            g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+            l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+            mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+        return day(y, mo - 1, da);
+    }
+    function ortho(y) {
+        var a = y % 4, b = y % 7, c = y % 19, d = (19 * c + 15) % 30, e = (2 * a + 4 * b - d + 34) % 7,
+            m = Math.floor((d + e + 114) / 31), dd = ((d + e + 114) % 31) + 1;
+        return addDays(day(y, m - 1, dd), 13);
+    }
+    function F(m, d) { return function (y) { return day(y, m - 1, d); }; }
+    function NTH(m, wd, n) { return function (y) { return nth(y, m - 1, wd, n); }; }
+    function LAST(m, wd) { return function (y) { return last(y, m - 1, wd); }; }
+    function EASTER(k) { return function (y) { return addDays(easter(y), k); }; }
+    function ORTHO(k) { return function (y) { return addDays(ortho(y), k); }; }
+    function TBL(t, k) { return function (y) { var v = t[y]; if (!v) return null; var p = v.split('-'); return addDays(day(y, +p[0] - 1, +p[1]), k || 0); }; }
+    var BLACKFRIDAY = function (y) { return addDays(nth(y, 10, 4, 4), 1); };
+    var SMALLBIZ = function (y) { return addDays(nth(y, 10, 4, 4), 2); };
+    var OKTOBERFEST = function (y) { var d = day(y, 8, 16); return addDays(d, (6 - d.getDay() + 7) % 7); };
+    var ADVENT1 = function (y) { var c = day(y, 11, 25), w = c.getDay() || 7; return addDays(c, -(w + 21)); };
+    
+    var UI = {
+        title: function (n) { return '提前备战' + n + '！'; }, cta: function (n) { return '为' + n + '创建我的游戏 ➡️'; }, today: "今天", tomorrow: "明天", inDays: function (d) { return d + ' 天后'; }, fmt: function (dt) { var J=['星期日','星期一','星期二','星期三','星期四','星期五','星期六']; return (dt.getMonth() + 1) + '月' + dt.getDate() + '日 ' + J[dt.getDay()]; }
+    };
+    // [id, emoji, name, lead time in days (banner appears this many days before), date rule, marketing argument]
+    var EVENTS = [
+        ["cny", "🧧", "春节", 56, TBL({2026:'02-17',2027:'02-06',2028:'01-26',2029:'02-13',2030:'02-03'}), "年货、红包、聚餐的黄金季：扫码抽奖游戏带来更多到店客流，并换来更多好评。"],
+        ["lantern", "🏮", "元宵节", 14, TBL({2026:'02-17',2027:'02-06',2028:'01-26',2029:'02-13',2030:'02-03'},14), "元宵团圆夜：扫码抽奖游戏吸引家人朋友到店，并收获好评。"],
+        ["newyear", "🎆", "元旦", 21, F(1,1), "新年开门红：扫码抽奖游戏提升到店客流，并带来更多好评。"],
+        ["valentine", "💘", "情人节", 21, F(2,14), "约会、鲜花与礼物：扫码抽奖游戏让情侣选择您的门店，并留下好评。"],
+        ["women", "👑", "女神节", 21, F(3,8), "为女神们准备惊喜：抽奖游戏送出护理、礼品与优惠，当场收获好评。"],
+        ["labor", "🧳", "五一假期", 28, F(5,1), "假期出游与聚餐高峰：扫码抽奖游戏吸引客流，沉淀口碑。"],
+        ["d520", "💕", "520 表白日", 21, F(5,20), "表白日送惊喜：扫码抽奖游戏吸引情侣到店，提升好评与口碑。"],
+        ["mother", "💐", "母亲节", 28, NTH(5,0,2), "鲜花、礼物与家庭聚餐：为妈妈们准备抽奖游戏，带来更多到店和 5★ 好评。"],
+        ["s618", "🛍️", "618 购物节", 28, F(6,18), "年中大促脱颖而出：抽奖游戏提升转化，把每次参与变成好评。"],
+        ["father", "👔", "父亲节", 28, NTH(6,0,3), "为爸爸挑礼物：抽奖游戏吸引最后一刻的顾客，并带来好评。"],
+        ["dragon", "🐲", "端午节", 21, TBL({2026:'06-19',2027:'06-09',2028:'05-28',2029:'06-16',2030:'06-05'}), "粽子、龙舟与小长假：扫码抽奖游戏吸引客流，沉淀口碑。"],
+        ["qixi", "🌌", "七夕节", 28, TBL({2026:'08-19',2027:'08-08'}), "中国情人节的约会旺季：抽奖游戏让情侣选择您，并留下好评。"],
+        ["school", "🎒", "开学季", 28, F(9,1), "文具、服饰与聚餐：扫码抽奖游戏吸引家长和学生，带来更多好评。"],
+        ["midautumn", "🥮", "中秋节", 35, TBL({2026:'09-25',2027:'09-15',2028:'10-03',2029:'09-22',2030:'09-12'}), "月饼、礼盒与团圆饭：抽奖游戏提升客单价，并带来 5★ 好评。"],
+        ["national", "🇨🇳", "国庆黄金周", 28, F(10,1), "黄金周客流高峰：扫码抽奖游戏让您在众多商家中脱颖而出，并收获好评。"],
+        ["d11", "🛒", "双十一", 42, F(11,11), "年度最大促销：抽奖游戏提升转化，把每一次参与变成好评与复购。"],
+        ["xmas", "🎄", "圣诞节", 28, F(12,25), "平安夜与圣诞聚会：抽奖游戏吸引年轻客群，并带来好评。"],
+    ];
+    var q = new URLSearchParams(location.search), today = new Date(), forced = null;
+    today = day(today.getFullYear(), today.getMonth(), today.getDate());
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q.get('date') || '')) { var p = q.get('date').split('-'); today = day(+p[0], +p[1] - 1, +p[2]); }
+    if (q.get('evenement')) forced = q.get('evenement');
+    var list = [];
+    EVENTS.forEach(function (ev) {
+        [today.getFullYear(), today.getFullYear() + 1].forEach(function (y) {
+            var dt = ev[4](y);
+            if (!dt) return;
+            var diff = Math.round((dt - today) / 86400000);
+            if (diff >= 0) list.push({ ev: ev, date: dt, diff: diff });
+        });
+    });
+    list.sort(function (a, b) { return a.diff - b.diff; });
+    var pick = null;
+    if (forced) pick = list.filter(function (x) { return x.ev[0] === forced; })[0] || null;
+    if (!pick) pick = list.filter(function (x) { return x.diff <= x.ev[3]; })[0] || list[0];
+    if (!pick) return;
+    var seen = {}, slides = [];
+    list.slice(list.indexOf(pick)).forEach(function (x) {
+        if (!seen[x.ev[0]] && slides.length < 6) { seen[x.ev[0]] = 1; slides.push(x); }
+    });
+    var cur = 0, timer = null, paused = false;
+    function fill(k) {
+        var x = slides[k], ev = x.ev;
+        var when = x.diff === 0 ? UI.today : (x.diff === 1 ? UI.tomorrow : UI.inDays(x.diff));
+        document.getElementById('event-emoji').textContent = ev[1];
+        document.getElementById('event-kicker').textContent = when + ' · ' + UI.fmt(x.date);
+        document.getElementById('event-title').textContent = UI.title(ev[2]);
+        document.getElementById('event-text').textContent = ev[5];
+        document.getElementById('event-cta').textContent = UI.cta(ev[2]);
+    }
+    function show(k) {
+        cur = (k + slides.length) % slides.length;
+        box.classList.add('swap');
+        setTimeout(function () { fill(cur); box.classList.remove('swap'); }, 230);
+    }
+    function lockHeight() {
+        box.style.minHeight = '';
+        var mh = 0;
+        for (var k = 0; k < slides.length; k++) { fill(k); mh = Math.max(mh, box.offsetHeight); }
+        fill(cur);
+        box.style.minHeight = mh + 'px';
+    }
+    function start() {
+        stop();
+        if (slides.length < 2 || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+        timer = setInterval(function () { if (!paused) show(cur + 1); }, 3500);
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    // As soon as the visitor uses the arrows, automatic scrolling stops for good (time to read)
+    document.getElementById('event-prev').addEventListener('click', function () { stop(); show(cur - 1); });
+    document.getElementById('event-next').addEventListener('click', function () { stop(); show(cur + 1); });
+    box.addEventListener('mouseenter', function () { paused = true; });
+    box.addEventListener('mouseleave', function () { paused = false; });
+    box.addEventListener('touchstart', function () { paused = true; setTimeout(function () { paused = false; }, 6000); }, { passive: true });
+    if (slides.length < 2) { document.getElementById('event-prev').style.display = 'none'; document.getElementById('event-next').style.display = 'none'; }
+    fill(0);
+    box.hidden = false;
+    lockHeight();
+    window.addEventListener('resize', function () { lockHeight(); });
+    start();
 })();
 </script>
 </body>
