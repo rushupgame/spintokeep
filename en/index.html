@@ -1482,6 +1482,32 @@
 .trade-marquee { direction: ltr; }
 .trade-marquee-group span::after { content: "•"; margin: 0 .7em; }
 [dir="rtl"] .rotator { padding: 0 .3em 0 .4em; }
+/* Bandeau « événement commercial à venir » */
+.event-banner { display: flex; align-items: center; gap: 1.1rem; width: calc(100% - 2.5rem); max-width: 780px; margin: 1.6rem auto 0; padding: 1.1rem 1.4rem; text-align: start; border-radius: 22px; background: linear-gradient(135deg, #f4f9ff 0%, #e6f0ff 100%); border: 1px solid rgba(0, 113, 227, .2); box-shadow: 0 8px 28px rgba(0, 113, 227, .10); box-sizing: border-box; animation: eventBannerIn .6s ease both; }
+.event-banner[hidden] { display: none; }
+.event-banner-emoji { font-size: 2.8rem; line-height: 1; flex-shrink: 0; }
+.event-banner-body { flex: 1; min-width: 0; }
+.event-banner-kicker { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-color); margin-bottom: .2rem; }
+.event-banner-title { font-size: 1.3rem; font-weight: 800; color: #1d1d1f; line-height: 1.2; }
+.event-banner-text { margin: .35rem 0 0; font-size: .92rem; line-height: 1.45; color: #48484a; }
+.event-banner-cta { flex-shrink: 0; padding: 12px 22px !important; font-size: .9rem !important; white-space: nowrap; }
+@keyframes eventBannerIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .event-banner { flex-direction: column; text-align: center; gap: .6rem; padding: 1.1rem 1rem 1.2rem; } .event-banner-cta { white-space: normal; } }
+.event-banner { position: relative; padding-left: 2.2rem; padding-right: 2.2rem; }
+.event-banner-emoji, .event-banner-body, .event-banner-cta { transition: opacity .25s ease, transform .25s ease; }
+.event-banner.swap .event-banner-emoji, .event-banner.swap .event-banner-body, .event-banner.swap .event-banner-cta { opacity: 0; transform: translateY(6px); }
+.event-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 36px; padding: 0; border: 0; background: transparent; color: var(--accent-color); font-size: 1.6rem; line-height: 1; cursor: pointer; opacity: .28; transition: opacity .2s ease; }
+.event-nav:hover, .event-nav:focus-visible { opacity: .85; }
+.event-prev { left: 4px; }
+.event-next { right: 4px; }
+@media (max-width: 640px) { .event-banner { padding-left: 1.6rem; padding-right: 1.6rem; } .event-nav { top: 2.2rem; } }
+.step-bullets { list-style: none; margin: 0 0 12px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.step-bullets li { display: flex; gap: 10px; align-items: flex-start; background: #f5f5f7; border-radius: 12px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5; color: #1d1d1f; }
+.step-bullets .sb-ico { font-size: 1.15rem; line-height: 1.3; flex-shrink: 0; }
+.step-tip { margin: 0 0 14px 0; font-size: 12px; line-height: 1.5; color: var(--accent-color); font-weight: 600; }
+html[lang="ar"] .event-banner { text-align: right; }
+html[lang="ar"] .event-prev { left: auto; right: 4px; }
+html[lang="ar"] .event-next { right: auto; left: 4px; }
     </style>
 </head>
 <body>
@@ -1547,6 +1573,18 @@
                 <div class="trade-marquee-group"><span>🥖 Bakery</span><span>💇 Hair salon</span><span>🔧 Garage</span><span>🍽️ Restaurant</span><span>🦷 Dentist</span><span>👗 Fashion boutique</span><span>🏨 Hotel</span><span>🌸 Florist</span><span>🏋️ Gym</span><span>🍷 Wine shop</span><span>🐾 Veterinarian</span><span>🏠 Real estate agency</span><span>🎮 Video games</span><span>💅 Nail salon</span><span>🛒 Supermarket</span><span>📚 Bookstore</span><span>⛽ Gas station</span><span>☕ Café</span><span>💊 Pharmacy</span><span>🚲 Bike shop</span><span>🍕 Pizzeria</span><span>💍 Jewelry store</span><span>🔨 Building contractor</span><span>🎳 Bowling alley</span><span>🥩 Butcher</span><span>👓 Optician</span><span>🛋️ Furniture & decor</span><span>🧖 Spa & beauty salon</span><span>🏪 Grocery store</span><span>📱 Phone shop</span><span>⛺ Campsite</span><span>🍰 Pastry shop</span><span>🚗 Car dealership</span><span>🧸 Toy store</span><span>🩺 Medical practice</span><span>🌱 Garden center</span><span>🍔 Fast food</span><span>🧺 Dry cleaner</span><span>🎬 Cinema</span><span>🐟 Fishmonger</span><span>💈 Barber</span><span>🛠️ Hardware store</span><span>🧘 Yoga studio</span><span>🍣 Sushi</span><span>📷 Photographer</span><span>🛞 Tire shop</span><span>👟 Shoe store</span><span>🎁 Gift shop</span><span>🧀 Cheese shop</span><span>💻 Computer store</span><span>🚕 Taxi & ride-hailing</span><span>🍦 Ice cream parlor</span><span>🏖️ Vacation rental</span><span>🐶 Pet grooming</span><span>🎢 Amusement park</span><span>🥦 Greengrocer</span><span>🚿 Car wash</span><span>💆 Massage</span><span>🥞 Crêperie</span><span>🛏️ Guest house</span><span>🎓 Driving school</span><span>🍫 Chocolatier</span><span>🍺 Bar & brewery</span></div>
                 <div class="trade-marquee-group"><span>🥖 Bakery</span><span>💇 Hair salon</span><span>🔧 Garage</span><span>🍽️ Restaurant</span><span>🦷 Dentist</span><span>👗 Fashion boutique</span><span>🏨 Hotel</span><span>🌸 Florist</span><span>🏋️ Gym</span><span>🍷 Wine shop</span><span>🐾 Veterinarian</span><span>🏠 Real estate agency</span><span>🎮 Video games</span><span>💅 Nail salon</span><span>🛒 Supermarket</span><span>📚 Bookstore</span><span>⛽ Gas station</span><span>☕ Café</span><span>💊 Pharmacy</span><span>🚲 Bike shop</span><span>🍕 Pizzeria</span><span>💍 Jewelry store</span><span>🔨 Building contractor</span><span>🎳 Bowling alley</span><span>🥩 Butcher</span><span>👓 Optician</span><span>🛋️ Furniture & decor</span><span>🧖 Spa & beauty salon</span><span>🏪 Grocery store</span><span>📱 Phone shop</span><span>⛺ Campsite</span><span>🍰 Pastry shop</span><span>🚗 Car dealership</span><span>🧸 Toy store</span><span>🩺 Medical practice</span><span>🌱 Garden center</span><span>🍔 Fast food</span><span>🧺 Dry cleaner</span><span>🎬 Cinema</span><span>🐟 Fishmonger</span><span>💈 Barber</span><span>🛠️ Hardware store</span><span>🧘 Yoga studio</span><span>🍣 Sushi</span><span>📷 Photographer</span><span>🛞 Tire shop</span><span>👟 Shoe store</span><span>🎁 Gift shop</span><span>🧀 Cheese shop</span><span>💻 Computer store</span><span>🚕 Taxi & ride-hailing</span><span>🍦 Ice cream parlor</span><span>🏖️ Vacation rental</span><span>🐶 Pet grooming</span><span>🎢 Amusement park</span><span>🥦 Greengrocer</span><span>🚿 Car wash</span><span>💆 Massage</span><span>🥞 Crêperie</span><span>🛏️ Guest house</span><span>🎓 Driving school</span><span>🍫 Chocolatier</span><span>🍺 Bar & brewery</span></div>
             </div>
+        </div>
+
+        <div class="event-banner" id="event-banner" hidden>
+            <button type="button" class="event-nav event-prev" id="event-prev" aria-label="Previous event">‹</button>
+            <button type="button" class="event-nav event-next" id="event-next" aria-label="Next event">›</button>
+            <div class="event-banner-emoji" id="event-emoji" aria-hidden="true"></div>
+            <div class="event-banner-body">
+                <div class="event-banner-kicker" id="event-kicker"></div>
+                <div class="event-banner-title" id="event-title"></div>
+                <p class="event-banner-text" id="event-text"></p>
+            </div>
+            <a href="#configurateur" class="btn event-banner-cta" id="event-cta"></a>
         </div>
     </section>
 
@@ -1753,10 +1791,17 @@
             </div>
         </details>
 
-        <details class="step">
+        <details class="step" open>
             <summary><span class="num">8</span><span class="label" id="sum-actions">Action before playing</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-google-url">Where the customer lands before playing (your Google listing, website, Insta...)</p>
+                <ul class="step-bullets">
+                    <li><span class="sb-ico">🌐</span><span><strong>Your website</strong> to showcase your offers: every player becomes a qualified visitor, ready to buy or book.</span></li>
+                    <li><span class="sb-ico">⭐</span><span><strong>Your Google Business Profile</strong> for reviews and visibility: more 5★ reviews, a better Google Maps ranking, more calls, directions and store visits.</span></li>
+                    <li><span class="sb-ico">📱</span><span><strong>Your social networks</strong> (Instagram, TikTok, Facebook…) to grow your followers: an audience you can re-engage for free with every promo.</span></li>
+                    <li><span class="sb-ico">🔗</span><span><strong>Or any URL of your choice</strong>: booking page, menu, catalog, current offer… just paste the link below.</span></li>
+                </ul>
+                <p class="step-tip">🎯 One link per game: pick the goal that matters most this month (reviews, followers or web traffic) and switch anytime to steer your results.</p>
                 <div class="field-lockable">
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </div>
@@ -2904,12 +2949,25 @@
     </div>
     
     <div id="legal" class="legal-text">
-        <p><strong style="color: #fff; font-size: 1rem;">Legal Notice and Hosting</strong></p>
-        <p>Spin To Keep<br> S.A.S with a capital of Ariary 2 100 000 Ar<br> NIF 3004082242 &nbsp;|&nbsp; RCS 2020B00582 &nbsp;|&nbsp; STAT N° 70202 11 2020 0 10628</p>
-        <p>Registered office: LOT IVF 45 Behoririka, Antsiranana 201, Madagascar.<br> Areas of operation: France, Belgium, Switzerland, Madagascar.<br> Database hosting: the website servers are hosted in Madagascar.</p>
-        <p style="margin-top: 1.5rem; font-style: italic; color: #777;">
-            In accordance with GDPR rules, all collected data (name, phone, email address) is obtained through an explicit consent (Opt-In) process. You have a right of access, correction and deletion of your personal data by writing to contact@spintokeep.com.
-        </p>
+        <p><strong style="color: #fff; font-size: 1rem;">Legal Notice &amp; Hosting</strong></p>
+        <p style="color: #fff; font-weight: 700; letter-spacing: .04em;">DESIGNED IN PARIS 🇫🇷 &nbsp;|&nbsp; DATA STORED IN EUROPE 🇪🇺</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Technical Infrastructure &amp; Data:</strong><br>
+        Code hosting &amp; deployment: GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, United States – Tel: +1 (877) 448-4820<br>
+        Databases &amp; backend: Supabase, Inc. (Delaware, United States) – Data servers located in the European Union. – Contact: support@supabase.io</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Website publisher:</strong><br>
+        Spin To Keep – Global service operating in France 🇫🇷, the United Kingdom 🇬🇧, China 🇨🇳, India 🇮🇳, Spain 🇪🇸, Brazil 🇧🇷, Bangladesh 🇧🇩, Russia 🇷🇺, Saudi Arabia 🇸🇦 and Germany 🇩🇪<br>
+        S.A.S with share capital of MGA 2,100,000 - NIF: 3004082242 &nbsp;|&nbsp; RCS: 2020B00582 &nbsp;|&nbsp; STAT: 70202 11 2020 0 10628 - Registered office: LOT IVF 45 - Behoririka, Antsiranana 201 (MG)<br>
+        Publication director: José Armand Andriantsalama Rakotovololona<br>
+        Contact: contact@spintokeep.com &nbsp;|&nbsp; +261 34 12 345 678 (Support requests and legal inquiries are handled exclusively by electronic means)</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Hosting &amp; Security:</strong><br>
+        The website servers and the data infrastructure are highly secure and based on international standards 🛡️.</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Data protection (GDPR):</strong><br>
+        In accordance with European regulations (GDPR), all data is collected through an explicit consent process (Opt-In). You have the right to access, rectify, port and delete your personal data by writing to contact@spintokeep.com ✉️.</p>
+
         <p style="margin-top: 3rem; font-size: 0.75rem; color: #555;">&copy; 2026 Spin To Keep. All rights reserved.</p>
     </div>
 </footer>
@@ -6797,6 +6855,125 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
             }, 480);
         }
     }, 2000);
+})();
+</script>
+<script>
+// Event banner (slider): picks the nearest commercial event from the visitor's date, then the next ones.
+// Test: add ?date=YYYY-MM-DD to the page address (simulates a day) or ?evenement=<id> (forces an event).
+(function () {
+    var box = document.getElementById('event-banner');
+    if (!box) return;
+    function day(y, m, d) { return new Date(y, m, d); }
+    function addDays(dt, n) { return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n); }
+    function nth(y, m, wd, n) { var f = day(y, m, 1); return day(y, m, 1 + ((wd - f.getDay() + 7) % 7) + (n - 1) * 7); }
+    function last(y, m, wd) { var e = day(y, m + 1, 0); return day(y, m, e.getDate() - ((e.getDay() - wd + 7) % 7)); }
+    function easter(y) {
+        var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+            g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+            l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+            mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+        return day(y, mo - 1, da);
+    }
+    function ortho(y) {
+        var a = y % 4, b = y % 7, c = y % 19, d = (19 * c + 15) % 30, e = (2 * a + 4 * b - d + 34) % 7,
+            m = Math.floor((d + e + 114) / 31), dd = ((d + e + 114) % 31) + 1;
+        return addDays(day(y, m - 1, dd), 13);
+    }
+    function F(m, d) { return function (y) { return day(y, m - 1, d); }; }
+    function NTH(m, wd, n) { return function (y) { return nth(y, m - 1, wd, n); }; }
+    function LAST(m, wd) { return function (y) { return last(y, m - 1, wd); }; }
+    function EASTER(k) { return function (y) { return addDays(easter(y), k); }; }
+    function ORTHO(k) { return function (y) { return addDays(ortho(y), k); }; }
+    function TBL(t, k) { return function (y) { var v = t[y]; if (!v) return null; var p = v.split('-'); return addDays(day(y, +p[0] - 1, +p[1]), k || 0); }; }
+    var BLACKFRIDAY = function (y) { return addDays(nth(y, 10, 4, 4), 1); };
+    var SMALLBIZ = function (y) { return addDays(nth(y, 10, 4, 4), 2); };
+    var OKTOBERFEST = function (y) { var d = day(y, 8, 16); return addDays(d, (6 - d.getDay() + 7) % 7); };
+    var ADVENT1 = function (y) { var c = day(y, 11, 25), w = c.getDay() || 7; return addDays(c, -(w + 21)); };
+    
+    var UI = {
+        title: function (n) { return 'Get ready for ' + n + '!'; }, cta: function (n) { return 'Create my game for ' + n + ' ➡️'; }, today: "Today", tomorrow: "Tomorrow", inDays: function (d) { return 'In ' + d + ' days'; }, fmt: function (dt) { var J=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], M=['January','February','March','April','May','June','July','August','September','October','November','December']; return J[dt.getDay()] + ', ' + M[dt.getMonth()] + ' ' + dt.getDate(); }
+    };
+    // [id, emoji, name, lead time in days (banner appears this many days before), date rule, marketing argument]
+    var EVENTS = [
+        ["nye", "🥂", "New Year's Eve", 21, F(12,31), "Ring in the new year with a prize: a QR code game fills your bookings and collects 5★ Google reviews."],
+        ["valentine", "💘", "Valentine's Day", 28, F(2,14), "Dinners, flowers and gifts for two: a prize game gets couples to choose you and leave a review."],
+        ["stpat", "☘️", "St. Patrick's Day", 14, F(3,17), "Green beer, specials and a packed room: a QR code game brings the crowd and the Google reviews."],
+        ["easter", "🐣", "Easter", 35, EASTER(0), "Brunch, treats and family outings: a prize game brings shoppers in before the holiday and earns 5★ reviews."],
+        ["cinco", "🌮", "Cinco de Mayo", 14, F(5,5), "Fiesta, tacos and happy hour: a QR code prize game fills your tables and builds your reviews."],
+        ["mothers", "💐", "Mother's Day", 35, NTH(5,0,2), "Flowers, gifts and family brunches: a prize game for moms brings more visits and 5★ reviews."],
+        ["memorial", "🇺🇸", "Memorial Day weekend", 14, LAST(5,1), "Long weekend, big crowds: a QR code game helps you stand out and turns visits into Google reviews."],
+        ["fathers", "👔", "Father's Day", 35, NTH(6,0,3), "Gifts, grills and a round on the house: a prize game catches last-minute shoppers and boosts your reviews."],
+        ["july4", "🎆", "the 4th of July", 21, F(7,4), "Cookouts, fireworks and full patios: a prize game brings the crowd and collects reviews during the rush."],
+        ["back", "🎒", "back to school", 28, F(8,15), "School supplies, clothes and snacks: a QR code game brings parents and students in and earns reviews."],
+        ["labor", "🌭", "Labor Day weekend", 14, NTH(9,1,1), "The last long weekend of summer: a prize game keeps your tables full and your reviews coming."],
+        ["halloween", "🎃", "Halloween", 28, F(10,31), "Treats, costumes and spooky deals: a QR code game attracts families and earns Google reviews."],
+        ["thanksgiving", "🦃", "Thanksgiving", 21, NTH(11,4,4), "Gather, gift and give thanks: a prize game thanks your regulars and turns every visit into a review."],
+        ["black", "🛍️", "Black Friday", 28, BLACKFRIDAY, "Stand out without sacrificing your margins: a prize game draws the crowd and turns every play into a Google review."],
+        ["smallbiz", "🏪", "Small Business Saturday", 21, SMALLBIZ, "Shoppers are looking for local businesses: a QR code game makes yours the one they remember and review."],
+        ["xmas", "🎄", "Christmas", 49, F(12,25), "The biggest season of the year: a prize game lifts sales, builds loyalty and collects 5★ reviews before the holidays."],
+    ];
+    var q = new URLSearchParams(location.search), today = new Date(), forced = null;
+    today = day(today.getFullYear(), today.getMonth(), today.getDate());
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q.get('date') || '')) { var p = q.get('date').split('-'); today = day(+p[0], +p[1] - 1, +p[2]); }
+    if (q.get('evenement')) forced = q.get('evenement');
+    var list = [];
+    EVENTS.forEach(function (ev) {
+        [today.getFullYear(), today.getFullYear() + 1].forEach(function (y) {
+            var dt = ev[4](y);
+            if (!dt) return;
+            var diff = Math.round((dt - today) / 86400000);
+            if (diff >= 0) list.push({ ev: ev, date: dt, diff: diff });
+        });
+    });
+    list.sort(function (a, b) { return a.diff - b.diff; });
+    var pick = null;
+    if (forced) pick = list.filter(function (x) { return x.ev[0] === forced; })[0] || null;
+    if (!pick) pick = list.filter(function (x) { return x.diff <= x.ev[3]; })[0] || list[0];
+    if (!pick) return;
+    var seen = {}, slides = [];
+    list.slice(list.indexOf(pick)).forEach(function (x) {
+        if (!seen[x.ev[0]] && slides.length < 6) { seen[x.ev[0]] = 1; slides.push(x); }
+    });
+    var cur = 0, timer = null, paused = false;
+    function fill(k) {
+        var x = slides[k], ev = x.ev;
+        var when = x.diff === 0 ? UI.today : (x.diff === 1 ? UI.tomorrow : UI.inDays(x.diff));
+        document.getElementById('event-emoji').textContent = ev[1];
+        document.getElementById('event-kicker').textContent = when + ' · ' + UI.fmt(x.date);
+        document.getElementById('event-title').textContent = UI.title(ev[2]);
+        document.getElementById('event-text').textContent = ev[5];
+        document.getElementById('event-cta').textContent = UI.cta(ev[2]);
+    }
+    function show(k) {
+        cur = (k + slides.length) % slides.length;
+        box.classList.add('swap');
+        setTimeout(function () { fill(cur); box.classList.remove('swap'); }, 230);
+    }
+    function lockHeight() {
+        box.style.minHeight = '';
+        var mh = 0;
+        for (var k = 0; k < slides.length; k++) { fill(k); mh = Math.max(mh, box.offsetHeight); }
+        fill(cur);
+        box.style.minHeight = mh + 'px';
+    }
+    function start() {
+        stop();
+        if (slides.length < 2 || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+        timer = setInterval(function () { if (!paused) show(cur + 1); }, 3500);
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    // As soon as the visitor uses the arrows, automatic scrolling stops for good (time to read)
+    document.getElementById('event-prev').addEventListener('click', function () { stop(); show(cur - 1); });
+    document.getElementById('event-next').addEventListener('click', function () { stop(); show(cur + 1); });
+    box.addEventListener('mouseenter', function () { paused = true; });
+    box.addEventListener('mouseleave', function () { paused = false; });
+    box.addEventListener('touchstart', function () { paused = true; setTimeout(function () { paused = false; }, 6000); }, { passive: true });
+    if (slides.length < 2) { document.getElementById('event-prev').style.display = 'none'; document.getElementById('event-next').style.display = 'none'; }
+    fill(0);
+    box.hidden = false;
+    lockHeight();
+    window.addEventListener('resize', function () { lockHeight(); });
+    start();
 })();
 </script>
 </body>
