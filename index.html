@@ -1476,6 +1476,30 @@
 @keyframes trade-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .trade-marquee-track { animation: none; } }
 .btn-download.btn-blue { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+
+/* Bandeau « événement commercial à venir » */
+.event-banner { display: flex; align-items: center; gap: 1.1rem; width: calc(100% - 2.5rem); max-width: 780px; margin: 1.6rem auto 0; padding: 1.1rem 1.4rem; text-align: left; border-radius: 22px; background: linear-gradient(135deg, #f4f9ff 0%, #e6f0ff 100%); border: 1px solid rgba(0, 113, 227, .2); box-shadow: 0 8px 28px rgba(0, 113, 227, .10); box-sizing: border-box; animation: eventBannerIn .6s ease both; }
+.event-banner[hidden] { display: none; }
+.event-banner-emoji { font-size: 2.8rem; line-height: 1; flex-shrink: 0; }
+.event-banner-body { flex: 1; min-width: 0; }
+.event-banner-kicker { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-color); margin-bottom: .2rem; }
+.event-banner-title { font-size: 1.3rem; font-weight: 800; color: #1d1d1f; line-height: 1.2; }
+.event-banner-text { margin: .35rem 0 0; font-size: .92rem; line-height: 1.45; color: #48484a; }
+.event-banner-cta { flex-shrink: 0; padding: 12px 22px !important; font-size: .9rem !important; white-space: nowrap; }
+@keyframes eventBannerIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .event-banner { flex-direction: column; text-align: center; gap: .6rem; padding: 1.1rem 1rem 1.2rem; } .event-banner-cta { white-space: normal; } }
+.event-banner { position: relative; padding-left: 2.2rem; padding-right: 2.2rem; }
+.event-banner-emoji, .event-banner-body, .event-banner-cta { transition: opacity .25s ease, transform .25s ease; }
+.event-banner.swap .event-banner-emoji, .event-banner.swap .event-banner-body, .event-banner.swap .event-banner-cta { opacity: 0; transform: translateY(6px); }
+.event-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 36px; padding: 0; border: 0; background: transparent; color: var(--accent-color); font-size: 1.6rem; line-height: 1; cursor: pointer; opacity: .28; transition: opacity .2s ease; }
+.event-nav:hover, .event-nav:focus-visible { opacity: .85; }
+.event-prev { left: 4px; }
+.event-next { right: 4px; }
+@media (max-width: 640px) { .event-banner { padding-left: 1.6rem; padding-right: 1.6rem; } .event-nav { top: 2.2rem; } }
+.step-bullets { list-style: none; margin: 0 0 12px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.step-bullets li { display: flex; gap: 10px; align-items: flex-start; background: #f5f5f7; border-radius: 12px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5; color: #1d1d1f; }
+.step-bullets .sb-ico { font-size: 1.15rem; line-height: 1.3; flex-shrink: 0; }
+.step-tip { margin: 0 0 14px 0; font-size: 12px; line-height: 1.5; color: var(--accent-color); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -1541,6 +1565,18 @@
                 <div class="trade-marquee-group">🥖 Boulangerie • 💇 Coiffeur • 🔧 Garage • 🍽️ Restaurant • 🦷 Dentiste • 👗 Boutique de mode • 🏨 Hôtel • 🌸 Fleuriste • 🏋️ Salle de sport • 🍷 Caviste • 🐾 Vétérinaire • 🏠 Agence immobilière • 🎮 Jeux vidéo • 💅 Onglerie • 🛒 Supermarché • 📚 Librairie • ⛽ Station-service • ☕ Café • 💊 Pharmacie • 🚲 Magasin de vélos • 🍕 Pizzeria • 💍 Bijouterie • 🔨 Artisan du bâtiment • 🎳 Bowling • 🥩 Boucherie • 👓 Opticien • 🛋️ Meubles & déco • 🧖 Spa & institut de beauté • 🏪 Épicerie • 📱 Téléphonie • ⛺ Camping • 🍰 Pâtisserie • 🚗 Concession auto • 🧸 Magasin de jouets • 🩺 Cabinet médical • 🌱 Jardinerie • 🍔 Fast-food • 🧺 Pressing • 🎬 Cinéma • 🐟 Poissonnerie • 💈 Barbier • 🛠️ Bricolage • 🧘 Studio de yoga • 🍣 Sushi • 📷 Photographe • 🛞 Centre pneus • 👟 Magasin de chaussures • 🎁 Boutique cadeaux • 🧀 Fromagerie • 💻 Informatique • 🚕 Taxi & VTC • 🍦 Glacier • 🏖️ Location de vacances • 🐶 Toilettage • 🎢 Parc de loisirs • 🥦 Primeur • 🚿 Lavage auto • 💆 Massage • 🥞 Crêperie • 🛏️ Chambre d'hôtes • 🎓 Auto-école • 🍫 Chocolatier • 🍺 Bar & brasserie • </div>
                 <div class="trade-marquee-group">🥖 Boulangerie • 💇 Coiffeur • 🔧 Garage • 🍽️ Restaurant • 🦷 Dentiste • 👗 Boutique de mode • 🏨 Hôtel • 🌸 Fleuriste • 🏋️ Salle de sport • 🍷 Caviste • 🐾 Vétérinaire • 🏠 Agence immobilière • 🎮 Jeux vidéo • 💅 Onglerie • 🛒 Supermarché • 📚 Librairie • ⛽ Station-service • ☕ Café • 💊 Pharmacie • 🚲 Magasin de vélos • 🍕 Pizzeria • 💍 Bijouterie • 🔨 Artisan du bâtiment • 🎳 Bowling • 🥩 Boucherie • 👓 Opticien • 🛋️ Meubles & déco • 🧖 Spa & institut de beauté • 🏪 Épicerie • 📱 Téléphonie • ⛺ Camping • 🍰 Pâtisserie • 🚗 Concession auto • 🧸 Magasin de jouets • 🩺 Cabinet médical • 🌱 Jardinerie • 🍔 Fast-food • 🧺 Pressing • 🎬 Cinéma • 🐟 Poissonnerie • 💈 Barbier • 🛠️ Bricolage • 🧘 Studio de yoga • 🍣 Sushi • 📷 Photographe • 🛞 Centre pneus • 👟 Magasin de chaussures • 🎁 Boutique cadeaux • 🧀 Fromagerie • 💻 Informatique • 🚕 Taxi & VTC • 🍦 Glacier • 🏖️ Location de vacances • 🐶 Toilettage • 🎢 Parc de loisirs • 🥦 Primeur • 🚿 Lavage auto • 💆 Massage • 🥞 Crêperie • 🛏️ Chambre d'hôtes • 🎓 Auto-école • 🍫 Chocolatier • 🍺 Bar & brasserie • </div>
             </div>
+        </div>
+
+        <div class="event-banner" id="event-banner" hidden>
+            <button type="button" class="event-nav event-prev" id="event-prev" aria-label="Événement précédent">‹</button>
+            <button type="button" class="event-nav event-next" id="event-next" aria-label="Événement suivant">›</button>
+            <div class="event-banner-emoji" id="event-emoji" aria-hidden="true"></div>
+            <div class="event-banner-body">
+                <div class="event-banner-kicker" id="event-kicker"></div>
+                <div class="event-banner-title" id="event-title"></div>
+                <p class="event-banner-text" id="event-text"></p>
+            </div>
+            <a href="#configurateur" class="btn event-banner-cta" id="event-cta"></a>
         </div>
     </section>
 
@@ -1743,10 +1779,17 @@
             </div>
         </details>
 
-        <details class="step">
+        <details class="step" open>
             <summary><span class="num">8</span><span class="label" id="sum-actions">Action avant de jouer</span><span class="chev">▾</span></summary>
             <div class="step-body">
                 <p class="step-help" id="lbl-google-url">Où le client atterrit avant de jouer (votre fiche Google, site, Insta...)</p>
+                <ul class="step-bullets">
+                    <li><span class="sb-ico">🌐</span><span><strong>Votre site web</strong> pour faire découvrir vos offres : chaque joueur devient un visiteur qualifié, prêt à acheter ou à réserver.</span></li>
+                    <li><span class="sb-ico">⭐</span><span><strong>Votre fiche Google My Business</strong> pour des avis et de la notoriété : plus d'avis 5★, un meilleur classement sur Google Maps, plus d'appels et de visites en boutique.</span></li>
+                    <li><span class="sb-ico">📱</span><span><strong>Vos réseaux sociaux</strong> (Instagram, TikTok, Facebook…) pour gagner des abonnés : une audience que vous pouvez réactiver gratuitement à chaque promo.</span></li>
+                    <li><span class="sb-ico">🔗</span><span><strong>Ou l'URL de votre choix</strong> : page de réservation, carte, catalogue, offre du moment… collez simplement le lien de votre choix ci-dessous.</span></li>
+                </ul>
+                <p class="step-tip">🎯 Un seul lien par jeu : choisissez l'objectif qui compte le plus ce mois-ci (avis, abonnés ou trafic web) et changez-le à tout moment pour piloter vos résultats.</p>
                 <div class="field-lockable">
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </div>
@@ -2897,16 +2940,25 @@
     </div>
     
     <div id="legal" class="legal-text">
-        <p><strong style="color: #fff; font-size: 1rem;">Mentions Légales & Hébergement</strong></p>
-        <p>Spin To Keep<br>
-        S.A.S au Capital de Ariary 2 100 000 Ar<br>
-        NIF 3004082242 &nbsp;|&nbsp; RCS 2020B00582 &nbsp;|&nbsp; STAT N° 70202 11 2020 0 10628</p>
-        <p>Siège social : LOT IVF 45 Behoririka, Antsiranana 201, Madagascar.<br>
-        Territoires d'intervention : France, Belgique, Suisse, Madagascar.<br>
-        Hébergement des bases de données : Les serveurs du site internet sont hébergés à Madagascar.</p>
-        <p style="margin-top: 1.5rem; font-style: italic; color: #777;">
-            Conformément à la réglementation RGPD, toutes les données collectées (nom, téléphone, adresse électronique) le sont via un processus de consentement explicite (Opt-In). Vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles en nous écrivant à contact@spintokeep.com.
-        </p>
+        <p><strong style="color: #fff; font-size: 1rem;">Mentions Légales &amp; Hébergement</strong></p>
+        <p style="color: #fff; font-weight: 700; letter-spacing: .04em;">DESIGN IN PARIS 🇫🇷 &nbsp;|&nbsp; DONNÉES STOCKÉES EN EUROPE 🇪🇺</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Infrastructure Technique &amp; Données :</strong><br>
+        Hébergement du code &amp; Déploiement : GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis – Tél : +1 (877) 448-4820<br>
+        Bases de données &amp; Backend : Supabase, Inc., (Delaware, États-Unis) – Serveurs de données localisés en Union Européenne. – Contact : support@supabase.io</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Éditeur du site :</strong><br>
+        Spin To Keep – Service mondial opérant en France 🇫🇷, Royaume-Uni 🇬🇧, Chine 🇨🇳, Inde 🇮🇳, Espagne 🇪🇸, Brésil 🇧🇷, Bangladesh 🇧🇩, Russie 🇷🇺, Arabie Saoudite 🇸🇦, Allemagne 🇩🇪<br>
+        S.A.S au capital de 2 100 000 MGA - NIF : 3004082242 &nbsp;|&nbsp; RCS : 2020B00582 &nbsp;|&nbsp; STAT : 70202 11 2020 0 10628 - Siège social : LOT IVF 45 - Behoririka, Antsiranana 201 (MG)<br>
+        Directeur de la publication : José Armand Andriantsalama Rakotovololona<br>
+        Contact : contact@spintokeep.com &nbsp;|&nbsp; +261 34 12 345 678 (Les demandes d'assistance et requêtes légales sont traitées exclusivement par voie électronique)</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Hébergement &amp; Sécurité :</strong><br>
+        Les serveurs du site internet et l'infrastructure de données sont hautement sécurisés et reposent sur des standards internationaux 🛡️.</p>
+
+        <p style="margin-top: 1.5rem;"><strong style="color: #fff;">Protection des données (RGPD) :</strong><br>
+        Conformément à la réglementation européenne (RGPD), toutes les données collectées le sont via un processus de consentement explicite (Opt-In). Vous disposez d'un droit d'accès, de rectification, de portabilité et de suppression de vos données personnelles en nous écrivant à contact@spintokeep.com ✉️.</p>
+
         <p style="margin-top: 3rem; font-size: 0.75rem; color: #555;">&copy; 2026 Spin To Keep. Tous droits réservés.</p>
     </div>
 </footer>
@@ -6761,6 +6813,135 @@ if(slider) {
             }, 480);
         }
     }, 2000);
+})();
+</script>
+<script>
+// Bandeau « événement commercial à venir » : choisit l'événement le plus proche selon la date du visiteur.
+// Test : ajouter ?date=2026-05-01 (simule un jour) ou ?evenement=noel (force un événement) à l'adresse de la page.
+(function () {
+    var box = document.getElementById('event-banner');
+    if (!box) return;
+    function day(y, m, d) { return new Date(y, m, d); }
+    function addDays(dt, n) { return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n); }
+    function nth(y, m, wd, n) { var f = day(y, m, 1); return day(y, m, 1 + ((wd - f.getDay() + 7) % 7) + (n - 1) * 7); }
+    function last(y, m, wd) { var e = day(y, m + 1, 0); return day(y, m, e.getDate() - ((e.getDay() - wd + 7) % 7)); }
+    function easter(y) {
+        var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+            g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+            l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+            mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+        return day(y, mo - 1, da);
+    }
+    // id, emoji, nom (après « Préparez »), date(année), lead = nombre de jours avant l'événement où le bandeau apparaît, argument marketing
+    var EVENTS = [
+        { id: 'soldes_hiver', e: '🏷️', n: "les soldes d'hiver", lead: 21, date: function (y) { return nth(y, 0, 3, 2); },
+          t: "Pendant les soldes, tout le monde compare. Un jeu par QR code à la caisse vous démarque et transforme chaque achat en avis Google 5★." },
+        { id: 'rois', e: '👑', n: 'la galette des rois', lead: 14, date: function (y) { var f = nth(y, 0, 0, 1); return f.getDate() === 1 ? day(y, 0, 8) : f; },
+          t: "Faites gagner une galette ou une couronne : chaque client qui joue laisse un avis Google et revient chercher son lot." },
+        { id: 'chandeleur', e: '🥞', n: 'la Chandeleur', lead: 14, date: function (y) { return day(y, 1, 2); },
+          t: "Crêpes offertes, remises surprises… un jeu par QR code attire les gourmands et récolte des avis Google en quelques secondes." },
+        { id: 'valentin', e: '💘', n: 'la Saint-Valentin', lead: 28, date: function (y) { return day(y, 1, 14); },
+          t: "Offrez un moment à deux : un jeu cadeau (dessert, bouquet, soin) incite les couples à passer chez vous et à laisser un avis." },
+        { id: 'mardi_gras', e: '🎭', n: 'Mardi gras', lead: 14, date: function (y) { return addDays(easter(y), -47); },
+          t: "Ambiance festive en vitrine : un jeu de gains (beignets, bugnes, remise) attire les familles et booste vos avis Google." },
+        { id: 'droits_femmes', e: '💜', n: 'la Journée des droits des femmes', lead: 14, date: function (y) { return day(y, 2, 8); },
+          t: "Soins, bouquets, pauses gourmandes : un jeu cadeau fait plaisir à vos clientes et les pousse à partager leur expérience." },
+        { id: 'grands_meres', e: '👵', n: 'la fête des grands-mères', lead: 21, date: function (y) { return nth(y, 2, 0, 1); },
+          t: "Un jeu cadeau qui fait plaisir aux mamies et à toute la famille : plus de passages en boutique, plus d'avis Google." },
+        { id: 'st_patrick', e: '☘️', n: 'la Saint-Patrick', lead: 14, date: function (y) { return day(y, 2, 17); },
+          t: "Soirée verte dans votre bar ou restaurant : un jeu par QR code à table fait gagner une tournée et génère des avis." },
+        { id: 'paques', e: '🐣', n: 'Pâques', lead: 35, date: function (y) { return easter(y); },
+          t: "Chocolats, brunchs, œufs à gagner : un jeu cadeau fait venir les familles avant le week-end et récolte des avis Google 5★." },
+        { id: 'muguet', e: '🌿', n: 'le 1er mai', lead: 14, date: function (y) { return day(y, 4, 1); },
+          t: "Un brin de muguet offert ou une remise surprise : un jeu par QR code crée du trafic et des avis pendant les ponts de mai." },
+        { id: 'fete_meres', e: '💐', n: 'la fête des mères', lead: 42,
+          date: function (y) { var l = last(y, 4, 0), pent = addDays(easter(y), 49); return l.getTime() === pent.getTime() ? addDays(l, 7) : l; },
+          t: "Un jeu cadeau pour toutes les mamans (bouquet, soin, dessert offert) : plus de visites avant la fête et des avis Google 5★ en rafale." },
+        { id: 'fete_peres', e: '👔', n: 'la fête des pères', lead: 35, date: function (y) { return nth(y, 5, 0, 3); },
+          t: "Pour les papas aussi : un jeu cadeau (verre offert, bon d'achat, soin) attire les derniers acheteurs et fait grimper vos avis." },
+        { id: 'musique', e: '🎶', n: 'la fête de la musique', lead: 14, date: function (y) { return day(y, 5, 21); },
+          t: "Soirée animée devant chez vous : un jeu par QR code fait gagner un verre ou une remise et transforme les passants en clients." },
+        { id: 'soldes_ete', e: '🏷️', n: "les soldes d'été", lead: 21, date: function (y) { return last(y, 5, 3); },
+          t: "Face aux grandes enseignes, misez sur l'expérience : un jeu par QR code à la sortie de caisse fidélise et fait monter vos avis Google." },
+        { id: 'fete_nationale', e: '🎆', n: 'le 14 juillet', lead: 14, date: function (y) { return day(y, 6, 14); },
+          t: "Pont, feux d'artifice, terrasses pleines : un jeu cadeau fait la différence et récolte des avis pendant le rush." },
+        { id: 'rentree', e: '🎒', n: 'la rentrée', lead: 28, date: function (y) { return day(y, 8, 1); },
+          t: "Rentrée = nouvelles habitudes. Un jeu par QR code fait revenir vos clients de l'été et attire les nouveaux : avis Google et fidélité." },
+        { id: 'halloween', e: '🎃', n: 'Halloween', lead: 28, date: function (y) { return day(y, 9, 31); },
+          t: "Bonbons, menus monstrueux, remises effrayantes : un jeu par QR code fait venir les familles et génère des avis Google." },
+        { id: 'beaujolais', e: '🍇', n: 'le Beaujolais nouveau', lead: 14, date: function (y) { return nth(y, 10, 4, 3); },
+          t: "Une bouteille à gagner pour fêter le Beaujolais nouveau : un jeu par QR code remplit la salle et récolte des avis." },
+        { id: 'black_friday', e: '🛍️', n: 'le Black Friday', lead: 28, date: function (y) { return addDays(nth(y, 10, 4, 4), 1); },
+          t: "Faites la différence sans casser vos marges : un jeu à gains attire la foule et chaque participation devient un avis Google." },
+        { id: 'noel', e: '🎄', n: 'Noël', lead: 42, date: function (y) { return day(y, 11, 25); },
+          t: "Le moment le plus rentable de l'année : un jeu cadeau par QR code incite à l'achat, fidélise et récolte des avis 5★ avant les fêtes." },
+        { id: 'sylvestre', e: '🥂', n: 'la Saint-Sylvestre', lead: 21, date: function (y) { return day(y, 11, 31); },
+          t: "Pour le réveillon, offrez une coupe ou un bon d'achat : un jeu par QR code remplit vos réservations et génère des avis." }
+    ];
+    var q = new URLSearchParams(location.search), today = new Date(), forced = null;
+    today = day(today.getFullYear(), today.getMonth(), today.getDate());
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q.get('date') || '')) { var p = q.get('date').split('-'); today = day(+p[0], +p[1] - 1, +p[2]); }
+    if (q.get('evenement')) forced = q.get('evenement');
+    var list = [];
+    EVENTS.forEach(function (ev) {
+        [today.getFullYear(), today.getFullYear() + 1].forEach(function (y) {
+            var dt = ev.date(y), diff = Math.round((dt - today) / 86400000);
+            if (diff >= 0) list.push({ ev: ev, date: dt, diff: diff });
+        });
+    });
+    list.sort(function (a, b) { return a.diff - b.diff; });
+    var pick = null;
+    if (forced) pick = list.filter(function (x) { return x.ev.id === forced; })[0] || null;
+    if (!pick) pick = list.filter(function (x) { return x.diff <= x.ev.lead; })[0] || list[0];
+    if (!pick) return;
+    var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    var MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    // Slider : l'événement choisi, puis les suivants (6 au maximum)
+    var seen = {}, slides = [];
+    list.slice(list.indexOf(pick)).forEach(function (x) {
+        if (!seen[x.ev.id] && slides.length < 6) { seen[x.ev.id] = 1; slides.push(x); }
+    });
+    var cur = 0, timer = null, paused = false;
+    function fill(k) {
+        var x = slides[k], ev = x.ev, dn = x.date.getDate();
+        var when = x.diff === 0 ? "Aujourd'hui" : (x.diff === 1 ? 'Demain' : 'Dans ' + x.diff + ' jours');
+        var long = JOURS[x.date.getDay()] + ' ' + (dn === 1 ? '1er' : dn) + ' ' + MOIS[x.date.getMonth()];
+        document.getElementById('event-emoji').textContent = ev.e;
+        document.getElementById('event-kicker').textContent = when + ' · ' + long;
+        document.getElementById('event-title').textContent = 'Préparez ' + ev.n + ' !';
+        document.getElementById('event-text').textContent = ev.t;
+        document.getElementById('event-cta').textContent = 'Créer mon jeu pour ' + ev.n + ' ➡️';
+    }
+    function show(k) {
+        cur = (k + slides.length) % slides.length;
+        box.classList.add('swap');
+        setTimeout(function () { fill(cur); box.classList.remove('swap'); }, 230);
+    }
+    function lockHeight() {
+        box.style.minHeight = '';
+        var mh = 0;
+        for (var k = 0; k < slides.length; k++) { fill(k); mh = Math.max(mh, box.offsetHeight); }
+        fill(cur);
+        box.style.minHeight = mh + 'px';
+    }
+    function start() {
+        stop();
+        if (slides.length < 2 || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+        timer = setInterval(function () { if (!paused) show(cur + 1); }, 3500);
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    // Dès que le visiteur utilise les flèches, le défilement automatique s'arrête définitivement (le temps de lire)
+    document.getElementById('event-prev').addEventListener('click', function () { stop(); show(cur - 1); });
+    document.getElementById('event-next').addEventListener('click', function () { stop(); show(cur + 1); });
+    box.addEventListener('mouseenter', function () { paused = true; });
+    box.addEventListener('mouseleave', function () { paused = false; });
+    box.addEventListener('touchstart', function () { paused = true; setTimeout(function () { paused = false; }, 6000); }, { passive: true });
+    if (slides.length < 2) { document.getElementById('event-prev').style.display = 'none'; document.getElementById('event-next').style.display = 'none'; }
+    fill(0);
+    box.hidden = false;
+    lockHeight();
+    window.addEventListener('resize', function () { lockHeight(); });
+    start();
 })();
 </script>
 </body>
