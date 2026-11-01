@@ -1,0 +1,50 @@
+# Spin To Keep
+
+> Spin To Keep is a B2B SaaS platform that helps local merchants collect Google Reviews and build their CRM through gamified QR codes (Wheel of Fortune, Slot Machine, Scratch Cards). Configure a campaign in under a minute and transform physical checkout traffic into digital growth.
+
+## Product
+
+Spin To Keep lets brick-and-mortar businesses transform the checkout experience into a review-generation and customer retention engine. No app download is required for merchants to create the games, nor for customers to play them.
+
+The key differentiator is gamification: instead of awkwardly asking for a review or handing out a boring flyer, merchants display a customized QR code. Customers scan it to play a quick digital game for a chance to win a small prize (e.g., free coffee, 10% off next visit). In the process, they opt-in to the merchant's CRM and are intelligently redirected to leave a Google Review at the moment of highest satisfaction.
+
+## Core Features
+
+- **Gamified QR Codes**: 6 interactive, animated game formats available (Wheel of Fortune, Slot Machine, Scratch Card, Mystery Boxes, Plinko, Shell Game).
+- **Live Configurator**: Customize brand colors, logos, texts, and prize probabilities in under a minute with a real-time mobile preview.
+- **Frictionless Google Reviews**: Smart redirection to the merchant's Google Business Profile review form to boost Local SEO and "Local Pack" rankings.
+- **CRM & Opt-in Data Collection**: Collects customer names, emails, and phone numbers (GDPR-compliant opt-in) before they spin.
+- **Analytics Dashboard**: Track total scans, game plays, win/loss ratios, and distributed prizes. Includes a feature to mark physical prizes as "claimed".
+- **Bulk CSV Export**: Download the entire list of participants to use for email marketing, SMS campaigns, or lookalike audiences.
+- **Print-Ready POS Posters**: Automatically generates high-resolution, print-ready PDF posters (A4, A5, A6) featuring the custom QR code and game instructions.
+- **Dynamic Redirection**: Premium users can change the final destination URL to anything (Google Maps, Instagram, booking page, custom website) at any time.
+
+## Pricing
+
+- **Free Tier / Demo**: Users can configure games, customize designs, and preview the experience for free. The destination URL is locked to a default example link until upgraded.
+- **Premium Plan**: €9.90 (incl. tax) per month. Unlocks custom destination URLs, the full analytics dashboard, CSV customer exports, and the ability to edit live games. No lock-in contract.
+
+## Use Cases
+
+- **Restaurants & Cafes**: QR codes placed on tables or bill folders to turn waiting time into Google Reviews and return visits (e.g., "win a free dessert for next time").
+- **Hair & Beauty Salons**: Displayed at the checkout counter to collect reviews and build a CRM database for SMS/email appointment reminders.
+- **Retail & Fashion**: Used at the register to capture customer emails for upcoming sales, offering an immediate small discount or branded tote bag.
+- **Automotive & Garages**: Building trust and local authority through a constant stream of fresh, positive local reviews.
+- **Local SEO Growth**: Any physical store needing to rank higher on Google Maps through a steady, automated flow of 5-star reviews.
+
+## Key Pages
+
+- Homepage / Generator: https://www.spintokeep.com
+- Pricing & Features: https://www.spintokeep.com/#tarifs
+- Local SEO Guide for Merchants: https://www.spintokeep.com/#guides
+- Use Cases by Industry: https://www.spintokeep.com/#cas-usage
+- FAQ: https://www.spintokeep.com/#faq
+
+## Technical Notes
+
+- Web application — no download required. Works on all modern smartphone browsers.
+- Extremely lightweight frontend (Vanilla JS, HTML5, CSS3) contained within a single file architecture for maximum performance, fast loading times, and SEO optimization.
+- Backend infrastructure powered by Supabase (PostgreSQL, Edge Functions, Authentication).
+- Payments are processed securely via the PayPal API with server-side Supabase Webhooks for instant premium activation.
+- GDPR compliant. Customer data is collected with explicit opt-in and stored securely on EU-based servers.
+- Global accessibility: The application supports dynamic localized translations (FR, EN, ES, DE, ZH, etc.) via hreflang tags to serve the correct language based on the URL path.
