@@ -22,6 +22,24 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pt_BR">
     <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:site_name" content="Spin To Keep">
+  <meta property="og:image" content="https://www.spintokeep.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Spin To Keep: roleta de prêmios por QR Code para ter mais avaliações no Google">
+  <meta property="og:locale:alternate" content="fr_FR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="es_ES">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="ru_RU">
+  <meta property="og:locale:alternate" content="hi_IN">
+  <meta property="og:locale:alternate" content="ar_AR">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:locale:alternate" content="bn_BD">
+  <meta name="twitter:title" content="Coleta de avaliações do Google por gamificação | Roleta com QR code – Spin To Keep">
+  <meta name="twitter:description" content="Transforme seu ponto de venda com jogos interativos (roleta, slot machine) e impulsione suas avaliações do Google e sua base de CRM.">
+  <meta name="twitter:image" content="https://www.spintokeep.com/og-image.png">
+  <meta name="twitter:image:alt" content="Spin To Keep: roleta de prêmios por QR Code para ter mais avaliações no Google">
     <meta property="og:url" content="https://www.spintokeep.com/pt">
     
     <!-- Données structurées SEO (Schema.org JSON-LD) -->
@@ -49,7 +67,11 @@
         "Personalização de logotipo e cores",
         "Conformidade com o RGPD (opt-in)",
         "Pôsteres prontos para imprimir"
-      ]
+      ],
+      "@id": "https://www.spintokeep.com/#software",
+      "publisher": {
+        "@id": "https://www.spintokeep.com/#organization"
+      }
     },
     {
       "@type": "FAQPage",
@@ -83,7 +105,7 @@
           "name": "Quanto tempo leva a configuração do jogo-concurso?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Menos de 5 minutos. A interface do software foi pensada especificamente para comerciantes com pressa: você envia seu logotipo, escolhe suas cores, lista seus presentes e sua campanha de marketing fica pronta para uso na hora. O QR Code é gerado automaticamente."
+            "text": "Em 1 minuto. A interface do software foi pensada especificamente para comerciantes com pressa: você envia seu logotipo, escolhe suas cores, lista seus presentes e sua campanha de marketing fica pronta para uso na hora. O QR Code é gerado automaticamente."
           }
         },
         {
@@ -263,6 +285,89 @@
           }
         }
       ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.spintokeep.com/#organization",
+      "name": "Spin To Keep",
+      "url": "https://www.spintokeep.com/",
+      "description": "Plataforma SaaS de animação comercial e de coleta de avaliações do Google por gamificação (roleta da sorte, slot machine) com QR code, CRM e painel de controle.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "LOT IVF 45 - Behoririka",
+        "addressLocality": "Antsiranana",
+        "postalCode": "201",
+        "addressCountry": "MG"
+      },
+      "areaServed": [
+        {
+          "@type": "Country",
+          "name": "France"
+        },
+        {
+          "@type": "Country",
+          "name": "United Kingdom"
+        },
+        {
+          "@type": "Country",
+          "name": "China"
+        },
+        {
+          "@type": "Country",
+          "name": "India"
+        },
+        {
+          "@type": "Country",
+          "name": "Spain"
+        },
+        {
+          "@type": "Country",
+          "name": "Brazil"
+        },
+        {
+          "@type": "Country",
+          "name": "Bangladesh"
+        },
+        {
+          "@type": "Country",
+          "name": "Russia"
+        },
+        {
+          "@type": "Country",
+          "name": "Saudi Arabia"
+        },
+        {
+          "@type": "Country",
+          "name": "Germany"
+        }
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "contact@spintokeep.com",
+        "availableLanguage": [
+          "fr",
+          "en",
+          "pt-BR",
+          "es",
+          "de",
+          "ru",
+          "hi",
+          "ar",
+          "zh-CN",
+          "bn"
+        ]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.spintokeep.com/pt#website",
+      "url": "https://www.spintokeep.com/pt",
+      "name": "Spin To Keep",
+      "inLanguage": "pt-BR",
+      "publisher": {
+        "@id": "https://www.spintokeep.com/#organization"
+      }
     }
   ]
 }
@@ -530,7 +635,12 @@
   --   supabase functions deploy verify-paypal-subscription
   --   supabase functions deploy paypal-webhook --no-verify-jwt
   --   supabase secrets set PAYPAL_CLIENT_ID=... PAYPAL_CLIENT_SECRET=... \
-  --     PAYPAL_ENV=live PAYPAL_PLAN_ID=P-16K40079FK484592LNF4PL2Q PAYPAL_WEBHOOK_ID=...
+  --     PAYPAL_ENV=live PAYPAL_PLAN_ID=P-7LF77960FL039693ANLVQZJQ PAYPAL_WEBHOOK_ID=...
+  --   Plans PayPal : PAYPAL_PLAN_ID = plan actuel (7 jours d'essai puis 9,90 €/mois).
+  --   Les anciens abonnés restent valides grâce à PAYPAL_LEGACY_PLAN_IDS (liste séparée
+  --   par des virgules), lue par verify-paypal-subscription et paypal-webhook :
+  --   supabase secrets set PAYPAL_LEGACY_PLAN_IDS=P-16K40079FK484592LNF4PL2Q
+  --   (ne désactivez pas l'ancien plan côté PayPal tant que des abonnés l'utilisent)
   -- Puis, dans le dashboard PayPal (Developer > Apps > votre app > Webhooks),
   -- créer un webhook pointant vers l'URL publique de paypal-webhook et cocher au
   -- minimum : BILLING.SUBSCRIPTION.CANCELLED, BILLING.SUBSCRIPTION.SUSPENDED,
@@ -642,7 +752,7 @@
         }
 
         /* Responsive Mobile Navigation (utilisateur non connecté) */
-        @media (max-width: 1300px) {
+        @media (max-width: 1180px) {
             .hamburger-btn { display: flex; }
             .nav-links {
                 display: none;
@@ -777,14 +887,14 @@
         .pricing-features li:last-child { border-bottom: none; }
 
         /* PayPal Button Styling */
-        #paypal-button-container-P-16K40079FK484592LNF4PL2Q {
+        #paypal-button-container-P-7LF77960FL039693ANLVQZJQ {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             margin: 20px 0;
         }
-        #paypal-button-container-P-16K40079FK484592LNF4PL2Q > div {
+        #paypal-button-container-P-7LF77960FL039693ANLVQZJQ > div {
             width: 100%;
             max-width: 500px;
         }
@@ -1254,7 +1364,7 @@
         .nav-more-menu a:hover { background: var(--bg-secondary); }
         .nav-links a.lang-switch { gap: 7px; }
         .lang-switch .flag { display: block; border-radius: 3px; flex-shrink: 0; }
-        @media (max-width: 1300px) {
+        @media (max-width: 1180px) {
             .nav-more, .nav-more-menu, .nav-more:hover .nav-more-menu, .nav-more:focus-within .nav-more-menu { display: contents; }
             .nav-more-btn { display: none; }
             .nav-more-menu a { padding: 0; border-radius: 0; }
@@ -1275,7 +1385,7 @@
         .nav-links .lang-dd-menu a:hover { background: var(--bg-secondary); }
         .nav-links .lang-dd-menu a[aria-current="true"] { font-weight: 700; background: var(--bg-secondary); }
         [dir="rtl"] .lang-dd-menu { right: auto; left: 0; }
-        @media (max-width: 1300px) {
+        @media (max-width: 1180px) {
             .nav-links { max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
             .nav-lang-dd { flex-direction: column; align-items: flex-start; }
             .lang-dd-menu { position: static; width: 100%; margin-top: 8px; box-shadow: none; }
@@ -1509,6 +1619,156 @@
 html[lang="ar"] .event-banner { text-align: right; }
 html[lang="ar"] .event-prev { left: auto; right: 4px; }
 html[lang="ar"] .event-next { right: auto; left: 4px; }
+/* Titres d'interface (hors plan de titres SEO) : mêmes rendus qu'avant la conversion h* -> div */
+.ui-h { display: block; margin: 0; letter-spacing: -0.02em; font-weight: bold; }
+.ui-h1 { font-weight: 700; line-height: 1.1; text-align: center; }
+.ui-h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; text-align: center; color: var(--text-primary); }
+.ui-h2.title { font-size: 1.15em; margin: 0 0 4px 0; font-weight: 800; letter-spacing: -.2px; }
+.ui-h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: .5rem; }
+.ui-h4 { font-size: 1em; }
+.ui-h5 { font-size: .83em; }
+.dash-header .ui-h1 { font-size: 1.4em; margin: 0; font-weight: 800; }
+.dash-chart-box .ui-h4 { margin: 0 0 14px 0; font-size: 13.5px; font-weight: 800; color: var(--ink); }
+.ui-h3.modal-title { font-size: 1.15em; font-weight: 800; margin: 0 0 4px 0; }
+.ui-h3.dash-section-title { font-size: 1.05em; font-weight: 800; margin: 0 0 12px 0; }
+.screen-mockup .ui-h4, .screen-mockup .ui-h5 { color: var(--text-color); position: relative; z-index: 2; }
+#pre-s3 .ui-h4 { font-family: var(--cd-font); font-weight: 400; letter-spacing: .02em; line-height: 1.12; -webkit-text-stroke: .17em var(--cd-outline); paint-order: stroke fill; text-shadow: 0 .1em 0 var(--cd-outline), 0 .2em .28em rgba(0,0,0,.28); }
+/* Mots tournants du H1 : texte injecté par CSS (hors du texte du titre pour les moteurs) */
+.rot-item[data-w]::before { content: attr(data-w); }
+/* Anti-décalage de mise en page (CLS) */
+@media (max-width: 900px) { .rotator { display: block; margin: .12em auto; } }
+.event-banner[hidden] { display: flex; visibility: hidden; min-height: 152px; }
+@media (max-width: 640px) { .event-banner[hidden] { min-height: 330px; } }
+.seo-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+/* Bloc « en bref » (réponse directe pour les moteurs de recherche et d'IA) */
+.en-bref { max-width: 900px; margin: 0 auto 3rem; padding: 1.6rem 1.8rem; border-radius: 20px; background: #fff; border: 1px solid rgba(0,0,0,.08); box-shadow: 0 6px 24px rgba(0,0,0,.05); text-align: start; box-sizing: border-box; }
+.en-bref h2 { font-size: 1.5rem; margin: 0 0 1.1rem 0; text-align: start; line-height: 1.25; }
+.en-bref dl { display: grid; grid-template-columns: max-content 1fr; gap: .6rem 1.4rem; margin: 0; }
+.en-bref dt { font-weight: 800; color: var(--accent-color); }
+.en-bref dd { margin: 0; line-height: 1.5; color: #1d1d1f; }
+@media (max-width: 640px) { .en-bref { padding: 1.3rem 1.2rem; } .en-bref dl { grid-template-columns: 1fr; gap: .15rem; } .en-bref dd { margin-bottom: .7rem; } }
+/* Bloc « en bref » (réponse directe pour les moteurs de recherche et d'IA) */
+.en-bref { max-width: 900px; margin: 0 auto 3rem; padding: 1.6rem 1.8rem; border-radius: 20px; background: #fff; border: 1px solid rgba(0,0,0,.08); box-shadow: 0 6px 24px rgba(0,0,0,.05); text-align: start; box-sizing: border-box; }
+.en-bref h2 { font-size: 1.5rem; margin: 0 0 1.1rem 0; text-align: start; line-height: 1.25; }
+.en-bref dl { display: grid; grid-template-columns: max-content 1fr; gap: .6rem 1.4rem; margin: 0; }
+.en-bref dt { font-weight: 800; color: var(--accent-color); }
+.en-bref dd { margin: 0; line-height: 1.5; color: #1d1d1f; }
+@media (max-width: 640px) { .en-bref { padding: 1.3rem 1.2rem; } .en-bref dl { grid-template-columns: 1fr; gap: .15rem; } .en-bref dd { margin-bottom: .7rem; } }
+/* =====================================================================
+   NAV v2 : menu complet + « Se connecter » (contour bleu) + CTA bleu
+   ===================================================================== */
+.btn-nav-outline { background: transparent; color: var(--accent-color); border: 1.5px solid var(--accent-color); padding: 7px 16px; border-radius: 980px; font-size: .88rem; font-weight: 600; font-family: inherit; line-height: 1.3; cursor: pointer; white-space: nowrap; transition: background .2s ease; }
+.btn-nav-outline:hover { background: rgba(0,113,227,.08); }
+.btn-nav-cta { background: var(--accent-color); color: #fff; border: 1.5px solid var(--accent-color); padding: 7px 16px; border-radius: 980px; font-size: .88rem; font-weight: 600; line-height: 1.3; text-decoration: none; white-space: nowrap; transition: background .2s ease; }
+.btn-nav-cta:hover { background: var(--accent-hover); }
+.nav-auth { gap: 8px; margin-left: .8rem; }
+@media (min-width: 1181px) { .nav-links { gap: 1.05rem; } .nav-links a, .nav-more-btn { font-size: .86rem; } }
+@media (max-width: 1180px) { .hamburger-btn { order: 3; margin-left: 12px; } .nav-auth { order: 2; margin-left: auto; } }
+@media (max-width: 520px) { .btn-nav-cta { display: none; } .btn-nav-outline { padding: 6px 12px; font-size: .8rem; } }
+
+/* =====================================================================
+   HERO v2 : 2 colonnes (texte à gauche, visuels à droite)
+   ===================================================================== */
+section.hero2 { max-width: 1240px; padding: 3rem 2rem 1.2rem; }
+.hero2-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.hero2-left { min-width: 0; text-align: left; }
+.hero2 h1 { text-align: left; font-size: clamp(2rem, 1rem + 2.3vw, 3.05rem); line-height: 1.08; margin: 0 0 1.1rem 0; letter-spacing: -0.02em; }
+.hero2 h1 .rotator { display: block; margin: .08em 0; }
+.hero2-proof { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin: 0 0 1.5rem 0; font-size: .98rem; font-weight: 500; color: var(--text-primary); }
+.hero2-stars { color: #f5b301; font-size: 1.35rem; letter-spacing: .12em; line-height: 1; }
+.hero2-cta { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 540px; box-sizing: border-box; min-height: 62px; padding: 14px 26px; background: var(--accent-color); color: #fff; font-weight: 700; font-size: 1.12rem; line-height: 1.25; text-align: center; text-decoration: none; border-radius: 16px; box-shadow: 0 12px 28px rgba(0,113,227,.32); transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+.hero2-cta:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 16px 34px rgba(0,113,227,.38); }
+.hero2-trial { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 540px; box-sizing: border-box; min-height: 62px; margin: .85rem 0 0 0; padding: 14px 26px; background: #e5302f; color: #fff; font-weight: 700; font-size: 1.12rem; line-height: 1.25; text-align: center; text-decoration: none; border-radius: 16px; box-shadow: 0 12px 28px rgba(229,48,47,.30); transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+.hero2-trial:hover { background: #cf2423; transform: translateY(-1px); box-shadow: 0 16px 34px rgba(229,48,47,.38); }
+.hero2-cta, .hero2-trial { text-wrap: balance; }
+.hero2-desc { margin: 1.6rem 0 0 0; max-width: 560px; font-size: 1.05rem; line-height: 1.6; color: #515154; }
+
+/* ---- colonne droite : composition chevalet + smartphone (scène 560 x 480 mise à l'échelle par JS) ---- */
+.hero2-right { min-width: 0; }
+.hero2-stage-wrap { --hs: 1; position: relative; width: 100%; max-width: 560px; margin: 0 auto; height: calc(480px * var(--hs)); }
+.hero2-stage { position: absolute; left: 0; top: 0; width: 560px; height: 480px; transform-origin: 0 0; transform: scale(var(--hs)); perspective: 1500px; }
+.stage-table { position: absolute; left: 4px; right: 4px; bottom: 4px; height: 120px; border-radius: 50%; background: radial-gradient(ellipse at 50% 35%, rgba(60,70,110,.22) 0%, rgba(60,70,110,.10) 42%, rgba(255,255,255,0) 72%); }
+/* Élément 1 : chevalet (affiche) en 3D */
+.easel { position: absolute; left: 22px; top: 44px; width: 270px; height: 410px; transform-style: preserve-3d; transform-origin: 50% 100%; transform: rotateY(17deg) rotateX(3deg) rotateZ(-2.5deg); filter: drop-shadow(0 28px 22px rgba(30,30,70,.30)) drop-shadow(0 6px 6px rgba(30,30,70,.18)); }
+.easel-poster { position: relative; z-index: 0; isolation: isolate; width: 270px; height: 382px; box-sizing: border-box; padding: 20px 16px 16px; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center; color: #fff; background: linear-gradient(135deg, #fc466b, #3f5efb); font-family: var(--font-family); box-shadow: 5px 3px 0 rgba(25,25,80,.35), inset 0 0 0 1.5px rgba(255,255,255,.35); }
+.poster-top { position: relative; width: 100%; }
+.poster-emoji { font-size: 38px; line-height: 1; margin-bottom: 6px; }
+.poster-title { font-size: 26px; font-weight: 800; line-height: 1.12; margin-bottom: 6px; text-shadow: 0 2px 6px rgba(0,0,0,.18); }
+.poster-sub { padding: 0 6px; font-size: 11.5px; font-weight: 600; line-height: 1.4; opacity: .95; }
+.poster-qrcard { position: relative; display: flex; flex-direction: column; align-items: center; padding: 11px 11px 10px; background: #fff; border-radius: 16px; box-shadow: 0 8px 18px rgba(0,0,0,.25); }
+.poster-qrcard .poster-qr { display: block; width: 116px; height: 116px; }
+.poster-cap { margin-top: 8px; padding: 6px 16px; background: #ff3d77; color: #fff; font-size: 12px; font-weight: 800; border-radius: 50px; }
+.poster-foot { position: relative; font-size: 8.5px; font-weight: 600; opacity: .85; }
+.easel-lip { position: absolute; left: -8px; right: -8px; bottom: 0; height: 34px; border-radius: 8px 8px 14px 14px; background: linear-gradient(180deg, rgba(255,255,255,.96) 0%, rgba(214,220,235,.96) 55%, rgba(170,178,200,.96) 100%); border: 1px solid rgba(255,255,255,.9); box-shadow: inset 0 3px 5px rgba(255,255,255,.95), inset 0 -3px 4px rgba(110,120,150,.35); }
+/* Élément 2 : smartphone */
+.phone { position: absolute; left: 272px; top: 8px; width: 248px; height: 464px; box-sizing: border-box; padding: 9px; border-radius: 44px; background: linear-gradient(145deg, #2d2d32, #0b0b0d); transform: rotate(5deg); z-index: 3; box-shadow: inset 0 0 0 2px #4a4a50, inset 0 0 0 4px #111, 0 34px 50px rgba(20,20,60,.38), 0 10px 14px rgba(20,20,60,.22); }
+.phone::before, .phone::after { content: ""; position: absolute; width: 3px; background: #2d2d32; border-radius: 2px; }
+.phone::before { left: -3px; top: 96px; height: 40px; box-shadow: 0 56px 0 #2d2d32; }
+.phone::after { right: -3px; top: 130px; height: 66px; }
+.phone-island { position: absolute; top: 9px; left: 50%; width: 72px; height: 21px; margin-left: -36px; border-radius: 14px; background: #000; }
+.phone-time { position: absolute; top: 12px; left: 22px; font-size: 10px; font-weight: 700; }
+.phone-batt { position: absolute; top: 14px; right: 22px; width: 18px; height: 8px; border-radius: 3px; border: 1.2px solid #fff; box-sizing: border-box; }
+.phone-batt::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; right: 4px; border-radius: 1px; background: #fff; }
+.confetti { position: absolute; pointer-events: none; font-size: 16px; animation: confettiUp 1.3s ease-out forwards; }
+@keyframes confettiUp { 0% { transform: translate(0, 0) scale(.6) rotate(0); opacity: 1; } 100% { transform: translate(var(--dx), -150px) scale(1.1) rotate(var(--rot)); opacity: 0; } }
+
+/* ---- pied de section : 2 lignes de réassurance (même taille, même police) ---- */
+.hero2-trust { display: flex; flex-direction: column; gap: .8rem; margin-top: 2.2rem; }
+.trust-row { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.trust-track { display: flex; width: max-content; animation: trust-scroll 80s linear infinite; }
+.trust-row.rev .trust-track { animation-direction: reverse; animation-duration: 90s; }
+.trust-row:hover .trust-track { animation-play-state: paused; }
+.trust-group { display: flex; align-items: center; white-space: nowrap; font-family: var(--font-family); font-size: .88rem; font-weight: 700; line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; color: #8e8e93; opacity: .85; }
+.trust-group span { display: inline-flex; align-items: center; gap: .5em; }
+.trust-group span::after { content: "•"; margin: 0 1.6rem; opacity: .55; }
+.trust-group .emo { filter: grayscale(1); opacity: .8; }
+.trust-group span img { height: 1.25em; width: auto; filter: grayscale(1); opacity: .8; }
+@keyframes trust-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .trust-track { animation: none; } }
+
+/* ---- responsive : < 768px = une seule colonne (texte, puis visuels, puis bandeaux) ---- */
+@media (max-width: 767px) {
+    section.hero2 { padding: 1.6rem 1.1rem .8rem; }
+    .hero2-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .hero2-left { text-align: center; }
+    .hero2 h1 { text-align: center; }
+    .hero2 h1 .rotator { margin: .08em auto; }
+    .hero2-proof { justify-content: center; margin-bottom: 1.2rem; }
+    .hero2-cta, .hero2-trial { max-width: none; }
+    .hero2-desc { margin: 1.3rem auto 0; text-align: center; font-size: 1rem; }
+    .hero2-proof { flex-wrap: nowrap; gap: .5rem; font-size: .9rem; }
+    .hero2-stars { font-size: 1.1rem; }
+    .hero2-cta, .hero2-trial { font-size: 1.05rem; }
+    .hero2-trust { margin-top: 2.4rem; }
+}
+
+/* ---- écran du smartphone = mockup par défaut du configurateur (étape « Jeu ») ---- */
+.phone-screen { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: linear-gradient(135deg, rgb(252, 70, 107), rgb(63, 94, 251)); }
+.phone-screen .hero-mock { position: absolute; left: 0; top: 0; z-index: 1; width: 256px; height: 496px; box-sizing: border-box; padding: 38px 15px 15px; text-align: center; background: linear-gradient(135deg, rgb(252, 70, 107), rgb(63, 94, 251)); transform: scale(.9); transform-origin: 0 0; overflow: hidden; }
+.phone-island, .phone-time, .phone-batt { z-index: 6; }
+.hero-wtitle { position: relative; z-index: 2; margin: 10px 0; font-size: 14px; color: var(--text-color, #fff); font-family: var(--cd-font); font-weight: 400; letter-spacing: .02em; line-height: 1.12; -webkit-text-stroke: .17em var(--cd-outline); paint-order: stroke fill; text-shadow: 0 .1em 0 var(--cd-outline), 0 .2em .28em rgba(0,0,0,.28); }
+#hero-spin-btn { position: relative; z-index: 2; font-family: var(--cd-font); font-weight: 400; letter-spacing: .05em; text-shadow: 0 2px 0 rgba(0,0,0,.28); border: 3px solid rgba(255,255,255,.8) !important; border-radius: 50px; background-image: linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0) 52%) !important; box-shadow: 0 5px 0 rgba(0,0,0,.3), 0 12px 20px rgba(0,0,0,.22), inset 0 -3px 0 rgba(0,0,0,.14) !important; }
+.hero-mock .phone-result { position: relative; z-index: 2; margin: 16px auto 0; width: max-content; max-width: 220px; padding: 8px 14px; border-radius: 14px; background: rgba(255,255,255,.97); color: #1d1d1f; font-size: 13px; font-weight: 800; line-height: 1.2; opacity: 0; transform: translateY(6px) scale(.96); transition: opacity .3s ease, transform .3s ease; box-shadow: 0 6px 14px rgba(0,0,0,.2); }
+.hero-mock .phone-result.show { opacity: 1; transform: none; }
+.hero-mock .phone-result.win { color: #0a7a3a; }
+.hero-mock .phone-result.lose { color: #c62a47; }
+/* Offre d'essai gratuit (carte tarifaire, fenêtre de paiement) */
+.pricing-strike { margin: .8rem 0 0 0; font-size: 1rem; color: var(--text-secondary); }
+.pricing-strike s { text-decoration-thickness: 2px; }
+.pricing-offered { color: #1a9f4b; font-weight: 800; margin-left: .3rem; }
+.pricing-today { margin: 1.2rem 0 -.4rem 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.pricing-then { margin: 0 0 1.2rem 0; font-size: 1.05rem; color: var(--text-secondary); font-weight: 500; }
+.trial-reassure { margin: 12px 0 4px; padding: 10px 12px; border-radius: 12px; background: #f0f9f3; color: #146c34; font-size: 12.5px; line-height: 1.45; text-align: center; font-weight: 600; }
+
+/* ---- compléments : titre d'affiche équilibré, lignes de réassurance toujours de gauche à droite, arabe (RTL) ---- */
+.poster-title { text-wrap: balance; }
+.trust-row { direction: ltr; }
+html[lang="ar"] .hero2-stage { direction: ltr; }
+html[lang="ar"] .easel-poster, html[lang="ar"] .hero-mock { direction: rtl; }
+html[lang="ar"] .hero2-left, html[lang="ar"] .hero2 h1, html[lang="ar"] .hero2-desc { text-align: right; }
+@media (max-width: 767px) { html[lang="ar"] .hero2-left, html[lang="ar"] .hero2 h1, html[lang="ar"] .hero2-desc { text-align: center; } }
+.topbar.is-guest { display: none !important; }
+@media (max-width: 640px) { .event-banner { justify-content: center; } .event-banner-body { flex: 0 0 auto; } }
     </style>
 </head>
 <body>
@@ -1528,12 +1788,12 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             <li><a href="#concept" onclick="closeMenu()">Como funciona</a></li>
             <li><a href="#configurateur" onclick="closeMenu()">Configurador</a></li>
             <li><a href="#enjeux-seo" onclick="closeMenu()">Por que as avaliações?</a></li>
-            <li><a href="#guides" onclick="closeMenu()">Guias</a></li>
-            <li><a href="#cas-usage" onclick="closeMenu()">Casos de uso</a></li>
             <li><a href="#tarifs" onclick="closeMenu()">Preços</a></li>
             <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
             <li class="nav-more"><button type="button" class="nav-more-btn" aria-haspopup="true">Mais</button>
                 <ul class="nav-more-menu">
+                    <li><a href="#guides" onclick="closeMenu()">Guias</a></li>
+                    <li><a href="#cas-usage" onclick="closeMenu()">Casos de uso</a></li>
                     <li><a href="#fonctionnalites" onclick="closeMenu()">Ferramenta e CRM</a></li>
                     <li><a href="#secteurs" onclick="closeMenu()">Setores</a></li>
                     <li><a href="#lexique" onclick="closeMenu()">Glossário</a></li>
@@ -1553,27 +1813,75 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 </defs></svg><button type="button" class="lang-dd-btn" aria-haspopup="true" aria-expanded="false" aria-label="Language / Langue"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-pt"/></svg><span>PT</span></button><ul class="lang-dd-menu"><li><a href="https://www.spintokeep.com/" hreflang="fr" lang="fr"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-fr"/></svg><span>Français</span></a></li><li><a href="https://www.spintokeep.com/en" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-en"/></svg><span>English</span></a></li><li><a href="https://www.spintokeep.com/zh" hreflang="zh-CN" lang="zh-CN"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-zh"/></svg><span>中文</span></a></li><li><a href="https://www.spintokeep.com/hi" hreflang="hi" lang="hi"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-hi"/></svg><span>हिन्दी</span></a></li><li><a href="https://www.spintokeep.com/es" hreflang="es" lang="es"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-es"/></svg><span>Español</span></a></li><li><a href="https://www.spintokeep.com/pt" hreflang="pt-BR" lang="pt-BR" aria-current="true"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-pt"/></svg><span>Português</span></a></li><li><a href="https://www.spintokeep.com/bn" hreflang="bn" lang="bn"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-bn"/></svg><span>বাংলা</span></a></li><li><a href="https://www.spintokeep.com/ru" hreflang="ru" lang="ru"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-ru"/></svg><span>Русский</span></a></li><li><a href="https://www.spintokeep.com/ar" hreflang="ar" lang="ar"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-ar"/></svg><span>العربية</span></a></li><li><a href="https://www.spintokeep.com/de" hreflang="de" lang="de"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-de"/></svg><span>Deutsch</span></a></li></ul></li>
             <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
-        <div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Entrar</button></div>
+        <div class="nav-auth" id="nav-auth"><button class="btn-nav-outline" onclick="closeMenu(); openAuthModal('login');">Entrar</button><a href="#configurateur" class="btn-nav-cta" onclick="closeMenu()">Experimentar grátis</a></div>
     </nav>
 </header>
 
 <main>
     <!-- HERO SECTION -->
-    <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 1.5rem;">
-        <div class="hero-emoji" id="hero-emoji" aria-hidden="true">⭐</div>
-        <h1>Receba mais <span class="rotator highlight" id="hero-rotator"><span class="rot-track"><span class="rot-item">avaliações no Google</span></span></span> com uma roleta da sorte por QR code.</h1>
-        <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
-            Cada avaliação de 5 estrelas que falta é um cliente que escolhe a concorrência no Google Maps. Transforme o seu balcão numa máquina de avaliações, curtidas e contatos qualificados com um jogo-concurso à sua imagem: crie-o abaixo, <strong>gratuitamente</strong>, em 1 minuto.
-        </p>
-        <div class="text-center">
-            <a href="#configurateur" class="btn hover-effect">Criar o meu jogo personalizado</a>
-            <p style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">Experimente grátis • Configuração em 1 minuto</p>
-        </div>
-        <div class="trade-marquee" aria-hidden="true">
-            <div class="trade-marquee-track">
-                <div class="trade-marquee-group"><span>🥖 Padaria</span><span>💇 Cabeleireiro</span><span>🔧 Oficina mecânica</span><span>🍽️ Restaurante</span><span>🦷 Dentista</span><span>👗 Loja de moda</span><span>🏨 Hotel</span><span>🌸 Floricultura</span><span>🏋️ Academia</span><span>🍷 Adega</span><span>🐾 Veterinário</span><span>🏠 Imobiliária</span><span>🎮 Games</span><span>💅 Esmalteria</span><span>🛒 Supermercado</span><span>📚 Livraria</span><span>⛽ Posto de gasolina</span><span>☕ Cafeteria</span><span>💊 Farmácia</span><span>🚲 Loja de bicicletas</span><span>🍕 Pizzaria</span><span>💍 Joalheria</span><span>🔨 Obras e reformas</span><span>🎳 Boliche</span><span>🥩 Açougue</span><span>👓 Ótica</span><span>🛋️ Móveis e decoração</span><span>🧖 Spa e salão de beleza</span><span>🏪 Mercearia</span><span>📱 Telefonia</span><span>⛺ Camping</span><span>🍰 Confeitaria</span><span>🚗 Concessionária</span><span>🧸 Loja de brinquedos</span><span>🩺 Consultório médico</span><span>🌱 Garden center</span><span>🍔 Fast food</span><span>🧺 Lavanderia</span><span>🎬 Cinema</span><span>🐟 Peixaria</span><span>💈 Barbearia</span><span>🛠️ Casa e construção</span><span>🧘 Estúdio de yoga</span><span>🍣 Sushi</span><span>📷 Fotógrafo</span><span>🛞 Loja de pneus</span><span>👟 Loja de calçados</span><span>🎁 Loja de presentes</span><span>🧀 Queijaria</span><span>💻 Informática</span><span>🚕 Táxi e transporte por app</span><span>🍦 Sorveteria</span><span>🏖️ Aluguel de temporada</span><span>🐶 Banho e tosa</span><span>🎢 Parque de diversões</span><span>🥦 Hortifrúti</span><span>🚿 Lava-rápido</span><span>💆 Massagem</span><span>🥞 Creperia</span><span>🛏️ Pousada</span><span>🎓 Autoescola</span><span>🍫 Chocolateria</span><span>🍺 Bar e cervejaria</span></div>
-                <div class="trade-marquee-group"><span>🥖 Padaria</span><span>💇 Cabeleireiro</span><span>🔧 Oficina mecânica</span><span>🍽️ Restaurante</span><span>🦷 Dentista</span><span>👗 Loja de moda</span><span>🏨 Hotel</span><span>🌸 Floricultura</span><span>🏋️ Academia</span><span>🍷 Adega</span><span>🐾 Veterinário</span><span>🏠 Imobiliária</span><span>🎮 Games</span><span>💅 Esmalteria</span><span>🛒 Supermercado</span><span>📚 Livraria</span><span>⛽ Posto de gasolina</span><span>☕ Cafeteria</span><span>💊 Farmácia</span><span>🚲 Loja de bicicletas</span><span>🍕 Pizzaria</span><span>💍 Joalheria</span><span>🔨 Obras e reformas</span><span>🎳 Boliche</span><span>🥩 Açougue</span><span>👓 Ótica</span><span>🛋️ Móveis e decoração</span><span>🧖 Spa e salão de beleza</span><span>🏪 Mercearia</span><span>📱 Telefonia</span><span>⛺ Camping</span><span>🍰 Confeitaria</span><span>🚗 Concessionária</span><span>🧸 Loja de brinquedos</span><span>🩺 Consultório médico</span><span>🌱 Garden center</span><span>🍔 Fast food</span><span>🧺 Lavanderia</span><span>🎬 Cinema</span><span>🐟 Peixaria</span><span>💈 Barbearia</span><span>🛠️ Casa e construção</span><span>🧘 Estúdio de yoga</span><span>🍣 Sushi</span><span>📷 Fotógrafo</span><span>🛞 Loja de pneus</span><span>👟 Loja de calçados</span><span>🎁 Loja de presentes</span><span>🧀 Queijaria</span><span>💻 Informática</span><span>🚕 Táxi e transporte por app</span><span>🍦 Sorveteria</span><span>🏖️ Aluguel de temporada</span><span>🐶 Banho e tosa</span><span>🎢 Parque de diversões</span><span>🥦 Hortifrúti</span><span>🚿 Lava-rápido</span><span>💆 Massagem</span><span>🥞 Creperia</span><span>🛏️ Pousada</span><span>🎓 Autoescola</span><span>🍫 Chocolateria</span><span>🍺 Bar e cervejaria</span></div>
+    <section id="accueil" class="hero2 animate-up">
+        <div class="hero2-grid">
+            <!-- ============ COLONNE GAUCHE : contenu & copywriting ============ -->
+            <div class="hero2-left">
+                <h1>Receba mais <span class="rotator highlight" id="hero-rotator"><span class="rot-track"><span class="rot-item">avaliações no Google</span></span></span><span class="seo-sr">, seguidores, clientes e dados de clientes</span> com uma roleta da sorte por QR code.</h1>
+                <div class="hero2-proof"><span class="hero2-stars" role="img" aria-label="5 estrelas em 5">★★★★★</span><span>Já adotado por <strong>+500 comércios</strong></span></div>
+                <a href="#configurateur" class="hero2-cta js-hero-spin">Crie o meu jogo personalizado em 1 minuto</a>
+                <a href="#configurateur" class="hero2-trial js-hero-spin" id="hero-promo">7 dias de teste 100% grátis</a>
+                <p class="hero2-desc">O Spin To Keep é a roleta por QR Code que traz mais avaliações, seguidores e clientes para o seu negócio. Seus clientes escaneiam, jogam, deixam uma avaliação ou seguem a sua marca e ganham um prêmio: você anima a sua loja, fideliza e coleta contatos em conformidade com o RGPD. <strong>Crie e teste o seu jogo gratuitamente abaixo, em 1 minuto.</strong></p>
             </div>
+
+            <!-- ============ COLONNE DROITE : visuels dynamiques (décoratifs) ============ -->
+            <div class="hero2-right" aria-hidden="true">
+                <div class="hero2-stage-wrap" id="hero-stage-wrap">
+                    <div class="hero2-stage">
+                        <div class="stage-table"></div>
+                        <!-- ► ÉLÉMENT 1 : CHEVALET (#hero-poster-slot = affiche du configurateur) -->
+                        <div class="easel" id="hero-easel">
+                            <div class="easel-poster" id="hero-poster-slot">
+                                <div class="cd-fx" aria-hidden="true" data-set="tresor"><span style="left:12%;top:10%;font-size:50px;--r:-20deg;animation-duration:6s;animation-delay:0s">💰</span><span style="left:82%;top:16%;font-size:67px;--r:-3deg;animation-duration:4.2s;animation-delay:-5s">🎉</span><span style="left:48%;top:30%;font-size:42px;--r:14deg;animation-duration:7s;animation-delay:-2s">💎</span><span style="left:16%;top:48%;font-size:58px;--r:-9deg;animation-duration:10s;animation-delay:-7s">🎊</span><span style="left:86%;top:52%;font-size:74px;--r:8deg;animation-duration:8s;animation-delay:-4s">💶</span><span style="left:50%;top:68%;font-size:45px;--r:-15deg;animation-duration:6s;animation-delay:-1s">🎈</span><span style="left:14%;top:86%;font-size:62px;--r:2deg;animation-duration:4.2s;animation-delay:-6s">👑</span><span style="left:80%;top:88%;font-size:54px;--r:19deg;animation-duration:7s;animation-delay:-3s">🎁</span></div>
+                                <div class="poster-top">
+                                    <div class="poster-emoji">🎁</div>
+                                    <div class="poster-title">Presentes para ganhar!</div>
+                                    <div class="poster-sub">Deixe uma avaliação para desbloquear a roleta.</div>
+                                </div>
+                                <div class="poster-qrcard">
+                                    <svg class="poster-qr" viewBox="0 0 33 33" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code Spin To Keep"><path fill="#111" d="M0 0h7v1h-7zM8 0h1v1h-1zM10 0h1v1h-1zM12 0h2v1h-2zM15 0h2v1h-2zM22 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM11 1h1v1h-1zM13 1h2v1h-2zM16 1h1v1h-1zM18 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h1v1h-1zM11 2h2v1h-2zM14 2h1v1h-1zM16 2h3v1h-3zM20 2h2v1h-2zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h2v1h-2zM15 3h3v1h-3zM21 3h3v1h-3zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h6v1h-6zM16 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h3v1h-3zM14 5h2v1h-2zM18 5h1v1h-1zM20 5h1v1h-1zM23 5h2v1h-2zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM17 7h1v1h-1zM19 7h4v1h-4zM24 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM6 8h5v1h-5zM12 8h1v1h-1zM15 8h4v1h-4zM20 8h4v1h-4zM25 8h5v1h-5zM32 8h1v1h-1zM4 9h1v1h-1zM14 9h5v1h-5zM21 9h1v1h-1zM23 9h1v1h-1zM25 9h1v1h-1zM29 9h3v1h-3zM0 10h1v1h-1zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h6v1h-6zM18 10h1v1h-1zM20 10h1v1h-1zM23 10h1v1h-1zM29 10h1v1h-1zM31 10h1v1h-1zM0 11h1v1h-1zM2 11h2v1h-2zM7 11h4v1h-4zM12 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h1v1h-1zM26 11h1v1h-1zM0 12h2v1h-2zM4 12h1v1h-1zM6 12h2v1h-2zM10 12h2v1h-2zM13 12h1v1h-1zM15 12h2v1h-2zM19 12h1v1h-1zM22 12h2v1h-2zM25 12h5v1h-5zM31 12h1v1h-1zM3 13h1v1h-1zM5 13h1v1h-1zM7 13h3v1h-3zM13 13h2v1h-2zM17 13h5v1h-5zM24 13h4v1h-4zM29 13h2v1h-2zM0 14h2v1h-2zM3 14h1v1h-1zM6 14h2v1h-2zM9 14h2v1h-2zM13 14h1v1h-1zM15 14h1v1h-1zM18 14h1v1h-1zM20 14h7v1h-7zM28 14h1v1h-1zM31 14h1v1h-1zM1 15h2v1h-2zM4 15h1v1h-1zM9 15h1v1h-1zM12 15h1v1h-1zM14 15h4v1h-4zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h4v1h-4zM1 16h2v1h-2zM5 16h3v1h-3zM9 16h1v1h-1zM11 16h1v1h-1zM13 16h2v1h-2zM16 16h2v1h-2zM19 16h4v1h-4zM24 16h1v1h-1zM26 16h1v1h-1zM28 16h2v1h-2zM31 16h1v1h-1zM1 17h3v1h-3zM5 17h1v1h-1zM7 17h4v1h-4zM12 17h4v1h-4zM18 17h1v1h-1zM23 17h2v1h-2zM29 17h3v1h-3zM4 18h1v1h-1zM6 18h3v1h-3zM10 18h1v1h-1zM12 18h2v1h-2zM15 18h1v1h-1zM17 18h1v1h-1zM20 18h8v1h-8zM29 18h1v1h-1zM31 18h1v1h-1zM1 19h2v1h-2zM4 19h1v1h-1zM7 19h1v1h-1zM13 19h2v1h-2zM17 19h3v1h-3zM21 19h1v1h-1zM24 19h1v1h-1zM26 19h2v1h-2zM31 19h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM11 20h1v1h-1zM15 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM24 20h1v1h-1zM27 20h3v1h-3zM0 21h2v1h-2zM4 21h1v1h-1zM7 21h1v1h-1zM9 21h2v1h-2zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM19 21h1v1h-1zM21 21h2v1h-2zM25 21h3v1h-3zM30 21h2v1h-2zM4 22h1v1h-1zM6 22h1v1h-1zM8 22h2v1h-2zM11 22h2v1h-2zM14 22h1v1h-1zM16 22h1v1h-1zM19 22h1v1h-1zM25 22h1v1h-1zM28 22h4v1h-4zM4 23h1v1h-1zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM17 23h6v1h-6zM24 23h3v1h-3zM31 23h2v1h-2zM0 24h3v1h-3zM6 24h3v1h-3zM10 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM20 24h9v1h-9zM32 24h1v1h-1zM8 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM17 25h2v1h-2zM21 25h4v1h-4zM28 25h1v1h-1zM30 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM18 26h1v1h-1zM20 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM11 27h2v1h-2zM14 27h2v1h-2zM19 27h2v1h-2zM22 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h2v1h-2zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h2v1h-2zM11 28h3v1h-3zM15 28h2v1h-2zM22 28h1v1h-1zM24 28h6v1h-6zM31 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM9 29h1v1h-1zM11 29h1v1h-1zM17 29h4v1h-4zM23 29h1v1h-1zM26 29h4v1h-4zM31 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM9 30h3v1h-3zM13 30h3v1h-3zM18 30h1v1h-1zM20 30h2v1h-2zM25 30h4v1h-4zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM11 31h1v1h-1zM15 31h4v1h-4zM21 31h2v1h-2zM29 31h1v1h-1zM0 32h7v1h-7zM8 32h1v1h-1zM13 32h2v1h-2zM17 32h1v1h-1zM19 32h4v1h-4zM24 32h1v1h-1zM26 32h1v1h-1zM32 32h1v1h-1z"/></svg>
+                                    <div class="poster-cap">Escaneie-me</div>
+                                </div>
+                                <div class="poster-foot">Jogo gratuito · Sem obrigação de compra*</div>
+                            </div>
+                            <div class="easel-lip"></div>
+                        </div>
+                        <!-- ► ÉLÉMENT 2 : SMARTPHONE (copie du mockup par défaut du configurateur, étape « Jeu ») -->
+                        <div class="phone" id="hero-phone">
+                            <div class="phone-screen">
+                                <!-- Écran = copie fidèle du mockup par défaut du configurateur (étape « Jeu ») : même fond, mêmes emojis flottants, même roue -->
+                                <div class="hero-mock">
+                                    <div class="cd-fx" aria-hidden="true" data-set="tresor"><span style="left:12%;top:10%;font-size:62px;--r:-20deg;animation-duration:6s;animation-delay:0s">💰</span><span style="left:82%;top:16%;font-size:84px;--r:-3deg;animation-duration:4.2s;animation-delay:-5s">🎉</span><span style="left:48%;top:30%;font-size:52px;--r:14deg;animation-duration:7s;animation-delay:-2s">💎</span><span style="left:16%;top:48%;font-size:72px;--r:-9deg;animation-duration:10s;animation-delay:-7s">🎊</span><span style="left:86%;top:52%;font-size:92px;--r:8deg;animation-duration:8s;animation-delay:-4s">💶</span><span style="left:50%;top:68%;font-size:56px;--r:-15deg;animation-duration:6s;animation-delay:-1s">🎈</span><span style="left:14%;top:86%;font-size:78px;--r:2deg;animation-duration:4.2s;animation-delay:-6s">👑</span><span style="left:80%;top:88%;font-size:68px;--r:19deg;animation-duration:7s;animation-delay:-3s">🎁</span></div>
+                                    <div class="hero-wtitle">Gire a roleta e tente ganhar* vários presentes!</div>
+                                    <div class="wheel-shell" id="hero-wheel-slot">
+                                        <div class="wheel-ring" id="hero-wheel-ring" style="width:200px;height:200px;border-width:9px;">
+                                            <div class="wheel-pointer-clean" id="hero-pointer"></div>
+                                            <canvas id="hero-wheel" width="400" height="400" style="transition:none"></canvas>
+                                            <div class="wheel-hub" style="width:40px;height:40px;"><div class="logo-emoji-fallback" style="display:flex;font-size:55%;">🎁</div></div>
+                                            <div id="hero-bulbs"><div class="wheel-dot" style="left:100.0000%;top:50.0000%;transform:translate(-50%,-50%);animation-delay:0.0s"></div><div class="wheel-dot" style="left:85.3553%;top:85.3553%;transform:translate(-50%,-50%);animation-delay:0.4s"></div><div class="wheel-dot" style="left:50.0000%;top:100.0000%;transform:translate(-50%,-50%);animation-delay:0.8s"></div><div class="wheel-dot" style="left:14.6447%;top:85.3553%;transform:translate(-50%,-50%);animation-delay:1.2s"></div><div class="wheel-dot" style="left:0.0000%;top:50.0000%;transform:translate(-50%,-50%);animation-delay:1.6s"></div><div class="wheel-dot" style="left:14.6447%;top:14.6447%;transform:translate(-50%,-50%);animation-delay:2.0s"></div><div class="wheel-dot" style="left:50.0000%;top:0.0000%;transform:translate(-50%,-50%);animation-delay:2.4s"></div><div class="wheel-dot" style="left:85.3553%;top:14.6447%;transform:translate(-50%,-50%);animation-delay:2.8s"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-black" id="hero-spin-btn" style="background:#FF3D77;color:#fff;font-size:10px;padding:10px 20px;width:150px;margin-top:8px;">GIRAR A ROLETA</div>
+                                    <div class="phone-result" id="hero-result"></div>
+                                </div>
+                                <div class="phone-island"></div><div class="phone-time">9:41</div><div class="phone-batt"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ PIED DE SECTION : réassurance (2 lignes, même police / même taille) ============ -->
+        <div class="hero2-trust">
+            <div class="trust-row" aria-hidden="true"><div class="trust-track"><div class="trust-group"><span><i class="emo">🥖</i>Padaria</span><span><i class="emo">💇</i>Cabeleireiro</span><span><i class="emo">🔧</i>Oficina mecânica</span><span><i class="emo">🍽️</i>Restaurante</span><span><i class="emo">🦷</i>Dentista</span><span><i class="emo">👗</i>Loja de moda</span><span><i class="emo">🏨</i>Hotel</span><span><i class="emo">🌸</i>Floricultura</span><span><i class="emo">🏋️</i>Academia</span><span><i class="emo">🍷</i>Adega</span><span><i class="emo">🐾</i>Veterinário</span><span><i class="emo">🏠</i>Imobiliária</span><span><i class="emo">🎮</i>Games</span><span><i class="emo">💅</i>Esmalteria</span><span><i class="emo">🛒</i>Supermercado</span><span><i class="emo">📚</i>Livraria</span><span><i class="emo">⛽</i>Posto de gasolina</span><span><i class="emo">☕</i>Cafeteria</span><span><i class="emo">💊</i>Farmácia</span><span><i class="emo">🚲</i>Loja de bicicletas</span><span><i class="emo">🍕</i>Pizzaria</span><span><i class="emo">💍</i>Joalheria</span><span><i class="emo">🔨</i>Obras e reformas</span><span><i class="emo">🎳</i>Boliche</span><span><i class="emo">🥩</i>Açougue</span><span><i class="emo">👓</i>Ótica</span><span><i class="emo">🛋️</i>Móveis e decoração</span><span><i class="emo">🧖</i>Spa e salão de beleza</span><span><i class="emo">🏪</i>Mercearia</span><span><i class="emo">📱</i>Telefonia</span><span><i class="emo">⛺</i>Camping</span><span><i class="emo">🍰</i>Confeitaria</span><span><i class="emo">🚗</i>Concessionária</span><span><i class="emo">🧸</i>Loja de brinquedos</span><span><i class="emo">🩺</i>Consultório médico</span><span><i class="emo">🌱</i>Garden center</span><span><i class="emo">🍔</i>Fast food</span><span><i class="emo">🧺</i>Lavanderia</span><span><i class="emo">🎬</i>Cinema</span><span><i class="emo">🐟</i>Peixaria</span><span><i class="emo">💈</i>Barbearia</span><span><i class="emo">🛠️</i>Casa e construção</span><span><i class="emo">🧘</i>Estúdio de yoga</span><span><i class="emo">🍣</i>Sushi</span><span><i class="emo">📷</i>Fotógrafo</span><span><i class="emo">🛞</i>Loja de pneus</span><span><i class="emo">👟</i>Loja de calçados</span><span><i class="emo">🎁</i>Loja de presentes</span><span><i class="emo">🧀</i>Queijaria</span><span><i class="emo">💻</i>Informática</span><span><i class="emo">🚕</i>Táxi e transporte por app</span><span><i class="emo">🍦</i>Sorveteria</span><span><i class="emo">🏖️</i>Aluguel de temporada</span><span><i class="emo">🐶</i>Banho e tosa</span><span><i class="emo">🎢</i>Parque de diversões</span><span><i class="emo">🥦</i>Hortifrúti</span><span><i class="emo">🚿</i>Lava-rápido</span><span><i class="emo">💆</i>Massagem</span><span><i class="emo">🥞</i>Creperia</span><span><i class="emo">🛏️</i>Pousada</span><span><i class="emo">🎓</i>Autoescola</span><span><i class="emo">🍫</i>Chocolateria</span><span><i class="emo">🍺</i>Bar e cervejaria</span></div><div class="trust-group"><span><i class="emo">🥖</i>Padaria</span><span><i class="emo">💇</i>Cabeleireiro</span><span><i class="emo">🔧</i>Oficina mecânica</span><span><i class="emo">🍽️</i>Restaurante</span><span><i class="emo">🦷</i>Dentista</span><span><i class="emo">👗</i>Loja de moda</span><span><i class="emo">🏨</i>Hotel</span><span><i class="emo">🌸</i>Floricultura</span><span><i class="emo">🏋️</i>Academia</span><span><i class="emo">🍷</i>Adega</span><span><i class="emo">🐾</i>Veterinário</span><span><i class="emo">🏠</i>Imobiliária</span><span><i class="emo">🎮</i>Games</span><span><i class="emo">💅</i>Esmalteria</span><span><i class="emo">🛒</i>Supermercado</span><span><i class="emo">📚</i>Livraria</span><span><i class="emo">⛽</i>Posto de gasolina</span><span><i class="emo">☕</i>Cafeteria</span><span><i class="emo">💊</i>Farmácia</span><span><i class="emo">🚲</i>Loja de bicicletas</span><span><i class="emo">🍕</i>Pizzaria</span><span><i class="emo">💍</i>Joalheria</span><span><i class="emo">🔨</i>Obras e reformas</span><span><i class="emo">🎳</i>Boliche</span><span><i class="emo">🥩</i>Açougue</span><span><i class="emo">👓</i>Ótica</span><span><i class="emo">🛋️</i>Móveis e decoração</span><span><i class="emo">🧖</i>Spa e salão de beleza</span><span><i class="emo">🏪</i>Mercearia</span><span><i class="emo">📱</i>Telefonia</span><span><i class="emo">⛺</i>Camping</span><span><i class="emo">🍰</i>Confeitaria</span><span><i class="emo">🚗</i>Concessionária</span><span><i class="emo">🧸</i>Loja de brinquedos</span><span><i class="emo">🩺</i>Consultório médico</span><span><i class="emo">🌱</i>Garden center</span><span><i class="emo">🍔</i>Fast food</span><span><i class="emo">🧺</i>Lavanderia</span><span><i class="emo">🎬</i>Cinema</span><span><i class="emo">🐟</i>Peixaria</span><span><i class="emo">💈</i>Barbearia</span><span><i class="emo">🛠️</i>Casa e construção</span><span><i class="emo">🧘</i>Estúdio de yoga</span><span><i class="emo">🍣</i>Sushi</span><span><i class="emo">📷</i>Fotógrafo</span><span><i class="emo">🛞</i>Loja de pneus</span><span><i class="emo">👟</i>Loja de calçados</span><span><i class="emo">🎁</i>Loja de presentes</span><span><i class="emo">🧀</i>Queijaria</span><span><i class="emo">💻</i>Informática</span><span><i class="emo">🚕</i>Táxi e transporte por app</span><span><i class="emo">🍦</i>Sorveteria</span><span><i class="emo">🏖️</i>Aluguel de temporada</span><span><i class="emo">🐶</i>Banho e tosa</span><span><i class="emo">🎢</i>Parque de diversões</span><span><i class="emo">🥦</i>Hortifrúti</span><span><i class="emo">🚿</i>Lava-rápido</span><span><i class="emo">💆</i>Massagem</span><span><i class="emo">🥞</i>Creperia</span><span><i class="emo">🛏️</i>Pousada</span><span><i class="emo">🎓</i>Autoescola</span><span><i class="emo">🍫</i>Chocolateria</span><span><i class="emo">🍺</i>Bar e cervejaria</span></div></div></div>
+            <div class="trust-row rev" aria-hidden="true"><div class="trust-track"><div class="trust-group"><span>McDonald's</span><span>SPAR</span><span>Intersport</span><span>Best Western</span><span>Subway</span><span>7-Eleven</span><span>Domino's Pizza</span><span>Ace Hardware</span><span>KFC</span><span>Hard Rock Cafe</span><span>Yves Rocher</span><span>Interflora</span></div><div class="trust-group"><span>McDonald's</span><span>SPAR</span><span>Intersport</span><span>Best Western</span><span>Subway</span><span>7-Eleven</span><span>Domino's Pizza</span><span>Ace Hardware</span><span>KFC</span><span>Hard Rock Cafe</span><span>Yves Rocher</span><span>Interflora</span></div></div></div>
         </div>
 
         <div class="event-banner" id="event-banner" hidden>
@@ -1595,7 +1903,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 <div id="toast-container"></div>
 
 <!-- ============ TOPBAR ============ -->
-<div class="topbar" id="topbar" style="display:none;">
+<div class="topbar is-guest" id="topbar" style="display:none;">
     <div class="topbar-brand"><span class="dot"></span> SpinToKeep</div>
     <div class="topbar-actions" id="topbar-actions">
         <button class="btn-ghost" id="btn-login-open" onclick="openAuthModal('login')">Entrar</button>
@@ -1607,7 +1915,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 <div class="main-wrapper" id="main-content">
     <div class="panel panel-config">
         <div class="panel-heading">
-            <h2 class="title" id="conf-title">Configuração do seu jogo</h2>
+            <div class="ui-h ui-h2 title" id="conf-title">Configuração do seu jogo</div>
         </div>
         <p class="subtitle" id="conf-subtitle">Siga os passos abaixo; a pré-visualização à direita atualiza ao vivo.</p>
 
@@ -1807,8 +2115,8 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
                     <input type="text" id="google_url" class="full-width" value="https://search.google.com/local/writereview?placeid=ChIJx_26Jupv5kcR47OyH6966iE" oninput="update()">
                 </div>
                 <div class="lock-overlay" id="url-lock-overlay">
-                    <div class="lock-text">🔒 O <strong>URL personalizado</strong> está reservado ao Premium. Passe a Premium para redirecionar para o seu próprio link.</div>
-                    <button class="btn-premium" onclick="openPremiumFlow()">Desbloquear</button>
+                    <div class="lock-text">🔒 O <strong>URL personalizado</strong> está reservado ao Premium. Passe a Premium (7 dias grátis) para redirecionar para o seu próprio link.</div>
+                    <button class="btn-premium" onclick="openPremiumFlow()">Desbloquear os meus 7 dias grátis</button>
                 </div>
 
                 <div style="background:#eef6ff; border:1px solid #cfe4fb; border-radius:12px; padding:12px 14px; margin-top:14px; font-size:12px; color:#0a4a8a; line-height:1.5;">
@@ -1832,7 +2140,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
         <div id="qr-display">
             <div id="qrcode-area">
                 <img id="qr-logo-top" src="" style="max-width:150px; max-height:80px; margin-bottom:10px; display:block; margin-left:auto; margin-right:auto;" loading="lazy">
-                <h3 id="qr-title" style="margin:0; font-size:22px; color:#000; font-weight:bold;">Um prêmio para ganhar! ✨</h3>
+                <div class="ui-h ui-h3" id="qr-title" style="margin:0; font-size:22px; color:#000; font-weight:bold;">Um prêmio para ganhar! ✨</div>
                 <p id="qr-scan-text" style="margin:5px 0 0 0; font-size:16px; font-weight:bold; color:#333;">Escaneie-me</p>
                 <div id="qrcode"></div>
                 <p id="qr-id-display" style="font-family:monospace; font-weight:bold; margin-top:5px; color:#555;"></p>
@@ -1849,7 +2157,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
     </div>
 
     <div class="panel panel-preview">
-        <h2 class="title" id="prev-title">Pré-visualização do percurso do cliente</h2>
+        <div class="ui-h ui-h2 title" id="prev-title">Pré-visualização do percurso do cliente</div>
         <p class="subtitle">O que verá, ao vivo, quem escanear o QR code.</p>
         <div class="preview-nav" id="preview-nav"></div>
         <div class="preview-grid">
@@ -1858,7 +2166,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
                 <div style="margin-top:40px;">
                     <img id="pre-logo-pop" src="" style="max-width:100px; margin-bottom:15px;" loading="lazy">
                     <div style="padding:15px;">
-                        <h4 id="pre-t1" style="margin:0 0 10px 0; font-size:14px;"></h4>
+                        <div class="ui-h ui-h4" id="pre-t1" style="margin:0 0 10px 0; font-size:14px;"></div>
                         <p id="pre-t2" style="font-size:10px;"></p>
                         <div class="btn-black" id="pre-t3" style="font-size:10px; padding:8px 15px;"></div>
                         <p id="pre-skip-avis-link-avis" style="display:none; font-size:9.5px; text-align:center; margin-top:10px; text-decoration:underline; color:var(--muted); cursor:pointer;">Continuar sem deixar avaliação</p>
@@ -1868,7 +2176,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             <div class="screen-mockup-wrap" id="pre-wrap2"><div class="screen-mockup" id="pre-s2">
                 <span class="screen-label" id="stp2-lbl">Passo 2: Formulário</span>
                 <div style="margin-top:30px; text-align:left; padding:0 10px;">
-                    <h5 id="pre-t-last" style="margin:0 0 10px 0; text-align:center;"></h5>
+                    <div class="ui-h ui-h5" id="pre-t-last" style="margin:0 0 10px 0; text-align:center;"></div>
                     <div class="mock-form">
                         <input type="text" id="pre-ph-name" placeholder="" disabled>
                         <input type="text" id="pre-ph-email" placeholder="" disabled>
@@ -1886,7 +2194,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             </div></div>
             <div class="screen-mockup-wrap" id="pre-wrap3"><div class="screen-mockup" id="pre-s3">
                 <span class="screen-label" id="stp3-lbl">Passo 3: Jogo</span>
-                <h4 id="pre-twheel" style="margin:10px 0; font-size:14px;"></h4>
+                <div class="ui-h ui-h4" id="pre-twheel" style="margin:10px 0; font-size:14px;"></div>
 
                 <div id="pre-block-wheel">
                     <div class="wheel-shell">
@@ -1942,7 +2250,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
                 <span class="screen-label" id="stp4-lbl">Passo 4: Resultado</span>
                 <div class="gain-box" style="margin-top:30px;">
                     <img id="pre-logo-gain" src="" style="max-width:50px; margin-bottom:10px;" loading="lazy">
-                    <h4 id="pre-t-thanks" style="margin:0; font-size:13px;"></h4>
+                    <div class="ui-h ui-h4" id="pre-t-thanks" style="margin:0; font-size:13px;"></div>
                     <p style="font-size:12px; font-weight:bold; margin:10px 0;"><span id="pre-t-res"></span> <span id="preview-win-txt">[Nome do prêmio]</span></p>
                     <div class="btn-black" id="pre-avis-end-btn" style="display:none; font-size:9.5px; padding:8px 14px; margin:8px auto 0 auto; width:fit-content;"></div>
                     <p id="pre-cond" style="font-size:8px; border-top:1px solid rgba(0,0,0,.1); padding-top:10px; margin-top:10px; text-align:justify; line-height:1.2;"></p>
@@ -1959,7 +2267,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 <!-- ============ DASHBOARD ============ -->
 <div id="dashboard-view">
     <div class="dash-header">
-        <h1>O meu Dashboard</h1>
+        <div class="ui-h ui-h1">O meu Dashboard</div>
         <div class="dash-header-actions">
             <button class="btn-ghost" onclick="startNewConfig()">+ Nova roleta</button>
             <button class="btn-ghost" onclick="exportAllParticipantsCSV()">⬇️ Exportar todos os meus clientes (CSV)</button>
@@ -1968,13 +2276,13 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
     </div>
 
     <div class="dash-upsell" id="dash-upsell" style="display:none;">
-        <div class="txt"><strong>🔒 Desbloqueie o URL personalizado</strong><span>Passe a Premium (9,90 €/mês) para redirecionar as suas roletas para o seu próprio link.</span></div>
-        <button class="btn-premium" onclick="openPremiumFlow()">Ver Premium</button>
+        <div class="txt"><strong>🔒 Desbloqueie o URL personalizado</strong><span>Passe a Premium (7 dias grátis, depois 9,90 €/mês) para redirecionar as suas roletas para o seu próprio link.</span></div>
+        <button class="btn-premium" onclick="openPremiumFlow()">Desbloquear os meus 7 dias grátis</button>
     </div>
 
     <div class="dash-body">
         <div class="dash-col-list">
-            <h3 class="dash-section-title">Histórico das minhas roletas</h3>
+            <div class="ui-h ui-h3 dash-section-title">Histórico das minhas roletas</div>
             <div id="dash-list" class="dash-list"></div>
         </div>
         <div class="dash-col-stats">
@@ -1992,7 +2300,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             <div class="dash-charts">
                 <div class="dash-chart-box" style="grid-column: 1 / -1;">
                     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-                        <h4 style="margin:0;">📈 Evolução num período</h4>
+                        <div class="ui-h ui-h4" style="margin:0;">📈 Evolução num período</div>
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                             <label style="font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:5px;">De <input type="date" id="dash-date-start" style="padding:6px 8px; font-size:12.5px; width:auto;"></label>
                             <label style="font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:5px;">a <input type="date" id="dash-date-end" style="padding:6px 8px; font-size:12.5px; width:auto;"></label>
@@ -2002,11 +2310,11 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
                     <div class="chart-wrap"><canvas id="dash-chart-evolution"></canvas></div>
                 </div>
                 <div class="dash-chart-box">
-                    <h4>📊 Distribuição Ganho / Perdido</h4>
+                    <div class="ui-h ui-h4">📊 Distribuição Ganho / Perdido</div>
                     <div class="chart-wrap"><canvas id="dash-chart-winloss"></canvas></div>
                 </div>
                 <div class="dash-chart-box">
-                    <h4>🏆 Top dos prêmios distribuídos</h4>
+                    <div class="ui-h ui-h4">🏆 Top dos prêmios distribuídos</div>
                     <div class="chart-wrap"><canvas id="dash-chart-toplots"></canvas></div>
                 </div>
             </div>
@@ -2018,7 +2326,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 <div class="modal-overlay" id="auth-modal">
     <div class="modal-box">
         <button class="modal-close" onclick="closeAuthModal()">×</button>
-        <h3 class="modal-title" id="auth-modal-title">Acesse sua conta</h3>
+        <div class="ui-h ui-h3 modal-title" id="auth-modal-title">Acesse sua conta</div>
         <p class="modal-sub" id="auth-modal-sub">Crie uma conta para desbloquear o URL personalizado e acompanhar as suas roletas.</p>
         <div class="auth-tabs" id="auth-tabs">
             <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Entrar</div>
@@ -2068,7 +2376,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 <div class="modal-overlay" id="poster-preview-modal">
     <div class="modal-box wide">
         <button class="modal-close" onclick="closePosterPreview()">×</button>
-        <h3 class="modal-title">Pré-visualização dos seus pôsteres</h3>
+        <div class="ui-h ui-h3 modal-title">Pré-visualização dos seus pôsteres</div>
         <p class="modal-sub">Verifique o resultado antes de baixar o PDF (A4, A5, A6, A4 horizontal).</p>
         <div id="poster-preview-images" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:14px; margin-bottom:18px;"></div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -2082,7 +2390,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
 <div class="modal-overlay" id="premium-modal">
     <div class="modal-box">
         <button class="modal-close" onclick="closePremiumModal()">×</button>
-        <h3 class="modal-title">Passar a Premium</h3>
+        <div class="ui-h ui-h3 modal-title">Passar a Premium</div>
         <p class="modal-sub">Desbloqueie o URL de destino personalizado e o dashboard completo.</p>
         <div class="premium-price"><div class="amount">9,90 € <span>com impostos / mês</span></div></div>
         <ul class="premium-benefits">
@@ -2095,6 +2403,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             Faça login ou crie uma conta antes de pagar, para associar o Premium à sua conta.
         </div>
         <div id="paypal-button-container"></div>
+        <p class="trial-reassure">7 dias de teste 100% grátis. Só será cobrado 9,90 € no 8.º dia. Cancele com um clique durante o teste para não pagar nada.</p>
 
         <div class="promo-code-box">
             <button type="button" class="promo-toggle" onclick="togglePromoBox()">Tenho um código promocional</button>
@@ -2122,12 +2431,27 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
     <div class="container animate-up" style="margin-bottom: 4rem;">
         <div class="hover-effect" style="background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%); border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 900px; margin: 0 auto;">
             <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">🚀 + 200 avaliações ⭐ e seguidores de «curtir» 👍 em 1 mês*</h2>
-            <p style="margin:0; font-size: 1.2rem; color: var(--text-primary);">Cada nova avaliação reforça o seu SEO local e tranquiliza os próximos clientes: impulsione a sua visibilidade no Google, Instagram ou TripAdvisor.</p>
+            <p style="margin:0; font-size: 1.2rem; color: var(--text-primary);">Cada avaliação de 5 estrelas que falta é um cliente que escolhe a concorrência no Google Maps. Cada nova avaliação reforça o seu SEO local e tranquiliza os próximos clientes: impulsione a sua visibilidade no Google, Instagram ou TripAdvisor.</p>
         </div>
     </div>
 
     <!-- CONCEPT SECTION -->
-    <section id="concept">
+    <section id="en-bref" class="animate-up" style="padding: 0 1.25rem 1rem;">
+    <div class="en-bref">
+        <h2>Spin To Keep em resumo: o jogo por QR Code para mais avaliações no Google</h2>
+        <dl>
+            <dt>O que é?</dt><dd>Um serviço online de jogos promocionais por QR Code (roleta da sorte, caça-níqueis…) para comerciantes.</dd>
+            <dt>Para quem?</dt><dd>Qualquer ponto de venda: restaurantes, lojas, salões, oficinas, hotéis…</dd>
+            <dt>Para que serve?</dt><dd>Coletar avaliações no Google, seguidores (Instagram, TikTok, Facebook…) e dados de clientes, animando o seu negócio.</dd>
+            <dt>Como funciona?</dt><dd>O cliente escaneia o QR Code, joga, deixa uma avaliação ou segue a sua marca e descobre o prêmio.</dd>
+            <dt>Quanto custa?</dt><dd>Criação e teste gratuitos; acesso completo por 9,90 € por mês (impostos incluídos), sem taxa de adesão.</dd>
+            <dt>E os meus dados?</dt><dd>Consentimento explícito (opt-in), dados armazenados na União Europeia, exportação CSV dos seus contatos.</dd>
+            <dt>Idiomas</dt><dd>Francês, inglês, português, espanhol, alemão, russo, hindi, árabe, chinês e bengali.</dd>
+        </dl>
+    </div>
+</section>
+
+<section id="concept">
         <h2>Como transformar cada passagem pela caixa numa avaliação no Google?</h2>
         <p class="text-center" style="margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
             Chega de folhetos ignorados e pedidos de avaliação constrangedores! A gamificação no ponto de venda (roleta da sorte, slot machine) elimina o atrito: o cliente escaneia um QR code, joga e passa à ação em menos de um minuto. Resultado: mais avaliações, mais contatos, mais regressos à loja.
@@ -2789,7 +3113,10 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             
             <div class="pricing-card hover-effect">
                 <h3 style="font-size: 1.8rem; margin-bottom: 0;">Plano Premium Access</h3>
-                <div class="pricing-price">9,90 € <span>com impostos / mês</span></div>
+                <p class="pricing-strike"><s>Taxa de adesão: 49 €</s> <span class="pricing-offered">Grátis</span></p>
+                <p class="pricing-today">Hoje:</p>
+                <div class="pricing-price">0 €</div>
+                <p class="pricing-then">depois 9,90 €/mês (impostos incluídos) após 7 dias de teste grátis</p>
                 <p style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Sem compromisso de prazo</p>
                 <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">Pagamento 100% seguro via PayPal. <em>(Não é necessária conta PayPal para pagar com cartão bancário).</em></p>
                 
@@ -2805,8 +3132,8 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
                      d'un bouton PayPal statique indépendant : ça garantit qu'un compte existe
                      avant paiement, et que l'abonnement est bien vérifié + activé via
                      l'Edge Function verify-paypal-subscription (pas juste une alert()). -->
-                <button class="btn-black" style="width:100%; padding:16px; font-size:15px; border-radius:50px;" onclick="openPremiumFlow()">⭐ Passar para Premium</button>
-                <p style="font-size: 12.5px; color: var(--muted); margin-top: 10px;">Será solicitada uma conta gratuita antes do pagamento (30 segundos, serve para você reencontrar suas roletas e seus clientes).</p>
+                <button class="btn-black" style="width:100%; padding:16px; font-size:15px; border-radius:50px;" onclick="openPremiumFlow()">⭐ Começar os meus 7 dias grátis</button>
+                <p style="font-size: 12.5px; color: var(--muted); margin-top: 10px;">Será pedida uma conta gratuita antes de iniciar o teste (30 segundos, permite reencontrar as suas roletas e os seus clientes).</p>
 
                 <p style="font-size: 0.8rem; margin-top: 1.5rem;">A personalização do URL de destino (para a ação de avaliação, curtida ou seguir) é desbloqueada imediatamente com esta assinatura.</p>
             </div>
@@ -2833,7 +3160,7 @@ html[lang="ar"] .event-next { right: auto; left: 4px; }
             </details>
             <details>
                 <summary>Quanto tempo leva a configuração do jogo-concurso?</summary>
-                <p>Menos de 5 minutos. A interface do software foi pensada especificamente para comerciantes com pressa: você envia seu logotipo, escolhe suas cores, lista seus presentes e sua campanha de marketing fica pronta para uso na hora. O QR Code é gerado automaticamente.</p>
+                <p>Em 1 minuto. A interface do software foi pensada especificamente para comerciantes com pressa: você envia seu logotipo, escolhe suas cores, lista seus presentes e sua campanha de marketing fica pronta para uso na hora. O QR Code é gerado automaticamente.</p>
             </details>
             <details>
                 <summary>Para quais plataformas posso redirecionar meus clientes ganhadores?</summary>
@@ -3204,7 +3531,7 @@ if(slider) {
     const PAYPAL_TEST_MODE = false; // → true pendant vos tests, repassez à false en prod
 
     const PAYPAL_LIVE_CLIENT_ID = "Ab_-vEhX2Woi4kUQ4UWQlt-LgLnk_43miGPDSwMvV-9lYf7ANcMlXN5pR-XxahPeSggMBrdL_3Xvokak";
-    const PAYPAL_LIVE_PLAN_ID = "P-16K40079FK484592LNF4PL2Q";
+    const PAYPAL_LIVE_PLAN_ID = "P-7LF77960FL039693ANLVQZJQ";
     const PAYPAL_SANDBOX_CLIENT_ID = "ASc59-JlaBgcQHuPlBGH72iJVuyONvZDwmuEuc-SMrRgP_LR98txizXKuuJnoXda1PdkGR0jD1gQXf1Q";
     const PAYPAL_SANDBOX_PLAN_ID = "P-6TM45236VA047520RNKHLOTI";
 
@@ -3440,6 +3767,9 @@ if(slider) {
     });
 
     function renderAuthUI() {
+        // La barre interne du configurateur ne sert qu'aux utilisateurs connectés (les visiteurs ont déjà « Se connecter » dans l'en-tête)
+        const topbarEl = document.getElementById('topbar');
+        if (topbarEl) topbarEl.classList.toggle('is-guest', !currentUser);
         const actions = document.getElementById('topbar-actions');
         const mobileActions = document.getElementById('topbar-menu-mobile');
         const navAuth = document.getElementById('nav-auth');
@@ -3448,7 +3778,7 @@ if(slider) {
             const html = `<button class="btn-ghost" onclick="openAuthModal('login')">Entrar</button>`;
             if (actions) actions.innerHTML = html;
             if (mobileActions) mobileActions.innerHTML = html;
-            if (navAuth) navAuth.innerHTML = `<button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Entrar</button>`;
+            if (navAuth) navAuth.innerHTML = `<button class="btn-nav-outline" onclick="closeMenu(); openAuthModal('login');">Entrar</button><a href="#configurateur" class="btn-nav-cta" onclick="closeMenu()">Experimentar grátis</a>`;
             const navAuthMobileOut = document.getElementById('nav-auth-mobile');
             if (navAuthMobileOut) navAuthMobileOut.innerHTML = '';
             if (navEl) navEl.classList.remove('logged-in');
@@ -6811,15 +7141,16 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
     var r = document.getElementById('hero-rotator');
     if (!r) return;
     var track = r.querySelector('.rot-track');
-    var words = ["avaliações no Google", "visitantes", "clientes", "seguidores", "tráfego"];
-    track.innerHTML = '';
-    words.concat([words[0]]).forEach(function (w) {
+    var words = ["avaliações no Google", "seguidores", "clientes", "dados de clientes"];
+    // Le 1er mot reste du vrai texte dans le H1 (SEO). Les suivants sont affichés par CSS (data-w) : ils ne font pas partie du texte du titre.
+    words.slice(1).concat([words[0]]).forEach(function (w) {
         var el = document.createElement('span');
         el.className = 'rot-item';
-        el.textContent = w;
+        el.setAttribute('data-w', w);
+        el.setAttribute('aria-hidden', 'true');
         track.appendChild(el);
     });
-    var emojis = ['⭐', '👋', '🛍️', '❤️', '🚀'];
+    var emojis = ['⭐', '👋', '🛍️', '❤️', '📊', '🚀'];
     var emojiEl = document.getElementById('hero-emoji');
     function setEmoji(k) {
         if (!emojiEl) return;
@@ -6932,14 +7263,28 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
     var pick = null;
     if (forced) pick = list.filter(function (x) { return x.ev[0] === forced; })[0] || null;
     if (!pick) pick = list.filter(function (x) { return x.diff <= x.ev[3]; })[0] || list[0];
-    if (!pick) return;
     var seen = {}, slides = [];
-    list.slice(list.indexOf(pick)).forEach(function (x) {
+    if (pick) list.slice(list.indexOf(pick)).forEach(function (x) {
         if (!seen[x.ev[0]] && slides.length < 6) { seen[x.ev[0]] = 1; slides.push(x); }
     });
+    if (!forced) slides.unshift({ promo: true });
+    if (!slides.length) { box.style.display = 'none'; return; }
+    var PM = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'], PSEASONS = ['Inverno','Primavera','Verão','Outono'], PSIDX = [2,2,3,3,3,0,0,0,1,1,1,2];
+    var PROMO_TITLE = function (s) { return 'Promoção de ' + s + ': 7 dias grátis para turbinar as suas avaliações'; }, PROMO_KICKER = function (m) { return 'Especial de ' + m + ' · Oferta do mês'; };
+    var PROMO_TEXT = "Experimente o Spin To Keep 7 dias grátis, depois 9,90 €/mês (impostos incluídos). Cancele com 1 clique durante o teste: não paga nada se não gostar.", PROMO_CTA = "Começar os meus 7 dias grátis ➡️";
     var cur = 0, timer = null, paused = false;
     function fill(k) {
-        var x = slides[k], ev = x.ev;
+        var x = slides[k];
+        if (x.promo) {
+            var mi = today.getMonth();
+            document.getElementById('event-emoji').textContent = '🎁';
+            document.getElementById('event-kicker').textContent = PROMO_KICKER(PM[mi], mi);
+            document.getElementById('event-title').textContent = PROMO_TITLE(PSEASONS[PSIDX[mi]]);
+            document.getElementById('event-text').textContent = PROMO_TEXT;
+            document.getElementById('event-cta').textContent = PROMO_CTA;
+            return;
+        }
+        var ev = x.ev;
         var when = x.diff === 0 ? UI.today : (x.diff === 1 ? UI.tomorrow : UI.inDays(x.diff));
         document.getElementById('event-emoji').textContent = ev[1];
         document.getElementById('event-kicker').textContent = when + ' · ' + UI.fmt(x.date);
@@ -6977,6 +7322,142 @@ document.querySelectorAll('input[type="file"][id$="_file_input"]').forEach(funct
     lockHeight();
     window.addEventListener('resize', function () { lockHeight(); });
     start();
+})();
+</script>
+<script>
+// HERO v2 : mise à l'échelle de la scène, roue animée dans le smartphone, clic sur le CTA
+(function () {
+    var wrap = document.getElementById('hero-stage-wrap');
+    var cv = document.getElementById('hero-wheel');
+    var pointer = document.getElementById('hero-pointer');
+    var result = document.getElementById('hero-result');
+    var phone = document.getElementById('hero-phone');
+    if (!wrap || !cv || !phone) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 1. La scène (560 x 480) est réduite pour tenir dans la colonne / l'écran
+    function fitStage() { var w = wrap.clientWidth; if (w > 0) wrap.style.setProperty('--hs', Math.min(1, w / 560)); }
+    if (window.ResizeObserver) new ResizeObserver(fitStage).observe(wrap); else window.addEventListener('resize', fitStage);
+    fitStage();
+
+    var cap = function (s) { return s.charAt(0) + s.slice(1).toLowerCase(); };
+    var WIN = function (l) { return '🎉 Ganhou: ' + l.toLowerCase() + '!'; }, LOSE = function (l) { return '😢 ' + cap(l) + '… tente de novo!'; };
+    // 2. Quartiers de la roue : repris du configurateur (defaultLots = lots par défaut du mockup) ──────────
+    // ► PLACEHOLDER : pour une autre configuration, remplacez LOTS par vos lots (mêmes champs : n, s, bg, tx, w).
+    var LOTS = (typeof defaultLots !== 'undefined' && defaultLots && defaultLots.length) ? defaultLots : [
+        { n: '🥹 PERDU', s: 16, bg: '#F0275F', tx: '#ffffff', w: false },
+        { n: '🎁 -20% REMISE', s: 16, bg: '#5B8DFF', tx: '#ffffff', w: true },
+        { n: '🥹 RATÉ', s: 16, bg: '#F0275F', tx: '#ffffff', w: false },
+        { n: '🎁 -10% REMISE', s: 16, bg: '#5B8DFF', tx: '#ffffff', w: true }
+    ];
+    var SEGMENTS = LOTS.map(function (l) {
+        var label = String(l.n).replace(/^[\s\p{Extended_Pictographic}\uFE0F\u200d]+/u, '').trim() || String(l.n);
+        var msg = l.w ? WIN(label) : LOSE(label);
+        return { t: l.n, s: l.s || 16, bg: l.bg, tx: l.tx, win: !!l.w, msg: msg };
+    });
+    var N = SEGMENTS.length, ARC = 360 / N;
+
+    // Dessin de la roue : même code que l'aperçu du configurateur (reflet, liseré, texte « sticker », moyeu)
+    function drawWheel() {
+        var size = cv.width, k = size / 200, ctx = cv.getContext('2d'), cx = size / 2, cy = size / 2, radius = size / 2 * 0.96, arc = 2 * Math.PI / N;
+        ctx.clearRect(0, 0, size, size);
+        SEGMENTS.forEach(function (sg, i) {
+            ctx.beginPath(); ctx.fillStyle = sg.bg; ctx.moveTo(cx, cy); ctx.arc(cx, cy, radius, i * arc, (i + 1) * arc); ctx.fill();
+            if (typeof cdWedgeSheen === 'function') { ctx.fillStyle = cdWedgeSheen(ctx, size); ctx.fill(); }
+            ctx.lineWidth = Math.max(1.5, size * 0.011); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.stroke();
+            ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * arc + arc / 2);
+            ctx.fillStyle = sg.tx; ctx.textAlign = 'left'; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 2 * k; ctx.shadowOffsetY = 1 * k;
+            var startX = size * 0.2;
+            var lines = typeof splitLotText === 'function' ? splitLotText(sg.t) : [sg.t];
+            var fit = typeof computeFitFontSize === 'function' ? computeFitFontSize(ctx, lines, sg.s * 0.7 * k, radius, startX, arc, 6 * k) : sg.s * 0.7 * k;
+            ctx.font = fit + "px 'Lilita One', 'Arial Black', Arial";
+            var put = typeof cdFillText === 'function' ? function (t, x, y) { cdFillText(ctx, t, x, y); } : function (t, x, y) { ctx.fillText(t, x, y); };
+            if (lines.length === 2) { put(lines[0], startX, -4 * k); put(lines[1], startX, 8 * k); } else { put(lines[0], startX, 4 * k); }
+            ctx.restore();
+        });
+        if (typeof cdWheelFinish === 'function') cdWheelFinish(ctx, size, 0.125);
+    }
+    drawWheel();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
+
+    // 3. Animation autonome : lancer rapide → ralentissement → arrêt sur un quartier → pause → on recommence
+    var angle = 0, spinning = false, raf = 0, timer = 0, seq = 0, lastSeg = -1, visible = true;
+    var OUTCOMES = [true, false, true, false, true, true, false];      // alternance gagné / perdu
+    var SPIN_MS = 3800, PAUSE_MS = 2200;
+    function segAt(a) { return Math.floor((((270 - a) % 360) + 360) % 360 / ARC); }  // quartier sous le pointeur (en haut)
+    function targetAngle(k) { var jitter = (Math.random() - .5) * ARC * .5; return (((270 - (k + .5) * ARC + jitter) % 360) + 360) % 360; }
+    function ease(t) {                                                  // montée en vitesse très courte, puis longue décélération
+        var a = .08, tot = a / 2 + (1 - a) / 4;
+        if (t < a) return (t * t / (2 * a)) / tot;
+        var u = (t - a) / (1 - a);
+        return (a / 2 + (1 - a) * (1 - Math.pow(1 - u, 4)) / 4) / tot;
+    }
+    function setAngle(a) { angle = a; cv.style.transform = 'rotate(' + a + 'deg)'; }
+    function hideResult() { result.className = 'phone-result'; }
+    function burst() {
+        var screen = phone.querySelector('.phone-screen'), icons = ['🎉', '✨', '⭐', '🎊'];
+        for (var i = 0; i < 10; i++) {
+            var c = document.createElement('span');
+            c.className = 'confetti'; c.textContent = icons[i % icons.length];
+            c.style.left = (35 + Math.random() * 30) + '%'; c.style.top = '58%';
+            c.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px'); c.style.setProperty('--rot', (Math.random() * 360 - 180) + 'deg');
+            screen.appendChild(c); setTimeout((function (el) { return function () { el.remove(); }; })(c), 1400);
+        }
+    }
+    function showResult(k) {
+        var sg = SEGMENTS[k];
+        result.textContent = sg.msg; result.className = 'phone-result show ' + (sg.win ? 'win' : 'lose');
+        if (sg.win) burst();
+    }
+    function pickSegment(win) {
+        var pool = [];
+        SEGMENTS.forEach(function (s, i) { if (s.win === win && i !== lastSeg) pool.push(i); });
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+    function loop() { if (visible && !document.hidden) spin(false); else timer = setTimeout(loop, 600); }
+    function spin(forceWin) {
+        if (spinning) return;
+        clearTimeout(timer); hideResult();
+        var win = forceWin ? true : OUTCOMES[seq++ % OUTCOMES.length], k = pickSegment(win);
+        lastSeg = k;
+        var from = angle, cur = ((from % 360) + 360) % 360;
+        var delta = ((targetAngle(k) - cur) % 360 + 360) % 360 + 360 * (5 + Math.floor(Math.random() * 2));
+        var t0 = 0; spinning = true; pointer.classList.add('vibrating');
+        function frame(ts) {
+            if (!t0) t0 = ts;
+            var t = Math.min(1, (ts - t0) / SPIN_MS);
+            setAngle(from + delta * ease(t));
+            if (t < 1) raf = requestAnimationFrame(frame);
+            else { spinning = false; pointer.classList.remove('vibrating'); showResult(k); timer = setTimeout(loop, PAUSE_MS); }
+        }
+        raf = requestAnimationFrame(frame);
+    }
+    if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: .2 }).observe(phone);
+    if (!reduce) timer = setTimeout(loop, 900);
+
+    // 4. Le clic sur un CTA du héros relance la roue (elle s'arrête alors sur un lot gagnant), puis on descend vers le configurateur
+    Array.prototype.forEach.call(document.querySelectorAll('.js-hero-spin'), function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || reduce) return;
+            clearTimeout(timer); if (!spinning) spin(true);
+            var href = a.getAttribute('href'), target = href && href.charAt(0) === '#' ? document.querySelector(href) : null;
+            if (target) {
+                e.preventDefault();
+                setTimeout(function () { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (history.replaceState) history.replaceState(null, '', href); }, 700);
+            }
+        });
+    });
+})();
+</script>
+<script>
+// Texte du bouton « essai gratuit » : mois en cours (test : ?date=2026-12-05)
+(function () {
+    var el = document.getElementById('hero-promo');
+    if (!el) return;
+    var M = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'], d = new Date(), q = new URLSearchParams(location.search).get('date');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q || '')) { var p = q.split('-'); d = new Date(+p[0], +p[1] - 1, +p[2]); }
+    var f = function (m, i) { return '7 dias de teste 100% grátis: especial de ' + m; };
+    el.textContent = f(M[d.getMonth()], d.getMonth());
 })();
 </script>
 </body>
