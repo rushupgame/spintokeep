@@ -752,7 +752,7 @@
         }
 
         /* Responsive Mobile Navigation (utilisateur non connecté) */
-        @media (max-width: 1300px) {
+        @media (max-width: 1180px) {
             .hamburger-btn { display: flex; }
             .nav-links {
                 display: none;
@@ -1364,7 +1364,7 @@
         .nav-more-menu a:hover { background: var(--bg-secondary); }
         .nav-links a.lang-switch { gap: 7px; }
         .lang-switch .flag { display: block; border-radius: 3px; flex-shrink: 0; }
-        @media (max-width: 1300px) {
+        @media (max-width: 1180px) {
             .nav-more, .nav-more-menu, .nav-more:hover .nav-more-menu, .nav-more:focus-within .nav-more-menu { display: contents; }
             .nav-more-btn { display: none; }
             .nav-more-menu a { padding: 0; border-radius: 0; }
@@ -1385,7 +1385,7 @@
         .nav-links .lang-dd-menu a:hover { background: var(--bg-secondary); }
         .nav-links .lang-dd-menu a[aria-current="true"] { font-weight: 700; background: var(--bg-secondary); }
         [dir="rtl"] .lang-dd-menu { right: auto; left: 0; }
-        @media (max-width: 1300px) {
+        @media (max-width: 1180px) {
             .nav-links { max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
             .nav-lang-dd { flex-direction: column; align-items: flex-start; }
             .lang-dd-menu { position: static; width: 100%; margin-top: 8px; box-shadow: none; }
@@ -1646,6 +1646,106 @@
 .pricing-today { margin: 1.2rem 0 -.4rem 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
 .pricing-then { margin: 0 0 1.2rem 0; font-size: 1.05rem; color: var(--text-secondary); font-weight: 500; }
 .trial-reassure { margin: 12px 0 4px; padding: 10px 12px; border-radius: 12px; background: #f0f9f3; color: #146c34; font-size: 12.5px; line-height: 1.45; text-align: center; font-weight: 600; }
+/* =====================================================================
+   NAV v2 : menu complet + « Se connecter » (contour bleu) + CTA bleu
+   ===================================================================== */
+.btn-nav-outline { background: transparent; color: var(--accent-color); border: 1.5px solid var(--accent-color); padding: 7px 16px; border-radius: 980px; font-size: .88rem; font-weight: 600; font-family: inherit; line-height: 1.3; cursor: pointer; white-space: nowrap; transition: background .2s ease; }
+.btn-nav-outline:hover { background: rgba(0,113,227,.08); }
+.btn-nav-cta { background: var(--accent-color); color: #fff; border: 1.5px solid var(--accent-color); padding: 7px 16px; border-radius: 980px; font-size: .88rem; font-weight: 600; line-height: 1.3; text-decoration: none; white-space: nowrap; transition: background .2s ease; }
+.btn-nav-cta:hover { background: var(--accent-hover); }
+.nav-auth { gap: 8px; margin-left: .8rem; }
+@media (min-width: 1181px) { .nav-links { gap: 1.05rem; } .nav-links a, .nav-more-btn { font-size: .86rem; } }
+@media (max-width: 1180px) { .hamburger-btn { order: 3; margin-left: 12px; } .nav-auth { order: 2; margin-left: auto; } }
+@media (max-width: 520px) { .btn-nav-cta { display: none; } .btn-nav-outline { padding: 6px 12px; font-size: .8rem; } }
+
+/* =====================================================================
+   HERO v2 : 2 colonnes (texte à gauche, visuels à droite)
+   ===================================================================== */
+section.hero2 { max-width: 1240px; padding: 3rem 2rem 1.2rem; }
+.hero2-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.hero2-left { min-width: 0; text-align: left; }
+.hero2 h1 { text-align: left; font-size: clamp(2rem, 1rem + 2.3vw, 3.05rem); line-height: 1.08; margin: 0 0 1.1rem 0; letter-spacing: -0.02em; }
+.hero2 h1 .rotator { display: block; margin: .08em 0; }
+.hero2-proof { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin: 0 0 1.5rem 0; font-size: .98rem; font-weight: 500; color: var(--text-primary); }
+.hero2-stars { color: #f5b301; font-size: 1.35rem; letter-spacing: .12em; line-height: 1; }
+.hero2-cta { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 540px; box-sizing: border-box; min-height: 62px; padding: 14px 26px; background: var(--accent-color); color: #fff; font-weight: 700; font-size: 1.12rem; line-height: 1.25; text-align: center; text-decoration: none; border-radius: 16px; box-shadow: 0 12px 28px rgba(0,113,227,.32); transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+.hero2-cta:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 16px 34px rgba(0,113,227,.38); }
+.hero2-trial { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 540px; box-sizing: border-box; min-height: 62px; margin: .85rem 0 0 0; padding: 14px 26px; background: #e5302f; color: #fff; font-weight: 700; font-size: 1.12rem; line-height: 1.25; text-align: center; text-decoration: none; border-radius: 16px; box-shadow: 0 12px 28px rgba(229,48,47,.30); transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+.hero2-trial:hover { background: #cf2423; transform: translateY(-1px); box-shadow: 0 16px 34px rgba(229,48,47,.38); }
+.hero2-cta, .hero2-trial { text-wrap: balance; }
+.hero2-desc { margin: 1.6rem 0 0 0; max-width: 560px; font-size: 1.05rem; line-height: 1.6; color: #515154; }
+
+/* ---- colonne droite : composition chevalet + smartphone (scène 560 x 480 mise à l'échelle par JS) ---- */
+.hero2-right { min-width: 0; }
+.hero2-stage-wrap { --hs: 1; position: relative; width: 100%; max-width: 560px; margin: 0 auto; height: calc(480px * var(--hs)); }
+.hero2-stage { position: absolute; left: 0; top: 0; width: 560px; height: 480px; transform-origin: 0 0; transform: scale(var(--hs)); perspective: 1500px; }
+.stage-table { position: absolute; left: 4px; right: 4px; bottom: 4px; height: 120px; border-radius: 50%; background: radial-gradient(ellipse at 50% 35%, rgba(60,70,110,.22) 0%, rgba(60,70,110,.10) 42%, rgba(255,255,255,0) 72%); }
+/* Élément 1 : chevalet (affiche) en 3D */
+.easel { position: absolute; left: 22px; top: 44px; width: 270px; height: 410px; transform-style: preserve-3d; transform-origin: 50% 100%; transform: rotateY(17deg) rotateX(3deg) rotateZ(-2.5deg); filter: drop-shadow(0 28px 22px rgba(30,30,70,.30)) drop-shadow(0 6px 6px rgba(30,30,70,.18)); }
+.easel-poster { position: relative; z-index: 0; isolation: isolate; width: 270px; height: 382px; box-sizing: border-box; padding: 20px 16px 16px; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center; color: #fff; background: linear-gradient(135deg, #fc466b, #3f5efb); font-family: var(--font-family); box-shadow: 5px 3px 0 rgba(25,25,80,.35), inset 0 0 0 1.5px rgba(255,255,255,.35); }
+.poster-top { position: relative; width: 100%; }
+.poster-emoji { font-size: 38px; line-height: 1; margin-bottom: 6px; }
+.poster-title { font-size: 26px; font-weight: 800; line-height: 1.12; margin-bottom: 6px; text-shadow: 0 2px 6px rgba(0,0,0,.18); }
+.poster-sub { padding: 0 6px; font-size: 11.5px; font-weight: 600; line-height: 1.4; opacity: .95; }
+.poster-qrcard { position: relative; display: flex; flex-direction: column; align-items: center; padding: 11px 11px 10px; background: #fff; border-radius: 16px; box-shadow: 0 8px 18px rgba(0,0,0,.25); }
+.poster-qrcard .poster-qr { display: block; width: 116px; height: 116px; }
+.poster-cap { margin-top: 8px; padding: 6px 16px; background: #ff3d77; color: #fff; font-size: 12px; font-weight: 800; border-radius: 50px; }
+.poster-foot { position: relative; font-size: 8.5px; font-weight: 600; opacity: .85; }
+.easel-lip { position: absolute; left: -8px; right: -8px; bottom: 0; height: 34px; border-radius: 8px 8px 14px 14px; background: linear-gradient(180deg, rgba(255,255,255,.96) 0%, rgba(214,220,235,.96) 55%, rgba(170,178,200,.96) 100%); border: 1px solid rgba(255,255,255,.9); box-shadow: inset 0 3px 5px rgba(255,255,255,.95), inset 0 -3px 4px rgba(110,120,150,.35); }
+/* Élément 2 : smartphone */
+.phone { position: absolute; left: 272px; top: 8px; width: 248px; height: 464px; box-sizing: border-box; padding: 9px; border-radius: 44px; background: linear-gradient(145deg, #2d2d32, #0b0b0d); transform: rotate(5deg); z-index: 3; box-shadow: inset 0 0 0 2px #4a4a50, inset 0 0 0 4px #111, 0 34px 50px rgba(20,20,60,.38), 0 10px 14px rgba(20,20,60,.22); }
+.phone::before, .phone::after { content: ""; position: absolute; width: 3px; background: #2d2d32; border-radius: 2px; }
+.phone::before { left: -3px; top: 96px; height: 40px; box-shadow: 0 56px 0 #2d2d32; }
+.phone::after { right: -3px; top: 130px; height: 66px; }
+.phone-island { position: absolute; top: 9px; left: 50%; width: 72px; height: 21px; margin-left: -36px; border-radius: 14px; background: #000; }
+.phone-time { position: absolute; top: 12px; left: 22px; font-size: 10px; font-weight: 700; }
+.phone-batt { position: absolute; top: 14px; right: 22px; width: 18px; height: 8px; border-radius: 3px; border: 1.2px solid #fff; box-sizing: border-box; }
+.phone-batt::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; right: 4px; border-radius: 1px; background: #fff; }
+.confetti { position: absolute; pointer-events: none; font-size: 16px; animation: confettiUp 1.3s ease-out forwards; }
+@keyframes confettiUp { 0% { transform: translate(0, 0) scale(.6) rotate(0); opacity: 1; } 100% { transform: translate(var(--dx), -150px) scale(1.1) rotate(var(--rot)); opacity: 0; } }
+
+/* ---- pied de section : 2 lignes de réassurance (même taille, même police) ---- */
+.hero2-trust { display: flex; flex-direction: column; gap: .8rem; margin-top: 2.2rem; }
+.trust-row { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.trust-track { display: flex; width: max-content; animation: trust-scroll 80s linear infinite; }
+.trust-row.rev .trust-track { animation-direction: reverse; animation-duration: 90s; }
+.trust-row:hover .trust-track { animation-play-state: paused; }
+.trust-group { display: flex; align-items: center; white-space: nowrap; font-family: var(--font-family); font-size: .88rem; font-weight: 700; line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; color: #8e8e93; opacity: .85; }
+.trust-group span { display: inline-flex; align-items: center; gap: .5em; }
+.trust-group span::after { content: "•"; margin: 0 1.6rem; opacity: .55; }
+.trust-group .emo { filter: grayscale(1); opacity: .8; }
+.trust-group span img { height: 1.25em; width: auto; filter: grayscale(1); opacity: .8; }
+@keyframes trust-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .trust-track { animation: none; } }
+
+/* ---- responsive : < 768px = une seule colonne (texte, puis visuels, puis bandeaux) ---- */
+@media (max-width: 767px) {
+    section.hero2 { padding: 1.6rem 1.1rem .8rem; }
+    .hero2-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .hero2-left { text-align: center; }
+    .hero2 h1 { text-align: center; }
+    .hero2 h1 .rotator { margin: .08em auto; }
+    .hero2-proof { justify-content: center; margin-bottom: 1.2rem; }
+    .hero2-cta, .hero2-trial { max-width: none; }
+    .hero2-desc { margin: 1.3rem auto 0; text-align: center; font-size: 1rem; }
+    .hero2-proof { flex-wrap: nowrap; gap: .5rem; font-size: .9rem; }
+    .hero2-stars { font-size: 1.1rem; }
+    .hero2-cta, .hero2-trial { font-size: 1.05rem; }
+    .hero2-trust { margin-top: 2.4rem; }
+}
+
+/* ---- écran du smartphone = mockup par défaut du configurateur (étape « Jeu ») ---- */
+.phone-screen { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: linear-gradient(135deg, rgb(252, 70, 107), rgb(63, 94, 251)); }
+.phone-screen .hero-mock { position: absolute; left: 0; top: 0; z-index: 1; width: 256px; height: 496px; box-sizing: border-box; padding: 38px 15px 15px; text-align: center; background: linear-gradient(135deg, rgb(252, 70, 107), rgb(63, 94, 251)); transform: scale(.9); transform-origin: 0 0; overflow: hidden; }
+.phone-island, .phone-time, .phone-batt { z-index: 6; }
+.hero-wtitle { position: relative; z-index: 2; margin: 10px 0; font-size: 14px; color: var(--text-color, #fff); font-family: var(--cd-font); font-weight: 400; letter-spacing: .02em; line-height: 1.12; -webkit-text-stroke: .17em var(--cd-outline); paint-order: stroke fill; text-shadow: 0 .1em 0 var(--cd-outline), 0 .2em .28em rgba(0,0,0,.28); }
+#hero-spin-btn { position: relative; z-index: 2; font-family: var(--cd-font); font-weight: 400; letter-spacing: .05em; text-shadow: 0 2px 0 rgba(0,0,0,.28); border: 3px solid rgba(255,255,255,.8) !important; border-radius: 50px; background-image: linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0) 52%) !important; box-shadow: 0 5px 0 rgba(0,0,0,.3), 0 12px 20px rgba(0,0,0,.22), inset 0 -3px 0 rgba(0,0,0,.14) !important; }
+.hero-mock .phone-result { position: relative; z-index: 2; margin: 16px auto 0; width: max-content; max-width: 220px; padding: 8px 14px; border-radius: 14px; background: rgba(255,255,255,.97); color: #1d1d1f; font-size: 13px; font-weight: 800; line-height: 1.2; opacity: 0; transform: translateY(6px) scale(.96); transition: opacity .3s ease, transform .3s ease; box-shadow: 0 6px 14px rgba(0,0,0,.2); }
+.hero-mock .phone-result.show { opacity: 1; transform: none; }
+.hero-mock .phone-result.win { color: #0a7a3a; }
+.hero-mock .phone-result.lose { color: #c62a47; }
+.topbar.is-guest { display: none !important; }
+@media (max-width: 640px) { .event-banner { justify-content: center; } .event-banner-body { flex: 0 0 auto; } }
     </style>
 </head>
 <body>
@@ -1665,12 +1765,12 @@
             <li><a href="#concept" onclick="closeMenu()">Comment ça marche</a></li>
             <li><a href="#configurateur" onclick="closeMenu()">Configurateur</a></li>
             <li><a href="#enjeux-seo" onclick="closeMenu()">Pourquoi les Avis ?</a></li>
-            <li><a href="#guides" onclick="closeMenu()">Guides</a></li>
-            <li><a href="#cas-usage" onclick="closeMenu()">Cas d'usage</a></li>
-            <li><a href="#tarifs" onclick="closeMenu()">Tarifs</a></li>
+                        <li><a href="#tarifs" onclick="closeMenu()">Tarifs</a></li>
             <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
             <li class="nav-more"><button type="button" class="nav-more-btn" aria-haspopup="true">Plus</button>
                 <ul class="nav-more-menu">
+                    <li><a href="#guides" onclick="closeMenu()">Guides</a></li>
+                    <li><a href="#cas-usage" onclick="closeMenu()">Cas d'usage</a></li>
                     <li><a href="#fonctionnalites" onclick="closeMenu()">Outil & CRM</a></li>
                     <li><a href="#secteurs" onclick="closeMenu()">Secteurs</a></li>
                     <li><a href="#lexique" onclick="closeMenu()">Lexique</a></li>
@@ -1690,27 +1790,79 @@
 </defs></svg><button type="button" class="lang-dd-btn" aria-haspopup="true" aria-expanded="false" aria-label="Language / Langue"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-fr"/></svg><span>FR</span></button><ul class="lang-dd-menu"><li><a href="https://www.spintokeep.com/" hreflang="fr" lang="fr" aria-current="true"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-fr"/></svg><span>Français</span></a></li><li><a href="https://www.spintokeep.com/en" hreflang="en" lang="en" title="Switch to English" aria-label="Switch to English"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-en"/></svg><span>English</span></a></li><li><a href="https://www.spintokeep.com/zh" hreflang="zh-CN" lang="zh-CN"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-zh"/></svg><span>中文</span></a></li><li><a href="https://www.spintokeep.com/hi" hreflang="hi" lang="hi"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-hi"/></svg><span>हिन्दी</span></a></li><li><a href="https://www.spintokeep.com/es" hreflang="es" lang="es"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-es"/></svg><span>Español</span></a></li><li><a href="https://www.spintokeep.com/pt" hreflang="pt-BR" lang="pt-BR"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-pt"/></svg><span>Português</span></a></li><li><a href="https://www.spintokeep.com/bn" hreflang="bn" lang="bn"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-bn"/></svg><span>বাংলা</span></a></li><li><a href="https://www.spintokeep.com/ru" hreflang="ru" lang="ru"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-ru"/></svg><span>Русский</span></a></li><li><a href="https://www.spintokeep.com/ar" hreflang="ar" lang="ar"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-ar"/></svg><span>العربية</span></a></li><li><a href="https://www.spintokeep.com/de" hreflang="de" lang="de"><svg class="lang-flag" width="20" height="14" viewBox="0 0 60 40" aria-hidden="true"><use href="#fl-de"/></svg><span>Deutsch</span></a></li></ul></li>
             <li class="nav-auth-mobile-item" id="nav-auth-mobile"></li>
         </ul>
-        <div class="nav-auth" id="nav-auth"><button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button></div>
+        <div class="nav-auth" id="nav-auth"><button class="btn-nav-outline" onclick="closeMenu(); openAuthModal('login');">Se connecter</button><a href="#configurateur" class="btn-nav-cta" onclick="closeMenu()">Essayer gratuitement</a></div>
     </nav>
 </header>
 
 <main>
     <!-- HERO SECTION -->
-    <section id="accueil" class="animate-up" style="padding-top: 8rem; padding-bottom: 1.5rem;">
-        <div class="hero-emoji" id="hero-emoji" aria-hidden="true">⭐</div>
-        <h1>Avoir plus <span class="rotator highlight" id="hero-rotator"><span class="rot-track"><span class="rot-item">d'avis Google</span></span></span><span class="seo-sr">, de visiteurs, de clients, d'abonnés, de données clients et de trafic</span> grâce à une roulette de la fortune par QR code.</h1>
-        <p class="text-center" style="max-width: 800px; margin: 0 auto 2.5rem; font-size: 1.3rem;">
-            Spin To Keep est la roulette par QR code qui fait venir plus d'avis, d'abonnés et de clients dans votre commerce. Vos clients scannent, jouent, laissent leur avis ou suivent votre marque, puis gagnent un cadeau : vous animez votre boutique, fidélisez et collectez des contacts conformes au RGPD. <strong>Créez et testez votre jeu gratuitement ci-dessous, en 1 minute.</strong>
-        </p>
-        <div class="text-center">
-            <a href="#configurateur" class="btn hover-effect">Créer mon jeu (7 jours offerts)</a>
-            <p id="hero-promo" style="margin-top: 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-primary);">🎁 7 jours d'essai 100% gratuit • Annulable en 1 clic</p>
-        </div>
-        <div class="trade-marquee" aria-hidden="true">
-            <div class="trade-marquee-track">
-                <div class="trade-marquee-group">🥖 Boulangerie • 💇 Coiffeur • 🔧 Garage • 🍽️ Restaurant • 🦷 Dentiste • 👗 Boutique de mode • 🏨 Hôtel • 🌸 Fleuriste • 🏋️ Salle de sport • 🍷 Caviste • 🐾 Vétérinaire • 🏠 Agence immobilière • 🎮 Jeux vidéo • 💅 Onglerie • 🛒 Supermarché • 📚 Librairie • ⛽ Station-service • ☕ Café • 💊 Pharmacie • 🚲 Magasin de vélos • 🍕 Pizzeria • 💍 Bijouterie • 🔨 Artisan du bâtiment • 🎳 Bowling • 🥩 Boucherie • 👓 Opticien • 🛋️ Meubles & déco • 🧖 Spa & institut de beauté • 🏪 Épicerie • 📱 Téléphonie • ⛺ Camping • 🍰 Pâtisserie • 🚗 Concession auto • 🧸 Magasin de jouets • 🩺 Cabinet médical • 🌱 Jardinerie • 🍔 Fast-food • 🧺 Pressing • 🎬 Cinéma • 🐟 Poissonnerie • 💈 Barbier • 🛠️ Bricolage • 🧘 Studio de yoga • 🍣 Sushi • 📷 Photographe • 🛞 Centre pneus • 👟 Magasin de chaussures • 🎁 Boutique cadeaux • 🧀 Fromagerie • 💻 Informatique • 🚕 Taxi & VTC • 🍦 Glacier • 🏖️ Location de vacances • 🐶 Toilettage • 🎢 Parc de loisirs • 🥦 Primeur • 🚿 Lavage auto • 💆 Massage • 🥞 Crêperie • 🛏️ Chambre d'hôtes • 🎓 Auto-école • 🍫 Chocolatier • 🍺 Bar & brasserie • </div>
-                <div class="trade-marquee-group">🥖 Boulangerie • 💇 Coiffeur • 🔧 Garage • 🍽️ Restaurant • 🦷 Dentiste • 👗 Boutique de mode • 🏨 Hôtel • 🌸 Fleuriste • 🏋️ Salle de sport • 🍷 Caviste • 🐾 Vétérinaire • 🏠 Agence immobilière • 🎮 Jeux vidéo • 💅 Onglerie • 🛒 Supermarché • 📚 Librairie • ⛽ Station-service • ☕ Café • 💊 Pharmacie • 🚲 Magasin de vélos • 🍕 Pizzeria • 💍 Bijouterie • 🔨 Artisan du bâtiment • 🎳 Bowling • 🥩 Boucherie • 👓 Opticien • 🛋️ Meubles & déco • 🧖 Spa & institut de beauté • 🏪 Épicerie • 📱 Téléphonie • ⛺ Camping • 🍰 Pâtisserie • 🚗 Concession auto • 🧸 Magasin de jouets • 🩺 Cabinet médical • 🌱 Jardinerie • 🍔 Fast-food • 🧺 Pressing • 🎬 Cinéma • 🐟 Poissonnerie • 💈 Barbier • 🛠️ Bricolage • 🧘 Studio de yoga • 🍣 Sushi • 📷 Photographe • 🛞 Centre pneus • 👟 Magasin de chaussures • 🎁 Boutique cadeaux • 🧀 Fromagerie • 💻 Informatique • 🚕 Taxi & VTC • 🍦 Glacier • 🏖️ Location de vacances • 🐶 Toilettage • 🎢 Parc de loisirs • 🥦 Primeur • 🚿 Lavage auto • 💆 Massage • 🥞 Crêperie • 🛏️ Chambre d'hôtes • 🎓 Auto-école • 🍫 Chocolatier • 🍺 Bar & brasserie • </div>
+    <section id="accueil" class="hero2 animate-up">
+        <div class="hero2-grid">
+            <!-- ============ COLONNE GAUCHE : contenu & copywriting ============ -->
+            <div class="hero2-left">
+                <h1>Avoir plus <span class="rotator highlight" id="hero-rotator"><span class="rot-track"><span class="rot-item">d'avis Google</span></span></span><span class="seo-sr">, d'abonnés, de clients et de données clients</span> grâce à une roulette de la fortune par QR code.</h1>
+                <div class="hero2-proof"><span class="hero2-stars" role="img" aria-label="5 étoiles sur 5">★★★★★</span><span>Déjà adopté par <strong>+500 commerces</strong></span></div>
+                <a href="#configurateur" class="hero2-cta js-hero-spin">Créez mon jeu personnalisé en 1 minute</a>
+                <a href="#configurateur" class="hero2-trial js-hero-spin" id="hero-promo">7 jours d'essai 100% gratuit : spécial novembre</a>
+                <p class="hero2-desc">Spin To Keep est la roulette par QR code qui fait venir plus d'avis, d'abonnés et de clients dans votre commerce. Vos clients scannent, jouent, laissent leur avis ou suivent votre marque, puis gagnent un cadeau : vous animez votre boutique, fidélisez et collectez des contacts conformes au RGPD.</p>
             </div>
+
+            <!-- ============ COLONNE DROITE : visuels dynamiques (décoratifs) ============ -->
+            <div class="hero2-right" aria-hidden="true">
+                <div class="hero2-stage-wrap" id="hero-stage-wrap">
+                    <div class="hero2-stage">
+                        <div class="stage-table"></div>
+
+                        <!-- ► ÉLÉMENT 1 : CHEVALET. Pour utiliser l'affiche de votre configurateur, remplacez le contenu de #hero-poster-slot
+                             par le HTML de l'affiche (le cadre 3D .easel, le support .easel-lip et l'ombre restent en place). -->
+                        <div class="easel" id="hero-easel">
+                            <div class="easel-poster" id="hero-poster-slot">
+                                <div class="cd-fx" aria-hidden="true" data-set="tresor"><span style="left:12%;top:10%;font-size:50px;--r:-20deg;animation-duration:6s;animation-delay:0s">💰</span><span style="left:82%;top:16%;font-size:67px;--r:-3deg;animation-duration:4.2s;animation-delay:-5s">🎉</span><span style="left:48%;top:30%;font-size:42px;--r:14deg;animation-duration:7s;animation-delay:-2s">💎</span><span style="left:16%;top:48%;font-size:58px;--r:-9deg;animation-duration:10s;animation-delay:-7s">🎊</span><span style="left:86%;top:52%;font-size:74px;--r:8deg;animation-duration:8s;animation-delay:-4s">💶</span><span style="left:50%;top:68%;font-size:45px;--r:-15deg;animation-duration:6s;animation-delay:-1s">🎈</span><span style="left:14%;top:86%;font-size:62px;--r:2deg;animation-duration:4.2s;animation-delay:-6s">👑</span><span style="left:80%;top:88%;font-size:54px;--r:19deg;animation-duration:7s;animation-delay:-3s">🎁</span></div>
+                                <div class="poster-top">
+                                    <div class="poster-emoji">🎁</div>
+                                    <div class="poster-title">Cadeaux<br>à&nbsp;gagner&nbsp;!</div>
+                                    <div class="poster-sub">Laissez un avis pour débloquer la roue et tentez votre chance.</div>
+                                </div>
+                                <div class="poster-qrcard">
+                                    <svg class="poster-qr" viewBox="0 0 33 33" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code Spin To Keep"><path fill="#111" d="M0 0h7v1h-7zM8 0h1v1h-1zM10 0h1v1h-1zM12 0h2v1h-2zM15 0h2v1h-2zM22 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM11 1h1v1h-1zM13 1h2v1h-2zM16 1h1v1h-1zM18 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h1v1h-1zM11 2h2v1h-2zM14 2h1v1h-1zM16 2h3v1h-3zM20 2h2v1h-2zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h2v1h-2zM15 3h3v1h-3zM21 3h3v1h-3zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h6v1h-6zM16 4h1v1h-1zM19 4h1v1h-1zM22 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h3v1h-3zM14 5h2v1h-2zM18 5h1v1h-1zM20 5h1v1h-1zM23 5h2v1h-2zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM17 7h1v1h-1zM19 7h4v1h-4zM24 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM6 8h5v1h-5zM12 8h1v1h-1zM15 8h4v1h-4zM20 8h4v1h-4zM25 8h5v1h-5zM32 8h1v1h-1zM4 9h1v1h-1zM14 9h5v1h-5zM21 9h1v1h-1zM23 9h1v1h-1zM25 9h1v1h-1zM29 9h3v1h-3zM0 10h1v1h-1zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h6v1h-6zM18 10h1v1h-1zM20 10h1v1h-1zM23 10h1v1h-1zM29 10h1v1h-1zM31 10h1v1h-1zM0 11h1v1h-1zM2 11h2v1h-2zM7 11h4v1h-4zM12 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM24 11h1v1h-1zM26 11h1v1h-1zM0 12h2v1h-2zM4 12h1v1h-1zM6 12h2v1h-2zM10 12h2v1h-2zM13 12h1v1h-1zM15 12h2v1h-2zM19 12h1v1h-1zM22 12h2v1h-2zM25 12h5v1h-5zM31 12h1v1h-1zM3 13h1v1h-1zM5 13h1v1h-1zM7 13h3v1h-3zM13 13h2v1h-2zM17 13h5v1h-5zM24 13h4v1h-4zM29 13h2v1h-2zM0 14h2v1h-2zM3 14h1v1h-1zM6 14h2v1h-2zM9 14h2v1h-2zM13 14h1v1h-1zM15 14h1v1h-1zM18 14h1v1h-1zM20 14h7v1h-7zM28 14h1v1h-1zM31 14h1v1h-1zM1 15h2v1h-2zM4 15h1v1h-1zM9 15h1v1h-1zM12 15h1v1h-1zM14 15h4v1h-4zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h4v1h-4zM1 16h2v1h-2zM5 16h3v1h-3zM9 16h1v1h-1zM11 16h1v1h-1zM13 16h2v1h-2zM16 16h2v1h-2zM19 16h4v1h-4zM24 16h1v1h-1zM26 16h1v1h-1zM28 16h2v1h-2zM31 16h1v1h-1zM1 17h3v1h-3zM5 17h1v1h-1zM7 17h4v1h-4zM12 17h4v1h-4zM18 17h1v1h-1zM23 17h2v1h-2zM29 17h3v1h-3zM4 18h1v1h-1zM6 18h3v1h-3zM10 18h1v1h-1zM12 18h2v1h-2zM15 18h1v1h-1zM17 18h1v1h-1zM20 18h8v1h-8zM29 18h1v1h-1zM31 18h1v1h-1zM1 19h2v1h-2zM4 19h1v1h-1zM7 19h1v1h-1zM13 19h2v1h-2zM17 19h3v1h-3zM21 19h1v1h-1zM24 19h1v1h-1zM26 19h2v1h-2zM31 19h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM11 20h1v1h-1zM15 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM24 20h1v1h-1zM27 20h3v1h-3zM0 21h2v1h-2zM4 21h1v1h-1zM7 21h1v1h-1zM9 21h2v1h-2zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM19 21h1v1h-1zM21 21h2v1h-2zM25 21h3v1h-3zM30 21h2v1h-2zM4 22h1v1h-1zM6 22h1v1h-1zM8 22h2v1h-2zM11 22h2v1h-2zM14 22h1v1h-1zM16 22h1v1h-1zM19 22h1v1h-1zM25 22h1v1h-1zM28 22h4v1h-4zM4 23h1v1h-1zM7 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM17 23h6v1h-6zM24 23h3v1h-3zM31 23h2v1h-2zM0 24h3v1h-3zM6 24h3v1h-3zM10 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM20 24h9v1h-9zM32 24h1v1h-1zM8 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM17 25h2v1h-2zM21 25h4v1h-4zM28 25h1v1h-1zM30 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM18 26h1v1h-1zM20 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM11 27h2v1h-2zM14 27h2v1h-2zM19 27h2v1h-2zM22 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h2v1h-2zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h2v1h-2zM11 28h3v1h-3zM15 28h2v1h-2zM22 28h1v1h-1zM24 28h6v1h-6zM31 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM9 29h1v1h-1zM11 29h1v1h-1zM17 29h4v1h-4zM23 29h1v1h-1zM26 29h4v1h-4zM31 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM9 30h3v1h-3zM13 30h3v1h-3zM18 30h1v1h-1zM20 30h2v1h-2zM25 30h4v1h-4zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM11 31h1v1h-1zM15 31h4v1h-4zM21 31h2v1h-2zM29 31h1v1h-1zM0 32h7v1h-7zM8 32h1v1h-1zM13 32h2v1h-2zM17 32h1v1h-1zM19 32h4v1h-4zM24 32h1v1h-1zM26 32h1v1h-1zM32 32h1v1h-1z"/></svg>
+                                    <div class="poster-cap">Scannez-moi</div>
+                                </div>
+                                <div class="poster-foot">Jeu gratuit · Sans obligation d'achat*</div>
+                            </div>
+                            <div class="easel-lip"></div>
+                        </div>
+
+                        <!-- ► ÉLÉMENT 2 : SMARTPHONE. La roue est dessinée dans <canvas id="hero-wheel"> (voir le script « HERO v2 » :
+                             tableau SEGMENTS à remplacer par la config de votre configurateur). -->
+                        <div class="phone" id="hero-phone">
+                            <div class="phone-screen">
+                                <!-- Écran = copie fidèle du mockup par défaut du configurateur (étape « Jeu ») : même fond, mêmes emojis flottants, même roue -->
+                                <div class="hero-mock">
+                                    <div class="cd-fx" aria-hidden="true" data-set="tresor"><span style="left:12%;top:10%;font-size:62px;--r:-20deg;animation-duration:6s;animation-delay:0s">💰</span><span style="left:82%;top:16%;font-size:84px;--r:-3deg;animation-duration:4.2s;animation-delay:-5s">🎉</span><span style="left:48%;top:30%;font-size:52px;--r:14deg;animation-duration:7s;animation-delay:-2s">💎</span><span style="left:16%;top:48%;font-size:72px;--r:-9deg;animation-duration:10s;animation-delay:-7s">🎊</span><span style="left:86%;top:52%;font-size:92px;--r:8deg;animation-duration:8s;animation-delay:-4s">💶</span><span style="left:50%;top:68%;font-size:56px;--r:-15deg;animation-duration:6s;animation-delay:-1s">🎈</span><span style="left:14%;top:86%;font-size:78px;--r:2deg;animation-duration:4.2s;animation-delay:-6s">👑</span><span style="left:80%;top:88%;font-size:68px;--r:19deg;animation-duration:7s;animation-delay:-3s">🎁</span></div>
+                                    <div class="hero-wtitle">Tournez la roue et tentez de gagner* de nombreux cadeaux !</div>
+                                    <div class="wheel-shell" id="hero-wheel-slot">
+                                        <div class="wheel-ring" id="hero-wheel-ring" style="width:200px;height:200px;border-width:9px;">
+                                            <div class="wheel-pointer-clean" id="hero-pointer"></div>
+                                            <canvas id="hero-wheel" width="400" height="400" style="transition:none"></canvas>
+                                            <div class="wheel-hub" style="width:40px;height:40px;"><div class="logo-emoji-fallback" style="display:flex;font-size:55%;">🎁</div></div>
+                                            <div id="hero-bulbs"><div class="wheel-dot" style="left:100.0000%;top:50.0000%;transform:translate(-50%,-50%);animation-delay:0.0s"></div><div class="wheel-dot" style="left:85.3553%;top:85.3553%;transform:translate(-50%,-50%);animation-delay:0.4s"></div><div class="wheel-dot" style="left:50.0000%;top:100.0000%;transform:translate(-50%,-50%);animation-delay:0.8s"></div><div class="wheel-dot" style="left:14.6447%;top:85.3553%;transform:translate(-50%,-50%);animation-delay:1.2s"></div><div class="wheel-dot" style="left:0.0000%;top:50.0000%;transform:translate(-50%,-50%);animation-delay:1.6s"></div><div class="wheel-dot" style="left:14.6447%;top:14.6447%;transform:translate(-50%,-50%);animation-delay:2.0s"></div><div class="wheel-dot" style="left:50.0000%;top:0.0000%;transform:translate(-50%,-50%);animation-delay:2.4s"></div><div class="wheel-dot" style="left:85.3553%;top:14.6447%;transform:translate(-50%,-50%);animation-delay:2.8s"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-black" id="hero-spin-btn" style="background:#FF3D77;color:#fff;font-size:10px;padding:10px 20px;width:150px;margin-top:8px;">LANCEZ LA ROUE</div>
+                                    <div class="phone-result" id="hero-result"></div>
+                                </div>
+                                <div class="phone-island"></div><div class="phone-time">9:41</div><div class="phone-batt"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ PIED DE SECTION : réassurance (2 lignes, même police / même taille) ============ -->
+        <div class="hero2-trust">
+            <div class="trust-row" aria-hidden="true"><div class="trust-track"><div class="trust-group"><span><i class="emo">🥖</i>Boulangerie</span><span><i class="emo">💇</i>Coiffeur</span><span><i class="emo">🔧</i>Garage</span><span><i class="emo">🍽️</i>Restaurant</span><span><i class="emo">🦷</i>Dentiste</span><span><i class="emo">👗</i>Boutique de mode</span><span><i class="emo">🏨</i>Hôtel</span><span><i class="emo">🌸</i>Fleuriste</span><span><i class="emo">🏋️</i>Salle de sport</span><span><i class="emo">🍷</i>Caviste</span><span><i class="emo">🐾</i>Vétérinaire</span><span><i class="emo">🏠</i>Agence immobilière</span><span><i class="emo">🎮</i>Jeux vidéo</span><span><i class="emo">💅</i>Onglerie</span><span><i class="emo">🛒</i>Supermarché</span><span><i class="emo">📚</i>Librairie</span><span><i class="emo">⛽</i>Station-service</span><span><i class="emo">☕</i>Café</span><span><i class="emo">💊</i>Pharmacie</span><span><i class="emo">🚲</i>Magasin de vélos</span><span><i class="emo">🍕</i>Pizzeria</span><span><i class="emo">💍</i>Bijouterie</span><span><i class="emo">🔨</i>Artisan du bâtiment</span><span><i class="emo">🎳</i>Bowling</span><span><i class="emo">🥩</i>Boucherie</span><span><i class="emo">👓</i>Opticien</span><span><i class="emo">🛋️</i>Meubles & déco</span><span><i class="emo">🧖</i>Spa & institut de beauté</span><span><i class="emo">🏪</i>Épicerie</span><span><i class="emo">📱</i>Téléphonie</span><span><i class="emo">⛺</i>Camping</span><span><i class="emo">🍰</i>Pâtisserie</span><span><i class="emo">🚗</i>Concession auto</span><span><i class="emo">🧸</i>Magasin de jouets</span><span><i class="emo">🩺</i>Cabinet médical</span><span><i class="emo">🌱</i>Jardinerie</span><span><i class="emo">🍔</i>Fast-food</span><span><i class="emo">🧺</i>Pressing</span><span><i class="emo">🎬</i>Cinéma</span><span><i class="emo">🐟</i>Poissonnerie</span><span><i class="emo">💈</i>Barbier</span><span><i class="emo">🛠️</i>Bricolage</span><span><i class="emo">🧘</i>Studio de yoga</span><span><i class="emo">🍣</i>Sushi</span><span><i class="emo">📷</i>Photographe</span><span><i class="emo">🛞</i>Centre pneus</span><span><i class="emo">👟</i>Magasin de chaussures</span><span><i class="emo">🎁</i>Boutique cadeaux</span><span><i class="emo">🧀</i>Fromagerie</span><span><i class="emo">💻</i>Informatique</span><span><i class="emo">🚕</i>Taxi & VTC</span><span><i class="emo">🍦</i>Glacier</span><span><i class="emo">🏖️</i>Location de vacances</span><span><i class="emo">🐶</i>Toilettage</span><span><i class="emo">🎢</i>Parc de loisirs</span><span><i class="emo">🥦</i>Primeur</span><span><i class="emo">🚿</i>Lavage auto</span><span><i class="emo">💆</i>Massage</span><span><i class="emo">🥞</i>Crêperie</span><span><i class="emo">🛏️</i>Chambre d'hôtes</span><span><i class="emo">🎓</i>Auto-école</span><span><i class="emo">🍫</i>Chocolatier</span><span><i class="emo">🍺</i>Bar & brasserie</span></div><div class="trust-group"><span><i class="emo">🥖</i>Boulangerie</span><span><i class="emo">💇</i>Coiffeur</span><span><i class="emo">🔧</i>Garage</span><span><i class="emo">🍽️</i>Restaurant</span><span><i class="emo">🦷</i>Dentiste</span><span><i class="emo">👗</i>Boutique de mode</span><span><i class="emo">🏨</i>Hôtel</span><span><i class="emo">🌸</i>Fleuriste</span><span><i class="emo">🏋️</i>Salle de sport</span><span><i class="emo">🍷</i>Caviste</span><span><i class="emo">🐾</i>Vétérinaire</span><span><i class="emo">🏠</i>Agence immobilière</span><span><i class="emo">🎮</i>Jeux vidéo</span><span><i class="emo">💅</i>Onglerie</span><span><i class="emo">🛒</i>Supermarché</span><span><i class="emo">📚</i>Librairie</span><span><i class="emo">⛽</i>Station-service</span><span><i class="emo">☕</i>Café</span><span><i class="emo">💊</i>Pharmacie</span><span><i class="emo">🚲</i>Magasin de vélos</span><span><i class="emo">🍕</i>Pizzeria</span><span><i class="emo">💍</i>Bijouterie</span><span><i class="emo">🔨</i>Artisan du bâtiment</span><span><i class="emo">🎳</i>Bowling</span><span><i class="emo">🥩</i>Boucherie</span><span><i class="emo">👓</i>Opticien</span><span><i class="emo">🛋️</i>Meubles & déco</span><span><i class="emo">🧖</i>Spa & institut de beauté</span><span><i class="emo">🏪</i>Épicerie</span><span><i class="emo">📱</i>Téléphonie</span><span><i class="emo">⛺</i>Camping</span><span><i class="emo">🍰</i>Pâtisserie</span><span><i class="emo">🚗</i>Concession auto</span><span><i class="emo">🧸</i>Magasin de jouets</span><span><i class="emo">🩺</i>Cabinet médical</span><span><i class="emo">🌱</i>Jardinerie</span><span><i class="emo">🍔</i>Fast-food</span><span><i class="emo">🧺</i>Pressing</span><span><i class="emo">🎬</i>Cinéma</span><span><i class="emo">🐟</i>Poissonnerie</span><span><i class="emo">💈</i>Barbier</span><span><i class="emo">🛠️</i>Bricolage</span><span><i class="emo">🧘</i>Studio de yoga</span><span><i class="emo">🍣</i>Sushi</span><span><i class="emo">📷</i>Photographe</span><span><i class="emo">🛞</i>Centre pneus</span><span><i class="emo">👟</i>Magasin de chaussures</span><span><i class="emo">🎁</i>Boutique cadeaux</span><span><i class="emo">🧀</i>Fromagerie</span><span><i class="emo">💻</i>Informatique</span><span><i class="emo">🚕</i>Taxi & VTC</span><span><i class="emo">🍦</i>Glacier</span><span><i class="emo">🏖️</i>Location de vacances</span><span><i class="emo">🐶</i>Toilettage</span><span><i class="emo">🎢</i>Parc de loisirs</span><span><i class="emo">🥦</i>Primeur</span><span><i class="emo">🚿</i>Lavage auto</span><span><i class="emo">💆</i>Massage</span><span><i class="emo">🥞</i>Crêperie</span><span><i class="emo">🛏️</i>Chambre d'hôtes</span><span><i class="emo">🎓</i>Auto-école</span><span><i class="emo">🍫</i>Chocolatier</span><span><i class="emo">🍺</i>Bar & brasserie</span></div></div></div>
+            <div class="trust-row rev" aria-label="Enseignes de commerces"><div class="trust-track"><div class="trust-group"><span>McDonald's</span><span>SPAR</span><span>Intersport</span><span>Best Western</span><span>Subway</span><span>7-Eleven</span><span>Domino's Pizza</span><span>Ace Hardware</span><span>KFC</span><span>Hard Rock Cafe</span><span>Yves Rocher</span><span>Interflora</span></div><div class="trust-group" aria-hidden="true"><span>McDonald's</span><span>SPAR</span><span>Intersport</span><span>Best Western</span><span>Subway</span><span>7-Eleven</span><span>Domino's Pizza</span><span>Ace Hardware</span><span>KFC</span><span>Hard Rock Cafe</span><span>Yves Rocher</span><span>Interflora</span></div></div></div>
         </div>
 
         <div class="event-banner" id="event-banner" hidden>
@@ -1732,7 +1884,7 @@
 <div id="toast-container"></div>
 
 <!-- ============ TOPBAR ============ -->
-<div class="topbar" id="topbar" style="display:none;">
+<div class="topbar is-guest" id="topbar" style="display:none;">
     <div class="topbar-brand"><span class="dot"></span> SpinToKeep</div>
     <div class="topbar-actions" id="topbar-actions">
         <button class="btn-ghost" id="btn-login-open" onclick="openAuthModal('login')">Se connecter</button>
@@ -3595,6 +3747,9 @@ if(slider) {
     });
 
     function renderAuthUI() {
+        // La barre interne du configurateur ne sert qu'aux utilisateurs connectés (les visiteurs ont déjà « Se connecter » dans l'en-tête)
+        const topbarEl = document.getElementById('topbar');
+        if (topbarEl) topbarEl.classList.toggle('is-guest', !currentUser);
         const actions = document.getElementById('topbar-actions');
         const mobileActions = document.getElementById('topbar-menu-mobile');
         const navAuth = document.getElementById('nav-auth');
@@ -3603,7 +3758,7 @@ if(slider) {
             const html = `<button class="btn-ghost" onclick="openAuthModal('login')">Se connecter</button>`;
             if (actions) actions.innerHTML = html;
             if (mobileActions) mobileActions.innerHTML = html;
-            if (navAuth) navAuth.innerHTML = `<button class="btn-nav-login" onclick="closeMenu(); openAuthModal('login');">Se connecter</button>`;
+            if (navAuth) navAuth.innerHTML = `<button class="btn-nav-outline" onclick="closeMenu(); openAuthModal('login');">Se connecter</button><a href="#configurateur" class="btn-nav-cta" onclick="closeMenu()">Essayer gratuitement</a>`;
             const navAuthMobileOut = document.getElementById('nav-auth-mobile');
             if (navAuthMobileOut) navAuthMobileOut.innerHTML = '';
             if (navEl) navEl.classList.remove('logged-in');
@@ -6931,7 +7086,7 @@ if(slider) {
     var r = document.getElementById('hero-rotator');
     if (!r) return;
     var track = r.querySelector('.rot-track');
-    var words = ["d'avis Google", "de visiteurs", "de clients", "d'abonnés", "de données clients", "de trafic"];
+    var words = ["d'avis Google", "d'abonnés", "de clients", "de données clients"];
     // Le 1er mot reste du vrai texte dans le H1 (SEO). Les suivants sont affichés par CSS (data-w) : ils ne font pas partie du texte du titre.
     words.slice(1).concat([words[0]]).forEach(function (w) {
         var el = document.createElement('span');
@@ -7131,7 +7286,130 @@ if(slider) {
     var MOIS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     var d = new Date(), q = new URLSearchParams(location.search).get('date');
     if (/^\d{4}-\d{2}-\d{2}$/.test(q || '')) { var p = q.split('-'); d = new Date(+p[0], +p[1] - 1, +p[2]); }
-    el.textContent = '🎁 Spécial ' + MOIS[d.getMonth()] + ' : 7 jours d\'essai 100% gratuit • Annulable en 1 clic';
+    el.textContent = '7 jours d\'essai 100% gratuit : spécial ' + MOIS[d.getMonth()].toLowerCase();
+})();
+</script>
+<script>
+// HERO v2 : mise à l'échelle de la scène, roue animée dans le smartphone, clic sur le CTA
+(function () {
+    var wrap = document.getElementById('hero-stage-wrap');
+    var cv = document.getElementById('hero-wheel');
+    var pointer = document.getElementById('hero-pointer');
+    var result = document.getElementById('hero-result');
+    var phone = document.getElementById('hero-phone');
+    if (!wrap || !cv || !phone) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 1. La scène (560 x 480) est réduite pour tenir dans la colonne / l'écran
+    function fitStage() { var w = wrap.clientWidth; if (w > 0) wrap.style.setProperty('--hs', Math.min(1, w / 560)); }
+    if (window.ResizeObserver) new ResizeObserver(fitStage).observe(wrap); else window.addEventListener('resize', fitStage);
+    fitStage();
+
+    // 2. Quartiers de la roue : repris du configurateur (defaultLots = lots par défaut du mockup) ──────────
+    // ► PLACEHOLDER : pour une autre configuration, remplacez LOTS par vos lots (mêmes champs : n, s, bg, tx, w).
+    var LOTS = (typeof defaultLots !== 'undefined' && defaultLots && defaultLots.length) ? defaultLots : [
+        { n: '🥹 PERDU', s: 16, bg: '#F0275F', tx: '#ffffff', w: false },
+        { n: '🎁 -20% REMISE', s: 16, bg: '#5B8DFF', tx: '#ffffff', w: true },
+        { n: '🥹 RATÉ', s: 16, bg: '#F0275F', tx: '#ffffff', w: false },
+        { n: '🎁 -10% REMISE', s: 16, bg: '#5B8DFF', tx: '#ffffff', w: true }
+    ];
+    var SEGMENTS = LOTS.map(function (l) {
+        var label = String(l.n).replace(/^\S+\s+/, '');
+        var msg = l.w ? '🎉 Gagné : ' + label.toLowerCase() + ' !' : '😢 ' + label.charAt(0) + label.slice(1).toLowerCase() + '… retentez !';
+        return { t: l.n, s: l.s || 16, bg: l.bg, tx: l.tx, win: !!l.w, msg: msg };
+    });
+    var N = SEGMENTS.length, ARC = 360 / N;
+
+    // Dessin de la roue : même code que l'aperçu du configurateur (reflet, liseré, texte « sticker », moyeu)
+    function drawWheel() {
+        var size = cv.width, k = size / 200, ctx = cv.getContext('2d'), cx = size / 2, cy = size / 2, radius = size / 2 * 0.96, arc = 2 * Math.PI / N;
+        ctx.clearRect(0, 0, size, size);
+        SEGMENTS.forEach(function (sg, i) {
+            ctx.beginPath(); ctx.fillStyle = sg.bg; ctx.moveTo(cx, cy); ctx.arc(cx, cy, radius, i * arc, (i + 1) * arc); ctx.fill();
+            if (typeof cdWedgeSheen === 'function') { ctx.fillStyle = cdWedgeSheen(ctx, size); ctx.fill(); }
+            ctx.lineWidth = Math.max(1.5, size * 0.011); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.stroke();
+            ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * arc + arc / 2);
+            ctx.fillStyle = sg.tx; ctx.textAlign = 'left'; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 2 * k; ctx.shadowOffsetY = 1 * k;
+            var startX = size * 0.2;
+            var lines = typeof splitLotText === 'function' ? splitLotText(sg.t) : [sg.t];
+            var fit = typeof computeFitFontSize === 'function' ? computeFitFontSize(ctx, lines, sg.s * 0.7 * k, radius, startX, arc, 6 * k) : sg.s * 0.7 * k;
+            ctx.font = fit + "px 'Lilita One', 'Arial Black', Arial";
+            var put = typeof cdFillText === 'function' ? function (t, x, y) { cdFillText(ctx, t, x, y); } : function (t, x, y) { ctx.fillText(t, x, y); };
+            if (lines.length === 2) { put(lines[0], startX, -4 * k); put(lines[1], startX, 8 * k); } else { put(lines[0], startX, 4 * k); }
+            ctx.restore();
+        });
+        if (typeof cdWheelFinish === 'function') cdWheelFinish(ctx, size, 0.125);
+    }
+    drawWheel();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
+
+    // 3. Animation autonome : lancer rapide → ralentissement → arrêt sur un quartier → pause → on recommence
+    var angle = 0, spinning = false, raf = 0, timer = 0, seq = 0, lastSeg = -1, visible = true;
+    var OUTCOMES = [true, false, true, false, true, true, false];      // alternance gagné / perdu
+    var SPIN_MS = 3800, PAUSE_MS = 2200;
+    function segAt(a) { return Math.floor((((270 - a) % 360) + 360) % 360 / ARC); }  // quartier sous le pointeur (en haut)
+    function targetAngle(k) { var jitter = (Math.random() - .5) * ARC * .5; return (((270 - (k + .5) * ARC + jitter) % 360) + 360) % 360; }
+    function ease(t) {                                                  // montée en vitesse très courte, puis longue décélération
+        var a = .08, tot = a / 2 + (1 - a) / 4;
+        if (t < a) return (t * t / (2 * a)) / tot;
+        var u = (t - a) / (1 - a);
+        return (a / 2 + (1 - a) * (1 - Math.pow(1 - u, 4)) / 4) / tot;
+    }
+    function setAngle(a) { angle = a; cv.style.transform = 'rotate(' + a + 'deg)'; }
+    function hideResult() { result.className = 'phone-result'; }
+    function burst() {
+        var screen = phone.querySelector('.phone-screen'), icons = ['🎉', '✨', '⭐', '🎊'];
+        for (var i = 0; i < 10; i++) {
+            var c = document.createElement('span');
+            c.className = 'confetti'; c.textContent = icons[i % icons.length];
+            c.style.left = (35 + Math.random() * 30) + '%'; c.style.top = '58%';
+            c.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px'); c.style.setProperty('--rot', (Math.random() * 360 - 180) + 'deg');
+            screen.appendChild(c); setTimeout((function (el) { return function () { el.remove(); }; })(c), 1400);
+        }
+    }
+    function showResult(k) {
+        var sg = SEGMENTS[k];
+        result.textContent = sg.msg; result.className = 'phone-result show ' + (sg.win ? 'win' : 'lose');
+        if (sg.win) burst();
+    }
+    function pickSegment(win) {
+        var pool = [];
+        SEGMENTS.forEach(function (s, i) { if (s.win === win && i !== lastSeg) pool.push(i); });
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+    function loop() { if (visible && !document.hidden) spin(false); else timer = setTimeout(loop, 600); }
+    function spin(forceWin) {
+        if (spinning) return;
+        clearTimeout(timer); hideResult();
+        var win = forceWin ? true : OUTCOMES[seq++ % OUTCOMES.length], k = pickSegment(win);
+        lastSeg = k;
+        var from = angle, cur = ((from % 360) + 360) % 360;
+        var delta = ((targetAngle(k) - cur) % 360 + 360) % 360 + 360 * (5 + Math.floor(Math.random() * 2));
+        var t0 = 0; spinning = true; pointer.classList.add('vibrating');
+        function frame(ts) {
+            if (!t0) t0 = ts;
+            var t = Math.min(1, (ts - t0) / SPIN_MS);
+            setAngle(from + delta * ease(t));
+            if (t < 1) raf = requestAnimationFrame(frame);
+            else { spinning = false; pointer.classList.remove('vibrating'); showResult(k); timer = setTimeout(loop, PAUSE_MS); }
+        }
+        raf = requestAnimationFrame(frame);
+    }
+    if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: .2 }).observe(phone);
+    if (!reduce) timer = setTimeout(loop, 900);
+
+    // 4. Le clic sur un CTA du héros relance la roue (elle s'arrête alors sur un lot gagnant), puis on descend vers le configurateur
+    Array.prototype.forEach.call(document.querySelectorAll('.js-hero-spin'), function (a) {
+        a.addEventListener('click', function (e) {
+            if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || reduce) return;
+            clearTimeout(timer); if (!spinning) spin(true);
+            var href = a.getAttribute('href'), target = href && href.charAt(0) === '#' ? document.querySelector(href) : null;
+            if (target) {
+                e.preventDefault();
+                setTimeout(function () { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (history.replaceState) history.replaceState(null, '', href); }, 700);
+            }
+        });
+    });
 })();
 </script>
 </body>
